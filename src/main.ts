@@ -5,9 +5,6 @@ import { registerAllFileListing } from "./file-listing/index.ts";
 const app = new Application();
 const router = new Router();
 
-router.get("/", (ctx) => {
-  ctx.response.body = "hello world!";
-});
 registerAllFileListing(router);
 
 app.use(router.routes());
