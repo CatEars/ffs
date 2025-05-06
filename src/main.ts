@@ -1,6 +1,6 @@
 import { Application } from "jsr:@oak/oak/application";
 import { Router } from "jsr:@oak/oak/router";
-import { register } from "./file-listing/list-directory.ts";
+import { registerAllFileListing } from "./file-listing/index.ts";
 
 const app = new Application();
 const router = new Router();
@@ -8,7 +8,7 @@ const router = new Router();
 router.get("/", (ctx) => {
   ctx.response.body = "hello world!";
 });
-register(router);
+registerAllFileListing(router);
 
 app.use(router.routes());
 app.use(router.allowedMethods());

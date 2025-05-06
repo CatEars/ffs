@@ -1,8 +1,8 @@
 import { Router } from "jsr:@oak/oak/router";
 import { fileExistsUnder } from "../utils/file-exists-under.ts";
 
-export function register(router: Router) {
-  router.get("/directory", (ctx) => {
+export function registerDirectoryRoutes(router: Router) {
+  router.get("/api/directory", (ctx) => {
     const pathToCheck = ctx.request.url.searchParams.get("path");
     if (!pathToCheck) {
       ctx.response.status = 404;
