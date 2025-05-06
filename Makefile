@@ -5,4 +5,4 @@ run:
 
 
 test:
-	curl -v localhost:8080
+	deno test --allow-all
