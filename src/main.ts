@@ -1,12 +1,12 @@
 import { Application } from "jsr:@oak/oak/application";
 import { Router } from "jsr:@oak/oak/router";
 import { registerAllFileListing } from "./file-listing/index.ts";
-import { setConfig, testApiKey, unsecure, validateConfig } from "./config.ts";
+import { setConfig, unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
 
 setConfig({
   storeRoot: ".",
-  apiKey: testApiKey,
+  usersFilePath: "data/users-file.json",
 });
 validateConfig();
 

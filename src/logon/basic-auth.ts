@@ -3,7 +3,7 @@ import {
   HTTP_400_BAD_REQUEST,
   HTTP_404_NOT_FOUND,
 } from "../utils/http-codes.ts";
-import { getMatchingUser } from "./users.ts";
+import { getMatchingUser } from "../security/users.ts";
 
 export function registerBasicAuthRoutes(router: Router) {
   router.post("/api/logon", async (ctx) => {

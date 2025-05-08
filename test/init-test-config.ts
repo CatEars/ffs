@@ -1,6 +1,6 @@
-import { setConfig, testApiKey } from "../src/config.ts";
+import { setConfig } from "../src/config.ts";
 
 setConfig({
   storeRoot: ".",
-  apiKey: testApiKey,
+  usersFilePath: "data/users-file.json",
 });

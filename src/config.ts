@@ -1,12 +1,10 @@
-export const testApiKey = "bab5b6be-2aad-11f0-a2ca-3b8bfdd0a613";
-
 let storeRoot: string | undefined = undefined;
-let apiKey: string | undefined = undefined;
 let noSec: boolean = false;
+let usersFilePath: string | undefined = undefined;
 
 type Config = {
   storeRoot: string;
-  apiKey: string;
+  usersFilePath: string;
 };
 
 export function getStoreRoot() {
@@ -16,11 +14,11 @@ export function getStoreRoot() {
   return storeRoot;
 }
 
-export function getApiKey() {
-  if (!apiKey) {
-    throw new Error(`API KEY NOT SET!`);
+export function getUsersFilePath() {
+  if (!usersFilePath) {
+    throw new Error(`USERS FILE PATH NOT SET!`);
   }
-  return apiKey;
+  return usersFilePath;
 }
 
 export function shouldAbandonSecurity() {
@@ -33,10 +31,10 @@ export function unsecure() {
 
 export function setConfig(config: Config) {
   storeRoot = config.storeRoot;
-  apiKey = config.apiKey;
+  usersFilePath = config.usersFilePath;
 }
 
 export function validateConfig() {
   getStoreRoot();
-  getApiKey();
+  getUsersFilePath();
 }
