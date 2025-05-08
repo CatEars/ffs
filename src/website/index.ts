@@ -1,10 +1,18 @@
 import { Router } from "@oak/oak/router";
+import { Application } from "@oak/oak/application";
 
 export function registerAllWebsiteRoutes(router: Router) {
   router.get("/", (ctx) => {
     ctx.response.redirect("/app");
   });
-  router.get("/app", async (ctx) => {
+}
+
+export function serveWebsiteMiddleware(application: Application) {
+  application.use(async (ctx, next) => {
+    if (!ctx.request.url.pathname.startsWith("/app")) {
+      return next();
+    }
+
     const path = ctx.request.url.pathname;
     let updatedPath = path.replace(/^\/app/g, "");
 
