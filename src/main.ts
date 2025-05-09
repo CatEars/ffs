@@ -3,10 +3,7 @@ import { Router } from "jsr:@oak/oak/router";
 import { registerAllFileListing } from "./file-listing/index.ts";
 import { setConfig, unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
-import {
-  registerAllWebsiteRoutes,
-  serveWebsiteMiddleware,
-} from "./website/index.ts";
+import { registerAllWebsiteRoutes } from "./website/index.ts";
 
 setConfig({
   storeRoot: ".",
@@ -24,9 +21,9 @@ const router = new Router();
 registerAllFileListing(router);
 registerAllLogonRoutes(router);
 registerAllWebsiteRoutes(router);
-serveWebsiteMiddleware(app);
 
 app.use(router.routes());
 app.use(router.allowedMethods());
 
+console.log("Starting server on http://localhost:8080");
 app.listen({ port: 8080 });

@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@oak/commons@1": "1.0.1",
     "jsr:@oak/oak@*": "17.1.4",
@@ -13,6 +13,7 @@
     "jsr:@std/internal@^1.0.6": "1.0.6",
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@1": "1.0.9",
+    "npm:@types/node@*": "22.12.0",
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
   "jsr": {
@@ -71,9 +72,31 @@
     }
   },
   "npm": {
+    "@types/node@22.12.0": {
+      "integrity": "sha512-Fll2FZ1riMjNmlmJOdAyY5pUbkftXslB5DgEzlIuNaiWhXd00FhWxVC/r4yV/4wBb9JfImTu+jiSvXTkJ7F/gA==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
     "path-to-regexp@6.3.0": {
       "integrity": "sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ=="
+    },
+    "undici-types@6.20.0": {
+      "integrity": "sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg=="
     }
+  },
+  "remote": {
+    "https://deno.land/x/eta@v3.0.3/src/compile-string.ts": "e919c1a5e2cf460dbbd93047ab3548a630e5eb5c7fa019335c08e95b50e86cd7",
+    "https://deno.land/x/eta@v3.0.3/src/compile.ts": "146782227ddd5c423d07dedb2be40a2a5643c7429d9a3af5ac9a79c21bf7ae95",
+    "https://deno.land/x/eta@v3.0.3/src/config.ts": "7e2971ba3ec4b31b5f1ae0ea71957f0a2b868285192be77836d65ca27adb4f90",
+    "https://deno.land/x/eta@v3.0.3/src/core.ts": "53a9a10c8fc06ce88155a125ffb7db724afb7b4e16d6f646b20a29f27baa2cdf",
+    "https://deno.land/x/eta@v3.0.3/src/err.ts": "e9732b5f7fe729fed9d67868ff7d87ef1002d45d0a8a4e8f7fb1fa9ec2e2d50b",
+    "https://deno.land/x/eta@v3.0.3/src/file-handling.ts": "ac54a84c4e73f47629d69725b8557080caf4e03cf34413b4a2a3f3a10c0abb25",
+    "https://deno.land/x/eta@v3.0.3/src/index.ts": "fa1e18db556462293408c7a455b05b5253aae460c97811f88bb023cdc3f95f62",
+    "https://deno.land/x/eta@v3.0.3/src/parse.ts": "8cb25b4ccf58ea7f08fe9835f7eb8bf45917d6d743d28d1e25cadc9fc908cb32",
+    "https://deno.land/x/eta@v3.0.3/src/render.ts": "bfd57548d5fdae11c1c1683ff748783c1f85be3db3c24fcc80ce915692b004dd",
+    "https://deno.land/x/eta@v3.0.3/src/storage.ts": "c40bd31cdd6f1218c86f70067282709e2f2c7fa7eea67547be950e1ed5d4bd4c",
+    "https://deno.land/x/eta@v3.0.3/src/utils.ts": "1994c8d228195558fb6785fb00a97cf21a457df598a6ab1945170f7a4b7f00d9"
   },
   "workspace": {
     "dependencies": [
