@@ -20,7 +20,7 @@ const router = new Router();
 
 registerAllFileListing(router);
 registerAllLogonRoutes(router);
-registerAllWebsiteRoutes(router);
+await registerAllWebsiteRoutes(router);
 
 app.use(router.routes());
 app.use(router.allowedMethods());

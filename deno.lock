@@ -1,6 +1,8 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@eta-dev/eta@*": "3.5.0",
+    "jsr:@eta-dev/eta@^3.5.0": "3.5.0",
     "jsr:@oak/commons@1": "1.0.1",
     "jsr:@oak/oak@*": "17.1.4",
     "jsr:@oak/oak@^17.1.4": "17.1.4",
@@ -17,6 +19,9 @@
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
   "jsr": {
+    "@eta-dev/eta@3.5.0": {
+      "integrity": "6b70827efc14c7cbf08498ac7a922ecab003641caf3852a6cb5b1b12ee58fb37"
+    },
     "@oak/commons@1.0.1": {
       "integrity": "889ff210f0b4292591721be07244ecb1b5c118742f5273c70cf30d7cd4184d0c",
       "dependencies": [
@@ -100,6 +105,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@eta-dev/eta@^3.5.0",
       "jsr:@oak/oak@^17.1.4",
       "jsr:@std/assert@1"
     ]

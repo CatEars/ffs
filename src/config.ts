@@ -1,6 +1,7 @@
 let storeRoot: string | undefined = undefined;
 let noSec: boolean = false;
 let usersFilePath: string | undefined = undefined;
+export const viewPath = Deno.cwd() + "/src/website/views/";
 
 type Config = {
   storeRoot: string;
