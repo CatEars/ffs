@@ -4,9 +4,18 @@ import { shouldAbandonSecurity } from "../config.ts";
 import { HTTP_401_UNAUTHORIZED } from "../utils/http-codes.ts";
 import { getUserMatchingApiKey } from "./users.ts";
 
-export const apiProtect: Middleware = (ctx: Context, next: Next) => {
+export const apiProtect: Middleware = async (ctx: Context, next: Next) => {
   if (shouldAbandonSecurity()) {
     return next();
+  }
+
+  const authCookie = await ctx.cookies.get("FFS-Authorization");
+  if (authCookie) {
+    const apiKey = authCookie;
+    const user = getUserMatchingApiKey(apiKey);
+    if (user) {
+      return next();
+    }
   }
 
   const authHeader = ctx.request.headers.get("Authorization");

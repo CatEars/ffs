@@ -1,9 +1,9 @@
 <% layout('/templates/base.html') %>
 <h1>Hello, <%= it.name %>!</h1>
-<form>
+<form method="POST" action="/api/user-logon">
   <label for="username">Username:</label>
-  <input id="username" type="text" />
+  <input id="username" name="username" type="text" />
   <label for="password">Password:</label>
-  <input id="password" type="password" />
+  <input id="password" name="password" type="password" />
   <button type="submit">Submit</button>
 </form>

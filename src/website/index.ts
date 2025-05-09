@@ -3,6 +3,7 @@ import { Router } from "@oak/oak/router";
 import { collectAllPages, PlainPage, PluginPage } from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
+import { Next } from "@oak/oak/middleware";
 
 const eta = new Eta({ views: viewPath, cache: true });
 
@@ -56,16 +57,31 @@ function registerPlainPages(
     if (page.getStaticData) {
       staticData = page.getStaticData();
     }
-
+    const compoundMiddleware = async (ctx: Context, next: Next) => {
+      let nextCalled = false;
+      const wrappedNext = () => {
+        nextCalled = true;
+        return next();
+      };
+      for (const mid of page.middlewares) {
+        await mid(ctx, wrappedNext);
+        if (nextCalled) {
+          return;
+        }
+      }
+      if (!nextCalled) {
+        return next();
+      }
+    };
     if (page.getDynamicData) {
       const dynamicDataGetter = page.getDynamicData;
 
-      router.get(page.webPath, async (ctx) => {
+      router.get(page.webPath, compoundMiddleware, async (ctx) => {
         const dynamicData = await dynamicDataGetter(ctx);
         respondWithData(ctx, page, { ...staticData, ...dynamicData });
       });
     } else {
-      router.get(page.webPath, (ctx) => {
+      router.get(page.webPath, compoundMiddleware, (ctx) => {
         respondWithData(ctx, page, staticData);
       });
     }

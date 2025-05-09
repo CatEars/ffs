@@ -1,6 +1,7 @@
 import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
 import { Router } from "@oak/oak/router";
+import { Middleware } from "@oak/oak/middleware";
 
 export type StaticLoader = () => object;
 export type StaticPage = {
@@ -18,6 +19,7 @@ export type PlainPage = {
   etaPath: string;
   getStaticData?: StaticLoader;
   getDynamicData?: DynamicLoader;
+  middlewares: Middleware[];
 };
 
 export type PluginPage = {
@@ -76,6 +78,7 @@ export async function collectAllPages(): Promise<Page[]> {
     );
     let getStaticData: StaticLoader | undefined = undefined;
     let getDynamicData: DynamicLoader | undefined = undefined;
+    let middlewares: Middleware[] = [];
     if (matchingDeno) {
       const importedDeno = await import(
         `${viewPath}${matchingDeno.parent.substring(1)}${matchingDeno.name}`
@@ -85,6 +88,9 @@ export async function collectAllPages(): Promise<Page[]> {
       }
       if (importedDeno.getDynamicData) {
         getDynamicData = importedDeno.getDynamicData;
+      }
+      if (importedDeno.middlewares) {
+        middlewares = importedDeno.middlewares;
       }
     }
     let webPath = `${html.parent}${html.name}`;
@@ -97,6 +103,7 @@ export async function collectAllPages(): Promise<Page[]> {
       webPath,
       getDynamicData,
       getStaticData,
+      middlewares,
     });
   }
 
