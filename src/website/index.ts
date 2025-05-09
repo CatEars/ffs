@@ -14,6 +14,21 @@ export async function registerAllWebsiteRoutes(router: Router) {
   ) as PluginPage[];
   registerPlainPages(plainPages, router);
   await registerPluginPages(pluginPages, router);
+  const staticFiles = Deno.readDirSync("./src/website/static");
+  for (const staticFile of staticFiles) {
+    if (staticFile.name === ".gitkeep") {
+      continue;
+    } else if (staticFile.isFile) {
+      const webPath = `/static/${staticFile.name}`;
+      console.log("Registering static file", webPath);
+      router.get(webPath, async (ctx) => {
+        await ctx.send({
+          root: "./src/website/static/",
+          path: staticFile.name,
+        });
+      });
+    }
+  }
 }
 
 async function registerPluginPages(

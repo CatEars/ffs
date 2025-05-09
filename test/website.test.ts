@@ -14,3 +14,20 @@ Deno.test("there is a logon website that kinda looks like HTML", async () => {
   assertEquals(HTTP_200_OK, result.status);
   assert((await result.text()).includes("<!DOCTYPE html>"));
 });
+
+Deno.test("You can load bootstrap css as static file", async () => {
+  const result = await fetch(baseUrl + "/static/bootstrap.min.css");
+  await result.body?.cancel();
+  assertEquals(HTTP_200_OK, result.status);
+  assertEquals("text/css; charset=UTF-8", result.headers.get("Content-Type"));
+});
+
+Deno.test("You can load bootstrap js as static files", async () => {
+  const result = await fetch(baseUrl + "/static/bootstrap.min.js");
+  await result.body?.cancel();
+  assertEquals(HTTP_200_OK, result.status);
+  assertEquals(
+    "text/javascript; charset=UTF-8",
+    result.headers.get("Content-Type"),
+  );
+});

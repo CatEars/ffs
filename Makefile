@@ -8,3 +8,6 @@ run-nosec:
 
 test:
 	deno test --allow-all
+
+download-deps:
+	deno run --allow-all scripts/download-deps.ts
