@@ -1,2 +1,24 @@
 <% layout('/templates/base.html') %>
 <p>Congrats on getting in here!</p>
+<section>
+  <script>
+    async function getFiles() {
+      const response = await fetch("/api/directory?path=.");
+      if (response.status === 200) {
+        const res = await response.json();
+        console.log(res);
+        return res;
+      }
+      return [];
+    }
+  </script>
+  <h2>Files</h2>
+  <div x-data="{ files: [] }">
+    <ul x-init="files = await getFiles()"></ul>
+    <template x-for="(file) in files" :key="file.name">
+      <li>
+        <span x-text="file.name"></span>
+      </li>
+    </template>
+  </div>
+</section>
