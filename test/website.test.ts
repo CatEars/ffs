@@ -31,3 +31,13 @@ Deno.test("You can load bootstrap js as static files", async () => {
     result.headers.get("Content-Type"),
   );
 });
+
+Deno.test("You can load alpine.js as static file", async () => {
+  const result = await fetch(baseUrl + "/static/alpine.min.js");
+  await result.body?.cancel();
+  assertEquals(HTTP_200_OK, result.status);
+  assertEquals(
+    "text/javascript; charset=UTF-8",
+    result.headers.get("Content-Type"),
+  );
+});
