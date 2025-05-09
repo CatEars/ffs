@@ -5,9 +5,7 @@
     async function getFiles() {
       const response = await fetch("/api/directory?path=.");
       if (response.status === 200) {
-        const res = await response.json();
-        console.log(res);
-        return res;
+        return await response.json();
       }
       return [];
     }

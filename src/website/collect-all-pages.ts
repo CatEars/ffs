@@ -93,7 +93,7 @@ export async function collectAllPages(): Promise<Page[]> {
         middlewares = importedDeno.middlewares;
       }
     }
-    let webPath = `${html.parent}${html.name}`;
+    let webPath = `${html.parent}${pageName}`;
     if (pageName === "index") {
       webPath = html.parent;
     }
