@@ -42,6 +42,10 @@ function collectDirectoryTree() {
   const allEntries: FileEntry[] = [];
   for (let idx = 0; idx < foundDirectories.length; ++idx) {
     const currentDirectory = foundDirectories[idx];
+    if (currentDirectory.name === "/templates/") {
+      // Specifically skip the /views/templates directory. It should only be used by `eta`
+      continue;
+    }
     const entries = Deno.readDirSync(currentDirectory.actualPath);
     for (const entry of entries) {
       if (entry.isDirectory) {

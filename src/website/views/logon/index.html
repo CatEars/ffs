@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head></head>
-  <body>
-    <h1>Hello, <%= it.name %>!</h1>
-    <form>
-      <label for="username">Username:</label>
-      <input id="username" type="text" />
-      <label for="password">Password:</label>
-      <input id="password" type="password" />
-      <button type="submit">Submit</button>
-    </form>
-  </body>
-</html>
+<% layout('/templates/base.html') %>
+<h1>Hello, <%= it.name %>!</h1>
+<form>
+  <label for="username">Username:</label>
+  <input id="username" type="text" />
+  <label for="password">Password:</label>
+  <input id="password" type="password" />
+  <button type="submit">Submit</button>
+</form>
