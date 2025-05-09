@@ -27,7 +27,7 @@ export function collectAllPages(): Page[] {
     {
       type: "PlainHtml",
       webPaths: ["/"],
-      etaPath: "/index.html",
+      etaPath: "/index.eta",
     },
     {
       type: "PlainHtml",
