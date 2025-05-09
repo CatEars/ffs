@@ -1,5 +1,6 @@
 import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
+import { Router } from "@oak/oak/router";
 
 export type StaticLoader = () => object;
 export type StaticPage = {
@@ -11,12 +12,21 @@ export type DynamicPage = {
   getDynamicData: DynamicLoader;
 };
 
-export type Page = {
+export type PlainPage = {
+  type: "Plain";
   webPath: string;
   etaPath: string;
   getStaticData?: StaticLoader;
   getDynamicData?: DynamicLoader;
 };
+
+export type PluginPage = {
+  type: "Plugin";
+  displayName: string;
+  register: (router: Router) => Promise<void>;
+};
+
+export type Page = PlainPage | PluginPage;
 
 type FileEntry = {
   parent: string;
@@ -78,11 +88,25 @@ export async function collectAllPages(): Promise<Page[]> {
       webPath = html.parent;
     }
     pages.push({
+      type: "Plain",
       etaPath: `${html.parent}${html.name}`,
       webPath,
       getDynamicData,
       getStaticData,
     });
+  }
+
+  for (const deno of denos) {
+    const importedDeno = await import(
+      `${viewPath}${deno.parent.substring(1)}${deno.name}`
+    );
+    if (importedDeno.register) {
+      pages.push({
+        type: "Plugin",
+        displayName: `${deno.parent}${deno.name}`,
+        register: importedDeno.register,
+      });
+    }
   }
   return pages;
 }

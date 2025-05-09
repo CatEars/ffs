@@ -1,6 +1,6 @@
 import { Eta } from "jsr:@eta-dev/eta";
 import { Router } from "@oak/oak/router";
-import { collectAllPages, Page } from "./collect-all-pages.ts";
+import { collectAllPages, PlainPage, PluginPage } from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
 
@@ -8,9 +8,31 @@ const eta = new Eta({ views: viewPath, cache: true });
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
-  const longestWebPath = getLongestWebPath(allPages);
-  const longestPropPath = getLongestPropPath(allPages);
-  for (const page of allPages) {
+  const plainPages = allPages.filter((x) => x.type === "Plain") as PlainPage[];
+  const pluginPages = allPages.filter((x) =>
+    x.type === "Plugin"
+  ) as PluginPage[];
+  registerPlainPages(plainPages, router);
+  await registerPluginPages(pluginPages, router);
+}
+
+async function registerPluginPages(
+  pluginPages: PluginPage[],
+  router: Router,
+) {
+  for (const page of pluginPages) {
+    console.log("Registering routes from", page.displayName);
+    await page.register(router);
+  }
+}
+
+function registerPlainPages(
+  plainPages: PlainPage[],
+  router: Router,
+) {
+  const longestWebPath = getLongestWebPath(plainPages);
+  const longestPropPath = getLongestPropPath(plainPages);
+  for (const page of plainPages) {
     console.log(
       "Registering",
       getPageDescription(page, longestWebPath, longestPropPath),
@@ -35,17 +57,17 @@ export async function registerAllWebsiteRoutes(router: Router) {
   }
 }
 
-function getLongestPropPath(allPages: Page[]) {
+function getLongestPropPath(allPages: PlainPage[]) {
   return allPages.map((x) => getProps(x).length)
     .reduce((p, c) => p > c ? p : c);
 }
 
-function getLongestWebPath(allPages: Page[]) {
+function getLongestWebPath(allPages: PlainPage[]) {
   return allPages.map((x) => x.webPath.length)
     .reduce((p, c) => p > c ? p : c);
 }
 
-function respondWithData(ctx: Context, page: Page, data: object) {
+function respondWithData(ctx: Context, page: PlainPage, data: object) {
   const rendered = eta.render(page.etaPath, data);
   const response = new Response(rendered, {
     status: 200,
@@ -56,7 +78,7 @@ function respondWithData(ctx: Context, page: Page, data: object) {
   ctx.response.with(response);
 }
 
-function getProps(page: Page) {
+function getProps(page: PlainPage) {
   const props = [];
   if (page.getStaticData) {
     props.push("Static");
@@ -71,7 +93,7 @@ function getProps(page: Page) {
 }
 
 function getPageDescription(
-  page: Page,
+  page: PlainPage,
   longestWebPath: number,
   longestPropLength: number,
 ): string {
