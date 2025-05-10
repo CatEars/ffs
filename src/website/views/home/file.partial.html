@@ -1,0 +1,35 @@
+<script>
+  function updatePath(root, folder) {
+    if (folder === "..") {
+      return popFolder(root);
+    }
+    return `${root}/${folder}`;
+  }
+
+  function popFolder(root) {
+    const lastSlashIndex = root.lastIndexOf("/");
+    if (lastSlashIndex === -1) {
+      return root;
+    } else {
+      return root.substring(0, lastSlashIndex);
+    }
+  }
+</script>
+<template x-if="file.isDirectory">
+  <div
+    @click="event.preventDefault(); root = updatePath(root, file.name)"
+    class="card-body pointer"
+  >
+    <span class="card-text" x-text="`${file.name}/`"></span>
+  </div>
+</template>
+<template x-if="file.isFile">
+  <a
+    x-bind:href="`/api/file?path=${root}/${file.name}`"
+    x-bind:download="file.name"
+  >
+    <div class="card-body pointer">
+      <span class="card-text" x-text="file.name"></span>
+    </div>
+  </a>
+</template>

@@ -68,7 +68,9 @@ function collectDirectoryTree() {
 
 export async function collectAllPages(): Promise<Page[]> {
   const allEntries = collectDirectoryTree();
-  const htmls = allEntries.filter((entry) => entry.name.endsWith(".html"));
+  const htmls = allEntries.filter((entry) =>
+    entry.name.endsWith(".html") && !entry.name.endsWith(".partial.html")
+  );
   const denos = allEntries.filter((entry) => entry.name.endsWith(".ts"));
   const pages: Page[] = [];
   for (const html of htmls) {
