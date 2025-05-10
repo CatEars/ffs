@@ -1,5 +1,5 @@
 <% layout('/templates/base.html') %>
-<section class="container">
+<section>
   <script>
     async function getFiles(rootPath) {
       const response = await fetch(`/api/directory?path=${rootPath}`);
@@ -19,8 +19,35 @@
       }
       return [];
     }
+
+    function sortedBy(files, sorting) {
+      const copy = JSON.parse(JSON.stringify(files));
+      if (sorting === "no-sorting") {
+        return copy;
+      }
+
+      if (sorting === "a-z") {
+        copy.sort((a, b) =>
+          a.name.localeCompare(b, undefined, { sensitivity: "accent" })
+        );
+        return copy;
+      }
+
+      if (sorting === "z-a") {
+        copy.sort(
+          (a, b) =>
+            -a.name.localeCompare(b, undefined, { sensitivity: "accent" })
+        );
+        return copy;
+      }
+
+      return copy;
+    }
   </script>
-  <div x-data="{ root: '.', files: [] }">
+  <div
+    class="container gy-3"
+    x-data="{ root: '.', files: [], sorting: 'none' }"
+  >
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">
       <div class="col col-sm-auto">
@@ -39,8 +66,9 @@
         </div>
       </div>
     </div>
+    <div class="row"><%~ include('./control-panel.partial.html') %></div>
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 gy-3">
-      <template x-for="(file) in files" :key="file.name">
+      <template x-for="(file) in sortedBy(files, sorting)" :key="file.name">
         <div class="col">
           <div class="card"><%~ include('./file.partial.html') %></div>
         </div>
