@@ -1,5 +1,4 @@
 <% layout('/templates/base.html') %>
-<p>Congrats on getting in here!</p>
 <section>
   <script>
     async function getFiles(rootPath) {
@@ -7,12 +6,24 @@
       if (response.status === 200) {
         const result = await response.json();
         result.sort((a, b) => a.isDirectory < b.isDirectory);
-        return result;
+        if (rootPath === ".") {
+          return result;
+        }
+        const resultWithParent = [
+          {
+            name: "..",
+            isDirectory: true,
+          },
+        ].concat(result);
+        return resultWithParent;
       }
       return [];
     }
 
-    function appendPath(root, folder) {
+    function updatePath(root, folder) {
+      if (folder === "..") {
+        return popFolder(root);
+      }
       return `${root}/${folder}`;
     }
 
@@ -24,24 +35,33 @@
         return root.substring(0, lastSlashIndex);
       }
     }
+
+    function downloadFile(filePath) {
+      console.log("downloading", filePath);
+      browser.downloads.download({
+        url: `/api/file?path=${filePath}`,
+      });
+    }
   </script>
   <h2>Files</h2>
   <div x-data="{ root: '.', files: [] }">
-    <ul x-effect="files = await getFiles(root)">
-      <template x-if="root !== '.'">
-        <li>
-          <button @click="root = popFolder(root)">..</button>
-        </li>
-      </template>
+    <ul x-effect="files = await getFiles(root);">
       <template x-for="(file) in files" :key="file.name">
         <li>
           <template x-if="file.isDirectory">
-            <button @click="root = appendPath(root, file.name)">
+            <button @click="root = updatePath(root, file.name)">
               <span x-text="file.name"></span>
             </button>
           </template>
           <template x-if="file.isFile">
-            <span x-text="file.name"></span>
+            <div>
+              <span x-text="file.name"></span>
+              <a
+                x-bind:href="`/api/file?path=${root}/${file.name}`"
+                x-bind:download="file.name"
+                >Download</a
+              >
+            </div>
           </template>
         </li>
       </template>

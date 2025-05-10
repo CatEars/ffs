@@ -98,21 +98,11 @@ function getLongestWebPath(allPages: PlainPage[]) {
 
 const eta = new Eta({
   views: viewPath,
-  cache: true,
-  cacheFilepaths: true,
+  cache: !devModeEnabled,
 });
 
-const getEta = devModeEnabled
-  ? () =>
-    new Eta({
-      views: viewPath,
-      cache: false,
-      cacheFilepaths: false,
-    })
-  : () => eta;
-
 function respondWithData(ctx: Context, page: PlainPage, data: object) {
-  const rendered = getEta().render(page.etaPath, data);
+  const rendered = eta.render(page.etaPath, data);
   const response = new Response(rendered, {
     status: 200,
     headers: {
