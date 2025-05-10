@@ -57,7 +57,7 @@
     }
   </script>
   <div class="row">
-    <h2>Files</h2>
+    <h1>Files</h1>
   </div>
 
   <div x-data="{ root: '.', files: [] }">
@@ -67,11 +67,15 @@
           <template x-for="(dir, index) in root.split('/')">
             <li x-bind:class="computeBreadcrumbClass(root, index)">
               <template x-if="isLastBreadcrumb(root, index)">
-                <span x-text="dir"></span>
+                <span
+                  style="padding-left: 0.5em; padding-right: 0.5em"
+                  x-text="dir"
+                ></span>
               </template>
               <template x-if="!isLastBreadcrumb(root, index)">
                 <a
                   href=""
+                  style="padding-left: 0.5em; padding-right: 0.5em"
                   @click="event.preventDefault(); root = gotoFolder(root, index)"
                   x-text="dir"
                 ></a>
@@ -84,20 +88,26 @@
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 gy-3">
       <template x-for="(file) in files" :key="file.name">
         <div class="col">
-          <template x-if="file.isDirectory">
-            <button @click="root = updatePath(root, file.name)">
-              <span x-text="`${file.name}/`"></span>
-            </button>
-          </template>
-          <template x-if="file.isFile">
-            <div>
+          <div class="card">
+            <template x-if="file.isDirectory">
+              <div
+                @click="event.preventDefault(); root = updatePath(root, file.name)"
+                class="card-body pointer"
+              >
+                <span class="card-text" x-text="`${file.name}/`"></span>
+              </div>
+            </template>
+            <template x-if="file.isFile">
               <a
                 x-bind:href="`/api/file?path=${root}/${file.name}`"
                 x-bind:download="file.name"
-                ><span x-text="file.name"></span
-              ></a>
-            </div>
-          </template>
+              >
+                <div class="card-body pointer">
+                  <span class="card-text" x-text="file.name"></span>
+                </div>
+              </a>
+            </template>
+          </div>
         </div>
       </template>
     </div>
