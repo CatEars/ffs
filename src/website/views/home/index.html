@@ -35,13 +35,6 @@
         return root.substring(0, lastSlashIndex);
       }
     }
-
-    function downloadFile(filePath) {
-      console.log("downloading", filePath);
-      browser.downloads.download({
-        url: `/api/file?path=${filePath}`,
-      });
-    }
   </script>
   <h2>Files</h2>
   <div x-data="{ root: '.', files: [] }">

@@ -28,6 +28,14 @@ export async function registerAllWebsiteRoutes(router: Router) {
       });
     }
   }
+  // Special case: favicon
+  console.log("Registering /favicon.ico");
+  router.get("/favicon.ico", async (ctx) => {
+    await ctx.send({
+      root: "./src/website/static/",
+      path: "favicon.ico",
+    });
+  });
 }
 
 async function registerPluginPages(

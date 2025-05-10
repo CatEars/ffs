@@ -9,5 +9,12 @@ run-nosec:
 test:
 	deno test --allow-all
 
-setup:
+download-dependencies:
 	deno run --allow-all scripts/download-deps.ts
+
+unpack-favicon:
+	deno run --allow-all scripts/unpack-favicon.ts
+	
+setup: download-dependencies unpack-favicon
+
+	

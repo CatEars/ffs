@@ -3,14 +3,20 @@ const dls = [
     url:
       "https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css",
     target: "./src/website/static/bootstrap.min.css",
+    replace: [
+      { pattern: "/*# sourceMappingURL=bootstrap.min.css.map */", into: "" },
+    ],
   },
   {
     url:
       "https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js",
     target: "./src/website/static/bootstrap.min.js",
+    replace: [
+      { pattern: "//# sourceMappingURL=bootstrap.bundle.min.js.map", into: "" },
+    ],
   },
   {
-    url: "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js",
+    url: "https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js",
     target: "./src/website/static/alpine.min.js",
     prependedLicense: `/** 
 # MIT License
@@ -34,19 +40,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-    */`,
+    */
+`,
   },
 ];
 
-for (const { url, target, prependedLicense } of dls) {
+for (const { url, target, prependedLicense, replace } of dls) {
+  try {
+    Deno.removeSync(target);
+  } catch (_error) {
+    // Intentionally left empty
+  }
   const targetFile = await Deno.open(target, { create: true, write: true });
   console.log("Downloading", url, "->", target);
   const req = await fetch(url);
   await req.body?.pipeTo(targetFile.writable);
+  let text = new TextDecoder("utf-8").decode(Deno.readFileSync(target));
   if (prependedLicense) {
-    const data = Deno.readFileSync(target);
-    const updatedWithLicense = prependedLicense +
-      new TextDecoder().decode(data);
-    Deno.writeFileSync(target, new TextEncoder().encode(updatedWithLicense));
+    console.log("  Prepending license");
+    text = prependedLicense + text;
   }
+  if (replace) {
+    for (const { pattern, into } of replace) {
+      console.log(`  Replacing '${pattern}' with '${into}'`);
+      text = text.replaceAll(pattern, into);
+    }
+  }
+  Deno.writeFileSync(target, new TextEncoder().encode(text));
 }
