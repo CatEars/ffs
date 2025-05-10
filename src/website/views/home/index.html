@@ -2,21 +2,49 @@
 <p>Congrats on getting in here!</p>
 <section>
   <script>
-    async function getFiles() {
-      const response = await fetch("/api/directory?path=.");
+    async function getFiles(rootPath) {
+      const response = await fetch(`/api/directory?path=${rootPath}`);
       if (response.status === 200) {
-        return await response.json();
+        const result = await response.json();
+        result.sort((a, b) => a.isDirectory < b.isDirectory);
+        return result;
       }
       return [];
     }
+
+    function appendPath(root, folder) {
+      return `${root}/${folder}`;
+    }
+
+    function popFolder(root) {
+      const lastSlashIndex = root.lastIndexOf("/");
+      if (lastSlashIndex === -1) {
+        return root;
+      } else {
+        return root.substring(0, lastSlashIndex);
+      }
+    }
   </script>
   <h2>Files</h2>
-  <div x-data="{ files: [] }">
-    <ul x-init="files = await getFiles()"></ul>
-    <template x-for="(file) in files" :key="file.name">
-      <li>
-        <span x-text="file.name"></span>
-      </li>
-    </template>
+  <div x-data="{ root: '.', files: [] }">
+    <ul x-effect="files = await getFiles(root)">
+      <template x-if="root !== '.'">
+        <li>
+          <button @click="root = popFolder(root)">..</button>
+        </li>
+      </template>
+      <template x-for="(file) in files" :key="file.name">
+        <li>
+          <template x-if="file.isDirectory">
+            <button @click="root = appendPath(root, file.name)">
+              <span x-text="file.name"></span>
+            </button>
+          </template>
+          <template x-if="file.isFile">
+            <span x-text="file.name"></span>
+          </template>
+        </li>
+      </template>
+    </ul>
   </div>
 </section>

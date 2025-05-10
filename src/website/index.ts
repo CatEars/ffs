@@ -2,10 +2,8 @@ import { Eta } from "jsr:@eta-dev/eta";
 import { Router } from "@oak/oak/router";
 import { collectAllPages, PlainPage, PluginPage } from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
-import { viewPath } from "../config.ts";
+import { devModeEnabled, viewPath } from "../config.ts";
 import { Next } from "@oak/oak/middleware";
-
-const eta = new Eta({ views: viewPath, cache: true });
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -98,8 +96,23 @@ function getLongestWebPath(allPages: PlainPage[]) {
     .reduce((p, c) => p > c ? p : c);
 }
 
+const eta = new Eta({
+  views: viewPath,
+  cache: true,
+  cacheFilepaths: true,
+});
+
+const getEta = devModeEnabled
+  ? () =>
+    new Eta({
+      views: viewPath,
+      cache: false,
+      cacheFilepaths: false,
+    })
+  : () => eta;
+
 function respondWithData(ctx: Context, page: PlainPage, data: object) {
-  const rendered = eta.render(page.etaPath, data);
+  const rendered = getEta().render(page.etaPath, data);
   const response = new Response(rendered, {
     status: 200,
     headers: {

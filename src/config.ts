@@ -2,6 +2,7 @@ let storeRoot: string | undefined = undefined;
 let noSec: boolean = false;
 let usersFilePath: string | undefined = undefined;
 export const viewPath = Deno.cwd() + "/src/website/views/";
+export const devModeEnabled = Deno.env.get("FFS_ENV") === "dev";
 
 type Config = {
   storeRoot: string;
