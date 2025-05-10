@@ -1,11 +1,18 @@
 <% layout('/templates/base.html') %>
 <section>
   <script>
+    function mapDateStrToDate(entries) {
+      for (const entry of entries) {
+        entry.date = new Date(entry.date);
+      }
+    }
+
     async function getFiles(rootPath) {
       const response = await fetch(`/api/directory?path=${rootPath}`);
       if (response.status === 200) {
         const result = await response.json();
         result.sort((a, b) => a.isDirectory < b.isDirectory);
+        mapDateStrToDate(result);
         if (rootPath === ".") {
           return result;
         }
@@ -21,26 +28,27 @@
     }
 
     function sortedBy(files, sorting) {
-      const copy = JSON.parse(JSON.stringify(files));
       if (sorting === "no-sorting") {
         return copy;
       }
 
-      if (sorting === "a-z") {
-        copy.sort((a, b) =>
-          a.name.localeCompare(b, undefined, { sensitivity: "accent" })
-        );
-        return copy;
-      }
+      const copy = JSON.parse(JSON.stringify(files));
+      mapDateStrToDate(copy);
 
-      if (sorting === "z-a") {
-        copy.sort(
-          (a, b) =>
-            -a.name.localeCompare(b, undefined, { sensitivity: "accent" })
-        );
-        return copy;
-      }
+      const sortingFunction =
+        sorting === "oldest"
+          ? (a, b) => a.date - b.date
+          : sorting === "newest"
+          ? (a, b) => b.date - a.date
+          : sorting === "a-z"
+          ? (a, b) =>
+              a.name.localeCompare(b, undefined, { sensitivity: "accent" })
+          : sorting === "z-a"
+          ? (a, b) =>
+              -a.name.localeCompare(b, undefined, { sensitivity: "accent" })
+          : () => {};
 
+      copy.sort(sortingFunction);
       return copy;
     }
   </script>
