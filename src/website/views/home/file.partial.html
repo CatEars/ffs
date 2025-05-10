@@ -14,6 +14,32 @@
       return root.substring(0, lastSlashIndex);
     }
   }
+
+  function isSoundFile(file) {
+    return file.endsWith(".mp3");
+  }
+
+  function isImageFile(file) {
+    return file.endsWith(".png");
+  }
+
+  function isMovieFile(file) {
+    return file.endsWith(".mp4");
+  }
+
+  function isMediaFile(file) {
+    return isSoundFile(file) || isImageFile(file) || isMovieFile(file);
+  }
+
+  function resolveEmojiForMediaFile(file) {
+    if (isSoundFile(file)) {
+      return "🎵";
+    } else if (isImageFile(file)) {
+      return "📷";
+    } else if (isMovieFile(file)) {
+      return "📽️";
+    }
+  }
 </script>
 <template x-if="file.isDirectory">
   <div
@@ -23,7 +49,15 @@
     <span class="card-text" x-text="`${file.name}/`"></span>
   </div>
 </template>
-<template x-if="file.isFile">
+<template x-if="file.isFile && isMediaFile(file.name)">
+  <a x-bind:href="`/api/file?path=${root}/${file.name}`">
+    <div class="card-body pointer">
+      <span x-text="resolveEmojiForMediaFile(file.name)"></span
+      ><span class="card-text" x-text="file.name"></span>
+    </div>
+  </a>
+</template>
+<template x-if="file.isFile && !isMediaFile(file.name)">
   <a
     x-bind:href="`/api/file?path=${root}/${file.name}`"
     x-bind:download="file.name"
