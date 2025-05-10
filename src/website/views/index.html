@@ -3,7 +3,23 @@
   <div class="row">
     <h1>FFS</h1>
   </div>
+  <div class="row"><h2>Logon</h2></div>
   <div class="row">
-    <a href="/logon/"><p>Log in</p></a>
+    <form method="POST" action="/api/user-logon">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username:</label>
+        <input id="username" name="username" type="text" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          class="form-control"
+        />
+      </div>
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
   </div>
 </section>
