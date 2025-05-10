@@ -1,5 +1,5 @@
 <% layout('/templates/base.html') %>
-<section>
+<section class="container">
   <script>
     async function getFiles(rootPath) {
       const response = await fetch(`/api/directory?path=${rootPath}`);
@@ -35,29 +35,72 @@
         return root.substring(0, lastSlashIndex);
       }
     }
+
+    function gotoFolder(root, index) {
+      const elements = root.split("/");
+      const include = [];
+      for (let idx = 0; idx <= index; ++idx) {
+        include.push(elements[idx]);
+      }
+      return include.join("/");
+    }
+
+    function isLastBreadcrumb(root, index) {
+      return index === root.split("/").length - 1;
+    }
+
+    function computeBreadcrumbClass(root, index) {
+      return (
+        "breadcrumb-item" +
+        (index === root.split("/").length - 1 ? " active" : "")
+      );
+    }
   </script>
-  <h2>Files</h2>
+  <div class="row">
+    <h2>Files</h2>
+  </div>
+
   <div x-data="{ root: '.', files: [] }">
-    <ul x-effect="files = await getFiles(root);">
+    <div class="row">
+      <nav>
+        <ol class="breadcrumb">
+          <template x-for="(dir, index) in root.split('/')">
+            <li x-bind:class="computeBreadcrumbClass(root, index)">
+              <template x-if="isLastBreadcrumb(root, index)">
+                <span x-text="dir"></span>
+              </template>
+              <template x-if="!isLastBreadcrumb(root, index)">
+                <a
+                  href=""
+                  @click="event.preventDefault(); root = gotoFolder(root, index)"
+                  x-text="dir"
+                ></a>
+              </template>
+            </li>
+          </template>
+        </ol>
+      </nav>
+    </div>
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 gy-3">
       <template x-for="(file) in files" :key="file.name">
-        <li>
+        <div class="col">
           <template x-if="file.isDirectory">
             <button @click="root = updatePath(root, file.name)">
-              <span x-text="file.name"></span>
+              <span x-text="`${file.name}/`"></span>
             </button>
           </template>
           <template x-if="file.isFile">
             <div>
-              <span x-text="file.name"></span>
               <a
                 x-bind:href="`/api/file?path=${root}/${file.name}`"
                 x-bind:download="file.name"
-                >Download</a
-              >
+                ><span x-text="file.name"></span
+              ></a>
             </div>
           </template>
-        </li>
+        </div>
       </template>
-    </ul>
+    </div>
+    <div style="display: none" x-effect="files = await getFiles(root)"></div>
   </div>
 </section>
