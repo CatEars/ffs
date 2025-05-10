@@ -1,54 +1,18 @@
 <form class="m-2">
   <div class="col">
-    <div @click="sorting = 'none'" class="form-check form-check-inline">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="no-sorting"
-        id="no-sorting"
-        x-bind:checked="sorting === 'none'"
-      />
-      <label class="form-check-label" for="no-sorting">No sorting</label>
-    </div>
-    <div @click="sorting = 'newest'" class="form-check form-check-inline">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="newest"
-        id="newest"
-        x-bind:checked="sorting === 'newest'"
-      />
-      <label class="form-check-label" for="newest">Newest</label>
-    </div>
-    <div @click="sorting = 'oldest'" class="form-check form-check-inline">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="oldest"
-        id="oldest"
-        x-bind:checked="sorting === 'oldest'"
-      />
-      <label class="form-check-label" for="oldest">Oldest</label>
-    </div>
-    <div @click="sorting = 'a-z'" class="form-check form-check-inline">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="a-z"
-        id="a-z"
-        x-bind:checked="sorting === 'a-z'"
-      />
-      <label class="form-check-label" for="a-z">A-Z</label>
-    </div>
-    <div @click="sorting = 'z-a'" class="form-check form-check-inline">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="z-a"
-        id="z-a"
-        x-bind:checked="sorting === 'z-a'"
-      />
-      <label class="form-check-label" for="z-a">Z-A</label>
-    </div>
+    <%~ include('./sort-radio.partial.html', { value: 'no-sorting',
+    displayValue: 'No sorting' }) %>
+    <!-- -->
+    <%~ include('./sort-radio.partial.html', { value: 'newest', displayValue:
+    'Newest' }) %>
+    <!-- -->
+    <%~ include('./sort-radio.partial.html', { value: 'oldest', displayValue:
+    'Oldest' }) %>
+    <!-- -->
+    <%~ include('./sort-radio.partial.html', { value: 'a-z', displayValue: 'A-Z'
+    }) %>
+    <!-- -->
+    <%~ include('./sort-radio.partial.html', { value: 'z-a', displayValue: 'Z-A'
+    }) %>
   </div>
 </form>

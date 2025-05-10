@@ -29,7 +29,7 @@
 
     function sortedBy(files, sorting) {
       if (sorting === "no-sorting") {
-        return copy;
+        return files;
       }
 
       const copy = JSON.parse(JSON.stringify(files));
@@ -52,7 +52,10 @@
       return copy;
     }
   </script>
-  <div class="container" x-data="{ root: '.', files: [], sorting: 'none' }">
+  <div
+    class="container"
+    x-data="{ root: '.', files: [], sorting: 'no-sorting' }"
+  >
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">
       <div class="col col-sm-auto">
