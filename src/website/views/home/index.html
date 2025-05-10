@@ -42,10 +42,10 @@
           ? (a, b) => b.date - a.date
           : sorting === "a-z"
           ? (a, b) =>
-              a.name.localeCompare(b, undefined, { sensitivity: "accent" })
+              a.name.localeCompare(b.name, "en", { sensitivity: "accent" })
           : sorting === "z-a"
           ? (a, b) =>
-              -a.name.localeCompare(b, undefined, { sensitivity: "accent" })
+              -a.name.localeCompare(b.name, "en", { sensitivity: "accent" })
           : () => {};
 
       copy.sort(sortingFunction);
