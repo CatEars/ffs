@@ -50,19 +50,23 @@
   </div>
 </template>
 <template x-if="file.isFile && isMediaFile(file.name)">
-  <a x-bind:href="`/api/file?path=${root}/${file.name}`">
-    <div class="card-body pointer">
-      <span x-text="resolveEmojiForMediaFile(file.name)"></span
+  <a
+    class="text-decoration-none"
+    x-bind:href="`/api/file?path=${root}/${file.name}`"
+  >
+    <div class="card-body pointer text-truncate">
+      <span x-text="resolveEmojiForMediaFile(file.name) + ' '"></span
       ><span class="card-text" x-text="file.name"></span>
     </div>
   </a>
 </template>
 <template x-if="file.isFile && !isMediaFile(file.name)">
   <a
+    class="text-decoration-none"
     x-bind:href="`/api/file?path=${root}/${file.name}`"
     x-bind:download="file.name"
   >
-    <div class="card-body pointer">
+    <div class="card-body pointer text-truncate">
       <span class="card-text" x-text="file.name"></span>
     </div>
   </a>
