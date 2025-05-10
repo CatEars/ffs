@@ -52,10 +52,7 @@
       return copy;
     }
   </script>
-  <div
-    class="container gy-3"
-    x-data="{ root: '.', files: [], sorting: 'none' }"
-  >
+  <div class="container" x-data="{ root: '.', files: [], sorting: 'none' }">
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">
       <div class="col col-sm-auto">
