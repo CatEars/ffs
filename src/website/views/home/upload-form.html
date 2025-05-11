@@ -1,0 +1,12 @@
+<form
+  class="m-2 mb-4"
+  action="/api/file/upload"
+  method="POST"
+  enctype="multipart/form-data"
+>
+  <div class="col">
+    <input type="file" id="file" name="file" />
+    <button type="submit">Upload File</button>
+  </div>
+  <input type="hidden" id="directory" name="directory" x-bind:value="root" />
+</form>

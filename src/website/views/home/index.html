@@ -75,6 +75,7 @@
       </div>
     </div>
     <div class="row"><%~ include('./control-panel.partial.html') %></div>
+    <div class="row"><%~ include('./upload-form.html') %></div>
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 gy-3">
       <template x-for="(file) in sortedBy(files, sorting)" :key="file.name">
         <div class="col">
