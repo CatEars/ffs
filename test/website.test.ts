@@ -1,7 +1,8 @@
 import { assertEquals } from "@std/assert/equals";
 import { baseUrl } from "./constants.ts";
-import { HTTP_200_OK } from "../src/utils/http-codes.ts";
+import { HTTP_200_OK, HTTP_401_UNAUTHORIZED } from "../src/utils/http-codes.ts";
 import { assert } from "@std/assert/assert";
+import { authenticatedFetch } from "./authenticated-fetch.ts";
 
 Deno.test("there is a website that kinda looks like HTML", async () => {
   const result = await fetch(baseUrl + "/");
@@ -9,10 +10,22 @@ Deno.test("there is a website that kinda looks like HTML", async () => {
   assert((await result.text()).includes("<!DOCTYPE html>"));
 });
 
-Deno.test("there is a logon website that kinda looks like HTML", async () => {
-  const result = await fetch(baseUrl + "/logon/");
+Deno.test("there is a 'failed to logon' webpage that kinda looks like HTML", async () => {
+  const result = await fetch(baseUrl + "/logon/fail");
   assertEquals(HTTP_200_OK, result.status);
   assert((await result.text()).includes("<!DOCTYPE html>"));
+});
+
+Deno.test("It is not possible to access homepage without authentication", async () => {
+  const result = await fetch(baseUrl + "/home/");
+  await result.text();
+  assertEquals(result.status, HTTP_401_UNAUTHORIZED);
+});
+
+Deno.test("It is possible to access homepage with authentication", async () => {
+  const result = await authenticatedFetch(baseUrl + "/home/");
+  await result.text();
+  assertEquals(result.status, HTTP_200_OK);
 });
 
 Deno.test("You can load bootstrap css as static file", async () => {

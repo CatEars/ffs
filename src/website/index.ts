@@ -4,6 +4,7 @@ import { collectAllPages, PlainPage, PluginPage } from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
 import { devModeEnabled, viewPath } from "../config.ts";
 import { Next } from "@oak/oak/middleware";
+import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -48,6 +49,10 @@ async function registerPluginPages(
   }
 }
 
+function passAlongMiddleware(_ctx: Context, next: Next) {
+  return next();
+}
+
 function registerPlainPages(
   plainPages: PlainPage[],
   router: Router,
@@ -63,6 +68,11 @@ function registerPlainPages(
     if (page.getStaticData) {
       staticData = page.getStaticData();
     }
+    const middlewares = page.middlewares;
+    if (middlewares.length === 0) {
+      middlewares.push(passAlongMiddleware);
+    }
+
     const compoundMiddleware = async (ctx: Context, next: Next) => {
       let nextCalled = false;
       const wrappedNext = () => {
@@ -71,12 +81,9 @@ function registerPlainPages(
       };
       for (const mid of page.middlewares) {
         await mid(ctx, wrappedNext);
-        if (nextCalled) {
+        if (nextCalled || ctx.response.status != HTTP_404_NOT_FOUND) {
           return;
         }
-      }
-      if (!nextCalled) {
-        return next();
       }
     };
     if (page.getDynamicData) {

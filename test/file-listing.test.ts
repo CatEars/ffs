@@ -2,6 +2,7 @@ import { assert } from "@std/assert/assert";
 import { assertEquals } from "@std/assert";
 import { baseUrl } from "./constants.ts";
 import {
+  HTTP_200_OK,
   HTTP_401_UNAUTHORIZED,
   HTTP_403_FORBIDDEN,
   HTTP_404_NOT_FOUND,
@@ -57,4 +58,23 @@ Deno.test("Not allowed to fetch / directory as file", async () => {
   const result = await authenticatedFetch(baseUrl + "/api/file?path=/");
   await result.text();
   assertEquals(result.status, HTTP_404_NOT_FOUND);
+});
+
+Deno.test("Can upload files", async () => {
+  const formData = new FormData();
+  const fileName = "Makefile";
+  formData.append(
+    "file",
+    new Blob([Deno.readFileSync(fileName)], { type: "text/plain" }),
+    fileName,
+  );
+  formData.append("directory", ".");
+
+  const result = await authenticatedFetch(baseUrl + "/api/file/upload", {
+    method: "POST",
+    body: formData,
+  });
+  await result.text();
+  assertEquals(result.status, HTTP_200_OK);
+  Deno.removeSync(fileName + " Copy");
 });
