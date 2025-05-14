@@ -4,6 +4,7 @@ import { registerAllFileListing } from "./file-listing/index.ts";
 import { setConfig, unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
 import { registerAllWebsiteRoutes } from "./website/index.ts";
+import { logger } from "./logging/logger.ts";
 
 setConfig({
   storeRoot: ".",
@@ -25,5 +26,5 @@ await registerAllWebsiteRoutes(router);
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-console.log("Starting server on http://localhost:8080");
+logger.info("Starting server on http://localhost:8080");
 app.listen({ port: 8080 });

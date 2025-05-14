@@ -5,6 +5,7 @@ import { Context } from "@oak/oak/context";
 import { devModeEnabled, viewPath } from "../config.ts";
 import { Next } from "@oak/oak/middleware";
 import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
+import { logger } from "../logging/logger.ts";
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -20,7 +21,7 @@ export async function registerAllWebsiteRoutes(router: Router) {
       continue;
     } else if (staticFile.isFile) {
       const webPath = `/static/${staticFile.name}`;
-      console.log("Registering static file", webPath);
+      logger.info("Registering static file", webPath);
       router.get(webPath, async (ctx) => {
         await ctx.send({
           root: "./src/website/static/",
@@ -30,7 +31,7 @@ export async function registerAllWebsiteRoutes(router: Router) {
     }
   }
   // Special case: favicon
-  console.log("Registering /favicon.ico");
+  logger.info("Registering /favicon.ico");
   router.get("/favicon.ico", async (ctx) => {
     await ctx.send({
       root: "./src/website/static/",
@@ -44,7 +45,7 @@ async function registerPluginPages(
   router: Router,
 ) {
   for (const page of pluginPages) {
-    console.log("Registering routes from", page.displayName);
+    logger.info("Registering routes from", page.displayName);
     await page.register(router);
   }
 }
@@ -60,7 +61,7 @@ function registerPlainPages(
   const longestWebPath = getLongestWebPath(plainPages);
   const longestPropPath = getLongestPropPath(plainPages);
   for (const page of plainPages) {
-    console.log(
+    logger.info(
       "Registering",
       getPageDescription(page, longestWebPath, longestPropPath),
     );
