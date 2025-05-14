@@ -6,6 +6,7 @@ import { devModeEnabled, viewPath } from "../config.ts";
 import { Next } from "@oak/oak/middleware";
 import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 import { logger } from "../logging/logger.ts";
+import { baseMiddlewares } from "../base-middlewares.ts";
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -22,7 +23,7 @@ export async function registerAllWebsiteRoutes(router: Router) {
     } else if (staticFile.isFile) {
       const webPath = `/static/${staticFile.name}`;
       logger.info("Registering static file", webPath);
-      router.get(webPath, async (ctx) => {
+      router.get(webPath, baseMiddlewares(), async (ctx) => {
         await ctx.send({
           root: "./src/website/static/",
           path: staticFile.name,
@@ -32,7 +33,7 @@ export async function registerAllWebsiteRoutes(router: Router) {
   }
   // Special case: favicon
   logger.info("Registering /favicon.ico");
-  router.get("/favicon.ico", async (ctx) => {
+  router.get("/favicon.ico", baseMiddlewares(), async (ctx) => {
     await ctx.send({
       root: "./src/website/static/",
       path: "favicon.ico",
@@ -90,12 +91,17 @@ function registerPlainPages(
     if (page.getDynamicData) {
       const dynamicDataGetter = page.getDynamicData;
 
-      router.get(page.webPath, compoundMiddleware, async (ctx) => {
-        const dynamicData = await dynamicDataGetter(ctx);
-        respondWithData(ctx, page, { ...staticData, ...dynamicData });
-      });
+      router.get(
+        page.webPath,
+        baseMiddlewares(),
+        compoundMiddleware,
+        async (ctx) => {
+          const dynamicData = await dynamicDataGetter(ctx);
+          respondWithData(ctx, page, { ...staticData, ...dynamicData });
+        },
+      );
     } else {
-      router.get(page.webPath, compoundMiddleware, (ctx) => {
+      router.get(page.webPath, baseMiddlewares(), compoundMiddleware, (ctx) => {
         respondWithData(ctx, page, staticData);
       });
     }

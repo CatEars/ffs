@@ -4,9 +4,10 @@ import {
   HTTP_404_NOT_FOUND,
 } from "../utils/http-codes.ts";
 import { getMatchingUser } from "../security/users.ts";
+import { baseMiddlewares } from "../base-middlewares.ts";
 
 export function registerBasicAuthRoutes(router: Router) {
-  router.post("/api/logon", async (ctx) => {
+  router.post("/api/logon", baseMiddlewares(), async (ctx) => {
     const body = await ctx.request.body.json();
     if (!body.username || !body.password) {
       return;
@@ -24,7 +25,7 @@ export function registerBasicAuthRoutes(router: Router) {
     };
   });
 
-  router.post("/api/user-logon", async (ctx) => {
+  router.post("/api/user-logon", baseMiddlewares(), async (ctx) => {
     const data = await ctx.request.body.form();
     const username = data.get("username");
     const password = data.get("password");

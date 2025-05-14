@@ -6,9 +6,10 @@ import {
   HTTP_400_BAD_REQUEST,
   HTTP_403_FORBIDDEN,
 } from "../utils/http-codes.ts";
+import { baseMiddlewares } from "../base-middlewares.ts";
 
 export function registerUploadFileRoute(router: Router) {
-  router.post("/api/file/upload", async (ctx) => {
+  router.post("/api/file/upload", baseMiddlewares(), async (ctx) => {
     const data = await ctx.request.body.formData();
     const directory = data.get("directory")?.toString() || getStoreRoot();
     const file = data.get("file");
