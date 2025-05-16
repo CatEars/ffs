@@ -4,9 +4,43 @@
   method="POST"
   enctype="multipart/form-data"
 >
-  <div class="col">
-    <input type="file" id="file" name="file" />
-    <button type="submit">Upload File</button>
+  <div class="col" x-data="{ names: [] }">
+    <div class="container">
+      <template x-for="name in names">
+        <div class="row"><p x-text="name"></p></div>
+      </template>
+    </div>
+    <input
+      @change="names = getFilenamesFromEvent(event)"
+      class="d-none"
+      type="file"
+      id="file"
+      name="file"
+    />
+    <button
+      class="btn btn-outline-secondary"
+      @click="document.getElementById('file').click()"
+      type="button"
+      id="browseButton"
+    >
+      Browse Files
+    </button>
+    <button
+      class="btn btn-outline-primary"
+      x-bind:disabled="names.length === 0"
+      type="submit"
+    >
+      Start upload
+    </button>
   </div>
   <input type="hidden" id="directory" name="directory" x-bind:value="root" />
+  <script>
+    function getFilenamesFromEvent(evt) {
+      const result = [];
+      for (const file of evt.target.files) {
+        result.push(file.name);
+      }
+      return result;
+    }
+  </script>
 </form>
