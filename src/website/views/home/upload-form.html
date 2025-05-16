@@ -6,32 +6,40 @@
 >
   <div class="col" x-data="{ names: [] }">
     <div class="container">
-      <template x-for="name in names">
-        <div class="row"><p x-text="name"></p></div>
-      </template>
+      <div class="row">
+        <input
+          @change="names = getFilenamesFromEvent(event)"
+          class="d-none"
+          type="file"
+          id="file"
+          name="file"
+        />
+        <div class="col-auto">
+          <button
+            class="btn btn-outline-secondary me-2"
+            @click="document.getElementById('file').click()"
+            type="button"
+            id="browseButton"
+          >
+            Browse Files
+          </button>
+        </div>
+        <div class="col-auto">
+          <button
+            class="btn btn-outline-primary"
+            x-bind:disabled="names.length === 0"
+            type="submit"
+          >
+            Upload Files
+          </button>
+        </div>
+        <div class="col d-flex align-items-center">
+          <template x-for="name in names">
+            <div x-text="name"></div>
+          </template>
+        </div>
+      </div>
     </div>
-    <input
-      @change="names = getFilenamesFromEvent(event)"
-      class="d-none"
-      type="file"
-      id="file"
-      name="file"
-    />
-    <button
-      class="btn btn-outline-secondary me-2"
-      @click="document.getElementById('file').click()"
-      type="button"
-      id="browseButton"
-    >
-      Browse Files
-    </button>
-    <button
-      class="btn btn-outline-primary"
-      x-bind:disabled="names.length === 0"
-      type="submit"
-    >
-      Start upload
-    </button>
   </div>
   <input type="hidden" id="directory" name="directory" x-bind:value="root" />
   <script>
