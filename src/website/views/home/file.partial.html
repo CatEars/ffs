@@ -40,12 +40,34 @@
       return "📽️";
     }
   }
+
+  function resolveSvgClassForFile(file) {
+    if (isSoundFile(file.name)) {
+      return "svg-music_note";
+    } else if (isImageFile(file.name)) {
+      return "svg-image";
+    } else if (isMovieFile(file.name)) {
+      return "svg-videocam";
+    }
+  }
+
+  function getCssClassesForFileImage(file) {
+    return 'card-img-top ' + resolveSvgClassForFile(file)
+  }
+
+  function getFileImageSource(root, file) {
+    if (file.name.endsWith('.mp4')) {
+      return `/api/thumbnail?path=${root}/${file.name}`
+    }
+    return ''
+  }
 </script>
 <template x-if="file.isDirectory">
   <div
     @click="event.preventDefault(); root = updatePath(root, file.name)"
     class="card-body pointer"
   >
+    <img height="125" class="card-img-top" src="/static/svg/folder.svg"></img>
     <span class="card-text" x-text="`${file.name}/`"></span>
   </div>
 </template>
@@ -54,9 +76,9 @@
     class="text-decoration-none"
     x-bind:href="`/api/file?path=${root}/${file.name}`"
   >
-      <template x-if="file.name.endsWith('.mp4')">
-        <img class="card-img-top" x-bind:src="`/api/thumbnail?path=${root}/${file.name}`"></img>
-      </template>
+    <img height="125" x-bind:class="getCssClassesForFileImage(file)" 
+         x-bind:src="getFileImageSource(root, file)"></img>
+      
 
     <div class="card-body pointer text-truncate">
       <span x-text="resolveEmojiForMediaFile(file.name) + ' '"></span
@@ -70,6 +92,7 @@
     x-bind:href="`/api/file?path=${root}/${file.name}`"
     x-bind:download="file.name"
   >
+    <img height="125" class="card-img-top" src="/static/svg/description.svg"></img>
     <div class="card-body pointer text-truncate">
       <span class="card-text" x-text="file.name"></span>
     </div>

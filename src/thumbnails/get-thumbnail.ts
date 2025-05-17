@@ -14,7 +14,6 @@ import {
   HTTP_400_BAD_REQUEST,
   HTTP_404_NOT_FOUND,
 } from "../utils/http-codes.ts";
-import { logger } from "../logging/logger.ts";
 
 async function tryGetFile(thumbnailPath: string) {
   for (let cnt = 0; cnt < 20; ++cnt) {
@@ -47,9 +46,7 @@ export function registerGetThumbnail(router: Router) {
 
     if (!thumbnailExists(path)) {
       await prioritizeThumbnail(path);
-      logger.info("waiting...");
       const generatedThumbnail = await waitUntilFilepathExistsOrBail(path);
-      logger.info("finished!...", generatedThumbnail);
       if (!generatedThumbnail) {
         ctx.response.status = HTTP_404_NOT_FOUND;
         return;
