@@ -7,6 +7,7 @@ import { Next } from "@oak/oak/middleware";
 import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 import { logger } from "../logging/logger.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
+import { registerStaticRoutes } from "./static-files.ts";
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -16,29 +17,7 @@ export async function registerAllWebsiteRoutes(router: Router) {
   ) as PluginPage[];
   registerPlainPages(plainPages, router);
   await registerPluginPages(pluginPages, router);
-  const staticFiles = Deno.readDirSync("./src/website/static");
-  for (const staticFile of staticFiles) {
-    if (staticFile.name === ".gitkeep") {
-      continue;
-    } else if (staticFile.isFile) {
-      const webPath = `/static/${staticFile.name}`;
-      logger.info("Registering static file", webPath);
-      router.get(webPath, baseMiddlewares(), async (ctx) => {
-        await ctx.send({
-          root: "./src/website/static/",
-          path: staticFile.name,
-        });
-      });
-    }
-  }
-  // Special case: favicon
-  logger.info("Registering /favicon.ico");
-  router.get("/favicon.ico", baseMiddlewares(), async (ctx) => {
-    await ctx.send({
-      root: "./src/website/static/",
-      path: "favicon.ico",
-    });
-  });
+  await registerStaticRoutes(router);
 }
 
 async function registerPluginPages(
