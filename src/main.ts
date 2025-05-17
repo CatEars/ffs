@@ -5,11 +5,16 @@ import { setConfig, unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
 import { registerAllWebsiteRoutes } from "./website/index.ts";
 import { logger } from "./logging/logger.ts";
-import { areThumbnailsAvailable } from "./thumbnails/index.ts";
+import {
+  areThumbnailsAvailable,
+  startThumbnailBackgroundProcess,
+} from "./thumbnails/index.ts";
+import { resolveCacheFolder } from "./files/cache-folder.ts";
 
 setConfig({
   storeRoot: ".",
   usersFilePath: "data/users-file.json",
+  cacheRoot: await resolveCacheFolder(),
 });
 validateConfig();
 
@@ -25,7 +30,11 @@ registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
 
 if (areThumbnailsAvailable()) {
-  logger.info("will enable thumbnails");
+  startThumbnailBackgroundProcess();
+} else {
+  logger.warn(
+    "ffmpeg is not available, so will not generate thumbnails in the background",
+  );
 }
 
 app.use(router.routes());

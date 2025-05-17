@@ -1,26 +1,34 @@
-let storeRoot: string | undefined = undefined;
 let noSec: boolean = false;
-let usersFilePath: string | undefined = undefined;
 export const viewPath = Deno.cwd() + "/src/website/views/";
 export const devModeEnabled = Deno.env.get("FFS_ENV") === "dev";
+const storeRootKey = "FFS_STORE_ROOT";
+const cacheRootKey = "FFS_CACHE_ROOT";
+const usersFileKey = "FFS_USERS_FILE";
 
 type Config = {
   storeRoot: string;
   usersFilePath: string;
+  cacheRoot: string;
 };
 
-export function getStoreRoot() {
-  if (!storeRoot) {
-    throw new Error(`STORE ROOT NOT SET!`);
+function getEnvValueOrThrow(key: string) {
+  const value = Deno.env.get(key);
+  if (!value) {
+    throw new Error(`${key} not set!`);
   }
-  return storeRoot;
+  return value;
+}
+
+export function getStoreRoot() {
+  return getEnvValueOrThrow(storeRootKey);
 }
 
 export function getUsersFilePath() {
-  if (!usersFilePath) {
-    throw new Error(`USERS FILE PATH NOT SET!`);
-  }
-  return usersFilePath;
+  return getEnvValueOrThrow(cacheRootKey);
+}
+
+export function getCacheRoot() {
+  return getEnvValueOrThrow(cacheRootKey);
 }
 
 export function shouldAbandonSecurity() {
@@ -32,11 +40,13 @@ export function unsecure() {
 }
 
 export function setConfig(config: Config) {
-  storeRoot = config.storeRoot;
-  usersFilePath = config.usersFilePath;
+  Deno.env.set(storeRootKey, config.storeRoot);
+  Deno.env.set(cacheRootKey, config.cacheRoot);
+  Deno.env.set(usersFileKey, config.usersFilePath);
 }
 
 export function validateConfig() {
   getStoreRoot();
   getUsersFilePath();
+  getCacheRoot();
 }
