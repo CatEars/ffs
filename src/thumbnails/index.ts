@@ -1,5 +1,5 @@
 import { logger } from "../logging/logger.ts";
-import { ThumbnailPrio } from "./type.ts";
+import { ThumbnailRequest } from "./types.ts";
 
 export function areThumbnailsAvailable() {
   const proc = runFfmpegVersion();
@@ -31,7 +31,7 @@ export function startThumbnailBackgroundProcess() {
 export async function prioritizeThumbnail(filePath: string) {
   if (thumbnailProcess !== null) {
     try {
-      const data: ThumbnailPrio = {
+      const data: ThumbnailRequest = {
         filePath,
       };
       const bytes = new TextEncoder().encode(JSON.stringify(data));

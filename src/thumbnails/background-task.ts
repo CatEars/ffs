@@ -1,40 +1,41 @@
 import { stdin } from "node:process";
 import { getCacheRoot } from "../config.ts";
 import { logger } from "../logging/logger.ts";
-import { ThumbnailPrio } from "./type.ts";
-
-logger.info("Background thread for thumbnail generation started");
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { ThumbnailRequest } from "./types.ts";
+import { generateThumbnail } from "./generate-thumbnail.ts";
+import { sleep } from "../utils/sleep.ts";
+import { Buffer } from "node:buffer";
 
 const cacheRoot = getCacheRoot();
-logger.info("Storing thumbnails in cache at", cacheRoot);
+logger.info(
+  "Background task for thumbnail generation started. Storing thumbnails in cache at",
+  cacheRoot,
+);
 
-const filesToPrioritize: ThumbnailPrio[] = [];
+const filesToPrioritize: ThumbnailRequest[] = [];
+
+function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
+  const request = new TextDecoder().decode(data);
+  try {
+    const res = JSON.parse(request) as ThumbnailRequest;
+    if (!res.filePath) {
+      return;
+    }
+    filesToPrioritize.push(res);
+  } catch (err) {
+    logger.warn(
+      "Received thumbnail prio request, but unable to parse it. Error:",
+      err,
+    );
+  }
+}
+
+stdin.addListener("data", parseIncomingThumbnailRequest);
 
 while (true) {
-  stdin.addListener("data", (data) => {
-    const request = new TextDecoder().decode(data);
-    try {
-      const res = JSON.parse(request) as ThumbnailPrio;
-      if (!res.filePath) {
-        return;
-      }
-      filesToPrioritize.push(res);
-      logger.debug(
-        "Added",
-        res.filePath,
-        "to thumbnail queue, now at",
-        filesToPrioritize.length,
-        "queued requests",
-      );
-    } catch (err) {
-      logger.warn(
-        "Received thumbnail prio request, but unable to parse it. Error:",
-        err,
-      );
-    }
-  });
-  await sleep(10000);
+  while (filesToPrioritize.length > 0) {
+    const next = filesToPrioritize.splice(0, 1)[0];
+    await generateThumbnail(next);
+  }
+  await sleep(500);
 }
