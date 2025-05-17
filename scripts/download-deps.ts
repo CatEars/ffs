@@ -43,6 +43,11 @@ SOFTWARE.
 */
 `,
   },
+  {
+    url:
+      "https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/LICENSE",
+    target: "./src/website/static/material-design-icons-license.txt",
+  },
 ];
 
 for (const { url, target, prependedLicense, replace } of dls) {

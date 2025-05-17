@@ -1,2 +1,3 @@
 src/website/static/*
+!src/website/static/svg
 *.mp4

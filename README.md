@@ -9,3 +9,10 @@ I want:
 - Usable mobile web-page. Not everyone is a frontend engineer, but does it hurt to enable responsive mode in the web console?
 - Good security posture. While copyparty is fun to look at from the outside. I just feel less safe looking at the inside.
 - Some extensibility. I don't need an app-store, but I do need to run some basic local scripts.
+
+## Material Design Icons License
+
+Material design icons are stored as part of this repository.
+
+See [License](https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/LICENSE) and [fonts.google.com](https://fonts.google.com)
+for more info
