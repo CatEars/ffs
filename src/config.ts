@@ -24,7 +24,7 @@ export function getStoreRoot() {
 }
 
 export function getUsersFilePath() {
-  return getEnvValueOrThrow(cacheRootKey);
+  return getEnvValueOrThrow(usersFileKey);
 }
 
 export function getCacheRoot() {

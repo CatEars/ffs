@@ -34,7 +34,7 @@ export async function prioritizeThumbnail(filePath: string) {
       const data: ThumbnailRequest = {
         filePath,
       };
-      const bytes = new TextEncoder().encode(JSON.stringify(data));
+      const bytes = new TextEncoder().encode(JSON.stringify(data) + "\n");
 
       await thumbnailProcessStdin?.write(bytes);
     } catch (err) {

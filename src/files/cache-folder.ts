@@ -1,13 +1,14 @@
-import path from "node:path";
+import { relative, resolve } from "@std/path";
 import { logger } from "../logging/logger.ts";
+import { getCacheRoot, getStoreRoot } from "../config.ts";
 
 const cachePrefix = "ffs-cachedir-";
 
 async function priorTempDirectory() {
   try {
-    for await (const entry of Deno.readDir(path.resolve("/", "tmp"))) {
+    for await (const entry of Deno.readDir(resolve("/", "tmp"))) {
       if (entry.isDirectory && entry.name.startsWith(cachePrefix)) {
-        return path.resolve("/", "tmp", entry.name);
+        return resolve("/", "tmp", entry.name);
       }
     }
   } catch {
@@ -30,4 +31,12 @@ export async function resolveCacheFolder() {
   } else {
     return await Deno.makeTempDir({ prefix: cachePrefix });
   }
+}
+
+export function getThumbnailPath(filePath: string) {
+  const storeRoot = getStoreRoot();
+  const cacheRoot = getCacheRoot();
+
+  const relPath = relative(storeRoot, filePath);
+  return resolve(cacheRoot, relPath + ".webp");
 }
