@@ -54,6 +54,10 @@
     class="text-decoration-none"
     x-bind:href="`/api/file?path=${root}/${file.name}`"
   >
+      <template x-if="file.name.endsWith('.mp4')">
+        <img class="card-img-top" x-bind:src="`/api/thumbnail?path=${root}/${file.name}`"></img>
+      </template>
+
     <div class="card-body pointer text-truncate">
       <span x-text="resolveEmojiForMediaFile(file.name) + ' '"></span
       ><span class="card-text" x-text="file.name"></span>

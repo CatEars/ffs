@@ -1,5 +1,7 @@
+import { Router } from "@oak/oak/router";
 import { logger } from "../logging/logger.ts";
 import { ThumbnailRequest } from "./types.ts";
+import { registerGetThumbnail } from "./get-thumbnail.ts";
 
 export function areThumbnailsAvailable() {
   const proc = runFfmpegVersion();
@@ -55,4 +57,8 @@ function runFfmpegVersion() {
 
 function isFfmpegVersionString(programOutput: string) {
   return /^ffmpeg version \d.\d.\d/.test(programOutput);
+}
+
+export function registerAllThumbnailRoutes(router: Router) {
+  registerGetThumbnail(router);
 }

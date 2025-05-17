@@ -13,3 +13,7 @@ export async function generateThumbnail(thumbnail: ThumbnailRequest) {
 export function thumbnailExists(filePath: string) {
   return existsSync(getThumbnailPath(filePath));
 }
+
+export function canGenerateThumbnailFor(filePath: string) {
+  return extname(filePath) === ".mp4";
+}

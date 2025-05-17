@@ -7,6 +7,7 @@ import { registerAllWebsiteRoutes } from "./website/index.ts";
 import { logger } from "./logging/logger.ts";
 import {
   areThumbnailsAvailable,
+  registerAllThumbnailRoutes,
   startThumbnailBackgroundProcess,
 } from "./thumbnails/index.ts";
 import { resolveCacheFolder } from "./files/cache-folder.ts";
@@ -28,6 +29,7 @@ const router = new Router();
 registerAllFileListing(router);
 registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
+registerAllThumbnailRoutes(router);
 
 if (areThumbnailsAvailable()) {
   startThumbnailBackgroundProcess();
