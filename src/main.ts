@@ -5,6 +5,7 @@ import { setConfig, unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
 import { registerAllWebsiteRoutes } from "./website/index.ts";
 import { logger } from "./logging/logger.ts";
+import { areThumbnailsAvailable } from "./thumbnails/index.ts";
 
 setConfig({
   storeRoot: ".",
@@ -22,6 +23,10 @@ const router = new Router();
 registerAllFileListing(router);
 registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
+
+if (areThumbnailsAvailable()) {
+  logger.info("will enable thumbnails");
+}
 
 app.use(router.routes());
 app.use(router.allowedMethods());
