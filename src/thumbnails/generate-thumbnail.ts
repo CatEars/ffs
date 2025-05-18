@@ -1,6 +1,6 @@
 import { ThumbnailRequest } from "./types.ts";
 import { extname } from "@std/path";
-import { createMp4Thumbnail } from "./processors/mp4.ts";
+import { createMp4Thumbnail } from "./nailers/mp4.ts";
 
 type Thumbnailer = {
   extName: string;
