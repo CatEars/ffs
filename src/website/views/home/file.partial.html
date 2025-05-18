@@ -51,6 +51,16 @@
     }
   }
 
+  function resolveSvgLocationForFile(file) {
+    if (isSoundFile(file.name)) {
+      return "/static/svg/music_note.svg";
+    } else if (isImageFile(file.name)) {
+      return "/static/svg/photo_camera.svg";
+    } else if (isMovieFile(file.name)) {
+      return "/static/svg/videocam.svg";
+    }
+  }
+
   function getCssClassesForFileImage(file) {
     return 'card-img-top ' + resolveSvgClassForFile(file)
   }
@@ -60,6 +70,18 @@
       return `/api/thumbnail?path=${root}/${file.name}`
     }
     return ''
+  }
+
+  async function tryPrefetchThumbnail(root, file) {
+    const imageSource = getFileImageSource(root, file)
+    if (!imageSource) {
+      throw new Error('No thumbnail to load from')
+    }
+    const result = await fetch(imageSource)
+    if (!result.ok) {
+      throw new Error('Unable to load thumbnail correctly')
+    }
+    return imageSource
   }
 </script>
 <template x-if="file.isDirectory">
@@ -76,8 +98,13 @@
     class="text-decoration-none"
     x-bind:href="`/api/file?path=${root}/${file.name}`"
   >
-    <img height="125" x-bind:class="getCssClassesForFileImage(file)" 
-         x-bind:src="getFileImageSource(root, file)"></img>
+    <div x-data="{ imgSrc: resolveSvgLocationForFile(file) }">
+      <img height="125"
+          x-bind:class="getCssClassesForFileImage(file)" 
+          x-bind:src="imgSrc"
+          @load="tryPrefetchThumbnail(root, file).then(src => imgSrc = src).catch(() => {})"></img>
+
+    </div>
       
 
     <div class="card-body pointer text-truncate">
