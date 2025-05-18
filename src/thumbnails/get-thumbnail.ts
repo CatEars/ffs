@@ -2,13 +2,10 @@ import { Router } from "@oak/oak";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { apiProtect } from "../security/api-protect.ts";
 import { getCacheRoot } from "../config.ts";
-import {
-  canGenerateThumbnailFor,
-  thumbnailExists,
-} from "./generate-thumbnail.ts";
+import { canGenerateThumbnailFor } from "./generate-thumbnail.ts";
 import { prioritizeThumbnail } from "./index.ts";
 import { exists } from "@std/fs/exists";
-import { getThumbnailPath } from "../files/cache-folder.ts";
+import { getThumbnailPath, thumbnailExists } from "../files/cache-folder.ts";
 import { sleep } from "../utils/sleep.ts";
 import {
   HTTP_400_BAD_REQUEST,

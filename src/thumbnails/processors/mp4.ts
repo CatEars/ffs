@@ -5,7 +5,28 @@ import { dirname } from "@std/path/dirname";
 import { getThumbnailPath } from "../../files/cache-folder.ts";
 import { move } from "@std/fs";
 
+async function getMp4Duration(thumbnail: ThumbnailRequest) {
+  const command = new Deno.Command("ffprobe", {
+    args: [
+      "-v",
+      "error",
+      "-select_streams",
+      "v:0",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      thumbnail.filePath,
+    ],
+  });
+  const result = await command.output();
+  const text = new TextDecoder().decode(result.stdout);
+  return Number.parseFloat(text);
+}
+
 export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
+  const duration = (await getMp4Duration(thumbnail)) || 100;
+  const position = duration * 0.25;
   const outputPath = getThumbnailPath(thumbnail.filePath);
   const tempFile = await Deno.makeTempFile({
     prefix: "ffs_mp4gen",
@@ -17,7 +38,7 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
       "-i",
       thumbnail.filePath,
       "-ss",
-      "00:00:30",
+      `${position}`,
       "-vframes",
       "1",
       "-vf",
