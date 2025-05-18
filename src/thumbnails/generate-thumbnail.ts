@@ -1,19 +1,31 @@
 import { ThumbnailRequest } from "./types.ts";
 import { extname } from "@std/path";
-import { existsSync } from "@std/fs/exists";
 import { createMp4Thumbnail } from "./processors/mp4.ts";
-import { getThumbnailPath } from "../files/cache-folder.ts";
+
+type Thumbnailer = {
+  extName: string;
+  handler: (thumbnail: ThumbnailRequest) => Promise<void>;
+};
+
+const nailers: Thumbnailer[] = [
+  {
+    extName: ".mp4",
+    handler: createMp4Thumbnail,
+  },
+];
+
+const extNames = nailers.map((x) => x.extName);
 
 export async function generateThumbnail(thumbnail: ThumbnailRequest) {
-  if (extname(thumbnail.filePath) === ".mp4") {
-    await createMp4Thumbnail(thumbnail);
+  const ext = extname(thumbnail.filePath);
+  for (const nailer of nailers) {
+    if (ext === nailer.extName) {
+      await nailer.handler(thumbnail);
+      return;
+    }
   }
 }
 
-export function thumbnailExists(filePath: string) {
-  return existsSync(getThumbnailPath(filePath));
-}
-
 export function canGenerateThumbnailFor(filePath: string) {
-  return extname(filePath) === ".mp4";
+  return extNames.includes(extname(filePath));
 }

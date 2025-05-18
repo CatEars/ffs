@@ -15,6 +15,8 @@ export class MemoryCache<T> {
     const res = this.cache.get(key);
     if (res && res.lastAccess + this.ttl > Date.now()) {
       return res.element;
+    } else {
+      this.cache.delete(key);
     }
   }
 

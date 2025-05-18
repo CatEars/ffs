@@ -36,6 +36,5 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
   logger.debug(
     "Generated thumbnail",
     outputPath,
-    tempFile,
   );
 }

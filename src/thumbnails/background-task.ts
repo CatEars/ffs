@@ -2,13 +2,15 @@ import { stdin } from "node:process";
 import { devModeEnabled, getCacheRoot, getStoreRoot } from "../config.ts";
 import { logger } from "../logging/logger.ts";
 import { ThumbnailRequest } from "./types.ts";
-import { generateThumbnail, thumbnailExists } from "./generate-thumbnail.ts";
+import {
+  canGenerateThumbnailFor,
+  generateThumbnail,
+} from "./generate-thumbnail.ts";
 import { sleep } from "../utils/sleep.ts";
 import { Buffer } from "node:buffer";
-import { exists, walk, WalkEntry } from "@std/fs";
-import { extname } from "@std/path";
+import { walk, WalkEntry } from "@std/fs";
 import { MemoryCache } from "../utils/memory-cache.ts";
-import { getThumbnailPath } from "../files/cache-folder.ts";
+import { thumbnailExists } from "../files/cache-folder.ts";
 
 const cacheRoot = getCacheRoot();
 const storeRoot = getStoreRoot();
@@ -58,8 +60,7 @@ function tryPushToQueue(file: WalkEntry) {
 
 async function findFilesToThumbnail() {
   for await (const file of walk(storeRoot)) {
-    const extName = extname(file.name);
-    if (extName === ".mp4") {
+    if (canGenerateThumbnailFor(file.path)) {
       tryPushToQueue(file);
     }
   }
@@ -73,7 +74,7 @@ while (true) {
     const next = filesToPrioritize.splice(0, 1)[0];
     if (
       recentlyParsedThumbnails.get(next.filePath) ||
-      await exists(getThumbnailPath(next.filePath))
+      thumbnailExists(next.filePath)
     ) {
       continue;
     }

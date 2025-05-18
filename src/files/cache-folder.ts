@@ -1,6 +1,7 @@
 import { relative, resolve } from "@std/path";
 import { logger } from "../logging/logger.ts";
 import { getCacheRoot, getStoreRoot } from "../config.ts";
+import { existsSync } from "@std/fs/exists";
 
 const cachePrefix = "ffs-cachedir-";
 
@@ -39,4 +40,8 @@ export function getThumbnailPath(filePath: string) {
 
   const relPath = relative(storeRoot, filePath);
   return resolve(cacheRoot, relPath + ".webp");
+}
+
+export function thumbnailExists(filePath: string) {
+  return existsSync(getThumbnailPath(filePath));
 }
