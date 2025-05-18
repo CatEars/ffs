@@ -87,10 +87,12 @@
 <template x-if="file.isDirectory">
   <div
     @click="event.preventDefault(); root = updatePath(root, file.name)"
-    class="card-body pointer"
+    class="pointer"
   >
     <img height="125" class="card-img-top" src="/static/svg/folder.svg"></img>
-    <span class="card-text" x-text="`${file.name}/`"></span>
+    <div class="card-body">
+      <span class="card-text" x-text="`${file.name}/`"></span>  
+    </div>
   </div>
 </template>
 <template x-if="file.isFile && isMediaFile(file.name)">
@@ -106,7 +108,6 @@
 
     </div>
       
-
     <div class="card-body pointer text-truncate">
       <span x-text="resolveEmojiForMediaFile(file.name) + ' '"></span
       ><span class="card-text" x-text="file.name"></span>
