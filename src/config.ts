@@ -1,9 +1,9 @@
 let noSec: boolean = false;
 export const viewPath = Deno.cwd() + "/src/website/views/";
 export const devModeEnabled = Deno.env.get("FFS_ENV") === "dev";
-const storeRootKey = "FFS_STORE_ROOT";
-const cacheRootKey = "FFS_CACHE_ROOT";
-const usersFileKey = "FFS_USERS_FILE";
+export const storeRootKey = "FFS_STORE_ROOT";
+export const cacheRootKey = "FFS_CACHE_ROOT";
+export const usersFileKey = "FFS_USERS_FILE";
 
 type Config = {
   storeRoot: string;

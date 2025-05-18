@@ -1,7 +1,7 @@
 .PHONY: all run test
 
 run:
-	FFS_ENV=dev deno run --allow-all src/main.ts
+	FFS_ENV=dev FFS_STORE_ROOT=. FFS_USERS_FILE=data/users-file.json deno run --allow-all src/main.ts
 
 run-nosec:
 	FFS_ENV=dev FFS_ABANDON_SECURITY=true deno run --allow-all src/main.ts

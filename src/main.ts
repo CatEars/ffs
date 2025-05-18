@@ -1,7 +1,7 @@
 import { Application } from "jsr:@oak/oak/application";
 import { Router } from "jsr:@oak/oak/router";
 import { registerAllFileListing } from "./file-listing/index.ts";
-import { setConfig, unsecure, validateConfig } from "./config.ts";
+import { unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
 import { registerAllWebsiteRoutes } from "./website/index.ts";
 import { logger } from "./logging/logger.ts";
@@ -10,18 +10,14 @@ import {
   registerAllThumbnailRoutes,
   startThumbnailBackgroundProcess,
 } from "./thumbnails/index.ts";
-import { resolveCacheFolder } from "./files/cache-folder.ts";
-
-setConfig({
-  storeRoot: ".",
-  usersFilePath: "data/users-file.json",
-  cacheRoot: await resolveCacheFolder(),
-});
-validateConfig();
+import { startup } from "./startup.ts";
 
 if (Deno.env.get("FFS_ABANDON_SECURITY") === "true") {
   unsecure();
 }
+
+await startup();
+validateConfig();
 
 const app = new Application();
 const router = new Router();
