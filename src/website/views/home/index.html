@@ -51,10 +51,16 @@
       copy.sort(sortingFunction);
       return copy;
     }
+
+    function getCurrentPath() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const path = urlParams.get("path");
+      return path || ".";
+    }
   </script>
   <div
     class="container"
-    x-data="{ root: '.', files: [], sorting: 'no-sorting' }"
+    x-data="{ root: getCurrentPath(), files: [], sorting: 'no-sorting' }"
   >
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">

@@ -41,16 +41,6 @@
     }
   }
 
-  function resolveSvgClassForFile(file) {
-    if (isSoundFile(file.name)) {
-      return "svg-music_note";
-    } else if (isImageFile(file.name)) {
-      return "svg-image";
-    } else if (isMovieFile(file.name)) {
-      return "svg-videocam";
-    }
-  }
-
   function resolveSvgLocationForFile(file) {
     if (isSoundFile(file.name)) {
       return "/static/svg/music_note.svg";
@@ -83,17 +73,27 @@
     }
     return imageSource
   }
+
+  function calculatePath(root, fileName) {
+    if (fileName === '..') {
+      const l = ''.lastI
+      const lastIndex = root.lastIndexOf('/')
+      if (lastIndex === -1) {
+        return root
+      }
+      return root.substring(0, lastIndex)
+    } else {
+      return `${root}/${fileName}`
+    }
+  }
 </script>
 <template x-if="file.isDirectory">
-  <div
-    @click="event.preventDefault(); root = updatePath(root, file.name)"
-    class="pointer"
-  >
+  <a class="text-decoration-none" x-bind:href="`/home/?path=${calculatePath(root, file.name)}`">
     <img height="125" class="card-img-top" src="/static/svg/folder.svg"></img>
     <div class="card-body">
       <span class="card-text" x-text="`${file.name}/`"></span>  
     </div>
-  </div>
+  </a>
 </template>
 <template x-if="file.isFile && isMediaFile(file.name)">
   <a
@@ -102,7 +102,7 @@
   >
     <div x-data="{ imgSrc: resolveSvgLocationForFile(file) }">
       <img height="125"
-          x-bind:class="getCssClassesForFileImage(file)" 
+          class="card-img-top" 
           x-bind:src="imgSrc"
           @load="tryPrefetchThumbnail(root, file).then(src => imgSrc = src).catch(() => {})"></img>
 
