@@ -38,5 +38,6 @@ if (areThumbnailsAvailable()) {
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-logger.info("Starting server on http://localhost:8080");
-app.listen({ port: 8080 });
+const port = 8080;
+logger.info(`Starting server on port ${port}`);
+app.listen({ port });

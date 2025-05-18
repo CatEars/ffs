@@ -5,7 +5,9 @@ import { registerGetThumbnail } from "./get-thumbnail.ts";
 
 export function areThumbnailsAvailable() {
   const proc = runFfmpegVersion();
-
+  if (proc === false) {
+    return false;
+  }
   const stdout = new TextDecoder().decode(proc.stdout);
   return proc.success && isFfmpegVersionString(stdout);
 }
@@ -52,7 +54,12 @@ export async function prioritizeThumbnail(filePath: string) {
 }
 
 function runFfmpegVersion() {
-  return new Deno.Command("ffmpeg", { args: ["-version"] }).outputSync();
+  try {
+    return new Deno.Command("ffmpeg", { args: ["-version"] }).outputSync();
+  } catch {
+    // Intentionally left empty
+    return false;
+  }
 }
 
 function isFfmpegVersionString(programOutput: string) {

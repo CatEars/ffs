@@ -17,4 +17,5 @@ unpack-favicon:
 	
 setup: download-dependencies unpack-favicon
 
-	
+build-docker:
+	docker build . -t catears/ffs

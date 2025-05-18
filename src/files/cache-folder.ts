@@ -1,5 +1,4 @@
 import { relative, resolve } from "@std/path";
-import { logger } from "../logging/logger.ts";
 import { getCacheRoot, getStoreRoot } from "../config.ts";
 import { existsSync } from "@std/fs/exists";
 
@@ -23,11 +22,6 @@ export async function resolveCacheFolder() {
   if (envEntry && (await Deno.stat(envEntry)).isDirectory) {
     return envEntry;
   } else if (prior) {
-    logger.debug(
-      "Found prior cache folder",
-      prior,
-      "and will use that over creating new",
-    );
     return prior;
   } else {
     return await Deno.makeTempDir({ prefix: cachePrefix });
