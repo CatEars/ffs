@@ -26,7 +26,12 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
       tempFile,
     ],
   });
-  await command.output();
+  const result = await command.output();
+  if (!result.success) {
+    logger.debug("ffmpeg problems", new TextDecoder().decode(result.stderr));
+    await Deno.remove(tempFile);
+    return;
+  }
   await move(tempFile, outputPath, { overwrite: true });
   logger.debug(
     "Generated thumbnail",

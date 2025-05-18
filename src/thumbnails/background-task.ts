@@ -5,8 +5,10 @@ import { ThumbnailRequest } from "./types.ts";
 import { generateThumbnail, thumbnailExists } from "./generate-thumbnail.ts";
 import { sleep } from "../utils/sleep.ts";
 import { Buffer } from "node:buffer";
-import { walk, WalkEntry } from "@std/fs";
+import { exists, walk, WalkEntry } from "@std/fs";
 import { extname } from "@std/path";
+import { MemoryCache } from "../utils/memory-cache.ts";
+import { getThumbnailPath } from "../files/cache-folder.ts";
 
 const cacheRoot = getCacheRoot();
 const storeRoot = getStoreRoot();
@@ -16,6 +18,8 @@ logger.info(
 );
 
 const filesToPrioritize: ThumbnailRequest[] = [];
+const fiveMinutes = 1000 * 60 * 60 * 5;
+const recentlyParsedThumbnails = new MemoryCache<ThumbnailRequest>(fiveMinutes);
 
 function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
   const request = new TextDecoder().decode(data);
@@ -28,7 +32,7 @@ function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
     try {
       const res = JSON.parse(line) as ThumbnailRequest;
       if (!res.filePath || !res.filePath.trim()) {
-        return;
+        continue;
       }
 
       // Always push STDIN requests to top. Let those found on own be at end
@@ -62,12 +66,19 @@ async function findFilesToThumbnail() {
 }
 
 await findFilesToThumbnail();
-setInterval(findFilesToThumbnail, devModeEnabled ? 5000 : 60_000);
+setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);
 
 while (true) {
   while (filesToPrioritize.length > 0) {
     const next = filesToPrioritize.splice(0, 1)[0];
+    if (
+      recentlyParsedThumbnails.get(next.filePath) ||
+      await exists(getThumbnailPath(next.filePath))
+    ) {
+      continue;
+    }
     await generateThumbnail(next);
+    recentlyParsedThumbnails.set(next.filePath, next);
   }
   await sleep(500);
 }
