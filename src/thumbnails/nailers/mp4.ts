@@ -4,6 +4,7 @@ import { ensureDir } from "@std/fs/ensure-dir";
 import { dirname } from "@std/path/dirname";
 import { getThumbnailPath } from "../../files/cache-folder.ts";
 import { move } from "@std/fs";
+import { getCacheRoot } from "../../config.ts";
 
 type Mp4Info = {
   duration: number;
@@ -41,6 +42,7 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
   const outputPath = getThumbnailPath(thumbnail.filePath);
   const tempFile = await Deno.makeTempFile({
     prefix: "ffs_mp4gen",
+    dir: getCacheRoot(),
     suffix: ".webp",
   });
   ensureDir(dirname(outputPath));

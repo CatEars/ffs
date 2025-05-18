@@ -78,7 +78,17 @@ while (true) {
     ) {
       continue;
     }
-    await generateThumbnail(next);
+    try {
+      await generateThumbnail(next);
+    } catch (err) {
+      logger.debug(
+        "Failed to generate thumbnail for",
+        next,
+        "Skiping. error:",
+        err,
+      );
+    }
+
     recentlyParsedThumbnails.set(next.filePath, next);
   }
   await sleep(500);
