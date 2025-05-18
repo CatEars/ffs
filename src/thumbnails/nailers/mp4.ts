@@ -37,7 +37,7 @@ async function getMp4Duration(thumbnail: ThumbnailRequest): Promise<Mp4Info> {
 
 export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
   const mp4Info = await getMp4Duration(thumbnail);
-  const position = mp4Info.duration * 0.45;
+  const position = (mp4Info.duration * 0.45) || 30;
   const outputPath = getThumbnailPath(thumbnail.filePath);
   const tempFile = await Deno.makeTempFile({
     prefix: "ffs_mp4gen",

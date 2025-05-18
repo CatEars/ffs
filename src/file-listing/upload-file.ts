@@ -7,6 +7,7 @@ import {
   HTTP_403_FORBIDDEN,
 } from "../utils/http-codes.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
+import { resolve } from "@std/path/resolve";
 
 export function registerUploadFileRoute(router: Router) {
   router.post("/api/file/upload", baseMiddlewares(), async (ctx) => {
@@ -19,8 +20,10 @@ export function registerUploadFileRoute(router: Router) {
     }
     const name = file.name;
 
-    if (fileExistsUnder(directory, getStoreRoot())) {
-      const filePath = resolveUploadFilename(directory, name);
+    const root = getStoreRoot();
+    const targetDirectory = resolve(root, directory);
+    if (fileExistsUnder(targetDirectory, root)) {
+      const filePath = resolveUploadFilename(targetDirectory, name);
       await Deno.writeFile(filePath, file.stream());
       ctx.response.redirect("/home/");
     } else {

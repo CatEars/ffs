@@ -4,6 +4,7 @@ import { getStoreRoot } from "../config.ts";
 import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 import { apiProtect } from "../security/api-protect.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
+import { resolve } from "jsr:@std/path";
 
 type ApiFile = Deno.DirEntry & {
   date: Date;
@@ -18,7 +19,8 @@ export function registerDirectoryRoutes(router: Router) {
     }
 
     const root = getStoreRoot();
-    const fileOrDirectory = fileExistsUnder(pathToCheck, root);
+    const combinedPath = resolve(root, pathToCheck);
+    const fileOrDirectory = fileExistsUnder(combinedPath, root);
     if (fileOrDirectory) {
       const files = Deno.readDirSync(fileOrDirectory).toArray();
       const results: ApiFile[] = [];
