@@ -1,0 +1,20 @@
+<% layout('/templates/base.html') %>
+<div class="container">
+  <div id="video-holder" class="col-12"></div>
+  <script>
+    function getVideoSource() {
+      const params = new URLSearchParams(window.location.search);
+      const path = params.get("path") || ".";
+      return path;
+    }
+
+    const element = document.getElementById("video-holder");
+    if (!element.innerHTML.trim()) {
+      element.innerHTML = `
+      <video class="col-12" controls>
+        <source src="/api/file?path=${getVideoSource()}" type="video/mp4" />
+      </video>
+      `;
+    }
+  </script>
+</div>
