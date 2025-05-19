@@ -30,5 +30,5 @@ build-dist: build-docker
 make-sure-tag-is-latest:
 	read -p 'Please enter the tag you think you are releasing ' tag
 
-release: #make-sure-tag-is-latest build-dist
+release: make-sure-tag-is-latest build-dist
 	./scripts/create-github-release.sh
