@@ -26,10 +26,9 @@ build-docker: ensure-dist
 build-dist: build-docker
 	rm -rf dist/*
 	docker save catears/ffs | gzip > dist/ffs.$(shell git describe --tags --abbrev=0).tar.gz
-	git archive HEAD --format=tar.gz --prefix=ffs/ --output dist/ffs.source-code.$(shell git describe --tags --abbrev=0).tar.gz
 
 make-sure-tag-is-latest:
 	read -p 'Please enter the tag you think you are releasing ' tag
 
-release: make-sure-tag-is-latest build-dist
+release: #make-sure-tag-is-latest build-dist
 	./scripts/create-github-release.sh
