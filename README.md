@@ -1,6 +1,6 @@
 # FFS
 
-All the different file servers I have tested have come short, see [motivation](./docs/motivation.md).
+All the different file servers I have tested have come short.
 
 I want:
 
