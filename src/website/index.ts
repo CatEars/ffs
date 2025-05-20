@@ -1,6 +1,11 @@
 import { Eta } from "jsr:@eta-dev/eta";
 import { Router } from "@oak/oak/router";
-import { collectAllPages, PlainPage, PluginPage } from "./collect-all-pages.ts";
+import {
+  collectAllPages,
+  NavbarLink,
+  PlainPage,
+  PluginPage,
+} from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
 import { devModeEnabled, viewPath } from "../config.ts";
 import { Next } from "@oak/oak/middleware";
@@ -8,6 +13,7 @@ import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 import { logger } from "../logging/logger.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { registerStaticRoutes } from "./static-files.ts";
+import { resolve } from "@std/path/resolve";
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -24,10 +30,25 @@ async function registerPluginPages(
   pluginPages: PluginPage[],
   router: Router,
 ) {
+  const navbarLinks: NavbarLink[] = [];
   for (const page of pluginPages) {
     logger.info("Registering routes from", page.displayName);
-    await page.register(router);
+    await page.register({
+      router,
+      navbarLinks,
+    });
   }
+  await writeNavbarExtensions(navbarLinks);
+}
+
+async function writeNavbarExtensions(navbarLinks: NavbarLink[]) {
+  const links = navbarLinks.map((link) =>
+    `<a href="${link.webPath}" class="nav-link">${link.displayText}</a>`
+  );
+  await Deno.writeTextFile(
+    resolve(viewPath, "templates/header/links-added-by-plugins.html"),
+    links.join("\n"),
+  );
 }
 
 function passAlongMiddleware(_ctx: Context, next: Next) {

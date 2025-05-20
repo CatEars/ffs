@@ -2,6 +2,9 @@ import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
 import { Router } from "@oak/oak/router";
 import { Middleware } from "@oak/oak/middleware";
+import { walk } from "@std/fs/walk";
+import { relative } from "@std/path/relative";
+import { dirname } from "@std/path/dirname";
 
 export type StaticLoader = () => object;
 export type StaticPage = {
@@ -22,10 +25,20 @@ export type PlainPage = {
   middlewares: Middleware[];
 };
 
+export type NavbarLink = {
+  displayText: string;
+  webPath: string;
+};
+
+export type ApplicationContext = {
+  router: Router;
+  navbarLinks: NavbarLink[];
+};
+
 export type PluginPage = {
   type: "Plugin";
   displayName: string;
-  register: (router: Router) => Promise<void>;
+  register: (context: ApplicationContext) => Promise<void>;
 };
 
 export type Page = PlainPage | PluginPage;
@@ -35,42 +48,43 @@ type FileEntry = {
   name: string;
 };
 
-function collectDirectoryTree() {
-  const root = viewPath;
-  const foundDirectories = [{
-    actualPath: root,
-    name: "/",
-  }];
+function isUnderTemplateDirectory(path: string) {
+  return path.includes("/templates/");
+}
+
+function isPartialHtmlFile(path: string) {
+  return path.endsWith(".partial.html");
+}
+
+async function collectDirectoryTree() {
   const allEntries: FileEntry[] = [];
-  for (let idx = 0; idx < foundDirectories.length; ++idx) {
-    const currentDirectory = foundDirectories[idx];
-    if (currentDirectory.name === "/templates/") {
-      // Specifically skip the /views/templates directory. It should only be used by `eta`
+  for await (
+    const entry of walk(viewPath, {
+      includeDirs: false,
+      includeFiles: true,
+      includeSymlinks: false,
+    })
+  ) {
+    const parent = dirname(relative(viewPath, entry.path));
+    const entryToSubmit: FileEntry = {
+      parent: parent === "." ? "/" : `/${parent}/`,
+      name: entry.name,
+    };
+    if (
+      isUnderTemplateDirectory(entryToSubmit.parent) ||
+      isPartialHtmlFile(entryToSubmit.name)
+    ) {
+      // Specifically skip /templates/ directories and partials. They are always included via `eta`
       continue;
     }
-    const entries = Deno.readDirSync(currentDirectory.actualPath);
-    for (const entry of entries) {
-      if (entry.isDirectory) {
-        foundDirectories.push({
-          actualPath: currentDirectory.actualPath + `${entry.name}/`,
-          name: currentDirectory.name + `${entry.name}/`,
-        });
-      } else if (entry.isFile) {
-        allEntries.push({
-          parent: currentDirectory.name,
-          name: entry.name,
-        });
-      }
-    }
+    allEntries.push(entryToSubmit);
   }
   return allEntries;
 }
 
 export async function collectAllPages(): Promise<Page[]> {
-  const allEntries = collectDirectoryTree();
-  const htmls = allEntries.filter((entry) =>
-    entry.name.endsWith(".html") && !entry.name.endsWith(".partial.html")
-  );
+  const allEntries = await collectDirectoryTree();
+  const htmls = allEntries.filter((entry) => entry.name.endsWith(".html"));
   const denos = allEntries.filter((entry) => entry.name.endsWith(".ts"));
   const pages: Page[] = [];
   for (const html of htmls) {
