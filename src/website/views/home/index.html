@@ -57,10 +57,32 @@
       const path = urlParams.get("path");
       return path || ".";
     }
+
+    // Set an item in localStorage
+    function setLocalStorage(key, value) {
+      try {
+        const serializedValue = JSON.stringify(value);
+        localStorage.setItem(key, serializedValue);
+        return value;
+      } catch (e) {
+        console.error("Error setting item to localStorage", e);
+      }
+    }
+
+    // Get an item from localStorage
+    function getLocalStorage(key) {
+      try {
+        const serializedValue = localStorage.getItem(key);
+        return serializedValue ? JSON.parse(serializedValue) : null;
+      } catch (e) {
+        console.error("Error getting item from localStorage", e);
+        return null;
+      }
+    }
   </script>
   <div
     class="container"
-    x-data="{ root: getCurrentPath(), files: [], sorting: 'no-sorting' }"
+    x-data="{ root: getCurrentPath(), files: [], sorting: getLocalStorage('file-sort-order') || 'no-sorting' }"
   >
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">
