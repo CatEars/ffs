@@ -28,10 +28,6 @@
     }
 
     function sortedBy(files, sorting) {
-      if (sorting === "no-sorting") {
-        return files;
-      }
-
       const copy = JSON.parse(JSON.stringify(files));
       mapDateStrToDate(copy);
 
@@ -82,7 +78,7 @@
   </script>
   <div
     class="container"
-    x-data="{ root: getCurrentPath(), files: [], sorting: getLocalStorage('file-sort-order') || 'no-sorting' }"
+    x-data="{ root: getCurrentPath(), files: [], sorting: getLocalStorage('file-sort-order') || 'newest' }"
   >
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">

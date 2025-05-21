@@ -1,18 +1,15 @@
 <form class="m-2">
   <div class="col">
-    <%~ include('./sort-radio.partial.html', { value: 'no-sorting',
-    displayValue: 'No sorting' }) %>
+    <%~ include('./sort-radio-img.partial.html', { value: 'newest', svgWebpath:
+    '/static/svg/child.svg' }) %>
     <!-- -->
-    <%~ include('./sort-radio.partial.html', { value: 'newest', displayValue:
-    'Newest' }) %>
+    <%~ include('./sort-radio-img.partial.html', { value: 'oldest', svgWebpath:
+    '/static/svg/elderly.svg' }) %>
     <!-- -->
-    <%~ include('./sort-radio.partial.html', { value: 'oldest', displayValue:
-    'Oldest' }) %>
+    <%~ include('./sort-radio.partial.html', { value: 'a-z', displayValue:
+    'A-Z'}) %>
     <!-- -->
-    <%~ include('./sort-radio.partial.html', { value: 'a-z', displayValue: 'A-Z'
-    }) %>
-    <!-- -->
-    <%~ include('./sort-radio.partial.html', { value: 'z-a', displayValue: 'Z-A'
-    }) %>
+    <%~ include('./sort-radio.partial.html', { value: 'z-a', displayValue:
+    'Z-A'}) %>
   </div>
 </form>
