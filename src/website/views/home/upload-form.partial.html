@@ -16,12 +16,12 @@
         />
         <div class="col-auto">
           <button
-            class="btn btn-outline-secondary me-2"
+            class="btn btn-outline-primary"
             @click="document.getElementById('file').click()"
             type="button"
             id="browseButton"
           >
-            Browse Files
+            <img src="/static/svg/attach.svg" />
           </button>
         </div>
         <div class="col-auto">
@@ -30,7 +30,7 @@
             x-bind:disabled="names.length === 0"
             type="submit"
           >
-            Upload Files
+            <img src="/static/svg/upload_file.svg" />
           </button>
         </div>
         <div class="col d-flex align-items-center">
