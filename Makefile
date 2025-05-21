@@ -21,7 +21,7 @@ unpack-favicon:
 setup: download-dependencies unpack-favicon
 
 build-docker: ensure-dist
-	docker build . -t catears/ffs
+	docker build --no-cache . -t catears/ffs
 
 build-dist: build-docker
 	rm -rf dist/*
