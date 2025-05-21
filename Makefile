@@ -32,3 +32,6 @@ make-sure-tag-is-latest:
 
 release: make-sure-tag-is-latest build-dist
 	./scripts/create-github-release.sh
+
+pack-plugins:
+	./scripts/pack-plugins.sh
