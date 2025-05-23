@@ -33,7 +33,7 @@
           <a
             href=""
             style="padding-left: 0.5em; padding-right: 0.5em"
-            @click="event.preventDefault(); root = gotoFolder(root, index)"
+            x-bind:href="`/home/?path=${gotoFolder(root, index)}`"
             x-text="dir"
           ></a>
         </template>
