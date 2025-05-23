@@ -1,5 +1,6 @@
 import {
   cacheRootKey,
+  requestLogsKey,
   setConfig,
   storeRootKey,
   usersFileKey,
@@ -46,10 +47,14 @@ async function setFirstTimeUserValuesIfLikely() {
       cacheRoot: await resolveCacheFolder(),
       storeRoot: ".",
       usersFilePath: "data/users-file.json",
+      requestLogsFile: "access.log",
     });
   } else {
     if (!Deno.env.get(cacheRootKey)) {
       Deno.env.set(cacheRootKey, await resolveCacheFolder());
+    }
+    if (!Deno.env.get(requestLogsKey)) {
+      Deno.env.set(requestLogsKey, "access.log");
     }
   }
 }

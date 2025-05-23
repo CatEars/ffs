@@ -3,3 +3,4 @@ src/website/static/*
 *.mp4
 testbench
 dist
+access.log

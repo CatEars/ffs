@@ -4,7 +4,7 @@ import { registerAllFileListing } from "./file-listing/index.ts";
 import { unsecure, validateConfig } from "./config.ts";
 import { registerAllLogonRoutes } from "./logon/index.ts";
 import { registerAllWebsiteRoutes } from "./website/index.ts";
-import { logger } from "./logging/logger.ts";
+import { initializeLoggers, logger } from "./logging/logger.ts";
 import {
   areThumbnailsAvailable,
   registerAllThumbnailRoutes,
@@ -18,6 +18,8 @@ if (Deno.env.get("FFS_ABANDON_SECURITY") === "true") {
 
 await startup();
 validateConfig();
+
+await initializeLoggers();
 
 const app = new Application();
 const router = new Router();

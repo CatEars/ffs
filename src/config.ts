@@ -4,11 +4,13 @@ export const devModeEnabled = Deno.env.get("FFS_ENV") === "dev";
 export const storeRootKey = "FFS_STORE_ROOT";
 export const cacheRootKey = "FFS_CACHE_ROOT";
 export const usersFileKey = "FFS_USERS_FILE";
+export const requestLogsKey = "FFS_REQUEST_LOGS_FILE";
 
 type Config = {
   storeRoot: string;
   usersFilePath: string;
   cacheRoot: string;
+  requestLogsFile: string;
 };
 
 function getEnvValueOrThrow(key: string) {
@@ -31,6 +33,10 @@ export function getCacheRoot() {
   return getEnvValueOrThrow(cacheRootKey);
 }
 
+export function getRequestLogsFile() {
+  return getEnvValueOrThrow(requestLogsKey);
+}
+
 export function shouldAbandonSecurity() {
   return noSec;
 }
@@ -43,10 +49,12 @@ export function setConfig(config: Config) {
   Deno.env.set(storeRootKey, config.storeRoot);
   Deno.env.set(cacheRootKey, config.cacheRoot);
   Deno.env.set(usersFileKey, config.usersFilePath);
+  Deno.env.set(requestLogsKey, config.requestLogsFile);
 }
 
 export function validateConfig() {
   getStoreRoot();
   getUsersFilePath();
   getCacheRoot();
+  getRequestLogsFile();
 }
