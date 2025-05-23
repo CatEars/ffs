@@ -28,7 +28,7 @@
             role="switch"
             id="switchCheckChecked"
             x-bind:checked="directoriesFirst"
-            @change="directoriesFirst = !directoriesFirst"
+            @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
           />
           <label class="form-check-label" for="switchCheckChecked"
             >Directories always first</label
