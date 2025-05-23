@@ -1,15 +1,40 @@
 <form class="m-2">
   <div class="col">
-    <%~ include('./sort-radio-img.partial.html', { value: 'newest', svgWebpath:
-    '/static/svg/child.svg' }) %>
-    <!-- -->
-    <%~ include('./sort-radio-img.partial.html', { value: 'oldest', svgWebpath:
-    '/static/svg/elderly.svg' }) %>
-    <!-- -->
-    <%~ include('./sort-radio.partial.html', { value: 'a-z', displayValue:
-    'A-Z'}) %>
-    <!-- -->
-    <%~ include('./sort-radio.partial.html', { value: 'z-a', displayValue:
-    'Z-A'}) %>
+    <div class="row">
+      <div class="col col-sm-auto">
+        <%~ include('./sort-radio-img.partial.html', { value: 'newest',
+        svgWebpath: '/static/svg/child.svg' }) %>
+        <!-- -->
+        <%~ include('./sort-radio-img.partial.html', { value: 'oldest',
+        svgWebpath: '/static/svg/elderly.svg' }) %>
+
+        <!-- -->
+        <%~ include('./sort-radio.partial.html', { value: 'a-z', displayValue:
+        'A-Z'}) %>
+        <!-- -->
+        <%~ include('./sort-radio.partial.html', { value: 'z-a', displayValue:
+        'Z-A'}) %>
+      </div>
+      <div class="col col-sm-auto">
+        <div class="d-flex" style="height: 100%; padding-bottom: 4px">
+          <div class="vr align-self-center" style="height: 60%"></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="switchCheckChecked"
+            x-bind:checked="directoriesFirst"
+            @change="directoriesFirst = !directoriesFirst"
+          />
+          <label class="form-check-label" for="switchCheckChecked"
+            >Directories always first</label
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </form>

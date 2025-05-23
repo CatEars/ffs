@@ -27,7 +27,7 @@
       return [];
     }
 
-    function sortedBy(files, sorting) {
+    function sortedBy(files, sorting, directoriesFirst) {
       const copy = JSON.parse(JSON.stringify(files));
       mapDateStrToDate(copy);
 
@@ -45,6 +45,15 @@
           : () => {};
 
       copy.sort(sortingFunction);
+      if (directoriesFirst) {
+        const directoryFirstSorter = (a, b) =>
+          a.isDirectory && !b.isDirectory
+            ? -1
+            : !a.isDirectory && b.isDirectory
+            ? 1
+            : 0;
+        copy.sort(directoryFirstSorter);
+      }
       return copy;
     }
 
@@ -78,7 +87,7 @@
   </script>
   <div
     class="container"
-    x-data="{ root: getCurrentPath(), files: [], sorting: getLocalStorage('file-sort-order') || 'newest' }"
+    x-data="{ root: getCurrentPath(), files: [], sorting: getLocalStorage('file-sort-order') || 'newest', directoriesFirst: true }"
   >
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">
@@ -103,7 +112,10 @@
     <div
       class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3"
     >
-      <template x-for="(file) in sortedBy(files, sorting)" :key="file.name">
+      <template
+        x-for="(file) in sortedBy(files, sorting, directoriesFirst)"
+        :key="file.name"
+      >
         <div class="col">
           <div class="card"><%~ include('./file.partial.html') %></div>
         </div>
