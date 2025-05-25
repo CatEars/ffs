@@ -12,7 +12,9 @@
     if (!element.innerHTML.trim()) {
       element.innerHTML = `
       <video class="col-12" controls>
-        <source src="/api/file?path=${getVideoSource()}" type="video/mp4" />
+        <source src="/api/file?path=${encodeURIComponent(
+          getVideoSource()
+        )}" type="video/mp4" />
       </video>
       `;
     }
