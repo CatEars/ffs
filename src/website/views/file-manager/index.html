@@ -61,6 +61,16 @@
         .filter((x) => x.path === myPath)
         .map((x) => x.fileName);
     }
+
+    function pasteFiles() {
+      const path = decodeURIComponent(getCurrentPath());
+      const board = getCuttingBoard();
+      resetCuttingBoard();
+      console.log(board);
+      document.getElementById("files-to-move").value = JSON.stringify(board);
+      document.getElementById("destination").value = path;
+      document.getElementById("paste-form").submit();
+    }
   </script>
   <h1>File Manager</h1>
   <%~ include('./upload-form.partial.html') %>
@@ -120,15 +130,28 @@
       id="control-panel"
       class="fixed-bottom bg-dark border-top p-3 text-center"
     >
-      <button class="btn btn-secondary mr-4">
+      <button class="btn btn-secondary">
         <img
           width="32"
           @click="cutFiles(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = findFilesToGrey()"
           src="/static/svg/content_cut.svg"
         />
       </button>
-      <button class="btn btn-secondary mr-4">
-        <img width="32" src="/static/svg/content_paste.svg" />
+      <form
+        id="paste-form"
+        action="/api/file/move"
+        method="POST"
+        style="display: none"
+      >
+        <input id="files-to-move" name="files-to-move" type="hidden" />
+        <input id="destination" name="destination" type="hidden" />
+      </form>
+      <button class="btn btn-secondary">
+        <img
+          width="32"
+          @click="pasteFiles()"
+          src="/static/svg/content_paste.svg"
+        />
       </button>
       <button class="btn btn-secondary">
         <img
