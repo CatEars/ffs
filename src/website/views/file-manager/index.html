@@ -33,7 +33,7 @@
           <template x-for="file of sort(files)">
             <tr>
               <td>
-                <div class="form-check px-2">
+                <div class="form-check">
                   <template x-if="!file.isDirectory">
                     <input
                       class="form-check-input"
@@ -67,5 +67,16 @@
         </tbody>
       </table>
     </form>
+    <div
+      id="control-panel"
+      class="fixed-bottom bg-dark border-top p-3 text-center"
+    >
+      <button class="btn btn-secondary mr-4">
+        <img width="32" src="/static/svg/content_cut.svg" />
+      </button>
+      <button class="btn btn-secondary">
+        <img width="32" src="/static/svg/content_paste.svg" />
+      </button>
+    </div>
   </div>
 </section>
