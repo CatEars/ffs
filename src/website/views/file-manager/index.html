@@ -44,6 +44,10 @@
       return `${getCuttingBoard().length} files in cutting board`;
     }
 
+    function resetCuttingBoard() {
+      storeToCuttingBoard([]);
+    }
+
     function fileInCuttingBoard(file) {
       const myPath = decodeURIComponent(getCurrentPath());
       return getCuttingBoard().some(
@@ -59,6 +63,7 @@
     }
   </script>
   <h1>File Manager</h1>
+  <%~ include('./upload-form.partial.html') %>
   <div
     x-data="{ files: [], filesDisplay: getCuttingBoardDisplay(), filesToGrey: [] }"
   >
@@ -70,7 +75,6 @@
         <thead>
           <tr>
             <th></th>
-            <th>Type</th>
             <th>Name</th>
           </tr>
         </thead>
@@ -91,9 +95,6 @@
                     ></label>
                   </template>
                 </div>
-              </td>
-              <td>
-                <span x-text="file.isDirectory ? 'Directory' : 'File'"></span>
               </td>
               <td>
                 <div class="px-2">
@@ -126,8 +127,15 @@
           src="/static/svg/content_cut.svg"
         />
       </button>
-      <button class="btn btn-secondary">
+      <button class="btn btn-secondary mr-4">
         <img width="32" src="/static/svg/content_paste.svg" />
+      </button>
+      <button class="btn btn-secondary">
+        <img
+          @click="resetCuttingBoard(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = []"
+          width="32"
+          src="/static/svg/undo.svg"
+        />
       </button>
       <p x-text="filesDisplay"></p>
     </div>

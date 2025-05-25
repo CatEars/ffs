@@ -25,7 +25,9 @@ export function registerUploadFileRoute(router: Router) {
     if (fileExistsUnder(targetDirectory, root)) {
       const filePath = resolveUploadFilename(targetDirectory, name);
       await Deno.writeFile(filePath, file.stream());
-      ctx.response.redirect("/home/");
+      ctx.response.redirect(
+        ctx.request.headers.get("Referer") || "/file-manager/",
+      );
     } else {
       ctx.response.status = HTTP_403_FORBIDDEN;
     }

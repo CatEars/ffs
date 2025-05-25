@@ -41,7 +41,12 @@
       </div>
     </div>
   </div>
-  <input type="hidden" id="directory" name="directory" x-bind:value="root" />
+  <input
+    type="hidden"
+    id="directory"
+    name="directory"
+    x-bind:value="decodeURIComponent(getCurrentPath())"
+  />
   <script>
     function getFilenamesFromEvent(evt) {
       const result = [];
