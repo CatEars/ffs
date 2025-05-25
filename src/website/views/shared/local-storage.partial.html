@@ -20,4 +20,26 @@
       return null;
     }
   }
+
+  // Set an item in sessionStorage
+  function setSessionStorage(key, value) {
+    try {
+      const serializedValue = JSON.stringify(value);
+      sessionStorage.setItem(key, serializedValue);
+      return value;
+    } catch (e) {
+      console.error("Error setting item to sessionStorage", e);
+    }
+  }
+
+  // Get an item from sessionStorage
+  function getSessionStorage(key, defaultValue) {
+    try {
+      const serializedValue = sessionStorage.getItem(key);
+      return serializedValue ? JSON.parse(serializedValue) : defaultValue;
+    } catch (e) {
+      console.error("Error getting item from sessionStorage", e);
+      return null;
+    }
+  }
 </script>

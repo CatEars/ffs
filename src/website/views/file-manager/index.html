@@ -1,42 +1,87 @@
 <% layout('/templates/base.html') %>
 <section class="container">
   <%~ include('/shared/file-api.partial.html') %>
+  <!-- -->
+  <%~ include('/shared/local-storage.partial.html') %>
   <script>
     function sort(files) {
-      console.log(files);
-      const result = sortedBy(files, "a-z", true);
-      console.log(result);
-      return result;
+      return sortedBy(files, "a-z", true);
     }
 
     function getLinkTo(file) {
       const currentPath = decodeURIComponent(getCurrentPath());
-      console.log(currentPath, file.name);
-
-      const path = encodeURIComponent(`${currentPath}/${file.name}`);
+      const path = calculatePath(currentPath, file.name);
       return `/file-manager/?path=${path}`;
+    }
+
+    function cutFiles() {
+      const myPath = getCurrentPath();
+      const clickedFiles = [];
+      for (const element of document.querySelectorAll(".file-to-cut")) {
+        if (element.checked) {
+          clickedFiles.push(element.value);
+        }
+        element.checked = false;
+      }
+      const filesToStore = clickedFiles.map((elem) => ({
+        path: myPath,
+        fileName: elem,
+      }));
+      if (filesToStore.length > 0) {
+        storeToCuttingBoard(filesToStore);
+      }
+    }
+
+    function storeToCuttingBoard(files) {
+      return setSessionStorage("cutting-board", files);
+    }
+
+    function getCuttingBoard() {
+      return getSessionStorage("cutting-board", []);
+    }
+
+    function getCuttingBoardDisplay() {
+      return `${getCuttingBoard().length} files in cutting board`;
+    }
+
+    function fileInCuttingBoard(file) {
+      const myPath = decodeURIComponent(getCurrentPath());
+      return getCuttingBoard().some(
+        (x) => x.path === myPath && x.fileName === file.name
+      );
+    }
+
+    function findFilesToGrey() {
+      const myPath = decodeURIComponent(getCurrentPath());
+      return getCuttingBoard()
+        .filter((x) => x.path === myPath)
+        .map((x) => x.fileName);
     }
   </script>
   <h1>File Manager</h1>
-  <div x-data="{ files: [] }">
-    <div x-effect="files = await getFiles(getCurrentPath())"></div>
+  <div
+    x-data="{ files: [], filesDisplay: getCuttingBoardDisplay(), filesToGrey: [] }"
+  >
+    <div
+      x-effect="files = sort(await getFiles(getCurrentPath())); filesToGrey = findFilesToGrey()"
+    ></div>
     <form>
       <table class="file-explorer-table">
         <thead>
           <tr>
             <th></th>
-            <th>Name</th>
             <th>Type</th>
+            <th>Name</th>
           </tr>
         </thead>
         <tbody>
-          <template x-for="file of sort(files)">
+          <template x-for="file of files">
             <tr>
               <td>
                 <div class="form-check">
                   <template x-if="!file.isDirectory">
                     <input
-                      class="form-check-input"
+                      class="form-check-input file-to-cut"
                       type="checkbox"
                       x-bind:value="file.name"
                     />
@@ -48,6 +93,9 @@
                 </div>
               </td>
               <td>
+                <span x-text="file.isDirectory ? 'Directory' : 'File'"></span>
+              </td>
+              <td>
                 <div class="px-2">
                   <template x-if="file.isDirectory">
                     <a x-bind:href="getLinkTo(file)">
@@ -55,12 +103,12 @@
                     </a>
                   </template>
                   <template x-if="!file.isDirectory">
-                    <span x-text="file.name"></span>
+                    <span
+                      x-text="file.name"
+                      x-bind:class="filesToGrey.includes(file.name) ? 'text-muted' : ''"
+                    ></span>
                   </template>
                 </div>
-              </td>
-              <td>
-                <span x-text="file.isDirectory ? 'Directory' : 'File'"></span>
               </td>
             </tr>
           </template>
@@ -72,11 +120,16 @@
       class="fixed-bottom bg-dark border-top p-3 text-center"
     >
       <button class="btn btn-secondary mr-4">
-        <img width="32" src="/static/svg/content_cut.svg" />
+        <img
+          width="32"
+          @click="cutFiles(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = findFilesToGrey()"
+          src="/static/svg/content_cut.svg"
+        />
       </button>
       <button class="btn btn-secondary">
         <img width="32" src="/static/svg/content_paste.svg" />
       </button>
+      <p x-text="filesDisplay"></p>
     </div>
   </div>
 </section>

@@ -74,18 +74,6 @@
     return imageSource
   }
 
-  function calculatePath(root, fileName) {
-    if (fileName === '..') {
-      const l = ''.lastI
-      const lastIndex = root.lastIndexOf('/')
-      if (lastIndex === -1) {
-        return root
-      }
-      return root.substring(0, lastIndex)
-    } else {
-      return encodeURIComponent(`${root}/${fileName}`)
-    }
-  }
 </script>
 <template x-if="file.isDirectory">
   <a class="text-decoration-none" x-bind:href="`/home/?path=${calculatePath(root, file.name)}`">
