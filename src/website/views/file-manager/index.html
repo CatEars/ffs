@@ -8,27 +8,64 @@
       console.log(result);
       return result;
     }
+
+    function getLinkTo(file) {
+      const currentPath = decodeURIComponent(getCurrentPath());
+      console.log(currentPath, file.name);
+
+      const path = encodeURIComponent(`${currentPath}/${file.name}`);
+      return `/file-manager/?path=${path}`;
+    }
   </script>
   <h1>File Manager</h1>
   <div x-data="{ files: [] }">
     <div x-effect="files = await getFiles(getCurrentPath())"></div>
-    <template x-for="file of sort(files)">
-      <div class="row">
-        <template x-if="file.isDirectory">
-          <div class="col">
-            <p>Link to <span x-text="file.name"></span></p>
-          </div>
-        </template>
-        <template x-if="file.isFile">
-          <div class="col">
-            <p>File <span x-text="file.name"></span></p>
-          </div>
-        </template>
-      </div>
-
-      <ul>
-        <li><p x-text="file.name"></p></li>
-      </ul>
-    </template>
+    <form>
+      <table class="file-explorer-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="file of sort(files)">
+            <tr>
+              <td>
+                <div class="form-check px-2">
+                  <template x-if="!file.isDirectory">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      x-bind:value="file.name"
+                    />
+                    <label
+                      class="form-check-label"
+                      x-bind:for="file.name"
+                    ></label>
+                  </template>
+                </div>
+              </td>
+              <td>
+                <div class="px-2">
+                  <template x-if="file.isDirectory">
+                    <a x-bind:href="getLinkTo(file)">
+                      <span x-text="file.name"></span>
+                    </a>
+                  </template>
+                  <template x-if="!file.isDirectory">
+                    <span x-text="file.name"></span>
+                  </template>
+                </div>
+              </td>
+              <td>
+                <span x-text="file.isDirectory ? 'Directory' : 'File'"></span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </form>
   </div>
 </section>
