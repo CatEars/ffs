@@ -93,24 +93,25 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <template x-if="!file.isDirectory">
-                    <input
-                      class="form-check-input file-to-cut"
-                      type="checkbox"
-                      x-bind:value="file.name"
-                    />
-                    <label
-                      class="form-check-label"
-                      x-bind:for="file.name"
-                    ></label>
-                  </template>
+                  <input
+                    class="form-check-input file-to-cut"
+                    type="checkbox"
+                    x-bind:value="file.name"
+                  />
+                  <label
+                    class="form-check-label"
+                    x-bind:for="file.name"
+                  ></label>
                 </div>
               </td>
               <td>
                 <div class="px-2">
                   <template x-if="file.isDirectory">
                     <a x-bind:href="getLinkTo(file)">
-                      <span x-text="file.name"></span>
+                      <span
+                        x-bind:class="filesToGrey.includes(file.name) ? 'text-muted' : ''"
+                        x-text="file.name"
+                      ></span>
                     </a>
                   </template>
                   <template x-if="!file.isDirectory">
