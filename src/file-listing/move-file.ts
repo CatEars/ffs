@@ -2,6 +2,9 @@ import { Router } from "@oak/oak";
 import { join } from "@std/path";
 import { move } from "@std/fs";
 import { logger } from "../logging/logger.ts";
+import { getStoreRoot } from "../config.ts";
+import { fileExistsUnder } from "../utils/file-exists-under.ts";
+import { HTTP_400_BAD_REQUEST } from "../utils/http-codes.ts";
 
 export function registerMoveFileRoute(router: Router) {
   router.post("/api/file/move", async (ctx) => {
@@ -26,10 +29,18 @@ export function registerMoveFileRoute(router: Router) {
       return;
     }
 
+    const root = getStoreRoot();
     for (const { path, fileName } of filesToMove) {
       try {
-        const from = join(path, fileName);
-        const to = join(destination.toString(), fileName);
+        const from = fileExistsUnder(join(root, path, fileName), root);
+        const to = fileExistsUnder(
+          join(root, destination.toString(), fileName),
+          root,
+        );
+        if (!from || !to) {
+          ctx.response.status = HTTP_400_BAD_REQUEST;
+          return;
+        }
         await move(from, to, { overwrite: false });
       } catch (err) {
         logger.warn(
