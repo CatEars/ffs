@@ -13,7 +13,17 @@ import {
   HTTP_404_NOT_FOUND,
 } from "../utils/http-codes.ts";
 import { resolve } from "@std/path/resolve";
-import { fileExistsUnder } from "../utils/file-exists-under.ts";
+
+function fileExistsUnder(
+  filePath: string,
+  root: string,
+): string | undefined {
+  const resolvedPath = Deno.realPathSync(filePath);
+  const resolvedRoot = Deno.realPathSync(root);
+  if (resolvedPath.startsWith(resolvedRoot)) {
+    return resolvedPath;
+  }
+}
 
 async function tryGetFile(thumbnailPath: string) {
   for (let cnt = 0; cnt < 20; ++cnt) {
