@@ -77,3 +77,17 @@ Deno.test("File tree can stat individual files under a directory", () => {
     }
   }
 });
+
+Deno.test("When resolving files that do not exist, inside a file tree, the resulting path is returned", () => {
+  const resolved = sampleFileTree.resolvePath(
+    "./test/this-file-does-not-exist.ts",
+  );
+  assertEquals(resolved.type, "valid");
+});
+
+Deno.test("When resolving files that do not exist, outside the file tree, an invalid result is returned", () => {
+  const resolved = sampleFileTree.resolvePath(
+    "../../../test/this-file-does-not-exist.ts",
+  );
+  assertEquals(resolved.type, "invalid");
+});

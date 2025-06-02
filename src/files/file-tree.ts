@@ -35,18 +35,27 @@ export class FileTree {
     return existsSync(this.root, { isDirectory: true });
   }
 
+  private ensureResolveIsUnderRoot(suggestedPath: string): PathResult {
+    if (suggestedPath.startsWith(this.root)) {
+      return {
+        type: "valid",
+        fullPath: suggestedPath,
+      };
+    } else {
+      return {
+        type: "invalid",
+      };
+    }
+  }
+
   resolvePath(...relativePaths: string[]): PathResult {
     try {
-      const resolved = Deno.realPathSync(resolve(this.root, ...relativePaths));
-      if (resolved.startsWith(this.root)) {
-        return {
-          type: "valid",
-          fullPath: resolved,
-        };
+      const resolved = resolve(this.root, ...relativePaths);
+      if (existsSync(resolved)) {
+        const realPath = Deno.realPathSync(resolved);
+        return this.ensureResolveIsUnderRoot(realPath);
       } else {
-        return {
-          type: "invalid",
-        };
+        return this.ensureResolveIsUnderRoot(resolved);
       }
     } catch {
       return {
