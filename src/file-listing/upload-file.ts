@@ -8,30 +8,36 @@ import {
 } from "../utils/http-codes.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { resolve } from "@std/path/resolve";
+import { apiProtect } from "../security/api-protect.ts";
 
 export function registerUploadFileRoute(router: Router) {
-  router.post("/api/file/upload", baseMiddlewares(), async (ctx) => {
-    const data = await ctx.request.body.formData();
-    const directory = data.get("directory")?.toString() || getStoreRoot();
-    const file = data.get("file");
-    if (!(file instanceof File)) {
-      ctx.response.status = HTTP_400_BAD_REQUEST;
-      return;
-    }
-    const name = file.name;
+  router.post(
+    "/api/file/upload",
+    baseMiddlewares(),
+    apiProtect,
+    async (ctx) => {
+      const data = await ctx.request.body.formData();
+      const directory = data.get("directory")?.toString() || getStoreRoot();
+      const file = data.get("file");
+      if (!(file instanceof File)) {
+        ctx.response.status = HTTP_400_BAD_REQUEST;
+        return;
+      }
+      const name = file.name;
 
-    const root = getStoreRoot();
-    const targetDirectory = resolve(root, directory);
-    if (fileExistsUnder(targetDirectory, root)) {
-      const filePath = resolveUploadFilename(targetDirectory, name);
-      await Deno.writeFile(filePath, file.stream());
-      ctx.response.redirect(
-        ctx.request.headers.get("Referer") || "/file-manager/",
-      );
-    } else {
-      ctx.response.status = HTTP_403_FORBIDDEN;
-    }
-  });
+      const root = getStoreRoot();
+      const targetDirectory = resolve(root, directory);
+      if (fileExistsUnder(targetDirectory, root)) {
+        const filePath = resolveUploadFilename(targetDirectory, name);
+        await Deno.writeFile(filePath, file.stream());
+        ctx.response.redirect(
+          ctx.request.headers.get("Referer") || "/file-manager/",
+        );
+      } else {
+        ctx.response.status = HTTP_403_FORBIDDEN;
+      }
+    },
+  );
 }
 
 function resolveUploadFilename(directory: string, name: string): string {
