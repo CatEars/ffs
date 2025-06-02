@@ -1,14 +1,14 @@
 import { Router } from "@oak/oak";
-import { join } from "@std/path";
 import { move } from "@std/fs";
 import { logger } from "../logging/logger.ts";
 import { getStoreRoot } from "../config.ts";
-import { fileExistsUnder } from "../utils/file-exists-under.ts";
-import { HTTP_400_BAD_REQUEST } from "../utils/http-codes.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { apiProtect } from "../security/api-protect.ts";
+import { FileTree } from "../files/file-tree.ts";
 
 export function registerMoveFileRoute(router: Router) {
+  const fileTree = new FileTree(getStoreRoot());
+
   router.post("/api/file/move", baseMiddlewares(), apiProtect, async (ctx) => {
     const formData = await ctx.request.body.formData();
 
@@ -31,19 +31,20 @@ export function registerMoveFileRoute(router: Router) {
       return;
     }
 
-    const root = getStoreRoot();
     for (const { path, fileName } of filesToMove) {
+      const resolvedFrom = fileTree.resolvePath(path, fileName);
+      if (resolvedFrom.type === "invalid") {
+        continue;
+      }
+      const resolvedTo = fileTree.resolvePath(destination.toString(), fileName);
+      if (resolvedTo.type === "invalid") {
+        continue;
+      }
+
       try {
-        const from = fileExistsUnder(join(root, path, fileName), root);
-        const to = fileExistsUnder(
-          join(root, destination.toString(), fileName),
-          root,
-        );
-        if (!from || !to) {
-          ctx.response.status = HTTP_400_BAD_REQUEST;
-          return;
-        }
-        await move(from, to, { overwrite: false });
+        await move(resolvedFrom.fullPath, resolvedTo.fullPath, {
+          overwrite: false,
+        });
       } catch (err) {
         logger.warn(
           "Tried to move file",
