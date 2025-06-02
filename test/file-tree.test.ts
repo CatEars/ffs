@@ -63,3 +63,17 @@ Deno.test("File tree returns invalid result when resolving symbolic directory li
   );
   assertEquals(listing.type, "none");
 });
+
+Deno.test("File tree can stat individual files under a directory", () => {
+  const listing = sampleFileTree.listDirectory("./test/");
+  if (listing.type === "none") {
+    fail();
+  } else {
+    const statResult = sampleFileTree.stat(listing, "file-tree.test.ts");
+    if (statResult.type === "invalid") {
+      fail();
+    } else {
+      assert(statResult.info.isFile);
+    }
+  }
+});

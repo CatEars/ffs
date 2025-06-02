@@ -1,16 +1,27 @@
 import { existsSync } from "@std/fs/exists";
-import { join } from "@std/path/join";
+import { resolve } from "@std/path/resolve";
 
 export type PathResult = { type: "invalid" } | {
   type: "valid";
   fullPath: string;
 };
 
+export type ListDirectorySuccess = {
+  type: "found";
+  dirPath: string;
+  files: Deno.DirEntry[];
+};
+
 export type ListDirectoryResult = {
   type: "none";
+} | ListDirectorySuccess;
+
+export type StatResult = {
+  type: "invalid";
 } | {
-  type: "found";
-  files: Deno.DirEntry[];
+  type: "valid";
+  fullPath: string;
+  info: Deno.FileInfo;
 };
 
 export class FileTree {
@@ -24,9 +35,9 @@ export class FileTree {
     return existsSync(this.root, { isDirectory: true });
   }
 
-  resolvePath(relativePath: string): PathResult {
+  resolvePath(...relativePaths: string[]): PathResult {
     try {
-      const resolved = Deno.realPathSync(join(this.root, relativePath));
+      const resolved = Deno.realPathSync(resolve(this.root, ...relativePaths));
       if (resolved.startsWith(this.root)) {
         return {
           type: "valid",
@@ -52,10 +63,30 @@ export class FileTree {
     try {
       return {
         type: "found",
+        dirPath: dir.fullPath,
         files: Deno.readDirSync(dir.fullPath).toArray(),
       };
     } catch {
       return { type: "none" };
+    }
+  }
+
+  stat(directory: ListDirectorySuccess, fileName: string): StatResult {
+    const resolved = this.resolvePath(directory.dirPath, fileName);
+    if (resolved.type === "invalid") {
+      return { type: "invalid" };
+    } else {
+      try {
+        return {
+          type: "valid",
+          fullPath: resolved.fullPath,
+          info: Deno.statSync(resolved.fullPath),
+        };
+      } catch {
+        return {
+          type: "invalid",
+        };
+      }
     }
   }
 }
