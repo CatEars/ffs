@@ -1,6 +1,7 @@
 src/website/static/*
 !src/website/static/svg
 *.mp4
+*.m4v
 testbench
 dist
 access.log

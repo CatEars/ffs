@@ -12,6 +12,10 @@ const nailers: Thumbnailer[] = [
     extName: ".mp4",
     handler: createMp4Thumbnail,
   },
+  {
+    extName: ".m4v",
+    handler: createMp4Thumbnail,
+  },
 ];
 
 const extNames = nailers.map((x) => x.extName);

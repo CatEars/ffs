@@ -24,7 +24,7 @@
   }
 
   function isMovieFile(file) {
-    return file.endsWith(".mp4");
+    return file.endsWith(".mp4") || file.endsWith(".m4v");
   }
 
   function isMediaFile(file) {
@@ -56,7 +56,7 @@
   }
 
   function getFileImageSource(root, file) {
-    if (file.name.endsWith('.mp4')) {
+    if (isMovieFile(file.name)) {
       return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`
     }
     return ''
