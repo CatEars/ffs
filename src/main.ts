@@ -11,6 +11,7 @@ import {
   startThumbnailBackgroundProcess,
 } from "./thumbnails/index.ts";
 import { startup } from "./startup.ts";
+import { registerSitemapRoute } from "./sitemap/index.ts";
 
 if (Deno.env.get("FFS_ABANDON_SECURITY") === "true") {
   unsecure();
@@ -28,6 +29,7 @@ registerAllFileListing(router);
 registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
 registerAllThumbnailRoutes(router);
+registerSitemapRoute(router);
 
 if (areThumbnailsAvailable()) {
   startThumbnailBackgroundProcess();

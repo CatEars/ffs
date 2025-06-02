@@ -5,9 +5,11 @@ import { logger } from "../logging/logger.ts";
 import { getStoreRoot } from "../config.ts";
 import { fileExistsUnder } from "../utils/file-exists-under.ts";
 import { HTTP_400_BAD_REQUEST } from "../utils/http-codes.ts";
+import { baseMiddlewares } from "../base-middlewares.ts";
+import { apiProtect } from "../security/api-protect.ts";
 
 export function registerMoveFileRoute(router: Router) {
-  router.post("/api/file/move", async (ctx) => {
+  router.post("/api/file/move", baseMiddlewares(), apiProtect, async (ctx) => {
     const formData = await ctx.request.body.formData();
 
     const filesToMoveRaw = formData.get("files-to-move");
