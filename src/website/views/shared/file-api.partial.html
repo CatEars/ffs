@@ -1,6 +1,6 @@
 <%~ include('./url-params.partial.html') %>
 <script>
-  const pageSize = 120;
+  const defaultPageSize = 120;
 
   function mapDateStrToDate(entries) {
     for (const entry of entries) {
@@ -27,17 +27,23 @@
     return [];
   }
 
-  function paginate(array, page) {
+  function paginate(array, page, pageSize = defaultPageSize) {
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return array.slice(startIndex, endIndex);
   }
 
-  function getNumPages(array) {
+  function getNumPages(array, pageSize = defaultPageSize) {
     return Math.ceil(array.length / pageSize);
   }
 
-  function sortedBy(files, sorting, directoriesFirst, page) {
+  function sortedBy(
+    files,
+    sorting,
+    directoriesFirst,
+    page,
+    pageSize = defaultPageSize
+  ) {
     const copy = JSON.parse(JSON.stringify(files));
     mapDateStrToDate(copy);
 

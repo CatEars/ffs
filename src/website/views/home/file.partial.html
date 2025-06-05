@@ -79,7 +79,7 @@
   <a class="text-decoration-none" x-bind:href="`/home/?path=${calculatePath(root, file.name)}`">
     <img height="125" class="card-img-top" src="/static/svg/folder.svg"></img>
     <div class="card-body">
-      <span class="card-text" x-text="`${file.name}/`"></span>  
+      <span class="card-text clamp-2" x-text="`${file.name}/`"></span>  
     </div>
   </a>
 </template>
@@ -96,9 +96,8 @@
 
     </div>
       
-    <div class="card-body pointer text-truncate">
-      <span x-text="resolveEmojiForMediaFile(file.name) + ' '"></span
-      ><span class="card-text" x-text="file.name"></span>
+    <div class="card-body pointer">
+      <span class="card-text clamp-2" x-text="resolveEmojiForMediaFile(file.name) + ' ' + file.name"></span>
     </div>
   </a>
 </template>

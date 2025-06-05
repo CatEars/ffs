@@ -5,7 +5,7 @@
   <%~ include('/shared/local-storage.partial.html') %>
   <script>
     function sort(files) {
-      return sortedBy(files, "newest", true);
+      return sortedBy(files, "newest", true, 1, Number.MAX_VALUE);
     }
 
     function getLinkTo(file) {
