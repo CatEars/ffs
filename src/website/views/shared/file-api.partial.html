@@ -1,4 +1,7 @@
+<%~ include('./url-params.partial.html') %>
 <script>
+  const pageSize = 120;
+
   function mapDateStrToDate(entries) {
     for (const entry of entries) {
       entry.date = new Date(entry.date);
@@ -24,7 +27,17 @@
     return [];
   }
 
-  function sortedBy(files, sorting, directoriesFirst) {
+  function paginate(array, page) {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return array.slice(startIndex, endIndex);
+  }
+
+  function getNumPages(array) {
+    return Math.ceil(array.length / pageSize);
+  }
+
+  function sortedBy(files, sorting, directoriesFirst, page) {
     const copy = JSON.parse(JSON.stringify(files));
     mapDateStrToDate(copy);
 
@@ -51,13 +64,12 @@
           : 0;
       copy.sort(directoryFirstSorter);
     }
-    return copy;
+
+    return paginate(copy, page);
   }
 
   function getCurrentPath() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const path = urlParams.get("path");
-    return path || ".";
+    return getUrlParam("path", ".");
   }
 
   function calculatePath(root, fileName) {
@@ -71,5 +83,30 @@
     } else {
       return encodeURIComponent(`${root}/${fileName}`);
     }
+  }
+
+  function getCurrentPage() {
+    return Number.parseInt(getUrlParam("page", "1"));
+  }
+
+  function setCurrentPage(pageNum) {
+    setUrlParam("page", `${pageNum}`);
+    return pageNum;
+  }
+
+  function lowerPageNumberByOne(page) {
+    if (page === 1) {
+      return page;
+    }
+    setCurrentPage(page - 1);
+    return page - 1;
+  }
+
+  function increasePageNumberByOne(array, page) {
+    if (page === getNumPages(array)) {
+      return page;
+    }
+    setCurrentPage(page + 1);
+    return page + 1;
   }
 </script>

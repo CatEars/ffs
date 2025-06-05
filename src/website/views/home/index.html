@@ -6,6 +6,7 @@
   <div
     class="container"
     x-data="{ root: getCurrentPath(), files: [], 
+      currentPage: getCurrentPage(),
        sorting: getLocalStorage('file-sort-order', 'newest'), 
        directoriesFirst: getLocalStorage('show-directories-first', true) }"
   >
@@ -28,11 +29,45 @@
       </div>
     </div>
     <div class="row"><%~ include('./control-panel.partial.html') %></div>
+    <div class="row">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item">
+            <a
+              href="#"
+              @click="currentPage = lowerPageNumberByOne(currentPage)"
+              x-bind:class="currentPage === 1 ? 'page-link disabled' : 'page-link'"
+              >&lt;</a
+            >
+          </li>
+          <template
+            x-for="(idx) in Array.from({ length: getNumPages(files) }, (_, i) => i + 1)"
+          >
+            <li class="page-item">
+              <a
+                href="#"
+                x-text="idx"
+                @click="setCurrentPage(idx); currentPage = idx"
+                x-bind:class="currentPage === idx ? 'page-link disabled' : 'page-link'"
+              ></a>
+            </li>
+          </template>
+          <li class="page-item">
+            <a
+              href="#"
+              @click="currentPage = increasePageNumberByOne(files, currentPage)"
+              x-bind:class="currentPage === getNumPages(files) ? 'page-link disabled' : 'page-link'"
+              >&gt;</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
     <div
       class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3"
     >
       <template
-        x-for="(file) in sortedBy(files, sorting, directoriesFirst)"
+        x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
         :key="file.name"
       >
         <div class="col">
