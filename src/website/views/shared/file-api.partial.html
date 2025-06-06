@@ -115,4 +115,65 @@
     setCurrentPage(page + 1);
     return page + 1;
   }
+
+  function isSoundFile(file) {
+    return file.endsWith(".mp3");
+  }
+
+  function isImageFile(file) {
+    return file.endsWith(".png");
+  }
+
+  function isMovieFile(file) {
+    return file.endsWith(".mp4") || file.endsWith(".m4v");
+  }
+
+  function isMediaFile(file) {
+    return isSoundFile(file) || isImageFile(file) || isMovieFile(file);
+  }
+
+  function resolveEmojiForMediaFile(file) {
+    if (isSoundFile(file)) {
+      return "🎵";
+    } else if (isImageFile(file)) {
+      return "📷";
+    } else if (isMovieFile(file)) {
+      return "📽️";
+    }
+  }
+
+  function resolveSvgLocationForFile(file) {
+    if (isSoundFile(file.name)) {
+      return "/static/svg/music_note.svg";
+    } else if (isImageFile(file.name)) {
+      return "/static/svg/photo_camera.svg";
+    } else if (isMovieFile(file.name)) {
+      return "/static/svg/videocam.svg";
+    } else if (file.isDirectory) {
+      return "/static/svg/folder.svg";
+    } else {
+      return "/static/svg/description.svg";
+    }
+  }
+
+  function getFileImageSource(root, file) {
+    if (isMovieFile(file.name)) {
+      return `/api/thumbnail?path=${encodeURIComponent(
+        root + "/" + file.name
+      )}`;
+    }
+    return "";
+  }
+
+  async function tryPrefetchThumbnail(root, file) {
+    const imageSource = getFileImageSource(root, file);
+    if (!imageSource) {
+      throw new Error("No thumbnail to load from");
+    }
+    const result = await fetch(imageSource);
+    if (!result.ok) {
+      throw new Error("Unable to load thumbnail correctly");
+    }
+    return imageSource;
+  }
 </script>

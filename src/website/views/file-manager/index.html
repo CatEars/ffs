@@ -85,6 +85,7 @@
         <thead>
           <tr>
             <th></th>
+            <th>Type</th>
             <th>Name</th>
           </tr>
         </thead>
@@ -102,6 +103,14 @@
                     class="form-check-label"
                     x-bind:for="file.name"
                   ></label>
+                </div>
+              </td>
+              <td>
+                <div class="px-2">
+                  <img
+                    x-bind:src="resolveSvgLocationForFile(file)"
+                    height="20"
+                  />
                 </div>
               </td>
               <td>
