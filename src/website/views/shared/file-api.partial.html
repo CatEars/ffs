@@ -158,6 +158,7 @@
 
   function getFileImageSource(root, file) {
     if (isMovieFile(file.name)) {
+      console.log("THUMBNAIL", root, file);
       return `/api/thumbnail?path=${encodeURIComponent(
         root + "/" + file.name
       )}`;
