@@ -93,9 +93,7 @@
           class="card-img-top" 
           x-bind:src="imgSrc"
           @load="tryPrefetchThumbnail(root, file).then(src => imgSrc = src).catch(() => {})"></img>
-
     </div>
-      
     <div class="card-body pointer">
       <span class="card-text clamp-2" x-text="resolveEmojiForMediaFile(file.name) + ' ' + file.name"></span>
     </div>
