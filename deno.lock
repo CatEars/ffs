@@ -3,8 +3,6 @@
   "specifiers": {
     "jsr:@deno-library/compress@*": "0.5.6",
     "jsr:@deno-library/crc32@1.0.2": "1.0.2",
-    "jsr:@eta-dev/eta@*": "3.5.0",
-    "jsr:@eta-dev/eta@^3.5.0": "3.5.0",
     "jsr:@oak/commons@1": "1.0.1",
     "jsr:@oak/oak@*": "17.1.4",
     "jsr:@oak/oak@^17.1.4": "17.1.4",
@@ -45,9 +43,6 @@
     },
     "@deno-library/crc32@1.0.2": {
       "integrity": "d2061bfee30c87c97f285dfca0fdc4458e632dc072a33ecfc73ca5177a5a39a0"
-    },
-    "@eta-dev/eta@3.5.0": {
-      "integrity": "6b70827efc14c7cbf08498ac7a922ecab003641caf3852a6cb5b1b12ee58fb37"
     },
     "@oak/commons@1.0.1": {
       "integrity": "889ff210f0b4292591721be07244ecb1b5c118742f5273c70cf30d7cd4184d0c",
@@ -165,7 +160,6 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@eta-dev/eta@^3.5.0",
       "jsr:@oak/oak@^17.1.4",
       "jsr:@std/assert@1",
       "jsr:@std/fs@^1.0.17",
