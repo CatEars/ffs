@@ -1,5 +1,6 @@
 import { dirname } from "@std/path/dirname";
 import { resolve } from "@std/path/resolve";
+import { viewPath } from "../config.ts";
 
 const textDecoder = new TextDecoder();
 
@@ -28,22 +29,25 @@ function resolveRelativePath(
   context: DirectiveContext,
   relativeLocation: string,
 ) {
+  if (relativeLocation.startsWith("/")) {
+    return resolve(viewPath, relativeLocation.slice(1));
+  }
   const sourceDirectory = dirname(context.filePath);
   return resolve(sourceDirectory, relativeLocation);
 }
 
 function findFirstSlot(sourceHtml: string, sourceFile: string): Directive {
-  const regex = /<--\s+slot\s+-->/gm;
+  const regex = /<!--\s+slot\s+-->/gm;
   const result = regex.exec(sourceHtml);
   if (result === null || result.length === 0) {
     throw new Error(
-      `Expected ${sourceFile} to include <-- slot --> but it did not`,
+      `Expected ${sourceFile} to include <!-- slot --> but it did not`,
     );
   }
   const firstMatch = result[0];
   return {
     name: "slot",
-    startIndex: regex.lastIndex,
+    startIndex: regex.lastIndex - firstMatch.length,
     length: firstMatch.length,
   };
 }
@@ -52,35 +56,37 @@ function findFirstLayout(
   sourceHtml: string,
   sourceFile: string,
 ): LayoutDirective | null {
-  const regex = /<--\s+layout\s+([\w\/\.]+)\s+-->/gm;
+  const regex = /<!--\s+layout\s+([\w\/\.-]+)\s+-->/gm;
   const result = regex.exec(sourceHtml);
   if (result === null || result.length === 0) {
     return null;
   }
   const firstMatch = result[0];
-  if (regex.lastIndex !== 0) {
+  const startIndex = regex.lastIndex - firstMatch.length;
+  if (startIndex !== 0) {
     throw new Error(
-      `<-- layout --> directive is always put at the top! ${sourceFile} is not following this convention`,
+      `<!-- layout --> directive is always put at the top! ${sourceFile} is not following this convention`,
     );
   }
   return {
     name: "layout",
-    startIndex: regex.lastIndex,
+    startIndex,
     length: firstMatch.length,
     relativeLayoutPath: result[1],
   };
 }
 
 function findFirstInclude(sourceHtml: string): IncludeDirective | null {
-  const regex = /<--\s+include\s+([\w\/\.]+)\s+-->/gm;
+  const regex = /<!--\s+include\s+([\w\/\.-]+)\s+-->/gm;
   const result = regex.exec(sourceHtml);
   if (result === null || result.length === 0) {
     return null;
   }
   const firstMatch = result[0];
+  const startIndex = regex.lastIndex - firstMatch.length;
   return {
     name: "include",
-    startIndex: regex.lastIndex,
+    startIndex,
     length: firstMatch.length,
     relativeIncludePath: result[1],
   };
@@ -129,6 +135,10 @@ function processIncludeDirective(
   return pre + partialContent + post;
 }
 
+const renderCache: {
+  [key: string]: string;
+} = {};
+
 export class HtmlTemplate {
   private readonly sourceFilePath: string;
   constructor(sourceFilePath: string) {
@@ -136,6 +146,9 @@ export class HtmlTemplate {
   }
 
   public render(): string {
+    if (renderCache[this.sourceFilePath]) {
+      return renderCache[this.sourceFilePath];
+    }
     let sourceCode = textDecoder.decode(
       Deno.readFileSync(this.sourceFilePath),
     );
@@ -150,6 +163,7 @@ export class HtmlTemplate {
         sourceCode,
       );
     }
+
     let include: IncludeDirective | null = null;
     while ((include = findFirstInclude(sourceCode))) {
       if (include === null) {
@@ -164,6 +178,7 @@ export class HtmlTemplate {
         sourceCode,
       );
     }
+    renderCache[this.sourceFilePath] = sourceCode;
     return sourceCode;
   }
 }

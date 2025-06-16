@@ -1,4 +1,3 @@
-import { Eta } from "jsr:@eta-dev/eta";
 import { Router } from "@oak/oak/router";
 import {
   collectAllPages,
@@ -14,6 +13,7 @@ import { logger } from "../logging/logger.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { registerStaticRoutes } from "./static-files.ts";
 import { resolve } from "@std/path/resolve";
+import { loadHtml } from "./templating.ts";
 
 export async function registerAllWebsiteRoutes(router: Router) {
   const allPages = await collectAllPages();
@@ -97,12 +97,12 @@ function registerPlainPages(
         compoundMiddleware,
         async (ctx) => {
           const dynamicData = await dynamicDataGetter(ctx);
-          respondWithData(ctx, page, { ...staticData, ...dynamicData });
+          respondWithData(ctx, page);
         },
       );
     } else {
       router.get(page.webPath, baseMiddlewares(), compoundMiddleware, (ctx) => {
-        respondWithData(ctx, page, staticData);
+        respondWithData(ctx, page);
       });
     }
   }
@@ -118,13 +118,10 @@ function getLongestWebPath(allPages: PlainPage[]) {
     .reduce((p, c) => p > c ? p : c);
 }
 
-const eta = new Eta({
-  views: viewPath,
-  cache: !devModeEnabled,
-});
-
-function respondWithData(ctx: Context, page: PlainPage, data: object) {
-  const rendered = eta.render(page.etaPath, data);
+function respondWithData(ctx: Context, page: PlainPage) {
+  const actualPath = resolve(viewPath, "." + page.etaPath);
+  const htmlTemplate = loadHtml(actualPath);
+  const rendered = htmlTemplate.render();
   const response = new Response(rendered, {
     status: 200,
     headers: {
