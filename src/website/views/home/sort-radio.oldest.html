@@ -1,0 +1,15 @@
+<div
+  @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
+  class="form-check form-check-inline"
+>
+  <input
+    class="form-check-input"
+    type="radio"
+    name="oldest"
+    id="oldest"
+    x-bind:checked="sorting === 'oldest'"
+  />
+  <label class="form-check-label" for="oldest">
+    <img width="26" src="/static/svg/elderly.svg" />
+  </label>
+</div>

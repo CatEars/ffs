@@ -1,8 +1,7 @@
-<% layout('/templates/base.html') %>
+<!-- layout /templates/base.html -->
 <section>
-  <%~ include('/shared/file-api.partial.html') %>
-  <!-- -->
-  <%~ include('/shared/local-storage.partial.html') %>
+  <!-- include /shared/file-api.partial.html -->
+  <!-- include /shared/local-storage.partial.html -->
   <div
     class="container"
     x-data="{ root: getCurrentPath(), files: [], 
@@ -18,12 +17,14 @@
       <div class="col col-sm-auto">
         <div class="d-flex" style="height: 100%">
           <div class="align-self-end">
-            <%~ include('./breadcrumbs.partial.html') %>
+            <!-- include ./breadcrumbs.partial.html -->
           </div>
         </div>
       </div>
     </div>
-    <div class="row"><%~ include('./control-panel.partial.html') %></div>
+    <div class="row">
+      <!-- include ./control-panel.partial.html -->
+    </div>
     <div class="row">
       <nav>
         <ul class="pagination">
@@ -66,7 +67,7 @@
         :key="file.name"
       >
         <div class="col">
-          <div class="card"><%~ include('./file.partial.html') %></div>
+          <div class="card"><!-- include ./file.partial.html --></div>
         </div>
       </template>
     </div>
