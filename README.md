@@ -1,16 +1,32 @@
 # FFS
 
-All the different file servers I have tested have come short.
+Friendly File Server (FFS) is a file server borne from the ~~frustration~~ friendliness of attempting to get other file servers to work.
 
-I want:
+The goals of FFS is to be:
 
-- Dead simple installation and setup. No SQL databases that need manual migrations and downtime. Looking at you NextCloud and Seafile!
-- Easy and intuitive online file management. It should not be hard to move some files around. If only Apache had this functionality...
-- Usable mobile web-page. Not everyone is a frontend engineer, but does it hurt to enable responsive mode in the web console?
-- Good security posture. While copyparty is fun to look at from the outside. I just feel less safe looking at the inside.
-- Some extensibility. I don't need an app-store, but I do need to run some basic local scripts.
+- Crash-resistant
+  - A power outage should mean you "just restart" the server
+- Zero config
+  - Runnable with no config and all config in-files and in-app
+- Low Dependency
+  - Use standard API-s and slow moving technologies instead of v0.0.1 NPM packages
+- Mobile usable
+  - Halfway between mobile hostile to mobile first lies mobile usable.
+- Easy Extensible
+  - Writing a custom plugin and enabling it should be easy peasy
 
-## Material Design Icons License
+## Honorable mentions - That simply did not fit me
+
+All the different file servers I have tested have fallen short. In short, their shortcomings are inspirations for FFS.
+
+- NextCloud - SQL Database and complicated upgrades. Clearly built for organizations that can pour lots of effort into just getting it running...
+- Seafile - Dead simple installation and setup. However, an SQL databases that need manual migrations and downtime. In my heart, I love you Seafile, it was simply not meant to be.
+- Apache file and directory indexes - Easy and little config. But not much else than that.
+- copyparty - Software that had the right _vibe_ and functions, but when I simply could not read the code, I felt like I was deploying a minefield of security issues.
+
+## Licenses
+
+### Material Design Icons License
 
 Material design icons are stored as part of this repository.
 
