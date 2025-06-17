@@ -6,13 +6,13 @@ const keepAllWalkEntries = (_: WalkEntry) => true;
 
 export class FileTreeWalker {
   private readonly root: string;
-  private filter: (entry: WalkEntry) => boolean = keepAllWalkEntries;
+  private _filter: (entry: WalkEntry) => boolean = keepAllWalkEntries;
   constructor(root: string) {
     this.root = root;
   }
 
-  filterOut(filter: (entry: WalkEntry) => boolean) {
-    this.filter = filter;
+  filter(filter: (entry: WalkEntry) => boolean) {
+    this._filter = filter;
   }
 
   async *walk() {
@@ -23,7 +23,7 @@ export class FileTreeWalker {
         includeSymlinks: false,
       })
     ) {
-      if (!this.filter(entry)) {
+      if (!this._filter(entry)) {
         continue;
       }
       const parent = "/" + dirname(relative(this.root, entry.path)) + "/";

@@ -1,21 +1,13 @@
 import { Router } from "@oak/oak";
 import { logger } from "../logging/logger.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
-import { walk } from "@std/fs/walk";
-import { relative } from "@std/path/relative";
+import { FileTreeWalker } from "../files/file-tree-walker.ts";
 
 export async function registerStaticRoutes(router: Router) {
-  for await (
-    const staticFile of walk("./src/website/static", {
-      includeDirs: false,
-      includeFiles: true,
-      includeSymlinks: false,
-    })
-  ) {
-    if (staticFile.name === ".gitkeep") {
-      continue;
-    }
-    const relPath = relative("./src/website/static", staticFile.path);
+  const staticTreeWalker = new FileTreeWalker("./src/website/static");
+  staticTreeWalker.filter((x) => x.name !== ".gitkeep");
+  for await (const entry of staticTreeWalker.walk()) {
+    const relPath = entry.parent.slice(1) + entry.name;
     const webPath = `/static/${relPath}`;
     logger.info("Registering static file", webPath);
     router.get(webPath, baseMiddlewares(), async (ctx) => {
