@@ -39,8 +39,8 @@ function isPartialHtmlFile(path: string) {
 async function collectDirectoryTree() {
   const walker = new FileTreeWalker(viewPath);
   walker.filterOut((entry) => {
-    return isUnderTemplateDirectory(entry.path) ||
-      isPartialHtmlFile(entry.name);
+    return !isUnderTemplateDirectory(entry.path) &&
+      !isPartialHtmlFile(entry.name);
   });
   return await walker.collectAll();
 }

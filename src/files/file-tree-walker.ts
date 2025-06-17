@@ -26,8 +26,9 @@ export class FileTreeWalker {
       if (!this.filter(entry)) {
         continue;
       }
+      const parent = "/" + dirname(relative(this.root, entry.path)) + "/";
       yield {
-        parent: "/" + dirname(relative(this.root, entry.path)) + "/",
+        parent: parent === "/./" ? "/" : parent,
         name: entry.name,
       };
     }
