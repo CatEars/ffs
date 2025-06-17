@@ -1,4 +1,3 @@
-import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
 import { Router } from "@oak/oak/router";
 import { Middleware } from "@oak/oak/middleware";
@@ -6,22 +5,10 @@ import { walk } from "@std/fs/walk";
 import { relative } from "@std/path/relative";
 import { dirname } from "@std/path/dirname";
 
-export type StaticLoader = () => object;
-export type StaticPage = {
-  getStaticData: StaticLoader;
-};
-
-export type DynamicLoader = (ctx: Context) => Promise<object>;
-export type DynamicPage = {
-  getDynamicData: DynamicLoader;
-};
-
 export type PlainPage = {
   type: "Plain";
   webPath: string;
-  etaPath: string;
-  getStaticData?: StaticLoader;
-  getDynamicData?: DynamicLoader;
+  filePath: string;
   middlewares: Middleware[];
 };
 
@@ -74,7 +61,6 @@ async function collectDirectoryTree() {
       isUnderTemplateDirectory(entryToSubmit.parent) ||
       isPartialHtmlFile(entryToSubmit.name)
     ) {
-      // Specifically skip /templates/ directories and partials. They are always included via `eta`
       continue;
     }
     allEntries.push(entryToSubmit);
@@ -92,19 +78,11 @@ export async function collectAllPages(): Promise<Page[]> {
     const matchingDeno = denos.find((x) =>
       x.parent === html.parent && x.name.startsWith(pageName)
     );
-    let getStaticData: StaticLoader | undefined = undefined;
-    let getDynamicData: DynamicLoader | undefined = undefined;
     let middlewares: Middleware[] = [];
     if (matchingDeno) {
       const importedDeno = await import(
         `${viewPath}${matchingDeno.parent.substring(1)}${matchingDeno.name}`
       );
-      if (importedDeno.getStaticData) {
-        getStaticData = importedDeno.getStaticData;
-      }
-      if (importedDeno.getDynamicData) {
-        getDynamicData = importedDeno.getDynamicData;
-      }
       if (importedDeno.middlewares) {
         middlewares = importedDeno.middlewares;
       }
@@ -115,10 +93,8 @@ export async function collectAllPages(): Promise<Page[]> {
     }
     pages.push({
       type: "Plain",
-      etaPath: `${html.parent}${html.name}`,
+      filePath: `${html.parent}${html.name}`,
       webPath,
-      getDynamicData,
-      getStaticData,
       middlewares,
     });
   }

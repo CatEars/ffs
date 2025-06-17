@@ -6,7 +6,7 @@ import {
   PluginPage,
 } from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
-import { devModeEnabled, viewPath } from "../config.ts";
+import { viewPath } from "../config.ts";
 import { Next } from "@oak/oak/middleware";
 import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 import { logger } from "../logging/logger.ts";
@@ -47,7 +47,8 @@ async function writeNavbarExtensions(navbarLinks: NavbarLink[]) {
   );
   await Deno.writeTextFile(
     resolve(viewPath, "templates/header/links-added-by-plugins.html"),
-    links.join("\n"),
+    "<!-- Below is auto-generated, do not touch! -->\n" +
+      links.join("\n"),
   );
 }
 
@@ -60,16 +61,11 @@ function registerPlainPages(
   router: Router,
 ) {
   const longestWebPath = getLongestWebPath(plainPages);
-  const longestPropPath = getLongestPropPath(plainPages);
   for (const page of plainPages) {
     logger.info(
       "Registering",
-      getPageDescription(page, longestWebPath, longestPropPath),
+      getPageDescription(page, longestWebPath),
     );
-    let staticData = {};
-    if (page.getStaticData) {
-      staticData = page.getStaticData();
-    }
     const middlewares = page.middlewares;
     if (middlewares.length === 0) {
       middlewares.push(passAlongMiddleware);
@@ -88,29 +84,10 @@ function registerPlainPages(
         }
       }
     };
-    if (page.getDynamicData) {
-      const dynamicDataGetter = page.getDynamicData;
-
-      router.get(
-        page.webPath,
-        baseMiddlewares(),
-        compoundMiddleware,
-        async (ctx) => {
-          const dynamicData = await dynamicDataGetter(ctx);
-          respondWithData(ctx, page);
-        },
-      );
-    } else {
-      router.get(page.webPath, baseMiddlewares(), compoundMiddleware, (ctx) => {
-        respondWithData(ctx, page);
-      });
-    }
+    router.get(page.webPath, baseMiddlewares(), compoundMiddleware, (ctx) => {
+      respondWithData(ctx, page);
+    });
   }
-}
-
-function getLongestPropPath(allPages: PlainPage[]) {
-  return allPages.map((x) => getProps(x).length)
-    .reduce((p, c) => p > c ? p : c);
 }
 
 function getLongestWebPath(allPages: PlainPage[]) {
@@ -119,7 +96,7 @@ function getLongestWebPath(allPages: PlainPage[]) {
 }
 
 function respondWithData(ctx: Context, page: PlainPage) {
-  const actualPath = resolve(viewPath, "." + page.etaPath);
+  const actualPath = resolve(viewPath, "." + page.filePath);
   const htmlTemplate = loadHtml(actualPath);
   const rendered = htmlTemplate.render();
   const response = new Response(rendered, {
@@ -131,26 +108,10 @@ function respondWithData(ctx: Context, page: PlainPage) {
   ctx.response.with(response);
 }
 
-function getProps(page: PlainPage) {
-  const props = [];
-  if (page.getStaticData) {
-    props.push("Static");
-  }
-  if (page.getDynamicData) {
-    props.push("Dynamic");
-  }
-  if (props.length === 0) {
-    props.push("Plain");
-  }
-  return props.join("+");
-}
-
 function getPageDescription(
   page: PlainPage,
   longestWebPath: number,
-  longestPropLength: number,
 ): string {
   const webPath = page.webPath.padEnd(longestWebPath);
-  const props = getProps(page).padEnd(longestPropLength);
-  return `${webPath}   [${props}] --> ${page.etaPath}`;
+  return `${webPath}   [Plain] --> ${page.filePath}`;
 }
