@@ -1,9 +1,7 @@
 import { viewPath } from "../config.ts";
 import { Router } from "@oak/oak/router";
 import { Middleware } from "@oak/oak/middleware";
-import { walk } from "@std/fs/walk";
-import { relative } from "@std/path/relative";
-import { dirname } from "@std/path/dirname";
+import { FileTreeWalker } from "../files/file-tree-walker.ts";
 
 export type PlainPage = {
   type: "Plain";
@@ -30,11 +28,6 @@ export type PluginPage = {
 
 export type Page = PlainPage | PluginPage;
 
-type FileEntry = {
-  parent: string;
-  name: string;
-};
-
 function isUnderTemplateDirectory(path: string) {
   return path.includes("/templates/");
 }
@@ -44,28 +37,12 @@ function isPartialHtmlFile(path: string) {
 }
 
 async function collectDirectoryTree() {
-  const allEntries: FileEntry[] = [];
-  for await (
-    const entry of walk(viewPath, {
-      includeDirs: false,
-      includeFiles: true,
-      includeSymlinks: false,
-    })
-  ) {
-    const parent = dirname(relative(viewPath, entry.path));
-    const entryToSubmit: FileEntry = {
-      parent: parent === "." ? "/" : `/${parent}/`,
-      name: entry.name,
-    };
-    if (
-      isUnderTemplateDirectory(entryToSubmit.parent) ||
-      isPartialHtmlFile(entryToSubmit.name)
-    ) {
-      continue;
-    }
-    allEntries.push(entryToSubmit);
-  }
-  return allEntries;
+  const walker = new FileTreeWalker(viewPath);
+  walker.filterOut((entry) => {
+    return isUnderTemplateDirectory(entry.path) ||
+      isPartialHtmlFile(entry.name);
+  });
+  return await walker.collectAll();
 }
 
 export async function collectAllPages(): Promise<Page[]> {
