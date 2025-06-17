@@ -8,9 +8,10 @@ import {
 } from "./generate-thumbnail.ts";
 import { sleep } from "../utils/sleep.ts";
 import { Buffer } from "node:buffer";
-import { walk, WalkEntry } from "@std/fs";
 import { MemoryCache } from "../utils/memory-cache.ts";
 import { thumbnailExists } from "../files/cache-folder.ts";
+import { FileTreeWalker } from "../files/file-tree-walker.ts";
+import { resolve } from "@std/path/resolve";
 
 const cacheRoot = getCacheRoot();
 const storeRoot = getStoreRoot();
@@ -50,19 +51,15 @@ function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
 
 stdin.addListener("data", parseIncomingThumbnailRequest);
 
-function tryPushToQueue(file: WalkEntry) {
-  if (!thumbnailExists(file.path)) {
-    filesToPrioritize.push({
-      filePath: file.path,
-    });
-  }
-}
-
 async function findFilesToThumbnail() {
-  for await (const file of walk(storeRoot)) {
-    if (canGenerateThumbnailFor(file.path)) {
-      tryPushToQueue(file);
-    }
+  const fileTreeWalker = new FileTreeWalker(storeRoot);
+  fileTreeWalker.filter((file) =>
+    canGenerateThumbnailFor(file.path) && !thumbnailExists(file.path)
+  );
+  for await (const file of fileTreeWalker.walk()) {
+    filesToPrioritize.push({
+      filePath: resolve(storeRoot, "." + file.parent, file.name),
+    });
   }
 }
 
@@ -84,7 +81,7 @@ while (true) {
       logger.debug(
         "Failed to generate thumbnail for",
         next,
-        "Skiping. error:",
+        "Skipping. error:",
         err,
       );
     }
