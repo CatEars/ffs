@@ -26,7 +26,13 @@ export type PluginPage = {
   register: (context: ApplicationContext) => Promise<void>;
 };
 
-export type Page = PlainPage | PluginPage;
+export type StaticJsPage = {
+  type: "Js";
+  webPath: string;
+  filePath: string;
+};
+
+export type Page = PlainPage | PluginPage | StaticJsPage;
 
 function isUnderTemplateDirectory(path: string) {
   return path.includes("/templates/");
@@ -49,6 +55,7 @@ export async function collectAllPages(): Promise<Page[]> {
   const allEntries = await collectDirectoryTree();
   const htmls = allEntries.filter((entry) => entry.name.endsWith(".html"));
   const denos = allEntries.filter((entry) => entry.name.endsWith(".ts"));
+  const javascripts = allEntries.filter((entry) => entry.name.endsWith(".js"));
   const pages: Page[] = [];
   for (const html of htmls) {
     const pageName = html.name.substring(0, html.name.length - ".html".length);
@@ -88,5 +95,16 @@ export async function collectAllPages(): Promise<Page[]> {
       });
     }
   }
+
+  for (const js of javascripts) {
+    const { parent, name } = js;
+    const webPath = `${parent}${name}`;
+    pages.push({
+      type: "Js",
+      filePath: `${parent.substring(1)}${name}`,
+      webPath,
+    });
+  }
+
   return pages;
 }

@@ -4,6 +4,7 @@ import {
   NavbarLink,
   PlainPage,
   PluginPage,
+  StaticJsPage,
 } from "./collect-all-pages.ts";
 import { Context } from "@oak/oak/context";
 import { viewPath } from "../config.ts";
@@ -21,9 +22,23 @@ export async function registerAllWebsiteRoutes(router: Router) {
   const pluginPages = allPages.filter((x) =>
     x.type === "Plugin"
   ) as PluginPage[];
+  const jsPages = allPages.filter((x) => x.type === "Js") as StaticJsPage[];
   registerPlainPages(plainPages, router);
   await registerPluginPages(pluginPages, router);
   await registerStaticRoutes(router);
+  registerStaticJsRoutes(jsPages, router);
+}
+
+function registerStaticJsRoutes(pages: StaticJsPage[], router: Router) {
+  for (const page of pages) {
+    logger.info("Registering static JS page at", page.webPath);
+    router.get(page.webPath, async (ctx) => {
+      await ctx.send({
+        root: viewPath,
+        path: page.filePath,
+      });
+    });
+  }
 }
 
 async function registerPluginPages(
