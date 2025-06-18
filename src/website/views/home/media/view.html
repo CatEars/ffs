@@ -1,31 +1,8 @@
 <!-- layout /templates/base.html -->
 <div class="container">
-  <div id="video-holder" class="col-12"></div>
-  <script>
-    function getVideoSource() {
-      const params = new URLSearchParams(window.location.search);
-      const path = params.get("path") || ".";
-      return path;
-    }
-
-    function getMimeType() {
-      const source = getVideoSource();
-      if (source.endsWith("mp4")) {
-        return "video/mp4";
-      } else if (source.endsWith("m4v")) {
-        return "video/x-m4v";
-      }
-    }
-
-    const element = document.getElementById("video-holder");
-    if (!element.innerHTML.trim()) {
-      element.innerHTML = `
-      <video class="col-12" controls>
-        <source src="/api/file?path=${encodeURIComponent(
-          getVideoSource()
-        )}" type="${getMimeType()}" />
-      </video>
-      `;
-    }
-  </script>
+    <script type="module" src="./media-viewer.js"></script>
+    <!-- include /shared/url-params.partial.html -->
+    <div x-data="{ src: getUrlParam('path', '.') }">
+        <media-viewer x-bind:src="src"></media-viewer>
+    </div>
 </div>

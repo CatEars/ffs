@@ -1,16 +1,16 @@
 <script>
-  function getUrlParam(key, defaultValue) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const path = urlParams.get(key);
-    if (path === null) {
-      return defaultValue;
+    function getUrlParam(key, defaultValue) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const path = urlParams.get(key);
+        if (path === null) {
+            return defaultValue;
+        }
+        return path;
     }
-    return path;
-  }
 
-  function setUrlParam(key, value) {
-    const url = new URL(window.location.href);
-    url.searchParams.set(key, value);
-    window.history.pushState({}, "", url); // Updates the URL without reloading the page
-  }
+    function setUrlParam(key, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        window.history.pushState({}, '', url); // Updates the URL without reloading the page
+    }
 </script>
