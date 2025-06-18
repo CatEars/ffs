@@ -2,10 +2,31 @@
   <div class="col">
     <div class="row">
       <div class="col col-sm-auto">
-        <!-- include ./sort-radio.newest.partial.html -->
-        <!-- include ./sort-radio.oldest.partial.html -->
-        <!-- include ./sort-radio.a-z.partial.html -->
-        <!-- include ./sort-radio.z-a.partial.html -->
+        <script type="module" src="./sort-radio.js"></script>
+        <sort-radio
+          imgSrc="/static/svg/child.svg"
+          name="newest"
+          @click="sorting = setLocalStorage('file-sort-order', 'newest')"
+          x-bind:checked="sorting === 'newest'"
+        ></sort-radio>
+        <sort-radio
+          imgSrc="/static/svg/elderly.svg"
+          name="oldest"
+          @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
+          x-bind:checked="sorting === 'oldest'"
+        ></sort-radio>
+        <sort-radio
+          text="A-Z"
+          name="a-z"
+          @click="sorting = setLocalStorage('file-sort-order', 'a-z')"
+          x-bind:checked="sorting === 'a-z'"
+        ></sort-radio>
+        <sort-radio
+          text="Z-A"
+          name="z-a"
+          @click="sorting = setLocalStorage('file-sort-order', 'z-a')"
+          x-bind:checked="sorting === 'z-a'"
+        ></sort-radio>
       </div>
       <div class="col">
         <div class="form-check form-switch">

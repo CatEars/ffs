@@ -1,6 +1,6 @@
 import { dirname } from "@std/path/dirname";
 import { resolve } from "@std/path/resolve";
-import { viewPath } from "../config.ts";
+import { devModeEnabled, viewPath } from "../config.ts";
 
 const textDecoder = new TextDecoder();
 
@@ -146,7 +146,7 @@ export class HtmlTemplate {
   }
 
   public render(): string {
-    if (renderCache[this.sourceFilePath]) {
+    if (!devModeEnabled && renderCache[this.sourceFilePath]) {
       return renderCache[this.sourceFilePath];
     }
     let sourceCode = textDecoder.decode(
