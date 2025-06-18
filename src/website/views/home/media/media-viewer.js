@@ -23,6 +23,10 @@ class MediaViewer extends HTMLElement {
             ? 'video/m4v'
             : src.endsWith('png')
             ? 'image/png'
+            : src.endsWith('jpg') || src.endsWith('jpeg')
+            ? 'image/jpg'
+            : src.endsWith('gif')
+            ? 'image/gif'
             : '';
 
         const srcPath = `/api/file?path=${encodeURIComponent(src)}`;
@@ -33,6 +37,8 @@ class MediaViewer extends HTMLElement {
             mediaHtml = `<video class="col-12 media-holder" controls>
   <source src="${srcPath}" type="${mimeType}" />
 </video>`;
+        } else {
+            mediaHtml = `<p>Appropriate media viewer for ${src} is not available</p>`;
         }
 
         this.innerHTML = `<div class="col-12">
