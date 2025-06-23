@@ -1,6 +1,7 @@
 import { ThumbnailRequest } from "./types.ts";
 import { extname } from "@std/path";
 import { createMp4Thumbnail } from "./nailers/mp4.ts";
+import { createJpgOrPngThumbnail } from "./nailers/static-images.ts";
 
 type Thumbnailer = {
   extName: string;
@@ -15,6 +16,18 @@ const nailers: Thumbnailer[] = [
   {
     extName: ".m4v",
     handler: createMp4Thumbnail,
+  },
+  {
+    extName: ".png",
+    handler: createJpgOrPngThumbnail,
+  },
+  {
+    extName: ".jpg",
+    handler: createJpgOrPngThumbnail,
+  },
+  {
+    extName: ".jpeg",
+    handler: createJpgOrPngThumbnail,
   },
 ];
 

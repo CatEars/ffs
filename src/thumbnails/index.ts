@@ -3,13 +3,26 @@ import { logger } from "../logging/logger.ts";
 import { ThumbnailRequest } from "./types.ts";
 import { registerGetThumbnail } from "./get-thumbnail.ts";
 
-export function areThumbnailsAvailable() {
+function isFfmpegAvailable() {
   const proc = runFfmpegVersion();
   if (proc === false) {
     return false;
   }
   const stdout = new TextDecoder().decode(proc.stdout);
   return proc.success && isFfmpegVersionString(stdout);
+}
+
+function isImageMagickAvailable() {
+  const proc = runImageMagickVersion();
+  if (proc === false) {
+    return false;
+  }
+  const stdout = new TextDecoder().decode(proc.stdout);
+  return proc.success && isImageMagickVersion(stdout);
+}
+
+export function areThumbnailsAvailable() {
+  return isFfmpegAvailable() && isImageMagickAvailable();
 }
 
 let thumbnailProcess: Deno.ChildProcess | undefined;
@@ -57,13 +70,24 @@ function runFfmpegVersion() {
   try {
     return new Deno.Command("ffmpeg", { args: ["-version"] }).outputSync();
   } catch {
-    // Intentionally left empty
+    return false;
+  }
+}
+
+function runImageMagickVersion() {
+  try {
+    return new Deno.Command("magick", { args: ["-version"] }).outputSync();
+  } catch {
     return false;
   }
 }
 
 function isFfmpegVersionString(programOutput: string) {
-  return /^ffmpeg version \d.\d.\d/.test(programOutput);
+  return /^ffmpeg version \d\.\d\.\d/.test(programOutput);
+}
+
+function isImageMagickVersion(programOutput: string) {
+  return /^Version: ImageMagick \d\.\d\.\d/.test(programOutput);
 }
 
 export function registerAllThumbnailRoutes(router: Router) {

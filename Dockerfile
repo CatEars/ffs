@@ -1,6 +1,6 @@
 FROM denoland/deno:ubuntu
 
-RUN apt update && apt install -y ffmpeg
+RUN apt update && apt install -y ffmpeg imagemagick
 
 WORKDIR /app
 COPY data/ /app/data
