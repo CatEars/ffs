@@ -76,7 +76,7 @@ function runFfmpegVersion() {
 
 function runImageMagickVersion() {
   try {
-    return new Deno.Command("magick", { args: ["-version"] }).outputSync();
+    return new Deno.Command("convert", { args: ["-version"] }).outputSync();
   } catch {
     return false;
   }

@@ -14,7 +14,7 @@ export async function createJpgOrPngThumbnail(thumbnail: ThumbnailRequest) {
     suffix: ".webp",
   });
   ensureDir(dirname(outputPath));
-  const command = new Deno.Command("magick", {
+  const command = new Deno.Command("convert", {
     args: [
       thumbnail.filePath,
       "-thumbnail",
