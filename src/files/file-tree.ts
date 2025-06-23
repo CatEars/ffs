@@ -4,6 +4,7 @@ import { resolve } from "@std/path/resolve";
 export type PathResult = { type: "invalid" } | {
   type: "valid";
   fullPath: string;
+  exists: boolean;
 };
 
 export type ListDirectorySuccess = {
@@ -35,11 +36,15 @@ export class FileTree {
     return existsSync(this.root, { isDirectory: true });
   }
 
-  private ensureResolveIsUnderRoot(suggestedPath: string): PathResult {
+  private ensureResolveIsUnderRoot(
+    suggestedPath: string,
+    pathHasFile: boolean,
+  ): PathResult {
     if (suggestedPath.startsWith(this.root)) {
       return {
         type: "valid",
         fullPath: suggestedPath,
+        exists: pathHasFile,
       };
     } else {
       return {
@@ -48,14 +53,19 @@ export class FileTree {
     }
   }
 
+  exists(relativePath: string): boolean {
+    const result = this.resolvePath(relativePath);
+    return result.type === "valid" && result.exists;
+  }
+
   resolvePath(...relativePaths: string[]): PathResult {
     try {
       const resolved = resolve(this.root, ...relativePaths);
       if (existsSync(resolved)) {
         const realPath = Deno.realPathSync(resolved);
-        return this.ensureResolveIsUnderRoot(realPath);
+        return this.ensureResolveIsUnderRoot(realPath, true);
       } else {
-        return this.ensureResolveIsUnderRoot(resolved);
+        return this.ensureResolveIsUnderRoot(resolved, false);
       }
     } catch {
       return {
