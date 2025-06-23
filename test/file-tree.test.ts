@@ -10,6 +10,7 @@ Deno.test("File tree resolves path correctly", () => {
   assertEquals(sampleFileTree.resolvePath("."), {
     type: "valid",
     fullPath: resolve("."),
+    exists: true,
   });
 });
 
