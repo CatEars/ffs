@@ -12,6 +12,7 @@ import {
 } from "./thumbnails/index.ts";
 import { startup } from "./startup.ts";
 import { registerSitemapRoute } from "./sitemap/index.ts";
+import { registerAllCustomCommandApi } from "./custom-commands/index.ts";
 
 if (Deno.env.get("FFS_ABANDON_SECURITY") === "true") {
   unsecure();
@@ -30,6 +31,7 @@ registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
 registerAllThumbnailRoutes(router);
 registerSitemapRoute(router);
+registerAllCustomCommandApi(router);
 
 if (areThumbnailsAvailable()) {
   startThumbnailBackgroundProcess();
