@@ -11,11 +11,11 @@ type CustomCommand = {
 };
 
 const commands: CustomCommand[] = [
-  {
+  /*{
     program: "echo",
     nargs: 1,
     args: ["$1"],
-  },
+  },*/
 ];
 
 export function registerCommandsApi(router: Router) {
