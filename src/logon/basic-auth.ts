@@ -6,12 +6,15 @@ import {
 import { getMatchingUser } from "../security/users.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { forgeBanhammer } from "../security/banhammer.ts";
+import { logger } from "../logging/logger.ts";
 
 const banhammer = forgeBanhammer({
   maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 10,
 });
 
 export function registerBasicAuthRoutes(router: Router) {
+  logger.info("Registering /api/logon");
+
   router.post("/api/logon", banhammer, baseMiddlewares(), async (ctx) => {
     const body = await ctx.request.body.json();
     if (!body.username || !body.password) {
