@@ -4,22 +4,18 @@
         <script>
             async function getCommands() {
                 const result = await fetch('/api/custom-commands');
-                console.log(result);
                 return await result.json();
             }
 
             function formatCommand(commands, idx) {
-                console.log('idx', idx);
                 const cmd = commands[idx];
                 return `${cmd['program']} ${cmd['args'].join(' ')}`;
             }
         </script>
         <div x-effect="commands = await getCommands();"></div>
         <h1>Commands</h1>
-        <ul>
-            <template x-for="idx in Array.from({ length: commands.length }, (_, i) => i)">
-                <li x-text="formatCommand(commands, idx)"></li>
-            </template>
-        </ul>
+        <template x-for="idx in Array.from({ length: commands.length }, (_, i) => i)">
+            <!-- include ./custom-command.partial.html -->
+        </template>
     </div>
 </section>
