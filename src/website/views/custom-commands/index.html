@@ -19,7 +19,6 @@
                     if (x.startsWith('$')) {
                         const argIdx = Number.parseInt(x.substring(1));
                         const argValue = commands[cmdIdx].args[argIdx - 1];
-                        console.log(commands[cmdIdx]);
                         if (argValue === '') {
                             return x;
                         } else {
@@ -33,9 +32,23 @@
 
             function formatCommand(commands, idx) {
                 const { cmd } = commands[idx];
-                return `${cmd['program']} ${resolveArgumentArray(commands, idx, cmd['args']).join(
-                    ' '
-                )}`;
+                const formattedArguments = resolveArgumentArray(commands, idx, cmd['args']);
+                return `${cmd['program']} ${formattedArguments.join(' ')}`;
+            }
+
+            async function submitCommand(commands, idx) {
+                const toSubmit = {
+                    id: idx,
+                    args: commands[idx].args,
+                };
+                const result = await fetch('/api/custom-commands/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(toSubmit),
+                });
+                return await result.text();
             }
         </script>
         <div x-effect="commands = await getCommands();"></div>

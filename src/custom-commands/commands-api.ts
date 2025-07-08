@@ -16,6 +16,11 @@ const commands: CustomCommand[] = [
     nargs: 1,
     args: ["$1"],
   },
+  {
+    program: "echo",
+    nargs: 2,
+    args: ["$1", "$2"],
+  },
 ];
 
 export function registerCommandsApi(router: Router) {
@@ -65,7 +70,7 @@ export function registerCommandsApi(router: Router) {
       const { stdout } = result.outputSync();
 
       ctx.response.status = HTTP_200_OK;
-      ctx.response.body = `${new TextDecoder().decode(stdout)}`;
+      ctx.response.body = new TextDecoder().decode(stdout);
     },
   );
 }
