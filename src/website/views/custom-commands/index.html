@@ -4,12 +4,38 @@
         <script>
             async function getCommands() {
                 const result = await fetch('/api/custom-commands');
-                return await result.json();
+                const commands = await result.json();
+                const joined = [];
+                for (let idx = 0; idx < commands.length; ++idx) {
+                    const cmd = commands[idx];
+                    const args = Array.from({ length: cmd.nargs }, (_) => '');
+                    joined.push({ cmd, args });
+                }
+                return joined;
+            }
+
+            function resolveArgumentArray(commands, cmdIdx, argumentArray) {
+                return argumentArray.map((x, idx) => {
+                    if (x.startsWith('$')) {
+                        const argIdx = Number.parseInt(x.substring(1));
+                        const argValue = commands[cmdIdx].args[argIdx - 1];
+                        console.log(commands[cmdIdx]);
+                        if (argValue === '') {
+                            return x;
+                        } else {
+                            return `\"${argValue}\"`;
+                        }
+                    } else {
+                        return x;
+                    }
+                });
             }
 
             function formatCommand(commands, idx) {
-                const cmd = commands[idx];
-                return `${cmd['program']} ${cmd['args'].join(' ')}`;
+                const { cmd } = commands[idx];
+                return `${cmd['program']} ${resolveArgumentArray(commands, idx, cmd['args']).join(
+                    ' '
+                )}`;
             }
         </script>
         <div x-effect="commands = await getCommands();"></div>

@@ -15,11 +15,11 @@
         <div class="col-12">
             <ul>
                 <template
-                    x-for="argIdx in Array.from({ length: commands[idx].nargs }, (_, i) => i)"
+                    x-for="argIdx in Array.from({ length: commands[idx].cmd.nargs }, (_, i) => i)"
                 >
                     <li>
-                        <label x-text="`${'$' + argIdx + 1}: `"></label>
-                        <input x-bind:x-id="'arg' + argIdx" type="text" />
+                        <label x-text="`${'$' + (argIdx + 1)}: `"></label>
+                        <input x-model="commands[idx].args[argIdx]" type="text" />
                     </li>
                 </template>
             </ul>
@@ -27,7 +27,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <input type="submit" value="Submit" />
+            <input @click="console.log(commands)" type="submit" value="Submit" />
         </div>
     </div>
 </div>
