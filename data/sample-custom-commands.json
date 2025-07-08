@@ -1,0 +1,12 @@
+[
+    {
+        "program": "echo",
+        "nargs": 1,
+        "args": ["$1"]
+    },
+    {
+        "program": "echo",
+        "nargs": 2,
+        "args": ["$1", "$2"]
+    }
+]

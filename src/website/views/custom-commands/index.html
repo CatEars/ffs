@@ -51,7 +51,7 @@
                 return await result.text();
             }
         </script>
-        <div x-effect="commands = await getCommands();"></div>
+        <div x-init="commands = await getCommands();"></div>
         <h1>Commands</h1>
         <template x-for="idx in Array.from({ length: commands.length }, (_, i) => i)">
             <!-- include ./custom-command.partial.html -->

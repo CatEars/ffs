@@ -1,5 +1,6 @@
 import {
   cacheRootKey,
+  customCommandsFileKey,
   requestLogsKey,
   setConfig,
   storeRootKey,
@@ -48,6 +49,7 @@ async function setFirstTimeUserValuesIfLikely() {
       storeRoot: ".",
       usersFilePath: "data/users-file.json",
       requestLogsFile: "access.log",
+      customCommandsFile: "./data/sample-custom-commands.json",
     });
   } else {
     if (!Deno.env.get(cacheRootKey)) {
@@ -55,6 +57,9 @@ async function setFirstTimeUserValuesIfLikely() {
     }
     if (!Deno.env.get(requestLogsKey)) {
       Deno.env.set(requestLogsKey, "access.log");
+    }
+    if (!Deno.env.get(customCommandsFileKey)) {
+      Deno.env.set(customCommandsFileKey, "");
     }
   }
 }

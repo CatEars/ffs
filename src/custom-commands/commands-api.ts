@@ -3,28 +3,12 @@ import { baseMiddlewares } from "../base-middlewares.ts";
 import { apiProtect } from "../security/api-protect.ts";
 import { HTTP_200_OK, HTTP_400_BAD_REQUEST } from "../utils/http-codes.ts";
 import { logger } from "../logging/logger.ts";
-
-type CustomCommand = {
-  program: string;
-  nargs: number;
-  args: string[];
-};
-
-const commands: CustomCommand[] = [
-  {
-    program: "echo",
-    nargs: 1,
-    args: ["$1"],
-  },
-  {
-    program: "echo",
-    nargs: 2,
-    args: ["$1", "$2"],
-  },
-];
+import { getCustomCommands } from "./custom-command.ts";
 
 export function registerCommandsApi(router: Router) {
   logger.info("Registering /api/custom-commands/*");
+
+  const commands = getCustomCommands();
 
   router.get("/api/custom-commands", baseMiddlewares(), apiProtect, (ctx) => {
     ctx.response.body = commands;
@@ -67,6 +51,10 @@ export function registerCommandsApi(router: Router) {
       const result = new Deno.Command(command.program, {
         args: computedArgs,
       });
+      logger.info(
+        "Running command",
+        `\`${command.program} ${computedArgs.join(" ")}\``,
+      );
       const { stdout } = result.outputSync();
 
       ctx.response.status = HTTP_200_OK;
