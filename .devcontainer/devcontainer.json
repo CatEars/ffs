@@ -7,7 +7,6 @@
         "vscode": {
             "extensions": [
                 "denoland.vscode-deno",
-                "ms-vscode.makefile-tools",
                 "ecmel.vscode-html-css",
                 "esbenp.prettier-vscode"
             ]
