@@ -1,5 +1,6 @@
 {
     "build": {
         "dockerfile": "./Dockerfile"
-    }
+    },
+    "postCreateCommand": "bash .devcontainer/setup-git-aliases.sh"
 }
