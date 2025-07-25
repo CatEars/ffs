@@ -2,5 +2,15 @@
     "build": {
         "dockerfile": "./Dockerfile"
     },
-    "postCreateCommand": "bash .devcontainer/setup-git-aliases.sh"
+    "postCreateCommand": "bash .devcontainer/setup-git-aliases.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "denoland.vscode-deno",
+                "ms-vscode.makefile-tools",
+                "ecmel.vscode-html-css",
+                "esbenp.prettier-vscode"
+            ]
+        }
+    }
 }
