@@ -1,6 +1,5 @@
 <!-- layout /templates/base.html -->
 <div class="container">
-    <script type="module" src="./media-viewer.js"></script>
     <!-- include /shared/url-params.partial.html -->
     <div x-data="{ src: getUrlParam('path', '.') }">
         <media-viewer x-bind:src="src"></media-viewer>

@@ -13,7 +13,6 @@ class MediaViewer extends HTMLElement {
 
     render() {
         const src = this.getAttribute('src');
-        console.log('source is', src);
         if (!src) {
             return;
         }
