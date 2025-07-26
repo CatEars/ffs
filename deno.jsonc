@@ -12,10 +12,12 @@
     },
     "test": "deno test --allow-all",
     "download-dependencies": "deno run --allow-all scripts/download-deps.ts",
+    "download-vendor-binaries": "./scripts/download-vendor-binaries.sh",
     "unpack-favicon": "deno run --allow-all scripts/unpack-favicon.ts",
     "setup": {
       "dependencies": [
         "download-dependencies",
+        "download-vendor-binaries",
         "unpack-favicon"
       ]
     },
