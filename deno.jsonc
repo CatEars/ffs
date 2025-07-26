@@ -1,0 +1,42 @@
+{
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^17.1.5",
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/fs": "jsr:@std/fs@^1.0.19",
+    "@std/path": "jsr:@std/path@^1.1.1"
+  },
+  "tasks": {
+    "ensure-dist": "mkdir -p dist",
+    "run": {
+      "command": "deno run --allow-all scripts/dev-main.ts"
+    },
+    "test": "deno test --allow-all",
+    "download-dependencies": "deno run --allow-all scripts/download-deps.ts",
+    "unpack-favicon": "deno run --allow-all scripts/unpack-favicon.ts",
+    "setup": {
+      "dependencies": [
+        "download-dependencies",
+        "unpack-favicon"
+      ]
+    },
+    "build-docker": {
+      "command": "docker build --no-cache . -t catears/ffs",
+      "dependencies": ["ensure-dist"]
+    },
+    "build-dist": {
+      "command": "rm -rf dist/* && docker save catears/ffs | gzip > dist/ffs.$(git describe --tags --abbrev=0).tar.gz",
+      "dependencies": ["build-docker"]
+    },
+    "make-sure-tag-is-latest": {
+      "command": "read -p 'Please enter the tag you think you are releasing' tag"
+    },
+    "release": {
+      "command": "./scripts/create-github-release.sh",
+      "dependencies": [
+        "make-sure-tag-is-latest",
+        "build-dist"
+      ]
+    },
+    "pack-plugins": "./scripts/pack-plugins.sh"
+  }
+}
