@@ -2,7 +2,7 @@
     "build": {
         "dockerfile": "./Dockerfile"
     },
-    "postCreateCommand": "bash .devcontainer/setup-git-aliases.sh",
+    "postCreateCommand": "bash .devcontainer/setup.sh",
     "customizations": {
         "vscode": {
             "extensions": [
