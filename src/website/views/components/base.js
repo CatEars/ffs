@@ -1,7 +1,7 @@
 import { h, render } from './vendor/preact.mjs';
 import htm from './vendor/htm.mjs';
 
-const html = htm.bind(h);
+export const html = htm.bind(h);
 
 let sharedStylesheet = null;
 

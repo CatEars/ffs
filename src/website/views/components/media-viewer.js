@@ -1,4 +1,5 @@
 import { BaseWebComponent } from './base.js';
+import FullColumn from './layout/FullColumn.js';
 
 class MediaViewer extends BaseWebComponent {
     static get observedAttributes() {
@@ -24,17 +25,17 @@ class MediaViewer extends BaseWebComponent {
 
         const srcPath = `/api/file?path=${encodeURIComponent(src)}`;
         if (mimeType.startsWith('image')) {
-            return html`<div class="col-12"><img class="media-holder" src="${srcPath}" /></div>`;
+            return html`<${FullColumn}><img class="media-holder" src="${srcPath}" /></${FullColumn}>`;
         } else if (mimeType.startsWith('video')) {
-            return html`<div class="col-12">
+            return html`<${FullColumn}>
                 <video class="col-12 media-holder" controls>
                     <source src="${srcPath}" type="${mimeType}" />
                 </video>
-            </div>`;
+            </${FullColumn}>`;
         } else {
-            return html`<div class="col-12">
+            return html`<${FullColumn}>
                 <p>Appropriate media viewer for ${src} is not available</p>
-            </div>`;
+            </${FullColumn}>`;
         }
     }
 }
