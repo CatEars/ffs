@@ -1,17 +1,11 @@
-class MediaViewer extends HTMLElement {
+import { BaseWebComponent } from './base.js';
+
+class MediaViewer extends BaseWebComponent {
     static get observedAttributes() {
         return ['src'];
     }
 
-    connectedCallback() {
-        this.render();
-    }
-
-    attributeChangedCallback() {
-        this.render();
-    }
-
-    render() {
+    render(html) {
         const src = this.getAttribute('src');
         if (!src) {
             return;
@@ -29,21 +23,20 @@ class MediaViewer extends HTMLElement {
             : '';
 
         const srcPath = `/api/file?path=${encodeURIComponent(src)}`;
-        let mediaHtml = '';
         if (mimeType.startsWith('image')) {
-            mediaHtml = `<img class="media-holder" src="${srcPath}"></img>`;
+            return html`<div class="col-12"><img class="media-holder" src="${srcPath}" /></div>`;
         } else if (mimeType.startsWith('video')) {
-            mediaHtml = `<video class="col-12 media-holder" controls>
-  <source src="${srcPath}" type="${mimeType}" />
-</video>`;
+            return html`<div class="col-12">
+                <video class="col-12 media-holder" controls>
+                    <source src="${srcPath}" type="${mimeType}" />
+                </video>
+            </div>`;
         } else {
-            mediaHtml = `<p>Appropriate media viewer for ${src} is not available</p>`;
+            return html`<div class="col-12">
+                <p>Appropriate media viewer for ${src} is not available</p>
+            </div>`;
         }
-
-        this.innerHTML = `<div class="col-12">
-        ${mediaHtml}
-        </div>`;
     }
 }
 
-customElements.define('media-viewer', MediaViewer);
+export default MediaViewer;

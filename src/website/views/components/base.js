@@ -49,11 +49,6 @@ export class BaseWebComponent extends HTMLElement {
     }
 
     _renderComponent() {
-        // Clear existing content in case of re-render
-        while (this.shadowRoot.firstChild) {
-            this.shadowRoot.removeChild(this.shadowRoot.firstChild);
-        }
-
         const content = this.render(html);
         render(content, this.shadowRoot);
     }

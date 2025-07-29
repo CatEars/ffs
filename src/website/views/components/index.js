@@ -1,2 +1,3 @@
-import './media-viewer.js';
-import './my-test.js';
+import MediaViewer from './media-viewer.js';
+
+customElements.define('media-viewer', MediaViewer);
