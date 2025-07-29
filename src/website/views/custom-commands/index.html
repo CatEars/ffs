@@ -52,7 +52,7 @@
             }
         </script>
         <div x-init="commands = await getCommands();"></div>
-        <h1>Commands</h1>
+        <app-header>Commands</app-header>
         <template x-for="idx in Array.from({ length: commands.length }, (_, i) => i)">
             <!-- include ./custom-command.partial.html -->
         </template>
