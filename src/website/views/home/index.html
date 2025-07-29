@@ -1,45 +1,42 @@
 <!-- layout /templates/base.html -->
-<section>
-    <!-- include /shared/file-api.partial.html -->
-    <!-- include /shared/local-storage.partial.html -->
-    <div
-        class="container"
-        x-data="{ root: getCurrentPath(), files: [], 
+<app-main
+    x-data="{ root: getCurrentPath(), files: [], 
       currentPage: getCurrentPage(),
        sorting: getLocalStorage('file-sort-order', 'newest'), 
        directoriesFirst: getLocalStorage('show-directories-first', true) }"
-    >
-        <div style="display: none" x-effect="files = await getFiles(root)"></div>
-        <div class="row">
-            <div class="col col-sm-auto">
-                <h1>Files</h1>
-            </div>
-            <div class="col col-sm-auto">
-                <div class="d-flex" style="height: 100%">
-                    <div class="align-self-end">
-                        <!-- include ./breadcrumbs.partial.html -->
-                    </div>
+>
+    <!-- include /shared/file-api.partial.html -->
+    <!-- include /shared/local-storage.partial.html -->
+    <div style="display: none" x-effect="files = await getFiles(root)"></div>
+    <div class="row">
+        <div class="col col-sm-auto">
+            <h1>Files</h1>
+        </div>
+        <div class="col col-sm-auto">
+            <div class="d-flex" style="height: 100%">
+                <div class="align-self-end">
+                    <!-- include ./breadcrumbs.partial.html -->
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <!-- include ./control-panel.partial.html -->
-        </div>
-        <div class="row">
-            <!-- include ./pagination.partial.html -->
-        </div>
-        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
-            <template
-                x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
-                :key="file.name"
-            >
-                <div class="col">
-                    <div class="card"><!-- include ./file.partial.html --></div>
-                </div>
-            </template>
-        </div>
-        <div class="row my-3">
-            <!-- include ./pagination.partial.html -->
         </div>
     </div>
-</section>
+    <div class="row">
+        <!-- include ./control-panel.partial.html -->
+    </div>
+    <div class="row">
+        <!-- include ./pagination.partial.html -->
+    </div>
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
+        <template
+            x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
+            :key="file.name"
+        >
+            <div class="col">
+                <div class="card"><!-- include ./file.partial.html --></div>
+            </div>
+        </template>
+    </div>
+    <div class="row my-3">
+        <!-- include ./pagination.partial.html -->
+    </div>
+</app-main>

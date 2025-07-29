@@ -1,11 +1,13 @@
 import AppHeader from './text/app-header.js'
 import AppSubheader from './text/app-subheader.js'
+import AppMain from "./layout/app-main.js";
 import MediaViewer from './media-viewer.js';
 
 
 const components = [
     ['app-header', AppHeader],
     ['app-subheader', AppSubheader],
+    ['app-main', AppMain],
     ['media-viewer', MediaViewer]
 ]
 
