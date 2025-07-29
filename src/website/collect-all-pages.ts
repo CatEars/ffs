@@ -42,11 +42,16 @@ function isPartialHtmlFile(path: string) {
   return path.endsWith(".partial.html");
 }
 
+function isVendoredComponentLibraries(path: string) {
+  return path.includes("/components/vendor/");
+}
+
 async function collectDirectoryTree() {
   const walker = new FileTreeWalker(viewPath);
   walker.filter((entry) => {
     return !isUnderTemplateDirectory(entry.path) &&
-      !isPartialHtmlFile(entry.name);
+      !isPartialHtmlFile(entry.name) &&
+      !isVendoredComponentLibraries(entry.path);
   });
   return await walker.collectAll();
 }

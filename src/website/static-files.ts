@@ -4,19 +4,13 @@ import { baseMiddlewares } from "../base-middlewares.ts";
 import { FileTreeWalker } from "../files/file-tree-walker.ts";
 
 export async function registerStaticRoutes(router: Router) {
-  const staticTreeWalker = new FileTreeWalker("./src/website/static");
-  staticTreeWalker.filter((x) => x.name !== ".gitkeep");
-  for await (const entry of staticTreeWalker.walk()) {
-    const relPath = entry.parent.slice(1) + entry.name;
-    const webPath = `/static/${relPath}`;
-    logger.info("Registering static file", webPath);
-    router.get(webPath, baseMiddlewares(), async (ctx) => {
-      await ctx.send({
-        root: "./src/website/static/",
-        path: relPath,
-      });
-    });
-  }
+  await registerUnder(router, "./src/website/static", "/static");
+  // Imported javascript libraries are put under `vendor` folder
+  await registerUnder(
+    router,
+    "./src/website/views/components/vendor",
+    "/components/vendor",
+  );
 
   // Special case: favicon
   logger.info("Registering /favicon.ico");
@@ -26,4 +20,20 @@ export async function registerStaticRoutes(router: Router) {
       path: "favicon.ico",
     });
   });
+}
+
+async function registerUnder(router: Router, root: string, webRoot: string) {
+  const staticTreeWalker = new FileTreeWalker(root);
+  staticTreeWalker.filter((x) => !x.name.startsWith(".git"));
+  for await (const entry of staticTreeWalker.walk()) {
+    const relPath = entry.parent.slice(1) + entry.name;
+    const webPath = `${webRoot}/${relPath}`;
+    logger.info("Registering static file", webPath);
+    router.get(webPath, baseMiddlewares(), async (ctx) => {
+      await ctx.send({
+        root: `${root}/`,
+        path: relPath,
+      });
+    });
+  }
 }

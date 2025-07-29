@@ -1,5 +1,5 @@
-import { h, render } from 'https://esm.sh/preact';
-import htm from 'https://esm.sh/htm';
+import { h, render } from './vendor/preact.mjs';
+import htm from './vendor/htm.mjs';
 
 const html = htm.bind(h);
 
