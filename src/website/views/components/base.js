@@ -1,3 +1,8 @@
+import { h, render } from 'https://esm.sh/preact';
+import htm from 'https://esm.sh/htm';
+
+const html = htm.bind(h);
+
 let sharedStylesheet = null;
 
 async function loadSharedStylesheet() {
@@ -17,7 +22,7 @@ async function loadSharedStylesheet() {
         console.log('Shared stylesheet loaded and parsed.');
     } catch (error) {
         console.error('Error loading shared stylesheet:', error);
-        sharedStylesheet = null; // Reset if loading failed
+        sharedStylesheet = null;
     }
     return sharedStylesheet;
 }
@@ -30,18 +35,17 @@ export class BaseWebComponent extends HTMLElement {
         this.attachShadow({ mode: 'open' });
     }
 
-    async connectedCallback() {
-        const stylesheet = await loadSharedStylesheet();
-        if (stylesheet) {
-            this.shadowRoot.adoptedStyleSheets = [stylesheet];
+    connectedCallback() {
+        if (sharedStylesheet) {
+            this.shadowRoot.adoptedStyleSheets = [sharedStylesheet];
         }
         this._renderComponent();
     }
 
-    render() {
+    render(_html) {
         // Sub-components should override this to return a Node (e.g., a div, p, template content)
-        // Example: return document.createElement('div').textContent = 'Hello from sub-component';
-        throw new Error('Sub-components must implement the render() method.');
+        // Example: return html`<div>Hello, World!</div>`;
+        throw new Error('Sub-components must implement the render(...) method.');
     }
 
     _renderComponent() {
@@ -50,12 +54,8 @@ export class BaseWebComponent extends HTMLElement {
             this.shadowRoot.removeChild(this.shadowRoot.firstChild);
         }
 
-        const content = this.render();
-        if (content instanceof Node) {
-            this.shadowRoot.appendChild(content);
-        } else {
-            console.warn('The render() method did not return a valid Node. Nothing rendered.');
-        }
+        const content = this.render(html);
+        render(content, this.shadowRoot);
     }
 
     attributeChangedCallback(_name, _oldValue, _newValue) {

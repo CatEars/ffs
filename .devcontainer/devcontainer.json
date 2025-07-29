@@ -8,7 +8,8 @@
             "extensions": [
                 "denoland.vscode-deno",
                 "ecmel.vscode-html-css",
-                "esbenp.prettier-vscode"
+                "esbenp.prettier-vscode",
+                "bierner.lit-html"
             ]
         }
     },
