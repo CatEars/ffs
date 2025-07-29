@@ -1,1 +1,2 @@
-import './media-viewer.js'
+import './media-viewer.js';
+import './my-test.js';
