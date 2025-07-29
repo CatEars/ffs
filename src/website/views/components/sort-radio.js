@@ -38,4 +38,4 @@ class SortRadio extends HTMLElement {
     }
 }
 
-customElements.define('sort-radio', SortRadio);
+export default SortRadio

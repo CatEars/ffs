@@ -1,7 +1,7 @@
 <!-- layout /templates/base.html -->
-<div class="container">
+<app-main>
     <!-- include /shared/url-params.partial.html -->
     <div x-data="{ src: getUrlParam('path', '.') }">
         <media-viewer x-bind:src="src"></media-viewer>
     </div>
-</div>
+</app-main>
