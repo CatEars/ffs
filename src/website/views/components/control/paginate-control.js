@@ -1,4 +1,4 @@
-import { BaseWebComponent } from './base.js';
+import { BaseWebComponent } from '../base.js';
 
 class PaginateControl extends BaseWebComponent {
     static observedAttributes = ['page', 'max-pages'];
