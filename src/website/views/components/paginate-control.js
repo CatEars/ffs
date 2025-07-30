@@ -1,13 +1,12 @@
 import { BaseWebComponent } from './base.js';
 
 class PaginateControl extends BaseWebComponent {
-    static get observedAtttributes() {
-        return ['page', 'maxPages'];
-    }
+    static observedAttributes = ['page', 'max-pages'];
 
     render(html) {
         const currentPage = Number.parseInt(this.getAttribute('page')) || 1;
-        const maxPages = Number.parseInt(this.getAttribute('maxPages')) || 1;
+        const maxPages = Number.parseInt(this.getAttribute('max-pages')) || 1;
+        console.log('Rendering with', this.getAttribute('page'), this.getAttribute('max-pages'));
         const to = (page) => {
             if (page < 1 || page > maxPages || page === currentPage) {
                 return;

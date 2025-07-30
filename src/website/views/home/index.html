@@ -24,13 +24,10 @@
     <div class="row">
         <!-- include ./control-panel.partial.html -->
     </div>
-    <div class="row">
-        <!-- include ./pagination.partial.html -->
-    </div>
     <paginate-control
         x-bind:page="currentPage"
-        x-bind:maxPages="getNumPages(files) + 5"
-        @page-shift="(evt) => console.log(evt.detail)"
+        x-bind:max-pages="getNumPages(files)"
+        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
         <template

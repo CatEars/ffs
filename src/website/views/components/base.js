@@ -57,7 +57,7 @@ export class BaseWebComponent extends HTMLElement {
     }
 
     _renderComponent() {
-        log('Rendering self ' + this.prototype);
+        console.log('_renderComponent of base called');
         const content = this.render(html);
         render(content, this.shadowRoot);
     }
