@@ -24,11 +24,13 @@
     <div class="row">
         <!-- include ./control-panel.partial.html -->
     </div>
-    <paginate-control
-        x-bind:page="currentPage"
-        x-bind:max-pages="getNumPages(files)"
-        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
-    ></paginate-control>
+    <div class="row">
+        <paginate-control
+            x-bind:page="currentPage"
+            x-bind:max-pages="getNumPages(files)"
+            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+        ></paginate-control>
+    </div>
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
         <template
             x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
@@ -40,6 +42,10 @@
         </template>
     </div>
     <div class="row my-3">
-        <!-- include ./pagination.partial.html -->
+        <paginate-control
+            x-bind:page="currentPage"
+            x-bind:max-pages="getNumPages(files)"
+            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+        ></paginate-control>
     </div>
 </section>

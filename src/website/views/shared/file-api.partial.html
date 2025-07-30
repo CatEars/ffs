@@ -88,22 +88,6 @@
         return pageNum;
     }
 
-    function lowerPageNumberByOne(page) {
-        if (page === 1) {
-            return page;
-        }
-        setCurrentPage(page - 1);
-        return page - 1;
-    }
-
-    function increasePageNumberByOne(array, page) {
-        if (page === getNumPages(array)) {
-            return page;
-        }
-        setCurrentPage(page + 1);
-        return page + 1;
-    }
-
     function isSoundFile(file) {
         return file.endsWith('.mp3');
     }
