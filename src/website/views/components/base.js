@@ -5,16 +5,6 @@ export const html = htm.bind(h);
 
 let sharedStylesheet = null;
 
-export function log(message) {
-    const elem = document.getElementById('log');
-    if (elem) {
-        const p = document.createElement('p');
-        p.innerText = message;
-        elem.appendChild(p);
-    }
-    console.log(message);
-}
-
 async function loadSharedStylesheet() {
     if (sharedStylesheet) {
         return sharedStylesheet;
