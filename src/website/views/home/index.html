@@ -1,5 +1,6 @@
 <!-- layout /templates/base.html -->
-<section class="container"
+<section
+    class="container"
     x-data="{ root: getCurrentPath(), files: [], 
       currentPage: getCurrentPage(),
        sorting: getLocalStorage('file-sort-order', 'newest'), 
@@ -26,7 +27,11 @@
     <div class="row">
         <!-- include ./pagination.partial.html -->
     </div>
-    <paginate-control x-bind:page="currentPage" x-bind:maxPages="getNumPages(files)"></paginate-control>
+    <paginate-control
+        x-bind:page="currentPage"
+        x-bind:maxPages="getNumPages(files) + 5"
+        @page-shift="(evt) => console.log(evt.detail)"
+    ></paginate-control>
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
         <template
             x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
