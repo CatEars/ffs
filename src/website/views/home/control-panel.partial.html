@@ -6,40 +6,33 @@
                 name="newest"
                 @click="sorting = setLocalStorage('file-sort-order', 'newest')"
                 x-bind:checked="sorting === 'newest'"
-            ></sort-radio>
-            <sort-radio
+            ></radio-control>
+            <radio-control
                 imgSrc="/static/svg/elderly.svg"
                 name="oldest"
                 @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
                 x-bind:checked="sorting === 'oldest'"
-            ></sort-radio>
-            <sort-radio
+            ></radio-control>
+            <radio-control
                 text="A-Z"
                 name="a-z"
                 @click="sorting = setLocalStorage('file-sort-order', 'a-z')"
                 x-bind:checked="sorting === 'a-z'"
-            ></sort-radio>
-            <sort-radio
+            ></radio-control>
+            <radio-control
                 text="Z-A"
                 name="z-a"
                 @click="sorting = setLocalStorage('file-sort-order', 'z-a')"
                 x-bind:checked="sorting === 'z-a'"
-            ></sort-radio>
+            ></radio-control>
         </div>
         <div class="col col-sm-auto">
-            <div class="form-check form-switch">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    id="switchCheckChecked"
-                    x-bind:checked="directoriesFirst"
-                    @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
-                />
-                <label class="form-check-label" for="switchCheckChecked"
-                    >Directories always first</label
-                >
-            </div>
+            <switch-control
+                x-bind:checked="directoriesFirst"
+                @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
+            >
+                Directories First
+            </switch-control>
         </div>
     </div>
 </form>
