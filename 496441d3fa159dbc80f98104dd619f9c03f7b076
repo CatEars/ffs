@@ -7,3 +7,4 @@
 [ ] Hide echo plugin by default
 [ ] Rename files in manage view
 [ ] Create directories (with naming)
+[ ] Automatically include newly created JS files without restart (especially during dev)
