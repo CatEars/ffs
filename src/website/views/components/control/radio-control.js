@@ -1,7 +1,7 @@
 import { BaseWebComponent } from '../base.js';
 import BaseRadio from './BaseRadio.js';
 
-class SortRadio extends BaseWebComponent {
+class RadioControl extends BaseWebComponent {
     static get observedAttributes() {
         return ['imgsrc', 'checked', 'name', 'text'];
     }
@@ -11,7 +11,6 @@ class SortRadio extends BaseWebComponent {
         const checked = this.getAttribute('checked') || '';
         const name = this.getAttribute('name') || '';
         const text = this.getAttribute('text') || '';
-        console.log('Rendering sort-radio', name, checked, imgSrc, text);
         if (imgSrc) {
             return html`<${BaseRadio} name="${name}" checked="${checked}">
                 <img width="26" src="${imgSrc}" />
@@ -24,4 +23,4 @@ class SortRadio extends BaseWebComponent {
     }
 }
 
-export default SortRadio;
+export default RadioControl;

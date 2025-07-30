@@ -2,7 +2,7 @@ import AppHeader from './text/app-header.js';
 import AppSubheader from './text/app-subheader.js';
 import AppMain from './layout/app-main.js';
 import MediaViewer from './media-viewer.js';
-import SortRadio from './control/sort-radio.js';
+import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
 
 const components = [
@@ -10,7 +10,7 @@ const components = [
     ['app-subheader', AppSubheader],
     ['app-main', AppMain],
     ['media-viewer', MediaViewer],
-    ['sort-radio', SortRadio],
+    ['radio-control', RadioControl],
     ['paginate-control', PaginateControl],
 ];
 
