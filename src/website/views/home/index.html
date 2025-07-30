@@ -7,17 +7,24 @@
 >
     <!-- include /shared/file-api.partial.html -->
     <!-- include /shared/local-storage.partial.html -->
+    <script>
+        function navigateToHomePath(path, index) {
+            const elements = path.split('/');
+            const selectedLocation = elements.slice(0, index + 1).join('/');
+            const webPath = `/home/?path=${selectedLocation}`;
+            window.location.href = webPath;
+        }
+    </script>
     <div style="display: none" x-effect="files = await getFiles(root)"></div>
     <div class="row">
         <div class="col col-sm-auto">
             <h1>Files</h1>
         </div>
         <div class="col col-sm-auto">
-            <div class="d-flex" style="height: 100%">
-                <div class="align-self-end">
-                    <!-- include ./breadcrumbs.partial.html -->
-                </div>
-            </div>
+            <breadcrumb-nav
+                x-bind:trail="root"
+                @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
+            ></breadcrumb-nav>
         </div>
     </div>
     <div class="row">
