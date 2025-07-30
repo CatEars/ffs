@@ -1,6 +1,8 @@
 import { dirname } from "@std/path/dirname";
 import { resolve } from "@std/path/resolve";
 import { devModeEnabled, viewPath } from "../config.ts";
+import { existsSync } from "node:fs";
+import { logger } from "../logging/logger.ts";
 
 const textDecoder = new TextDecoder();
 
@@ -148,6 +150,11 @@ export class HtmlTemplate {
   public render(): string {
     if (!devModeEnabled && renderCache[this.sourceFilePath]) {
       return renderCache[this.sourceFilePath];
+    }
+    if (!existsSync(this.sourceFilePath)) {
+      logger.info('Tried to render', this.sourceFilePath, 
+        'but file does not exist, render empty string instead')
+      return renderCache[this.sourceFilePath] = '';
     }
     let sourceCode = textDecoder.decode(
       Deno.readFileSync(this.sourceFilePath),
