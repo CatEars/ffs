@@ -1,57 +1,5 @@
 import { BaseWebComponent } from '../base.js';
 
-/**
- * <div class="d-flex" style="height: 100%">
-                <div class="align-self-end">
-                    <!-- include ./breadcrumbs.partial.html -->
-                </div>
-            </div>
- <nav>
-  <script>
-    function isLastBreadcrumb(root, index) {
-      return index === root.split("/").length - 1;
-    }
-
-    function computeBreadcrumbClass(root, index) {
-      return (
-        "breadcrumb-item" +
-        (index === root.split("/").length - 1 ? " active" : "")
-      );
-    }
-
-    function gotoFolder(root, index) {
-      const elements = root.split("/");
-      const include = [];
-      for (let idx = 0; idx <= index; ++idx) {
-        include.push(elements[idx]);
-      }
-      return include.join("/");
-    }
-  </script>
-  <ol class="breadcrumb">
-    <template x-for="(dir, index) in root.split('/')">
-      <li x-bind:class="computeBreadcrumbClass(root, index)">
-        <template x-if="isLastBreadcrumb(root, index)">
-          <span
-            style="padding-left: 0.5em; padding-right: 0.5em"
-            x-text="dir"
-          ></span>
-        </template>
-        <template x-if="!isLastBreadcrumb(root, index)">
-          <a
-            href=""
-            style="padding-left: 0.5em; padding-right: 0.5em"
-            x-bind:href="`/home/?path=${gotoFolder(root, index)}`"
-            x-text="dir"
-          ></a>
-        </template>
-      </li>
-    </template>
-  </ol>
-</nav>
-
- */
-
 class BreadcrumbNav extends BaseWebComponent {
     static observedAttributes = ['trail'];
 
