@@ -1,6 +1,6 @@
 <form>
     <div class="row">
-        <div class="col col-sm-auto">
+        <auto-column>
             <radio-control
                 imgSrc="/static/svg/child.svg"
                 name="newest"
@@ -25,14 +25,12 @@
                 @click="sorting = setLocalStorage('file-sort-order', 'z-a')"
                 x-bind:checked="sorting === 'z-a'"
             ></radio-control>
-        </div>
-        <div class="col col-sm-auto">
             <switch-control
                 x-bind:checked="directoriesFirst"
                 @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
             >
                 Directories First
             </switch-control>
-        </div>
+        </auto-column>
     </div>
 </form>

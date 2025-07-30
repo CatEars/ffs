@@ -16,7 +16,7 @@ class SwitchControl extends BaseWebComponent {
                 })
             );
         };
-        return html`<div class="form-check form-switch">
+        return html`<div class="form-check form-check-inline form-switch">
             <input
                 class="form-check-input"
                 type="checkbox"

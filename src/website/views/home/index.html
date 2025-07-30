@@ -1,6 +1,5 @@
 <!-- layout /templates/base.html -->
-<section
-    class="container"
+<app-main
     x-data="{ root: getCurrentPath(), files: [], 
       currentPage: getCurrentPage(),
        sorting: getLocalStorage('file-sort-order', 'newest'), 
@@ -41,11 +40,11 @@
             </div>
         </template>
     </div>
-    <div class="row my-3">
+    <div class="row">
         <paginate-control
             x-bind:page="currentPage"
             x-bind:max-pages="getNumPages(files)"
             @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
         ></paginate-control>
     </div>
-</section>
+</app-main>

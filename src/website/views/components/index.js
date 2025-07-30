@@ -1,6 +1,7 @@
 import AppHeader from './text/app-header.js';
 import AppSubheader from './text/app-subheader.js';
 import AppMain from './layout/app-main.js';
+import AutoColumn from './layout/auto-column.js';
 import MediaViewer from './media-viewer.js';
 import SwitchControl from './control/switch-control.js';
 import RadioControl from './control/radio-control.js';
@@ -10,6 +11,7 @@ const components = [
     ['app-header', AppHeader],
     ['app-subheader', AppSubheader],
     ['app-main', AppMain],
+    ['auto-column', AutoColumn],
     ['media-viewer', MediaViewer],
     ['switch-control', SwitchControl],
     ['radio-control', RadioControl],
