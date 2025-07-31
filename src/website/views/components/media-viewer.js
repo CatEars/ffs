@@ -35,7 +35,7 @@ class MediaViewer extends BaseWebComponent {
     ${
         mimeType.startsWith('image')
             ? html`<img class="media-holder" src=${srcPath} />`
-            : html`<video class="col-12 media-holder">
+            : html`<video controls class="col-12 media-holder">
                   <source src="${srcPath}" type="${mimeType}" />
               </video>`
     }
