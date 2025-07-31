@@ -3,7 +3,6 @@
 [ ] Assimilate file manager and home view with multi-view functionality
 [ ] Build downloadable test bench
 	[ ] Extend test bench with many more image formats and more video codec formats
-[ ] Hide echo plugin by default
 [ ] Rename files in manage view
 [ ] Create directories (with naming)
 [ ] Automatically include newly created JS files without restart (especially during dev)
