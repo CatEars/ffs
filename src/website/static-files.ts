@@ -2,6 +2,10 @@ import { Router } from "@oak/oak";
 import { logger } from "../logging/logger.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { FileTreeWalker } from "../files/file-tree-walker.ts";
+import { devModeEnabled } from "../config.ts";
+
+const anHour = (1_000 * 60 * 60 * 1);
+const maxage = devModeEnabled ? 0 : anHour;
 
 export async function registerStaticRoutes(router: Router) {
   await registerUnder(router, "./src/website/static", "/static");
@@ -18,6 +22,7 @@ export async function registerStaticRoutes(router: Router) {
     await ctx.send({
       root: "./src/website/static/",
       path: "favicon.ico",
+      maxage
     });
   });
 }
@@ -33,6 +38,7 @@ async function registerUnder(router: Router, root: string, webRoot: string) {
       await ctx.send({
         root: `${root}/`,
         path: relPath,
+        maxage
       });
     });
   }
