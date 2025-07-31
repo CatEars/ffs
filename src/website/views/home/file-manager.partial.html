@@ -1,8 +1,4 @@
 <script>
-    function sort(files) {
-        return sortedBy(files, 'newest', true, 1, 100_000);
-    }
-
     function getLinkTo(file) {
         const currentPath = decodeURIComponent(getCurrentPath());
         const path = calculatePath(currentPath, file.name);
@@ -48,7 +44,7 @@
         </thead>
         <tbody>
             <template
-                x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
+                x-for="(file, idx) in sortedBy(files, sorting, directoriesFirst, currentPage)"
                 :key="file.name"
             >
                 <tr>
