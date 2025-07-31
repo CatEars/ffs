@@ -1,8 +1,10 @@
+import { canGenerateThumbnailFor } from "../thumbnails/generate-thumbnail.ts";
+
 export type FileType = 'video' | 'image' | 'sound' | 'directory' | 'unidentified'
 
 export type FileIdentification = {
     fileType: FileType;
-    imageSrc?: string;
+    imageSrc: string;
 }
 
 function isVideoFile(filename: string): boolean {
@@ -17,7 +19,7 @@ function isImageFile(filename: string): boolean {
     return ['png', 'jpg', 'jpeg', 'gif'].some(x => filename.endsWith(x));
 }
 
-export function identifyFileFromDirEntry(entry: Deno.DirEntry): FileIdentification {
+export function identifyFileFromDirEntry(fullPath: string, entry: Deno.DirEntry): FileIdentification {
     if (entry.isDirectory) {
         return {
             fileType: 'directory',
@@ -25,26 +27,26 @@ export function identifyFileFromDirEntry(entry: Deno.DirEntry): FileIdentificati
         }
     }
     const lowercaseName = entry.name.toLocaleLowerCase();
-
+    const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${fullPath}` : ''
     if (isVideoFile(lowercaseName)) {
         return {
             fileType: 'video',
-            imageSrc: '/static/svg/videocam.svg'
+            imageSrc: imageSrc || '/static/svg/videocam.svg'
         }
     } else if (isSoundFile(lowercaseName)) {
         return {
             fileType: 'sound',
-            imageSrc: '/static/svg/music_note.svg'
+            imageSrc: imageSrc || '/static/svg/music_note.svg'
         }
     } else if (isImageFile(lowercaseName)) {
         return {
             fileType: 'image',
-            imageSrc: '/static/svg/photo_camera.svg'
+            imageSrc: imageSrc || '/static/svg/photo_camera.svg'
         }
     } else {
         return {    
             fileType: 'unidentified',
-            imageSrc: '/static/svg/description.svg'
+            imageSrc: imageSrc || '/static/svg/description.svg'
         }
     }
 }

@@ -33,8 +33,14 @@ export function registerDirectoryRoutes(router: Router) {
         continue;
       }
       const date = fileStat.info.ctime || fileStat.info.mtime || new Date(0);
+      const resolvedPath = fileTree.resolvePath(pathToCheck, result.name)
+      if (resolvedPath.type === 'invalid') {
+        continue
+      }
 
-      results.push({ ...result, ...identifyFileFromDirEntry(result), date });
+      const relativePath = pathToCheck + '/' + result.name
+      const fileIdentification = identifyFileFromDirEntry(relativePath, result)
+      results.push({ ...result, ...fileIdentification, date });
     }
 
     ctx.response.body = results;
