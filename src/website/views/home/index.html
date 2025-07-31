@@ -3,21 +3,81 @@
 <!-- include /shared/local-storage.partial.html -->
 <app-main
     x-data="{
-        isGalleryMode: getSessionStorage('gallery-mode', true)
+        isGalleryMode: getSessionStorage('gallery-mode', true),
+        sorting: getLocalStorage('file-sort-order', 'newest'), 
+        directoriesFirst: getLocalStorage('show-directories-first', true),
+        files: [], 
+        filesDisplay: getCuttingBoardDisplay(), 
+        filesToGrey: [],
+        root: getCurrentPath(), 
+        currentPage: getCurrentPage()
      }"
 >
+    <script>
+        function storeToCuttingBoard(files) {
+            return setSessionStorage('cutting-board', files);
+        }
+
+        function getCuttingBoard() {
+            return getSessionStorage('cutting-board', []);
+        }
+
+        function getCuttingBoardDisplay() {
+            return `${getCuttingBoard().length} files in cutting board`;
+        }
+
+        function resetCuttingBoard() {
+            storeToCuttingBoard([]);
+        }
+
+        function fileInCuttingBoard(file) {
+            const myPath = decodeURIComponent(getCurrentPath());
+            return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
+        }
+
+        function findFilesToGrey() {
+            const myPath = decodeURIComponent(getCurrentPath());
+            return getCuttingBoard()
+                .filter((x) => x.path === myPath)
+                .map((x) => x.fileName);
+        }
+    </script>
+    <div
+        style="display: none"
+        x-effect="files = await getFiles(getCurrentPath()); filesToGrey = findFilesToGrey()"
+    ></div>
+
+    <app-header>Files</app-header>
     <div class="row">
-        <switch-control
-            x-bind:checked="isGalleryMode"
-            @change="evt => isGalleryMode = setSessionStorage('gallery-mode', !isGalleryMode)"
-        >
-            Gallery
-        </switch-control>
+        <!-- include ./control-panel.partial.html -->
     </div>
-    <div x-show="isGalleryMode">
+    <div class="row">
+        <div class="col col-sm-auto">
+            <breadcrumb-nav
+                x-bind:trail="root"
+                @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
+            ></breadcrumb-nav>
+        </div>
+    </div>
+    <div class="row">
+        <paginate-control
+            x-bind:page="currentPage"
+            x-bind:max-pages="getNumPages(files)"
+            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+        ></paginate-control>
+    </div>
+    <div class="row" x-show="isGalleryMode">
         <!-- include ./gallery.partial.html -->
     </div>
-    <div x-show="!isGalleryMode">
+    <div class="row" x-show="!isGalleryMode">
         <!-- include ./file-manager.partial.html -->
+    </div>
+
+    <div class="row">
+        <paginate-control
+            x-bind:page="currentPage"
+            x-bind:max-pages="getNumPages(files)"
+            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+        ></paginate-control>
     </div>
 </app-main>

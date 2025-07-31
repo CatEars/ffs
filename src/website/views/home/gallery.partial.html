@@ -1,61 +1,30 @@
-<div
-    x-data="{ 
-        root: getCurrentPath(), 
-        files: [], 
-        currentPage: getCurrentPage(),
-        sorting: getLocalStorage('file-sort-order', 'newest'), 
-        directoriesFirst: getLocalStorage('show-directories-first', true) }"
->
-    <script>
-        function navigateToHomePath(path, index) {
-            const elements = path.split('/');
-            const selectedLocation = elements.slice(0, index + 1).join('/');
-            const webPath = `/home/?path=${selectedLocation}`;
-            window.location.href = webPath;
-        }
-    </script>
-    <div style="display: none" x-effect="files = await getFiles(root)"></div>
-    <div class="row">
-        <div class="col col-sm-auto">
-            <h1>Files</h1>
+<script>
+    function navigateToHomePath(path, index) {
+        const elements = path.split('/');
+        const selectedLocation = elements.slice(0, index + 1).join('/');
+        const webPath = `/home/?path=${selectedLocation}`;
+        window.location.href = webPath;
+    }
+</script>
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
+    <template
+        x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
+        :key="file.name"
+    >
+        <div class="col">
+            <file-card
+                x-bind:filename="file.name"
+                x-bind:file-type="file.fileType"
+                x-bind:image-src="file.imageSrc"
+                x-bind:root="root"
+            ></file-card>
         </div>
-        <div class="col col-sm-auto">
-            <breadcrumb-nav
-                x-bind:trail="root"
-                @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
-            ></breadcrumb-nav>
-        </div>
-    </div>
-    <div class="row">
-        <!-- include ./control-panel.partial.html -->
-    </div>
-    <div class="row">
-        <paginate-control
-            x-bind:page="currentPage"
-            x-bind:max-pages="getNumPages(files)"
-            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
-        ></paginate-control>
-    </div>
-    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
-        <template
-            x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
-            :key="file.name"
-        >
-            <div class="col">
-                <file-card
-                    x-bind:filename="file.name"
-                    x-bind:file-type="file.fileType"
-                    x-bind:image-src="file.imageSrc"
-                    x-bind:root="root"
-                ></file-card>
-            </div>
-        </template>
-    </div>
-    <div class="row">
-        <paginate-control
-            x-bind:page="currentPage"
-            x-bind:max-pages="getNumPages(files)"
-            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
-        ></paginate-control>
-    </div>
+    </template>
+</div>
+<div class="row">
+    <paginate-control
+        x-bind:page="currentPage"
+        x-bind:max-pages="getNumPages(files)"
+        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+    ></paginate-control>
 </div>

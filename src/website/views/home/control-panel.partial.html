@@ -31,6 +31,12 @@
             >
                 Directories First
             </switch-control>
+            <switch-control
+                x-bind:checked="isGalleryMode"
+                @change="evt => isGalleryMode = setSessionStorage('gallery-mode', !isGalleryMode)"
+            >
+                Gallery
+            </switch-control>
         </auto-column>
     </div>
 </form>
