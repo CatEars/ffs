@@ -1,42 +1,30 @@
 import { ThumbnailRequest } from "./types.ts";
 import { extname } from "@std/path";
 import { createMp4Thumbnail } from "./nailers/mp4.ts";
-import { createJpgOrPngThumbnail } from "./nailers/static-images.ts";
+import { createImageMagickThumbnail } from "./nailers/static-images.ts";
 
 type Thumbnailer = {
-  extName: string;
+  extNames: string[];
   handler: (thumbnail: ThumbnailRequest) => Promise<void>;
 };
 
 const nailers: Thumbnailer[] = [
   {
-    extName: ".mp4",
+    extNames: [".mp4", ".m4v"],
     handler: createMp4Thumbnail,
   },
   {
-    extName: ".m4v",
-    handler: createMp4Thumbnail,
-  },
-  {
-    extName: ".png",
-    handler: createJpgOrPngThumbnail,
-  },
-  {
-    extName: ".jpg",
-    handler: createJpgOrPngThumbnail,
-  },
-  {
-    extName: ".jpeg",
-    handler: createJpgOrPngThumbnail,
+    extNames: [".png", ".jpg", ".jpeg", ".tiff", ".webp", ".gif", ".avif", ".bmp", ".ico", ".psd"],
+    handler: createImageMagickThumbnail,
   },
 ];
 
-const extNames = nailers.map((x) => x.extName);
+const extNames = nailers.flatMap((x) => x.extNames);
 
 export async function generateThumbnail(thumbnail: ThumbnailRequest) {
   const ext = extname(thumbnail.filePath);
   for (const nailer of nailers) {
-    if (ext === nailer.extName) {
+    if (nailer.extNames.includes(ext)) {
       await nailer.handler(thumbnail);
       return;
     }

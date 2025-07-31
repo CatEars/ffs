@@ -16,7 +16,7 @@ function isSoundFile(filename: string): boolean {
 }
 
 function isImageFile(filename: string): boolean {
-    return ['png', 'jpg', 'jpeg', 'gif'].some(x => filename.endsWith(x));
+    return ['png', 'jpg', 'jpeg', 'gif', 'tiff', 'webp', 'avif', 'bmp', 'ico'].some(x => filename.endsWith(x));
 }
 
 export function identifyFileFromDirEntry(fullPath: string, entry: Deno.DirEntry): FileIdentification {

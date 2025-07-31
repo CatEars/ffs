@@ -6,7 +6,7 @@ import { getThumbnailPath } from "../../files/cache-folder.ts";
 import { logger } from "../../logging/logger.ts";
 import { move } from "@std/fs/move";
 
-export async function createJpgOrPngThumbnail(thumbnail: ThumbnailRequest) {
+export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
   const outputPath = getThumbnailPath(thumbnail.filePath);
   const tempFile = await Deno.makeTempFile({
     prefix: "ffs_imggen",
