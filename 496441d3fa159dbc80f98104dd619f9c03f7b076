@@ -1,7 +1,5 @@
 [ ] Rotate logs
 [ ] Create shareable links to specific files
-[ ] Build downloadable test bench
-	[ ] Extend test bench with many more image formats and more video codec formats
 [ ] Rename files in manage view
 [ ] Create directories (with naming)
 [ ] Automatically include newly created JS files without restart (especially during dev)
