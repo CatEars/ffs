@@ -4,8 +4,9 @@ import { HTTP_404_NOT_FOUND } from "../utils/http-codes.ts";
 import { apiProtect } from "../security/api-protect.ts";
 import { baseMiddlewares } from "../base-middlewares.ts";
 import { FileTree } from "../files/file-tree.ts";
+import { FileIdentification, identifyFileFromDirEntry } from "./file-type.ts";
 
-type ApiFile = Deno.DirEntry & {
+type ApiFile = Deno.DirEntry & FileIdentification & {
   date: Date;
 };
 
@@ -32,7 +33,8 @@ export function registerDirectoryRoutes(router: Router) {
         continue;
       }
       const date = fileStat.info.ctime || fileStat.info.mtime || new Date(0);
-      results.push({ ...result, date });
+
+      results.push({ ...result, ...identifyFileFromDirEntry(result), date });
     }
 
     ctx.response.body = results;

@@ -44,8 +44,9 @@
         >
             <div class="col">
                 <file-card
-                    x-bind:is-directory="file.isDirectory"
                     x-bind:filename="file.name"
+                    x-bind:file-type="file.fileType"
+                    x-bind:image-src="file.imageSrc"
                     x-bind:root="root"
                 ></file-card>
             </div>
