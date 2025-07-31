@@ -15,6 +15,9 @@ export const apiProtect: Middleware = async (ctx: Context, next: Next) => {
     const user = getUserMatchingApiKey(apiKey);
     if (user) {
       return next();
+    } else {
+      ctx.response.redirect('/')
+      return;
     }
   }
 
@@ -24,6 +27,9 @@ export const apiProtect: Middleware = async (ctx: Context, next: Next) => {
     const user = getUserMatchingApiKey(apiKey);
     if (user) {
       return next();
+    } else {
+      ctx.response.redirect('/');
+      return;
     }
   }
   ctx.response.status = HTTP_401_UNAUTHORIZED;

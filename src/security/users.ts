@@ -1,3 +1,4 @@
+import { encodeBase64 } from "jsr:@std/encoding@1/base64";
 import { getUsersFilePath } from "../config.ts";
 import { pbkdf2Hash } from "./password-hash.ts";
 
@@ -20,13 +21,25 @@ type UserDefinition = Pbkdf2Auth | InsecureBasicAuth;
 
 let hasReadUsersFile = false;
 const knownUsers: UserDefinition[] = [];
+const instanceSalt = new Uint8Array(32);
+crypto.getRandomValues(instanceSalt);
+const instanceUserHashes = new Map<string, string>()
 
-function deriveApiKey(key: string) {
-  return key
+async function calculateUserHash(user: UserDefinition, apiKey: string): Promise<string> {
+    const key = encodeBase64(user.username) + ':' + encodeBase64(apiKey)
+    const salt = instanceSalt
+    const keyBytes = new TextEncoder().encode(key);
+    const combinedBytes = new Uint8Array(salt.length + keyBytes.length);
+    combinedBytes.set(salt, 0);
+    combinedBytes.set(keyBytes, salt.length);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', combinedBytes);
+    return encodeBase64(hashBuffer)
 }
 
-function isDerivedApiKey(key: string, user: UserDefinition) {
-  return user.key === key;
+async function deriveApiKey(user: UserDefinition) {
+  const hashedKey = await calculateUserHash(user, user.key)
+  instanceUserHashes.set(hashedKey, user.username)
+  return hashedKey
 }
 
 export function getMatchingUser(
@@ -40,13 +53,13 @@ export function getMatchingUser(
       user.username === username &&
       user.password === password
     ) {
-      return Promise.resolve(deriveApiKey(user.key));
+      return deriveApiKey(user);
     } else if (
       user.type === "pbkdf2" &&
       user.username === username &&
       pbkdf2Compare(user, password)
     ) {
-      return Promise.resolve(deriveApiKey(user.key));
+      return deriveApiKey(user);
     }
   }
   return Promise.resolve(undefined);
@@ -54,8 +67,12 @@ export function getMatchingUser(
 
 export function getUserMatchingApiKey(apiKey: string) {
   ensureUsersFileRead();
+  const userMatchingKey = instanceUserHashes.get(apiKey)
+  if (!userMatchingKey) {
+    return;
+  }
   for (const user of knownUsers) {
-    if (isDerivedApiKey(apiKey, user)) {
+    if (user.username === userMatchingKey) {
       return user;
     }
   }
@@ -83,4 +100,10 @@ function ensureUsersFileRead() {
 function pbkdf2Compare(user: Pbkdf2Auth, password: string) {
   const result = pbkdf2Hash(password, user.salt);
   return user.b64Hash === result;
+}
+
+export function resetSecuritySaltEveryTwentyFiveHours() {
+  setInterval(() => {
+    crypto.getRandomValues(instanceSalt)
+  }, 1000 * 60 * 60 * 25)
 }

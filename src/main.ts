@@ -14,6 +14,7 @@ import { startup } from "./startup.ts";
 import { registerSitemapRoute } from "./sitemap/index.ts";
 import { registerAllCustomCommandApi } from "./custom-commands/index.ts";
 import { generatePreloadHtmlTemplate } from "./website/static-files.ts";
+import { resetSecuritySaltEveryTwentyFiveHours } from "./security/users.ts";
 
 if (Deno.env.get("FFS_ABANDON_SECURITY") === "true") {
   unsecure();
@@ -27,6 +28,7 @@ await initializeLoggers();
 const app = new Application();
 const router = new Router();
 
+resetSecuritySaltEveryTwentyFiveHours();
 registerAllFileListing(router);
 registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
