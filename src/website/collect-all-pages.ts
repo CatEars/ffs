@@ -23,6 +23,7 @@ export type ApplicationContext = {
 export type PluginPage = {
   type: "Plugin";
   displayName: string;
+  enabled: boolean;
   register: (context: ApplicationContext) => Promise<void>;
 };
 
@@ -97,6 +98,7 @@ export async function collectAllPages(): Promise<Page[]> {
         type: "Plugin",
         displayName: `${deno.parent}${deno.name}`,
         register: importedDeno.register,
+        enabled: !!importedDeno.enabled
       });
     }
   }

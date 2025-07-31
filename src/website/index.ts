@@ -47,6 +47,10 @@ async function registerPluginPages(
 ) {
   const navbarLinks: NavbarLink[] = [];
   for (const page of pluginPages) {
+    if (!page.enabled) {
+      logger.info("Plugin", page.displayName, "was disabled, will not register it")
+      continue;
+    }
     logger.info("Registering routes from", page.displayName);
     await page.register({
       router,

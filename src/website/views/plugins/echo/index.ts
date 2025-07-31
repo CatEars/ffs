@@ -3,6 +3,8 @@ import { logger } from "../../../../logging/logger.ts";
 import { apiProtect } from "../../../../security/api-protect.ts";
 import { ApplicationContext } from "../../../collect-all-pages.ts";
 
+export const enabled = false;
+
 export const middlewares = [apiProtect];
 
 export function register(context: ApplicationContext): Promise<void> {
