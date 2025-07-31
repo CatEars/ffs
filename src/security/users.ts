@@ -21,6 +21,14 @@ type UserDefinition = Pbkdf2Auth | InsecureBasicAuth;
 let hasReadUsersFile = false;
 const knownUsers: UserDefinition[] = [];
 
+function deriveApiKey(key: string) {
+  return key
+}
+
+function isDerivedApiKey(key: string, user: UserDefinition) {
+  return user.key === key;
+}
+
 export function getMatchingUser(
   username: string,
   password: string,
@@ -32,13 +40,13 @@ export function getMatchingUser(
       user.username === username &&
       user.password === password
     ) {
-      return Promise.resolve(user.key);
+      return Promise.resolve(deriveApiKey(user.key));
     } else if (
       user.type === "pbkdf2" &&
       user.username === username &&
       pbkdf2Compare(user, password)
     ) {
-      return Promise.resolve(user.key);
+      return Promise.resolve(deriveApiKey(user.key));
     }
   }
   return Promise.resolve(undefined);
@@ -47,7 +55,7 @@ export function getMatchingUser(
 export function getUserMatchingApiKey(apiKey: string) {
   ensureUsersFileRead();
   for (const user of knownUsers) {
-    if (user.key === apiKey) {
+    if (isDerivedApiKey(apiKey, user)) {
       return user;
     }
   }
