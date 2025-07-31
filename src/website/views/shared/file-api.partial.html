@@ -106,16 +106,6 @@
         return isSoundFile(file) || isImageFile(file) || isMovieFile(file);
     }
 
-    function resolveEmojiForMediaFile(file) {
-        if (isSoundFile(file)) {
-            return '🎵';
-        } else if (isImageFile(file)) {
-            return '📷';
-        } else if (isMovieFile(file)) {
-            return '📽️';
-        }
-    }
-
     function resolveSvgLocationForFile(file) {
         if (isSoundFile(file.name)) {
             return '/static/svg/music_note.svg';
@@ -135,17 +125,5 @@
             return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
         }
         return '';
-    }
-
-    async function tryPrefetchThumbnail(root, file) {
-        const imageSource = getFileImageSource(root, file);
-        if (!imageSource) {
-            throw new Error('No thumbnail to load from');
-        }
-        const result = await fetch(imageSource);
-        if (!result.ok) {
-            throw new Error('Unable to load thumbnail correctly');
-        }
-        return imageSource;
     }
 </script>
