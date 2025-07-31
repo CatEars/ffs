@@ -21,10 +21,3 @@
         </div>
     </template>
 </div>
-<div class="row">
-    <paginate-control
-        x-bind:page="currentPage"
-        x-bind:max-pages="getNumPages(files)"
-        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
-    ></paginate-control>
-</div>
