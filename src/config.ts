@@ -1,3 +1,5 @@
+import { logger } from "./logging/logger.ts";
+
 let noSec: boolean = false;
 export const viewPath = Deno.cwd() + "/src/website/views/";
 export const devModeEnabled = Deno.env.get("FFS_ENV") === "dev";
@@ -6,6 +8,7 @@ export const cacheRootKey = "FFS_CACHE_ROOT";
 export const usersFileKey = "FFS_USERS_FILE";
 export const requestLogsKey = "FFS_REQUEST_LOGS_FILE";
 export const customCommandsFileKey = "FFS_CUSTOM_COMMANDS_FILE";
+export const instanceSecretKey = "FFS_INSTANCE_SECRET";
 
 type Config = {
   storeRoot: string;
@@ -13,6 +16,7 @@ type Config = {
   cacheRoot: string;
   requestLogsFile: string;
   customCommandsFile: string;
+  instanceSecret: string;
 };
 
 function getEnvValueOrThrow(key: string) {
@@ -43,6 +47,23 @@ export function getCustomCommandsFile() {
   return Deno.env.get(customCommandsFileKey) || "";
 }
 
+
+const featuresThatDependOnInstanceSecret: string[] = []
+let _instanceSecret: string | null = null
+export function getInstanceSecret() {
+  if (_instanceSecret) {
+    return _instanceSecret
+  } else {
+    _instanceSecret = Deno.env.get(instanceSecretKey) || null
+    if (!_instanceSecret) {
+      logger.warn(`Instance secret (${instanceSecretKey}) not set, 
+        The following features will not work between restarts: [${featuresThatDependOnInstanceSecret.join(', ')}]`)
+      _instanceSecret = crypto.randomUUID()
+    }
+  }
+  return _instanceSecret
+}
+
 export function shouldAbandonSecurity() {
   return noSec;
 }
@@ -57,6 +78,7 @@ export function setConfig(config: Config) {
   Deno.env.set(usersFileKey, config.usersFilePath);
   Deno.env.set(requestLogsKey, config.requestLogsFile);
   Deno.env.set(customCommandsFileKey, config.customCommandsFile);
+  Deno.env.set(instanceSecretKey, config.instanceSecret)
 }
 
 export function validateConfig() {
@@ -64,4 +86,5 @@ export function validateConfig() {
   getUsersFilePath();
   getCacheRoot();
   getRequestLogsFile();
+  getInstanceSecret();
 }
