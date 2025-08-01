@@ -1,3 +1,3 @@
 export type ThumbnailRequest = {
-  filePath: string;
+    filePath: string;
 };

@@ -17,7 +17,7 @@ class PaginateControl extends BaseWebComponent {
                     detail: {
                         page,
                     },
-                })
+                }),
             );
         };
         const pre = () => {
@@ -28,38 +28,40 @@ class PaginateControl extends BaseWebComponent {
             to(currentPage + 1);
         };
 
-        return html`<nav>
-            <ul class="pagination">
-                <li class="page-item">
-                    <a
-                        href="#"
-                        class="page-link ${currentPage === 1 ? 'disabled' : ''}"
-                        onclick=${() => pre()}
-                        >${'<'}</a
-                    >
-                </li>
-                ${Array.from({ length: maxPages }).map(
-                    (_, idx) => html`
-                        <li class="page-item">
-                            <a
-                                href="#"
-                                class="page-link ${currentPage === idx + 1 ? 'disabled' : ''}"
-                                onclick=${() => to(idx + 1)}
-                                >${idx + 1}</a
-                            >
-                        </li>
-                    `
-                )}
-                <li class="page-item">
-                    <a
-                        href="#"
-                        class="page-link ${currentPage === maxPages ? 'disabled' : ''}"
-                        onclick=${() => post()}
-                        >${'>'}</a
-                    >
-                </li>
-            </ul>
-        </nav>`;
+        return html`
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item">
+                        <a
+                            href="#"
+                            class="page-link ${currentPage === 1 ? 'disabled' : ''}"
+                            onclick="${() => pre()}"
+                        >${'<'}</a>
+                    </li>
+                    ${Array.from({ length: maxPages }).map(
+                        (_, idx) =>
+                            html`
+                                <li class="page-item">
+                                    <a
+                                        href="#"
+                                        class="page-link ${currentPage === idx + 1
+                                            ? 'disabled'
+                                            : ''}"
+                                        onclick="${() => to(idx + 1)}"
+                                    >${idx + 1}</a>
+                                </li>
+                            `,
+                    )}
+                    <li class="page-item">
+                        <a
+                            href="#"
+                            class="page-link ${currentPage === maxPages ? 'disabled' : ''}"
+                            onclick="${() => post()}"
+                        >${'>'}</a>
+                    </li>
+                </ul>
+            </nav>
+        `;
     }
 }
 

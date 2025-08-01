@@ -1,9 +1,9 @@
-import { setConfig } from "../src/config.ts";
+import { setConfig } from '../src/config.ts';
 
 setConfig({
-  storeRoot: ".",
-  usersFilePath: "data/users-file.json",
-  cacheRoot: Deno.makeTempDirSync(),
-  requestLogsFile: Deno.makeTempFileSync(),
-  customCommandsFile: "",
+    storeRoot: '.',
+    usersFilePath: 'data/users-file.json',
+    cacheRoot: Deno.makeTempDirSync(),
+    requestLogsFile: Deno.makeTempFileSync(),
+    customCommandsFile: '',
 });

@@ -1,45 +1,45 @@
 <script>
-  // Set an item in localStorage
-  function setLocalStorage(key, value) {
-    try {
-      const serializedValue = JSON.stringify(value);
-      localStorage.setItem(key, serializedValue);
-      return value;
-    } catch (e) {
-      console.error("Error setting item to localStorage", e);
+    // Set an item in localStorage
+    function setLocalStorage(key, value) {
+        try {
+            const serializedValue = JSON.stringify(value);
+            localStorage.setItem(key, serializedValue);
+            return value;
+        } catch (e) {
+            console.error('Error setting item to localStorage', e);
+        }
     }
-  }
 
-  // Get an item from localStorage
-  function getLocalStorage(key, defaultValue) {
-    try {
-      const serializedValue = localStorage.getItem(key);
-      return serializedValue ? JSON.parse(serializedValue) : defaultValue;
-    } catch (e) {
-      console.error("Error getting item from localStorage", e);
-      return null;
+    // Get an item from localStorage
+    function getLocalStorage(key, defaultValue) {
+        try {
+            const serializedValue = localStorage.getItem(key);
+            return serializedValue ? JSON.parse(serializedValue) : defaultValue;
+        } catch (e) {
+            console.error('Error getting item from localStorage', e);
+            return null;
+        }
     }
-  }
 
-  // Set an item in sessionStorage
-  function setSessionStorage(key, value) {
-    try {
-      const serializedValue = JSON.stringify(value);
-      sessionStorage.setItem(key, serializedValue);
-      return value;
-    } catch (e) {
-      console.error("Error setting item to sessionStorage", e);
+    // Set an item in sessionStorage
+    function setSessionStorage(key, value) {
+        try {
+            const serializedValue = JSON.stringify(value);
+            sessionStorage.setItem(key, serializedValue);
+            return value;
+        } catch (e) {
+            console.error('Error setting item to sessionStorage', e);
+        }
     }
-  }
 
-  // Get an item from sessionStorage
-  function getSessionStorage(key, defaultValue) {
-    try {
-      const serializedValue = sessionStorage.getItem(key);
-      return serializedValue ? JSON.parse(serializedValue) : defaultValue;
-    } catch (e) {
-      console.error("Error getting item from sessionStorage", e);
-      return null;
+    // Get an item from sessionStorage
+    function getSessionStorage(key, defaultValue) {
+        try {
+            const serializedValue = sessionStorage.getItem(key);
+            return serializedValue ? JSON.parse(serializedValue) : defaultValue;
+        } catch (e) {
+            console.error('Error getting item from sessionStorage', e);
+            return null;
+        }
     }
-  }
 </script>

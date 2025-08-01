@@ -19,25 +19,29 @@ class BreadcrumbNav extends BaseWebComponent {
                         trail,
                         index: idx,
                     },
-                })
+                }),
             );
         };
 
         return html`
             <style>
-                .breadcrumb-item > * {
-                    padding-left: 0.5em;
-                    padding-right: 0.5em;
-                }
+            .breadcrumb-item > * {
+                padding-left: 0.5em;
+                padding-right: 0.5em;
+            }
             </style>
             <div class="d-flex" style="height: 100%;">
                 <div class="align-self-end">
                     <nav>
                         <ol class="breadcrumb">
                             ${preCrumbs.map(
-                                (crumb, idx) => html`<li class="breadcrumb-item">
-                                    <a href="#" onclick=${() => onIndexClick(idx)}>${crumb}</a>
-                                </li>`
+                                (crumb, idx) =>
+                                    html`
+                                        <li class="breadcrumb-item">
+                                            <a href="#" onclick="${() =>
+                                                onIndexClick(idx)}">${crumb}</a>
+                                        </li>
+                                    `,
                             )}
                             <li class="breadcrumb-item active">
                                 <span>${lastCrumb}</span>

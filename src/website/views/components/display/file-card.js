@@ -35,18 +35,19 @@ class FileCard extends BaseWebComponent {
 
         const styling = html`
             <style>
-                .clamp-2 {
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2; /* Limit to 2 lines */
-                    line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
+            .clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2; /* Limit to 2 lines */
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
             </style>
         `;
         if (fileType === 'directory') {
-            return html`${styling}
+            return html`
+                ${styling}
                 <div class="card">
                     <a
                         class="text-decoration-none"
@@ -57,11 +58,13 @@ class FileCard extends BaseWebComponent {
                             <span class="card-text clamp-2">${filename}/</span>
                         </div>
                     </a>
-                </div>`;
+                </div>
+            `;
         } else if (fileType === 'sound' || fileType === 'image' || fileType === 'video') {
             const href = `/home/media/view?path=${encodeURIComponent(root + '/' + filename)}`;
             const displayText = resolveEmojiForMediaFile(fileType) + ' ' + filename;
-            return html`${styling}
+            return html`
+                ${styling}
                 <div class="card">
                     <a class="text-decoration-none" href="${href}">
                         <img height="125" class="card-img-top" src="${imageSrc}" />
@@ -69,9 +72,11 @@ class FileCard extends BaseWebComponent {
                             <span class="card-text clamp-2">${displayText}</span>
                         </div>
                     </a>
-                </div>`;
+                </div>
+            `;
         } else {
-            return html`${styling}
+            return html`
+                ${styling}
                 <div class="card">
                     <a
                         class="text-decoration-none"
@@ -83,7 +88,8 @@ class FileCard extends BaseWebComponent {
                             <span class="card-text clamp-2">${filename}</span>
                         </div>
                     </a>
-                </div>`;
+                </div>
+            `;
         }
     }
 }

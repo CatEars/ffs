@@ -1,44 +1,44 @@
 <!-- layout /templates/base.html -->
 <div class="container">
-  <script>
-    async function submitEchoText(evt) {
-      evt.preventDefault();
-      const msg = document.getElementById("message").value;
-      console.log(msg);
-      const result = await fetch("/api/echo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: msg,
-        }),
-      });
-      const body = await result.json();
-      return body.message;
+    <script>
+        async function submitEchoText(evt) {
+        evt.preventDefault();
+        const msg = document.getElementById('message').value;
+        console.log(msg);
+        const result = await fetch('/api/echo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: msg,
+            }),
+        });
+        const body = await result.json();
+        return body.message;
     }
-  </script>
-  <div x-data="{ displayText: '' }">
-    <div class="row">
-      <form>
-        <div class="form-group mb-3">
-          <label class="mb-3" for="message">Message:</label>
-          <input class="form-control" type="text" id="message" name="message" />
+    </script>
+    <div x-data="{ displayText: '' }">
+        <div class="row">
+            <form>
+                <div class="form-group mb-3">
+                    <label class="mb-3" for="message">Message:</label>
+                    <input class="form-control" type="text" id="message" name="message" />
+                </div>
+                <button
+                    type="submit"
+                    class="btn btn-primary mb-3"
+                    @click="submitEchoText(event).then(msg => displayText = msg)"
+                >
+                    Submit
+                </button>
+            </form>
         </div>
-        <button
-          type="submit"
-          class="btn btn-primary mb-3"
-          @click="submitEchoText(event).then(msg => displayText = msg)"
-        >
-          Submit
-        </button>
-      </form>
+        <template x-if="displayText.length > 0">
+            <div class="row">
+                <p>The server response:</p>
+                <i><p x-text="displayText"></p></i>
+            </div>
+        </template>
     </div>
-    <template x-if="displayText.length > 0">
-      <div class="row">
-        <p>The server response:</p>
-        <i><p x-text="displayText"></p></i>
-      </div>
-    </template>
-  </div>
 </div>

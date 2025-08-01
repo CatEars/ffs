@@ -37,6 +37,6 @@
             "attachSimplePort": 9229,
             "outputCapture": "std",
             "console": "integratedTerminal"
-        },
+        }
     ]
 }

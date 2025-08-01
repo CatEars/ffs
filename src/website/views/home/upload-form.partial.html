@@ -1,58 +1,58 @@
 <form
-  class="m-2 mb-4"
-  action="/api/file/upload"
-  method="POST"
-  enctype="multipart/form-data"
+    class="m-2 mb-4"
+    action="/api/file/upload"
+    method="POST"
+    enctype="multipart/form-data"
 >
-  <div class="col" x-data="{ names: [] }">
-    <div class="container">
-      <div class="row">
-        <input
-          @change="names = getFilenamesFromEvent(event)"
-          class="d-none"
-          type="file"
-          id="file"
-          name="file"
-        />
-        <div class="col-auto">
-          <button
-            class="btn btn-outline-primary"
-            @click="document.getElementById('file').click()"
-            type="button"
-            id="browseButton"
-          >
-            <img src="/static/svg/attach.svg" />
-          </button>
+    <div class="col" x-data="{ names: [] }">
+        <div class="container">
+            <div class="row">
+                <input
+                    @change="names = getFilenamesFromEvent(event)"
+                    class="d-none"
+                    type="file"
+                    id="file"
+                    name="file"
+                />
+                <div class="col-auto">
+                    <button
+                        class="btn btn-outline-primary"
+                        @click="document.getElementById('file').click()"
+                        type="button"
+                        id="browseButton"
+                    >
+                        <img src="/static/svg/attach.svg" />
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button
+                        class="btn btn-outline-primary"
+                        x-bind:disabled="names.length === 0"
+                        type="submit"
+                    >
+                        <img src="/static/svg/upload_file.svg" />
+                    </button>
+                </div>
+                <div class="col d-flex align-items-center">
+                    <template x-for="name in names">
+                        <div x-text="name"></div>
+                    </template>
+                </div>
+            </div>
         </div>
-        <div class="col-auto">
-          <button
-            class="btn btn-outline-primary"
-            x-bind:disabled="names.length === 0"
-            type="submit"
-          >
-            <img src="/static/svg/upload_file.svg" />
-          </button>
-        </div>
-        <div class="col d-flex align-items-center">
-          <template x-for="name in names">
-            <div x-text="name"></div>
-          </template>
-        </div>
-      </div>
     </div>
-  </div>
-  <input type="hidden" id="directory" name="directory" />
-  <script>
-    function getFilenamesFromEvent(evt) {
-      const result = [];
-      for (const file of evt.target.files) {
-        result.push(file.name);
-      }
-      return result;
+    <input type="hidden" id="directory" name="directory" />
+    <script>
+        function getFilenamesFromEvent(evt) {
+        const result = [];
+        for (const file of evt.target.files) {
+            result.push(file.name);
+        }
+        return result;
     }
 
-    document.getElementById("directory").value = decodeURIComponent(
-      getCurrentPath()
+    document.getElementById('directory').value = decodeURIComponent(
+        getCurrentPath(),
     );
-  </script>
+    </script>
 </form>

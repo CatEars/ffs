@@ -1,13 +1,13 @@
 # This docker compose is an example of how to deploy FFS
 
 services:
-  ffs:
-    image: catears/ffs
-    volumes:
-      - ./:/files
-      - ./users-file.json:/config/users-file.json:ro
-    environment:
-      - FFS_USERS_FILE=/config/users-file.json
-      - FFS_STORE_ROOT=/files
-    ports:
-      - 8080:8080
+    ffs:
+        image: catears/ffs
+        volumes:
+            - ./:/files
+            - ./users-file.json:/config/users-file.json:ro
+        environment:
+            - FFS_USERS_FILE=/config/users-file.json
+            - FFS_STORE_ROOT=/files
+        ports:
+            - 8080:8080

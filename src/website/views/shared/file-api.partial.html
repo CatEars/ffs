@@ -43,21 +43,24 @@
         const copy = JSON.parse(JSON.stringify(files));
         mapDateStrToDate(copy);
 
-        const sortingFunction =
-            sorting === 'oldest'
-                ? (a, b) => a.date - b.date
-                : sorting === 'newest'
-                ? (a, b) => b.date - a.date
-                : sorting === 'a-z'
-                ? (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
-                : sorting === 'z-a'
-                ? (a, b) => -a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
-                : () => {};
+        const sortingFunction = sorting === 'oldest'
+            ? (a, b) => a.date - b.date
+            : sorting === 'newest'
+            ? (a, b) => b.date - a.date
+            : sorting === 'a-z'
+            ? (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
+            : sorting === 'z-a'
+            ? (a, b) => -a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
+            : () => {};
 
         copy.sort(sortingFunction);
         if (directoriesFirst) {
             const directoryFirstSorter = (a, b) =>
-                a.isDirectory && !b.isDirectory ? -1 : !a.isDirectory && b.isDirectory ? 1 : 0;
+                a.isDirectory && !b.isDirectory
+                    ? -1
+                    : !a.isDirectory && b.isDirectory
+                    ? 1
+                    : 0;
             copy.sort(directoryFirstSorter);
         }
 
@@ -121,7 +124,10 @@
     }
 
     function getFileImageSource(root, file) {
-        if (isMovieFile(file.name) || (isImageFile(file.name) && !file.name.endsWith('.gif'))) {
+        if (
+            isMovieFile(file.name) ||
+            (isImageFile(file.name) && !file.name.endsWith('.gif'))
+        ) {
             return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
         }
         return '';

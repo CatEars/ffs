@@ -1,3 +1,3 @@
-import { apiProtect } from "../../../security/api-protect.ts";
+import { apiProtect } from '../../../security/api-protect.ts';
 
 export const middlewares = [apiProtect];

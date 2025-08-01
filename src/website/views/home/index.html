@@ -15,37 +15,38 @@
 >
     <script>
         function storeToCuttingBoard(files) {
-            return setSessionStorage('cutting-board', files);
-        }
+        return setSessionStorage('cutting-board', files);
+    }
 
-        function getCuttingBoard() {
-            return getSessionStorage('cutting-board', []);
-        }
+    function getCuttingBoard() {
+        return getSessionStorage('cutting-board', []);
+    }
 
-        function getCuttingBoardDisplay() {
-            return `${getCuttingBoard().length} files in cutting board`;
-        }
+    function getCuttingBoardDisplay() {
+        return `${getCuttingBoard().length} files in cutting board`;
+    }
 
-        function resetCuttingBoard() {
-            storeToCuttingBoard([]);
-        }
+    function resetCuttingBoard() {
+        storeToCuttingBoard([]);
+    }
 
-        function fileInCuttingBoard(file) {
-            const myPath = decodeURIComponent(getCurrentPath());
-            return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
-        }
+    function fileInCuttingBoard(file) {
+        const myPath = decodeURIComponent(getCurrentPath());
+        return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
+    }
 
-        function findFilesToGrey() {
-            const myPath = decodeURIComponent(getCurrentPath());
-            return getCuttingBoard()
-                .filter((x) => x.path === myPath)
-                .map((x) => x.fileName);
-        }
+    function findFilesToGrey() {
+        const myPath = decodeURIComponent(getCurrentPath());
+        return getCuttingBoard()
+            .filter((x) => x.path === myPath)
+            .map((x) => x.fileName);
+    }
     </script>
     <div
         style="display: none"
         x-effect="files = await getFiles(getCurrentPath()); filesToGrey = findFilesToGrey()"
-    ></div>
+    >
+    </div>
 
     <app-header>Files</app-header>
     <div class="row">
