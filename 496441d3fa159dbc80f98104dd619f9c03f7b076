@@ -4,3 +4,4 @@
 [ ] Create directories (with naming)
 [ ] Automatically include newly created JS files without restart (especially during dev)
 [ ] Add thumbnail support for more video files
+[ ] Automate changelog of features and fixes
