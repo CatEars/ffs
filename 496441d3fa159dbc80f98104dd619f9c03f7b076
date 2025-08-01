@@ -5,3 +5,4 @@
 [ ] Automatically include newly created JS files without restart (especially during dev)
 [ ] Add thumbnail support for more video files
 [ ] Automate changelog of features and fixes
+[ ] Create @cached decorator (support for both non-promise and promise results)
