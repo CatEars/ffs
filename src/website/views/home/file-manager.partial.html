@@ -5,8 +5,7 @@
         return `/home/?path=${path}`;
     }
 
-    function cutFiles() {
-        const myPath = getCurrentPath();
+    function getCheckedFiles() {
         const clickedFiles = [];
         for (const element of document.querySelectorAll('.file-to-cut')) {
             if (element.checked) {
@@ -14,6 +13,12 @@
             }
             element.checked = false;
         }
+        return clickedFiles;
+    }
+
+    function cutFiles() {
+        const myPath = getCurrentPath();
+        const clickedFiles = getCheckedFiles();
         const filesToStore = clickedFiles.map((elem) => ({
             path: myPath,
             fileName: elem,
@@ -30,6 +35,13 @@
         document.getElementById('files-to-move').value = JSON.stringify(board);
         document.getElementById('destination').value = path;
         document.getElementById('paste-form').submit();
+    }
+
+    function createFileShare() {
+        const myPath = getCurrentPath();
+        const paths = getCheckedFiles().map((x) => `${myPath}/${x}`);
+        document.getElementById('link-paths').value = JSON.stringify(paths);
+        document.getElementById('link-form').submit();
     }
 </script>
 <!-- include ./upload-form.partial.html -->
@@ -115,6 +127,12 @@
         >
             <use href="/static/svg/sprite_sheet.svg#undo"></use>
         </svg>
+    </button>
+    <form id="link-form" action="/api/link" method="POST" style="display: none">
+        <input id="link-paths" name="paths" type="hidden" />
+    </form>
+    <button class="btn btn-secondary">
+        <img @click="createFileShare()" width="32" src="/static/svg/undo.svg" />
     </button>
     <p x-text="filesDisplay"></p>
 </div>

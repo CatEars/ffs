@@ -4,6 +4,7 @@ import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../utils/http-codes
 import { decodeBase64Url, encodeBase64Url } from 'jsr:@std/encoding/base64url';
 
 const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 let _cachedKey: CryptoKey | null = null;
 async function getCryptoKey() {
@@ -53,7 +54,8 @@ export const shareProtect: Middleware = async (ctx, next) => {
         ctx.response.status = HTTP_400_BAD_REQUEST;
         return;
     }
-    const paths = JSON.parse(decodeBase64Url(pathsFromUrl));
+    const decoded = decoder.decode(decodeBase64Url(pathsFromUrl));
+    const paths = JSON.parse(decoded);
     const hmac = decodeBase64Url(hmacFromUrl);
     const claim = buildClaim(paths);
     if (await validateHmac(claim, hmac)) {

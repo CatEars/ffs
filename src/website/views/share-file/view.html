@@ -1,0 +1,25 @@
+<!-- layout /templates/base.html -->
+<!-- include /shared/url-params.partial.html -->
+<script>
+    async function getFilesFromParams() {
+        const paths = getUrlParam('paths');
+        const hmac = getUrlParam('hmac');
+        const result = await fetch(`/api/share-file/list?paths=${paths}&hmac=${hmac}`);
+        return await result.json();
+    }
+</script>
+<app-main x-data="{ files: [] }">
+    <div style="display: none" x-init="files = await getFilesFromParams()"></div>
+    <app-header>Shared Files</app-header>
+    <p>
+        <b>Instructions:</b> This is the share link, by copying the URL and giving it to a friend,
+        you are able to share this view with them. They can only access what is shown here.
+    </p>
+    <ul>
+        <template x-for="file in files">
+            <li style="margin-top: 3px">
+                <button class="btn btn-primary">Download</button><span x-text="file"></span>
+            </li>
+        </template>
+    </ul>
+</app-main>
