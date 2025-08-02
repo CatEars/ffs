@@ -14,10 +14,12 @@
         "@std/path": "jsr:@std/path@^1.1.1"
     },
     "tasks": {
+        "bundle-component-library": "deno run --allow-all scripts/bundle-component-library.ts",
         "ensure-dist": "mkdir -p dist",
         "enable-eruda": "./scripts/set-eruda-as-personal-html-file.sh",
         "create-personal-files": "deno run --allow-all scripts/create-empty-personal-files.ts",
         "remove-personal-files": "deno run --allow-all scripts/remove-personal-files.ts",
+        "generate-svg-spritesheet": "deno run --allow-all scripts/generate-svg-sprite-sheet.ts",
         "run": {
             "command": "deno run --allow-all scripts/dev-main.ts"
         },
@@ -35,7 +37,7 @@
         },
         "build-docker": {
             "command": "docker build --no-cache . -t catears/ffs",
-            "dependencies": ["ensure-dist", "remove-personal-files"]
+            "dependencies": ["ensure-dist", "remove-personal-files", "bundle-component-library"]
         },
         "build-dist": {
             "command": "rm -rf dist/* && docker save catears/ffs | gzip > dist/ffs.$(git describe --tags --abbrev=0).tar.gz",

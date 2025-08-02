@@ -1,9 +1,4 @@
-<form
-    class="m-2 mb-4"
-    action="/api/file/upload"
-    method="POST"
-    enctype="multipart/form-data"
->
+<form class="m-2 mb-4" action="/api/file/upload" method="POST" enctype="multipart/form-data">
     <div class="col" x-data="{ names: [] }">
         <div class="container">
             <div class="row">
@@ -21,7 +16,9 @@
                         type="button"
                         id="browseButton"
                     >
-                        <img src="/static/svg/attach.svg" />
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#attach"></use>
+                        </svg>
                     </button>
                 </div>
                 <div class="col-auto">
@@ -30,7 +27,9 @@
                         x-bind:disabled="names.length === 0"
                         type="submit"
                     >
-                        <img src="/static/svg/upload_file.svg" />
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
+                        </svg>
                     </button>
                 </div>
                 <div class="col d-flex align-items-center">
@@ -44,15 +43,13 @@
     <input type="hidden" id="directory" name="directory" />
     <script>
         function getFilenamesFromEvent(evt) {
-        const result = [];
-        for (const file of evt.target.files) {
-            result.push(file.name);
+            const result = [];
+            for (const file of evt.target.files) {
+                result.push(file.name);
+            }
+            return result;
         }
-        return result;
-    }
 
-    document.getElementById('directory').value = decodeURIComponent(
-        getCurrentPath(),
-    );
+        document.getElementById('directory').value = decodeURIComponent(getCurrentPath());
     </script>
 </form>

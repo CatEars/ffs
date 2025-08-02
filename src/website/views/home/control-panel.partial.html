@@ -2,13 +2,13 @@
     <div class="row">
         <auto-column>
             <radio-control
-                imgSrc="/static/svg/child.svg"
+                imgSrc="child"
                 name="newest"
                 @click="sorting = setLocalStorage('file-sort-order', 'newest')"
                 x-bind:checked="sorting === 'newest'"
             ></radio-control>
             <radio-control
-                imgSrc="/static/svg/elderly.svg"
+                imgSrc="elderly"
                 name="oldest"
                 @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
                 x-bind:checked="sorting === 'oldest'"

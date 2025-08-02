@@ -45,13 +45,11 @@ async function registerUnder(router: Router, root: string, webRoot: string) {
 }
 
 export async function generatePreloadHtmlTemplate() {
-    const staticJsWalker = new FileTreeWalker('./src/website/views/components');
-    staticJsWalker.filter((x) => x.name.endsWith('.js'));
-    const paths = await staticJsWalker.collectAll();
-    const links2 = paths.map((x) =>
-        `<link rel="modulepreload" href="/components${x.parent}${x.name}" />`
-    ).sort();
-    const links = ['<link rel="modulepreload" href="/components/index.bundle.js" />'];
+    const links = [
+        '<link rel="modulepreload" href="/components/index.bundle.js" />',
+        '<link rel="preload" href="/static/css/styling.css" as="style" />',
+        '<link rel="preload" href="/static/bootstrap.min.css" as="style" />',
+    ];
     const generatedHtml =
         '<!-- This file is auto-generated. It can be commited to source control, but do not modify! -->\n' +
         links.join('\n');

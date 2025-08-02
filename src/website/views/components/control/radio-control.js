@@ -13,7 +13,9 @@ class RadioControl extends BaseWebComponent {
         const text = this.getAttribute('text') || '';
         if (imgSrc) {
             return html`<${BaseRadio} name="${name}" checked="${checked}">
-                <img width="26" src="${imgSrc}" />
+                <svg class="icon">
+                    <use href="/static/svg/sprite_sheet.svg#${imgSrc}"></use>
+                </svg>
             </${BaseRadio}>`;
         } else {
             return html`<${BaseRadio} name="${name}" checked="${checked}">

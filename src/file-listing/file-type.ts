@@ -28,7 +28,7 @@ export function identifyFileFromDirEntry(
     if (entry.isDirectory) {
         return {
             fileType: 'directory',
-            imageSrc: '/static/svg/folder.svg',
+            imageSrc: 'folder',
         };
     }
     const lowercaseName = entry.name.toLocaleLowerCase();
@@ -36,22 +36,22 @@ export function identifyFileFromDirEntry(
     if (isVideoFile(lowercaseName)) {
         return {
             fileType: 'video',
-            imageSrc: imageSrc || '/static/svg/videocam.svg',
+            imageSrc: imageSrc || 'videocam',
         };
     } else if (isSoundFile(lowercaseName)) {
         return {
             fileType: 'sound',
-            imageSrc: imageSrc || '/static/svg/music_note.svg',
+            imageSrc: imageSrc || 'music_note',
         };
     } else if (isImageFile(lowercaseName)) {
         return {
             fileType: 'image',
-            imageSrc: imageSrc || '/static/svg/photo_camera.svg',
+            imageSrc: imageSrc || 'photo_camera',
         };
     } else {
         return {
             fileType: 'unidentified',
-            imageSrc: imageSrc || '/static/svg/description.svg',
+            imageSrc: imageSrc || 'description',
         };
     }
 }
