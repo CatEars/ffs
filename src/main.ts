@@ -13,7 +13,6 @@ import {
 import { startup } from './startup.ts';
 import { registerSitemapRoute } from './sitemap/index.ts';
 import { registerAllCustomCommandApi } from './custom-commands/index.ts';
-import { generatePreloadHtmlTemplate } from './website/static-files.ts';
 import { resetSecuritySaltEveryTwentyFiveHours } from './security/users.ts';
 import { registerAllFileShareRoutes } from './share-file/index.ts';
 
@@ -37,7 +36,6 @@ await registerAllWebsiteRoutes(router);
 registerAllThumbnailRoutes(router);
 registerSitemapRoute(router);
 registerAllCustomCommandApi(router);
-generatePreloadHtmlTemplate();
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();

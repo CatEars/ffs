@@ -43,18 +43,3 @@ async function registerUnder(router: Router, root: string, webRoot: string) {
         });
     }
 }
-
-export async function generatePreloadHtmlTemplate() {
-    const links = [
-        '<link rel="modulepreload" href="/components/index.bundle.js" />',
-        '<link rel="preload" href="/static/css/styling.css" as="style" />',
-        '<link rel="preload" href="/static/bootstrap.min.css" as="style" />',
-    ];
-    const generatedHtml =
-        '<!-- This file is auto-generated. It can be commited to source control, but do not modify! -->\n' +
-        links.join('\n');
-    await Deno.writeFile(
-        './src/website/views/templates/preload.html',
-        new TextEncoder().encode(generatedHtml),
-    );
-}
