@@ -10,6 +10,7 @@
     "jsr:@std/bytes@1": "1.0.6",
     "jsr:@std/bytes@^1.0.2": "1.0.5",
     "jsr:@std/crypto@1": "1.0.5",
+    "jsr:@std/encoding@*": "1.0.10",
     "jsr:@std/encoding@1": "1.0.10",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/fs@1.0.5": "1.0.5",

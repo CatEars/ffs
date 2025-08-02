@@ -16,6 +16,7 @@
     "tasks": {
         "ensure-dist": "mkdir -p dist",
         "enable-eruda": "./scripts/set-eruda-as-personal-html-file.sh",
+        "create-personal-files": "deno run --allow-all scripts/create-empty-personal-files.ts",
         "remove-personal-files": "deno run --allow-all scripts/remove-personal-files.ts",
         "run": {
             "command": "deno run --allow-all scripts/dev-main.ts"
@@ -26,6 +27,7 @@
         "unpack-favicon": "deno run --allow-all scripts/unpack-favicon.ts",
         "setup": {
             "dependencies": [
+                "create-personal-files",
                 "download-dependencies",
                 "download-vendor-binaries",
                 "unpack-favicon"
