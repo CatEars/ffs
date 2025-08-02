@@ -48,9 +48,10 @@ export async function generatePreloadHtmlTemplate() {
     const staticJsWalker = new FileTreeWalker('./src/website/views/components');
     staticJsWalker.filter((x) => x.name.endsWith('.js'));
     const paths = await staticJsWalker.collectAll();
-    const links = paths.map((x) =>
+    const links2 = paths.map((x) =>
         `<link rel="modulepreload" href="/components${x.parent}${x.name}" />`
     ).sort();
+    const links = ['<link rel="modulepreload" href="/components/index.bundle.js" />'];
     const generatedHtml =
         '<!-- This file is auto-generated. It can be commited to source control, but do not modify! -->\n' +
         links.join('\n');

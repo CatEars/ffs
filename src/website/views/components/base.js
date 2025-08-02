@@ -5,7 +5,7 @@ export const html = htm.bind(h);
 
 let sharedStylesheet = null;
 
-async function loadSharedStylesheet() {
+export async function loadSharedStylesheet() {
     if (sharedStylesheet) {
         return sharedStylesheet;
     }
@@ -18,7 +18,7 @@ async function loadSharedStylesheet() {
         }
         const cssText = await response.text();
 
-        sharedStylesheet.replaceSync(cssText);
+        await sharedStylesheet.replace(cssText);
         console.log('Shared stylesheet loaded and parsed.');
     } catch (error) {
         console.error('Error loading shared stylesheet:', error);
@@ -27,13 +27,11 @@ async function loadSharedStylesheet() {
     return sharedStylesheet;
 }
 
-loadSharedStylesheet();
-
 export class BaseWebComponent extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.adoptedStyleSheets = [sharedStylesheet];
+        this.shadowRoot.adoptedStyleSheets = [...document.adoptedStyleSheets];
     }
 
     connectedCallback() {

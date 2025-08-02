@@ -8,6 +8,7 @@ import MediaViewer from './media-viewer.js';
 import SwitchControl from './control/switch-control.js';
 import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
+import { loadSharedStylesheet } from './base.js';
 
 const components = [
     ['app-header', AppHeader],
@@ -27,6 +28,9 @@ function register(name, Component) {
     customElements.define(name, Component);
 }
 
-for (const [name, Component] of components) {
-    register(name, Component);
-}
+loadSharedStylesheet().then((sharedStylesheet) => {
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, sharedStylesheet];
+    for (const [name, Component] of components) {
+        register(name, Component);
+    }
+});
