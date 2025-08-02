@@ -1,3 +1,6 @@
+html {
+    background: rgb(33, 37, 41);
+}
 .card-body {
     --bs-card-spacer-x: 0.5rem;
     --bs-card-spacer-y: 0.5rem;
