@@ -7,6 +7,12 @@
         const result = await fetch(`/api/share-file/list?paths=${paths}&hmac=${hmac}`);
         return await result.json();
     }
+
+    function buildDownloadHref(index) {
+        const paths = getUrlParam('paths');
+        const hmac = getUrlParam('hmac');
+        return `/api/share-file/download?paths=${paths}&hmac=${hmac}&index=${index}`;
+    }
 </script>
 <app-main x-data="{ files: [] }">
     <div style="display: none" x-init="files = await getFilesFromParams()"></div>
@@ -16,9 +22,9 @@
         you are able to share this view with them. They can only access what is shown here.
     </p>
     <ul>
-        <template x-for="file in files">
+        <template x-for="(file, idx) in files">
             <li style="margin-top: 3px">
-                <button class="btn btn-primary">Download</button><span x-text="file"></span>
+                <a x-bind:href="buildDownloadHref(idx)"><span x-text="file"></span></a>
             </li>
         </template>
     </ul>

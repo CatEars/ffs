@@ -8,7 +8,7 @@ import { getStoreRoot } from '../config.ts';
 const decoder = new TextDecoder();
 
 export function registerGetSharedFilesRoutes(router: Router) {
-    router.get('/api/share-file/list', baseMiddlewares(), shareProtect, async (ctx) => {
+    router.get('/api/share-file/list', baseMiddlewares(), shareProtect, (ctx) => {
         const x = decoder.decode(decodeBase64Url(ctx.request.url.searchParams.get('paths') || ''));
         const paths = JSON.parse(x);
         if (!paths) {
@@ -19,7 +19,10 @@ export function registerGetSharedFilesRoutes(router: Router) {
     });
 
     router.get('/api/share-file/download', baseMiddlewares(), shareProtect, async (ctx) => {
-        const paths = JSON.parse(decodeBase64Url(ctx.request.url.searchParams.get('paths') || ''));
+        const pathsUnparsed = decoder.decode(
+            decodeBase64Url(ctx.request.url.searchParams.get('paths') || ''),
+        );
+        const paths = JSON.parse(pathsUnparsed);
         const index = Number.parseInt(ctx.request.url.searchParams.get('index') || '');
         if (!paths || (typeof index !== 'number') || isNaN(index) || !paths[index]) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
