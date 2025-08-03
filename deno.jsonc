@@ -5,7 +5,7 @@
         "singleQuote": true,
         "indentWidth": 4,
         "lineWidth": 100,
-        "exclude": ["**/*.html", "**/*.svg", "**/*.js"]
+        "exclude": ["**/*.html", "**/*.js"]
     },
     "imports": {
         "@oak/oak": "jsr:@oak/oak@^17.1.5",

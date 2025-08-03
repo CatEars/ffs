@@ -12,6 +12,9 @@ async function generateSvgSpriteSheet() {
         const spriteSymbols: string[] = [];
 
         for await (const dirEntry of Deno.readDir(INPUT_FOLDER)) {
+            if (dirEntry.name.includes('sprite_sheet.svg')) {
+                continue;
+            }
             if (dirEntry.isFile && dirEntry.name.endsWith('.svg')) {
                 const filePath = join(INPUT_FOLDER, dirEntry.name);
 

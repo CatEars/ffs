@@ -132,7 +132,9 @@
         <input id="link-paths" name="paths" type="hidden" />
     </form>
     <button class="btn btn-secondary">
-        <img @click="createFileShare()" width="32" src="/static/svg/undo.svg" />
+        <svg @click="createFileShare();" class="medium-icon">
+            <use href="/static/svg/sprite_sheet.svg#share"></use>
+        </svg>
     </button>
     <p x-text="filesDisplay"></p>
 </div>
