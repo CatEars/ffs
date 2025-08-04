@@ -3,8 +3,8 @@ export type BundleParams = {
 };
 
 async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
-    const command = new Deno.Command('deno', {
-        args: ['bundle', 'index.js', '--output', 'index.bundle.js'],
+    const command = new Deno.Command('esbuild', {
+        args: ['--bundle', 'index.js', '--outfile=index.bundle.js'],
         cwd: './src/website/views/components',
     });
 
@@ -22,8 +22,8 @@ async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
 }
 
 async function bundleCssStyles(opts?: BundleParams) {
-    const command = new Deno.Command('deno', {
-        args: ['bundle', 'index.css', '--output', 'index.bundle.css'],
+    const command = new Deno.Command('esbuild', {
+        args: ['--bundle', 'index.css', '--outfile=index.bundle.css'],
         cwd: './src/website/static/css',
     });
 
