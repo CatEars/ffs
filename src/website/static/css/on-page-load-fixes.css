@@ -1,0 +1,16 @@
+@layer main {
+    /* Set full page to have background color, and undefined 
+    web components to be invisible. Override body for the `landing` layers hidden
+    to `visible to show content, now that the styles have been loaded.
+    Lastly, always default to flexbox */
+    *:not(:defined) {
+        visibility: hidden;
+    }
+
+    body {
+        background-color: var(--background-color);
+        visibility: visible;
+        display: flex;
+        flex-direction: column;
+    }
+}

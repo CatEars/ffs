@@ -1,0 +1,6 @@
+@layer main {
+    :root {
+        color: var(--font-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+}

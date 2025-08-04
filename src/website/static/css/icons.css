@@ -1,0 +1,25 @@
+@layer main {
+    .icon {
+        width: 26px;
+        height: 26px;
+        fill: var(--icon-color);
+    }
+
+    .small-icon {
+        width: 22px;
+        height: 22px;
+        fill: var(--icon-color);
+    }
+
+    .medium-icon {
+        width: 32px;
+        height: 32px;
+        fill: var(--icon-color);
+    }
+
+    .large-icon {
+        width: 125px;
+        height: 125px;
+        fill: var(--icon-color);
+    }
+}

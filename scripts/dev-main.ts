@@ -7,8 +7,12 @@ Deno.env.set('FFS_INSTANCE_SECRET', 'VerySecretIndeed');
 const { bundle } = await import('./bundle-component-library.ts');
 await bundle();
 setInterval(async () => {
-    await bundle({
-        silent: true,
-    });
+    try {
+        await bundle({
+            silent: true,
+        });
+    } catch (err) {
+        console.error('Failed to bundle', err);
+    }
 }, 5000);
 await import('../src/main.ts');

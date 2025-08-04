@@ -1,0 +1,7 @@
+.header {}
+
+.header > a {
+    color: var(--font-color);
+}
+
+.header > a > b {}
