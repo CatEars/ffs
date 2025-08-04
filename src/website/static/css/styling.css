@@ -1,67 +1,75 @@
-html {
-    background: rgb(33, 37, 41);
-}
+@layer landing, main;
 
-.card-body {
-    --bs-card-spacer-x: 0.5rem;
-    --bs-card-spacer-y: 0.5rem;
-    white-space: wrap;
-    line-break: anywhere;
-    min-height: 62px;
-}
-
-*:not(:defined) {
-    visibility: hidden;
-}
-
-main {
-    margin-top: 3rem;
-}
-
-@media (max-width: 576px) {
-    main {
-        margin-top: 0.5rem;
+@layer main {
+    html {
+        background: rgb(33, 37, 41);
     }
-}
 
-.pointer {
-    cursor: pointer;
-}
+    .card-body {
+        --bs-card-spacer-x: 0.5rem;
+        --bs-card-spacer-y: 0.5rem;
+        white-space: wrap;
+        line-break: anywhere;
+        min-height: 62px;
+    }
 
-.clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limit to 2 lines */
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    *:not(:defined) {
+        visibility: hidden;
+    }
 
-.icon {
-    width: 26px;
-    height: 26px;
-    fill: #e3e3e3;
-}
+    main {
+        margin-top: 3rem;
+    }
 
-.small-icon {
-    width: 22px;
-    height: 22px;
-    fill: #e3e3e3;
-}
+    @media (max-width: 576px) {
+        main {
+            margin-top: 0.5rem;
+        }
+    }
 
-.medium-icon {
-    width: 32px;
-    height: 32px;
-    fill: #e3e3e3;
-}
+    .pointer {
+        cursor: pointer;
+    }
 
-.large-icon {
-    width: 125px;
-    height: 125px;
-    fill: #e3e3e3;
-}
+    .clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Limit to 2 lines */
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-.flex-with-center {
-    display: flex;
-    justify-content: center;
+    .icon {
+        width: 26px;
+        height: 26px;
+        fill: #e3e3e3;
+    }
+
+    .small-icon {
+        width: 22px;
+        height: 22px;
+        fill: #e3e3e3;
+    }
+
+    .medium-icon {
+        width: 32px;
+        height: 32px;
+        fill: #e3e3e3;
+    }
+
+    .large-icon {
+        width: 125px;
+        height: 125px;
+        fill: #e3e3e3;
+    }
+
+    .flex-with-center {
+        display: flex;
+        justify-content: center;
+    }
+
+    body {
+        visibility: visible;
+    }
 }

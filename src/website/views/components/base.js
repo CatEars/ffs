@@ -5,14 +5,10 @@ export const html = htm.bind(h);
 
 export async function loadSharedStylesheets() {
     const sharedStylesheet = new CSSStyleSheet();
-    const sharedStylesheet2 = new CSSStyleSheet();
 
     try {
-        const resp1 = fetch('/static/bootstrap.min.css');
-        const resp2 = fetch('/static/css/styling.css');
-        const response = await resp1;
-        const response2 = await resp2;
-        if (!response.ok || !response2.ok) {
+        const response = await fetch('/static/css/index.bundle.css');
+        if (!response.ok) {
             throw new Error(
                 `Failed to load stylesheet: ${response.statusText} / ${response2.statusText}`
             );
@@ -20,12 +16,11 @@ export async function loadSharedStylesheets() {
         const cssText = await response.text();
 
         await sharedStylesheet.replace(cssText);
-        await sharedStylesheet2.replace(await response2.text());
         console.log('Shared stylesheet loaded and parsed.');
     } catch (error) {
         console.error('Error loading shared stylesheet:', error);
     }
-    return [sharedStylesheet, sharedStylesheet2];
+    return [sharedStylesheet];
 }
 
 export class BaseWebComponent extends HTMLElement {
