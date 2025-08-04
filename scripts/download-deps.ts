@@ -1,19 +1,5 @@
 const dls = [
     {
-        url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css',
-        target: './src/website/static/bootstrap.min.css',
-        replace: [
-            { pattern: '/*# sourceMappingURL=bootstrap.min.css.map */', into: '' },
-        ],
-    },
-    {
-        url: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js',
-        target: './src/website/static/bootstrap.min.js',
-        replace: [
-            { pattern: '//# sourceMappingURL=bootstrap.bundle.min.js.map', into: '' },
-        ],
-    },
-    {
         url: 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
         target: './src/website/static/alpine.min.js',
         prependedLicense: `/** 

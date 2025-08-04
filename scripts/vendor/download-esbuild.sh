@@ -1,0 +1,1 @@
+curl -fsSL https://esbuild.github.io/dl/latest | sh
