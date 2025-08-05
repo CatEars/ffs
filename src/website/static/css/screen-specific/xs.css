@@ -1,0 +1,7 @@
+@media (max-width: 546px) {
+    @layer main {
+        :root {
+            --file-grid-columns: repeat(3, 1fr);
+        }
+    }
+}

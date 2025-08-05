@@ -6,18 +6,16 @@
         window.location.href = webPath;
     }
 </script>
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 gy-3">
+<section class="gallery">
     <template
         x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
         :key="file.name"
     >
-        <div class="col">
-            <file-card
-                x-bind:filename="file.name"
-                x-bind:file-type="file.fileType"
-                x-bind:image-src="file.imageSrc"
-                x-bind:root="root"
-            ></file-card>
-        </div>
+        <file-card
+            x-bind:filename="file.name"
+            x-bind:file-type="file.fileType"
+            x-bind:image-src="file.imageSrc"
+            x-bind:root="root"
+        ></file-card>
     </template>
-</div>
+</section>

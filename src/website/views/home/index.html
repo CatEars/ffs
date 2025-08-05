@@ -15,69 +15,58 @@
 >
     <script>
         function storeToCuttingBoard(files) {
-        return setSessionStorage('cutting-board', files);
-    }
+            return setSessionStorage('cutting-board', files);
+        }
 
-    function getCuttingBoard() {
-        return getSessionStorage('cutting-board', []);
-    }
+        function getCuttingBoard() {
+            return getSessionStorage('cutting-board', []);
+        }
 
-    function getCuttingBoardDisplay() {
-        return `${getCuttingBoard().length} files in cutting board`;
-    }
+        function getCuttingBoardDisplay() {
+            return `${getCuttingBoard().length} files in cutting board`;
+        }
 
-    function resetCuttingBoard() {
-        storeToCuttingBoard([]);
-    }
+        function resetCuttingBoard() {
+            storeToCuttingBoard([]);
+        }
 
-    function fileInCuttingBoard(file) {
-        const myPath = decodeURIComponent(getCurrentPath());
-        return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
-    }
+        function fileInCuttingBoard(file) {
+            const myPath = decodeURIComponent(getCurrentPath());
+            return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
+        }
 
-    function findFilesToGrey() {
-        const myPath = decodeURIComponent(getCurrentPath());
-        return getCuttingBoard()
-            .filter((x) => x.path === myPath)
-            .map((x) => x.fileName);
-    }
+        function findFilesToGrey() {
+            const myPath = decodeURIComponent(getCurrentPath());
+            return getCuttingBoard()
+                .filter((x) => x.path === myPath)
+                .map((x) => x.fileName);
+        }
     </script>
     <div
         style="display: none"
         x-effect="files = await getFiles(getCurrentPath()); filesToGrey = findFilesToGrey()"
-    >
-    </div>
+    ></div>
 
     <app-header>Files</app-header>
-    <div class="row">
-        <!-- include ./control-panel.partial.html -->
-    </div>
-    <div class="row">
-        <div class="col col-sm-auto">
-            <breadcrumb-nav
-                x-bind:trail="root"
-                @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
-            ></breadcrumb-nav>
-        </div>
-    </div>
-    <div class="row">
-        <paginate-control
-            x-bind:page="currentPage"
-            x-bind:max-pages="getNumPages(files)"
-            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
-        ></paginate-control>
-    </div>
-    <div class="row" x-show="isGalleryMode">
+    <!-- include ./control-panel.partial.html -->
+    <breadcrumb-nav
+        x-bind:trail="root"
+        @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
+    ></breadcrumb-nav>
+    <paginate-control
+        x-bind:page="currentPage"
+        x-bind:max-pages="getNumPages(files)"
+        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+    ></paginate-control>
+    <div x-show="isGalleryMode">
         <!-- include ./gallery.partial.html -->
     </div>
-    <div class="row" x-show="!isGalleryMode">
+    <div x-show="!isGalleryMode">
         <!-- include ./file-manager.partial.html -->
     </div>
-    <div class="row">
-        <paginate-control
-            x-bind:page="currentPage"
-            x-bind:max-pages="getNumPages(files)"
-            @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
-        ></paginate-control>
-    </div>
+    <paginate-control
+        x-bind:page="currentPage"
+        x-bind:max-pages="getNumPages(files)"
+        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+    ></paginate-control>
 </app-main>

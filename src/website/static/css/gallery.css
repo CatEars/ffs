@@ -1,0 +1,6 @@
+@layer main {
+    .gallery {
+        display: grid;
+        grid-template-columns: var(--file-grid-columns);
+    }
+}

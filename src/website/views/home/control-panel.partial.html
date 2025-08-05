@@ -1,42 +1,40 @@
 <form>
-    <div class="row">
-        <auto-column>
-            <radio-control
-                imgSrc="child"
-                name="newest"
-                @click="sorting = setLocalStorage('file-sort-order', 'newest')"
-                x-bind:checked="sorting === 'newest'"
-            ></radio-control>
-            <radio-control
-                imgSrc="elderly"
-                name="oldest"
-                @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
-                x-bind:checked="sorting === 'oldest'"
-            ></radio-control>
-            <radio-control
-                text="A-Z"
-                name="a-z"
-                @click="sorting = setLocalStorage('file-sort-order', 'a-z')"
-                x-bind:checked="sorting === 'a-z'"
-            ></radio-control>
-            <radio-control
-                text="Z-A"
-                name="z-a"
-                @click="sorting = setLocalStorage('file-sort-order', 'z-a')"
-                x-bind:checked="sorting === 'z-a'"
-            ></radio-control>
-            <switch-control
-                x-bind:checked="directoriesFirst"
-                @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
-            >
-                Directories First
-            </switch-control>
-            <switch-control
-                x-bind:checked="isGalleryMode"
-                @change="evt => isGalleryMode = setSessionStorage('gallery-mode', !isGalleryMode)"
-            >
-                Gallery
-            </switch-control>
-        </auto-column>
+    <div class="form-row">
+        <radio-control
+            imgSrc="child"
+            name="newest"
+            @click="sorting = setLocalStorage('file-sort-order', 'newest')"
+            x-bind:checked="sorting === 'newest'"
+        ></radio-control>
+        <radio-control
+            imgSrc="elderly"
+            name="oldest"
+            @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
+            x-bind:checked="sorting === 'oldest'"
+        ></radio-control>
+        <radio-control
+            text="A-Z"
+            name="a-z"
+            @click="sorting = setLocalStorage('file-sort-order', 'a-z')"
+            x-bind:checked="sorting === 'a-z'"
+        ></radio-control>
+        <radio-control
+            text="Z-A"
+            name="z-a"
+            @click="sorting = setLocalStorage('file-sort-order', 'z-a')"
+            x-bind:checked="sorting === 'z-a'"
+        ></radio-control>
+        <switch-control
+            x-bind:checked="directoriesFirst"
+            @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
+        >
+            Directories First
+        </switch-control>
+        <switch-control
+            x-bind:checked="isGalleryMode"
+            @change="evt => isGalleryMode = setSessionStorage('gallery-mode', !isGalleryMode)"
+        >
+            Gallery
+        </switch-control>
     </div>
 </form>

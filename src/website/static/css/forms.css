@@ -7,16 +7,23 @@
 
     .form-row {
         display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .form-column {
+        display: flex;
         flex-direction: column;
     }
 
-    .form-row > label {
+    .form-column > label {
         font-size: 16px;
         margin-left: 1rem;
         margin-bottom: 0.2rem;
     }
 
-    .form-row > input[type='text'], input[type='password'] {
+    .form-column > input[type='text'], input[type='password'] {
         height: 2rem;
         font-size: 16px;
         padding-left: 0.5rem;
@@ -26,7 +33,7 @@
         border-radius: 4px;
     }
 
-    .form-row > *[type='submit'] {
+    .form-column > *[type='submit'] {
         height: 1.5rem;
         margin-left: 1rem;
         margin-right: 1rem;

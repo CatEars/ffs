@@ -3,4 +3,7 @@
     --icon-color: #e3e3e3;
     --font-color: #f6f6f6;
     --font-size: 16px;
+
+    --small-screen-breakpoint: 768px;
+    --medium-screen-breakpoint: 1476px;
 }

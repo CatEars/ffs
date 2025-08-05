@@ -6,3 +6,9 @@
 @import url('./fonts.css');
 @import url('./header.css');
 @import url('./forms.css');
+@import url('./gallery.css');
+
+@import url('./screen-specific/l.css');
+@import url('./screen-specific/m.css');
+@import url('./screen-specific/s.css');
+@import url('./screen-specific/xs.css');
