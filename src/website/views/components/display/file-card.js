@@ -33,72 +33,52 @@ class FileCard extends BaseWebComponent {
         const imageSrc = this.getAttribute('image-src') || '';
         const fileType = this.getAttribute('file-type') || '';
 
-        const styling = html`
+        const image = imageSrc.includes('/thumbnail')
+            ? html`<img height="125" src="${imageSrc}" />`
+            : html`<svg class="large-icon">
+                  <use href="/static/svg/sprite_sheet.svg#${imageSrc}"></use>
+              </svg>`;
+        let href = '';
+        let displayText = filename;
+        if (fileType === 'directory') {
+            href = `/home/?path=${calculatePath(root, filename)}`;
+        } else if (fileType === 'sound' || fileType === 'image' || fileType === 'video') {
+            href = `/home/media/view?path=${encodeURIComponent(root + '/' + filename)}`;
+            displayText = resolveEmojiForMediaFile(fileType) + ' ' + filename;
+        } else {
+            href = `/api/file?path=${encodeURIComponent(root + '/' + filename)}`;
+        }
+        return html`
             <style>
-                .clamp-2 {
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2; /* Limit to 2 lines */
-                    line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                a {
+                    display: flex;
+                    flex-direction: column;
+                    text-decoration: none;
+                    color: var(--font-color);
+                }
+                a > div {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-bottom: 0rem;
+                    padding-bottom: 0rem;
+                    border: 1px solid grey;
+                    border-top-left-radius: 5px;
+                    border-top-right-radius: 5px;
+                }
+                a > span {
+                    border: 1px solid grey;
+                    border-top: none;
+                    border-bottom-left-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                    padding: 0.2rem;
                 }
             </style>
+            <a href="${href}">
+                <div>${image}</div>
+                <span>${displayText}/</span>
+            </a>
         `;
-        const image = imageSrc.includes('/thumbnail')
-            ? html`<img height="125" class="card-img-top" src="${imageSrc}" />`
-            : html`<div class="flex-with-center">
-                  <svg class="large-icon">
-                      <use href="/static/svg/sprite_sheet.svg#${imageSrc}"></use>
-                  </svg>
-              </div>`;
-
-        if (fileType === 'directory') {
-            return html`
-                ${styling}
-                <div class="card">
-                    <a
-                        class="text-decoration-none"
-                        href="/home/?path=${calculatePath(root, filename)}"
-                    >
-                        ${image}
-                        <div class="card-body">
-                            <span class="card-text clamp-2">${filename}/</span>
-                        </div>
-                    </a>
-                </div>
-            `;
-        } else if (fileType === 'sound' || fileType === 'image' || fileType === 'video') {
-            const href = `/home/media/view?path=${encodeURIComponent(root + '/' + filename)}`;
-            const displayText = resolveEmojiForMediaFile(fileType) + ' ' + filename;
-            return html`
-                ${styling}
-                <div class="card">
-                    <a class="text-decoration-none" href="${href}">
-                        ${image}
-                        <div class="card-body pointer">
-                            <span class="card-text clamp-2">${displayText}</span>
-                        </div>
-                    </a>
-                </div>
-            `;
-        } else {
-            return html`
-                ${styling}
-                <div class="card">
-                    <a
-                        class="text-decoration-none"
-                        href="/api/file?path=${encodeURIComponent(root + '/' + filename)}"
-                        download="${filename}"
-                    >
-                        ${image}
-                        <div class="card-body pointer">
-                            <span class="card-text clamp-2">${filename}</span>
-                        </div>
-                    </a>
-                </div>
-            `;
-        }
     }
 }
 

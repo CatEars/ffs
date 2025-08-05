@@ -2,5 +2,6 @@
     .gallery {
         display: grid;
         grid-template-columns: var(--file-grid-columns);
+        gap: 1rem;
     }
 }
