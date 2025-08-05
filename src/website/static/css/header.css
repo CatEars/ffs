@@ -1,11 +1,23 @@
-.header {
-    padding: 0.5rem;
-}
+@layer main {
+    .header {
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+    }
 
-.header > a {
-    color: var(--font-color);
-}
+    .header > a {
+        color: var(--font-color);
+        font-size: 16px;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        line-height: 16px;
+    }
 
-.header > a > b {
-    font-size: calc(var(--font-size) + 8px);
+    .header > .main-link {
+        font-weight: 800;
+        font-size: 26px;
+    }
 }
