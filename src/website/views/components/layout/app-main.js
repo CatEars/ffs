@@ -4,13 +4,15 @@ class AppMain extends BaseWebComponent {
     render(html) {
         return html`
             <style>
-            ::slotted(.row) {
-                margin-bottom: 1rem;
-            }
+                main {
+                    display: flex;
+                    flex-direction: column;
+                    margin-left: 1rem;
+                }
             </style>
-            <section class="container">
+            <main>
                 <slot></slot>
-            </section>
+            </main>
         `;
     }
 }

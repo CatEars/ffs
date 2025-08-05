@@ -1,7 +1,11 @@
-.header {}
+.header {
+    padding: 0.5rem;
+}
 
 .header > a {
     color: var(--font-color);
 }
 
-.header > a > b {}
+.header > a > b {
+    font-size: calc(var(--font-size) + 8px);
+}

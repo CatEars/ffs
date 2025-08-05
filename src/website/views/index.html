@@ -2,17 +2,17 @@
 <app-main>
     <app-header>Friendly File Server (FFS)</app-header>
     <app-subheader>Logon</app-subheader>
-    <div class="row">
-        <form method="POST" action="/api/user-logon">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username:</label>
-                <input id="username" name="username" type="text" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password:</label>
-                <input id="password" name="password" type="password" class="form-control" />
-            </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
-        </form>
-    </div>
+    <form method="POST" action="/api/user-logon">
+        <div class="form-row">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" />
+        </div>
+        <div class="form-row">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" />
+        </div>
+        <div class="form-row">
+            <button type="submit">Log on</button>
+        </div>
+    </form>
 </app-main>
