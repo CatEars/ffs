@@ -17,7 +17,7 @@ class PaginateControl extends BaseWebComponent {
                     detail: {
                         page,
                     },
-                }),
+                })
             );
         };
         const pre = () => {
@@ -29,35 +29,55 @@ class PaginateControl extends BaseWebComponent {
         };
 
         return html`
+            <style>
+                li {
+                    list-style-type: none;
+                }
+
+                nav {
+                    border: 1px white;
+                    border-radius: 3px;
+                }
+                ul {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 1rem;
+                }
+                a {
+                    text-decoration: underline;
+                    color: var(--font-color);
+                }
+            </style>
             <nav>
-                <ul class="pagination">
-                    <li class="page-item">
+                <ul>
+                    <li>
                         <a
                             href="#"
-                            class="page-link ${currentPage === 1 ? 'disabled' : ''}"
+                            class="${currentPage === 1 ? 'disabled' : ''}"
                             onclick="${() => pre()}"
-                        >${'<'}</a>
+                            >${'<'}</a
+                        >
                     </li>
                     ${Array.from({ length: maxPages }).map(
                         (_, idx) =>
                             html`
-                                <li class="page-item">
+                                <li>
                                     <a
                                         href="#"
-                                        class="page-link ${currentPage === idx + 1
-                                            ? 'disabled'
-                                            : ''}"
+                                        class="${currentPage === idx + 1 ? 'disabled' : ''}"
                                         onclick="${() => to(idx + 1)}"
-                                    >${idx + 1}</a>
+                                        >${idx + 1}</a
+                                    >
                                 </li>
-                            `,
+                            `
                     )}
-                    <li class="page-item">
+                    <li>
                         <a
                             href="#"
-                            class="page-link ${currentPage === maxPages ? 'disabled' : ''}"
+                            class="${currentPage === maxPages ? 'disabled' : ''}"
                             onclick="${() => post()}"
-                        >${'>'}</a>
+                            >${'>'}</a
+                        >
                     </li>
                 </ul>
             </nav>
