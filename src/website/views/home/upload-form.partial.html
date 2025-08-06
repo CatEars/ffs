@@ -1,44 +1,27 @@
-<form class="m-2 mb-4" action="/api/file/upload" method="POST" enctype="multipart/form-data">
-    <div class="col" x-data="{ names: [] }">
-        <div class="container">
-            <div class="row">
-                <input
-                    @change="names = getFilenamesFromEvent(event)"
-                    class="d-none"
-                    type="file"
-                    id="file"
-                    name="file"
-                />
-                <div class="col-auto">
-                    <button
-                        class="btn btn-outline-primary"
-                        @click="document.getElementById('file').click()"
-                        type="button"
-                        id="browseButton"
-                    >
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#attach"></use>
-                        </svg>
-                    </button>
-                </div>
-                <div class="col-auto">
-                    <button
-                        class="btn btn-outline-primary"
-                        x-bind:disabled="names.length === 0"
-                        type="submit"
-                    >
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
-                        </svg>
-                    </button>
-                </div>
-                <div class="col d-flex align-items-center">
-                    <template x-for="name in names">
-                        <div x-text="name"></div>
-                    </template>
-                </div>
-            </div>
-        </div>
+<form x-data="{ names: [] }" action="/api/file/upload" method="POST" enctype="multipart/form-data">
+    <div class="form-row">
+        <input
+            style="display: none"
+            @change="names = getFilenamesFromEvent(event)"
+            type="file"
+            id="file"
+            name="file"
+        />
+        <button @click="document.getElementById('file').click()" id="browseButton">
+            <svg class="medium-icon">
+                <use href="/static/svg/sprite_sheet.svg#attach"></use>
+            </svg>
+        </button>
+        <button x-bind:disabled="names.length === 0" type="submit">
+            <svg class="medium-icon">
+                <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
+            </svg>
+        </button>
+    </div>
+    <div>
+        <template x-for="name in names">
+            <div x-text="name"></div>
+        </template>
     </div>
     <input type="hidden" id="directory" name="directory" />
     <script>

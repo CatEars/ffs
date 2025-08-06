@@ -41,4 +41,21 @@
         border: none;
         border-radius: 4px;
     }
+
+    .form-row > button,
+    .form-column > button {
+        background-color: #999;
+        border-radius: 4px;
+        border: 2px #777;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-content: center;
+        padding: 0.5rem;
+    }
+
+    .form-row > button:disabled,
+    .form-column > button:disabled {
+        background-color: #666;
+    }
 }
