@@ -45,6 +45,44 @@
     }
 </script>
 <!-- include ./upload-form.partial.html -->
+<form id="control-panel">
+    <div class="form-row">
+        <button>
+            <svg
+                @click="cutFiles(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = findFilesToGrey()"
+                class="medium-icon"
+            >
+                <use href="/static/svg/sprite_sheet.svg#content_cut"></use>
+            </svg>
+        </button>
+        <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
+            <input id="files-to-move" name="files-to-move" type="hidden" />
+            <input id="destination" name="destination" type="hidden" />
+        </form>
+        <button>
+            <svg @click="pasteFiles()" class="medium-icon">
+                <use href="/static/svg/sprite_sheet.svg#content_paste"></use>
+            </svg>
+        </button>
+        <button>
+            <svg
+                @click="resetCuttingBoard(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = []"
+                class="medium-icon"
+            >
+                <use href="/static/svg/sprite_sheet.svg#undo"></use>
+            </svg>
+        </button>
+        <form id="link-form" action="/api/link" method="POST" style="display: none">
+            <input id="link-paths" name="paths" type="hidden" />
+        </form>
+        <button>
+            <svg @click="createFileShare();" class="medium-icon">
+                <use href="/static/svg/sprite_sheet.svg#share"></use>
+            </svg>
+        </button>
+    </div>
+    <p x-text="filesDisplay"></p>
+</form>
 <section class="file-list">
     <template
         x-for="(file, idx) in sortedBy(files, sorting, directoriesFirst, currentPage)"
@@ -79,39 +117,3 @@
         </div>
     </template>
 </section>
-<div id="control-panel" class="fixed-bottom bg-dark border-top p-3 text-center">
-    <button class="btn btn-secondary">
-        <svg
-            @click="cutFiles(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = findFilesToGrey()"
-            class="medium-icon"
-        >
-            <use href="/static/svg/sprite_sheet.svg#content_cut"></use>
-        </svg>
-    </button>
-    <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
-        <input id="files-to-move" name="files-to-move" type="hidden" />
-        <input id="destination" name="destination" type="hidden" />
-    </form>
-    <button class="btn btn-secondary">
-        <svg @click="pasteFiles()" class="medium-icon">
-            <use href="/static/svg/sprite_sheet.svg#content_paste"></use>
-        </svg>
-    </button>
-    <button class="btn btn-secondary">
-        <svg
-            @click="resetCuttingBoard(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = []"
-            class="medium-icon"
-        >
-            <use href="/static/svg/sprite_sheet.svg#undo"></use>
-        </svg>
-    </button>
-    <form id="link-form" action="/api/link" method="POST" style="display: none">
-        <input id="link-paths" name="paths" type="hidden" />
-    </form>
-    <button class="btn btn-secondary">
-        <svg @click="createFileShare();" class="medium-icon">
-            <use href="/static/svg/sprite_sheet.svg#share"></use>
-        </svg>
-    </button>
-    <p x-text="filesDisplay"></p>
-</div>
