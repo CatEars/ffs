@@ -47,12 +47,15 @@
         x-effect="files = await getFiles(getCurrentPath()); filesToGrey = findFilesToGrey()"
     ></div>
 
-    <app-header>Files</app-header>
+    <app-header>
+        <h1 slot="starter">Files</h1>
+        <breadcrumb-nav
+            slot="ender"
+            x-bind:trail="root"
+            @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
+        ></breadcrumb-nav>
+    </app-header>
     <!-- include ./control-panel.partial.html -->
-    <breadcrumb-nav
-        x-bind:trail="root"
-        @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
-    ></breadcrumb-nav>
     <paginate-control
         x-bind:page="currentPage"
         x-bind:max-pages="getNumPages(files)"

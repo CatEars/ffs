@@ -19,37 +19,43 @@ class BreadcrumbNav extends BaseWebComponent {
                         trail,
                         index: idx,
                     },
-                }),
+                })
             );
         };
 
         return html`
             <style>
-            .breadcrumb-item > * {
-                padding-left: 0.5em;
-                padding-right: 0.5em;
-            }
+                ol {
+                    display: flex;
+                    flex-direction: row;
+                    align-content: center;
+                    list-style-type: none;
+                    gap: 1rem;
+                }
+                a {
+                    color: var(--font-color);
+                    text-decoration: underline;
+                }
+                li::after {
+                    content: '/';
+                    margin-left: 1rem;
+                }
             </style>
-            <div class="d-flex" style="height: 100%;">
-                <div class="align-self-end">
-                    <nav>
-                        <ol class="breadcrumb">
-                            ${preCrumbs.map(
-                                (crumb, idx) =>
-                                    html`
-                                        <li class="breadcrumb-item">
-                                            <a href="#" onclick="${() =>
-                                                onIndexClick(idx)}">${crumb}</a>
-                                        </li>
-                                    `,
-                            )}
-                            <li class="breadcrumb-item active">
-                                <span>${lastCrumb}</span>
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
+            <nav>
+                <ol class="breadcrumb">
+                    ${preCrumbs.map(
+                        (crumb, idx) =>
+                            html`
+                                <li class="breadcrumb-item">
+                                    <a href="#" onclick="${() => onIndexClick(idx)}">${crumb}</a>
+                                </li>
+                            `
+                    )}
+                    <li class="breadcrumb-item">
+                        <span>${lastCrumb}</span>
+                    </li>
+                </ol>
+            </nav>
         `;
     }
 }
