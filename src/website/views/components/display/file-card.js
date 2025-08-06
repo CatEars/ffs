@@ -42,6 +42,7 @@ class FileCard extends BaseWebComponent {
         let displayText = filename;
         if (fileType === 'directory') {
             href = `/home/?path=${calculatePath(root, filename)}`;
+            displayText += '/';
         } else if (fileType === 'sound' || fileType === 'image' || fileType === 'video') {
             href = `/home/media/view?path=${encodeURIComponent(root + '/' + filename)}`;
             displayText = resolveEmojiForMediaFile(fileType) + ' ' + filename;
@@ -76,7 +77,7 @@ class FileCard extends BaseWebComponent {
             </style>
             <a href="${href}">
                 <div>${image}</div>
-                <span>${displayText}/</span>
+                <span>${displayText}</span>
             </a>
         `;
     }
