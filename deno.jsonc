@@ -45,13 +45,9 @@
             "command": "rm -rf dist/* && docker save catears/ffs | gzip > dist/ffs.$(git describe --tags --abbrev=0).tar.gz",
             "dependencies": ["build-docker"]
         },
-        "make-sure-tag-is-latest": {
-            "command": "read -p 'Please enter the tag you think you are releasing' tag"
-        },
         "release": {
             "command": "./scripts/create-github-release.sh",
             "dependencies": [
-                "make-sure-tag-is-latest",
                 "build-dist"
             ]
         },
