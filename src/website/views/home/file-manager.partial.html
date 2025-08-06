@@ -45,63 +45,40 @@
     }
 </script>
 <!-- include ./upload-form.partial.html -->
-<form>
-    <table class="file-explorer-table">
-        <thead>
-            <tr>
-                <th></th>
-                <th></th>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <template
-                x-for="(file, idx) in sortedBy(files, sorting, directoriesFirst, currentPage)"
-                :key="file.name"
-            >
-                <tr>
-                    <td>
-                        <div style="padding-top: 5px" class="form-check">
-                            <input
-                                class="form-check-input file-to-cut"
-                                type="checkbox"
-                                x-bind:value="file.name"
-                            />
-                            <label class="form-check-label" x-bind:for="file.name"></label>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <svg class="small-icon">
-                                <use
-                                    x-bind:href="`/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`"
-                                ></use>
-                            </svg>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="px-2">
-                            <template x-if="file.isDirectory">
-                                <a x-bind:href="getLinkTo(file)">
-                                    <span
-                                        x-bind:class="filesToGrey.includes(file.name) ? 'text-muted' : ''"
-                                        x-text="file.name"
-                                    ></span>
-                                </a>
-                            </template>
-                            <template x-if="!file.isDirectory">
-                                <span
-                                    x-text="file.name"
-                                    x-bind:class="filesToGrey.includes(file.name) ? 'text-muted' : ''"
-                                ></span>
-                            </template>
-                        </div>
-                    </td>
-                </tr>
-            </template>
-        </tbody>
-    </table>
-</form>
+<section class="file-list">
+    <template
+        x-for="(file, idx) in sortedBy(files, sorting, directoriesFirst, currentPage)"
+        :key="file.name"
+    >
+        <div class="file-row">
+            <div>
+                <input class="file-to-cut" type="checkbox" x-bind:value="file.name" />
+                <label x-bind:for="file.name"></label>
+            </div>
+            <svg class="small-icon">
+                <use
+                    x-bind:href="`/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`"
+                ></use>
+            </svg>
+            <div>
+                <template x-if="file.isDirectory">
+                    <a x-bind:href="getLinkTo(file)">
+                        <span
+                            x-bind:class="filesToGrey.includes(file.name) ? 'text-muted' : ''"
+                            x-text="file.name"
+                        ></span>
+                    </a>
+                </template>
+                <template x-if="!file.isDirectory">
+                    <span
+                        x-text="file.name"
+                        x-bind:class="filesToGrey.includes(file.name) ? 'text-muted' : ''"
+                    ></span>
+                </template>
+            </div>
+        </div>
+    </template>
+</section>
 <div id="control-panel" class="fixed-bottom bg-dark border-top p-3 text-center">
     <button class="btn btn-secondary">
         <svg
