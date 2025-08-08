@@ -51,11 +51,15 @@ class FileCard extends BaseWebComponent {
         }
         return html`
             <style>
+                :root {
+                    max-width: 5rem;
+                }
                 a {
                     display: flex;
                     flex-direction: column;
                     text-decoration: none;
                     color: var(--font-color);
+                    max-width: 13rem;
                 }
                 a > div {
                     display: flex;
@@ -73,6 +77,9 @@ class FileCard extends BaseWebComponent {
                     border-bottom-left-radius: 5px;
                     border-bottom-right-radius: 5px;
                     padding: 0.2rem;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
                 }
             </style>
             <a href="${href}">

@@ -1,7 +1,7 @@
 @media (min-width: 547px) and (max-width: 840px) {
     @layer main {
         :root {
-            --file-grid-columns: repeat(6, 1fr);
+            --file-grid-columns: repeat(4, 1fr);
         }
     }
 }
