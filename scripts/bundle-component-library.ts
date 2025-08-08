@@ -1,9 +1,17 @@
+import { join } from '@std/path/join';
+
 export type BundleParams = {
     silent?: boolean;
 };
 
+function myLocation() {
+    return new URL('.', import.meta.url).pathname;
+}
+
+const esbuildLocation = join(myLocation(), 'vendor', 'bin', 'esbuild');
+
 async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
-    const command = new Deno.Command('esbuild', {
+    const command = new Deno.Command(esbuildLocation, {
         args: ['--bundle', 'index.js', '--outfile=index.bundle.js'],
         cwd: './src/website/views/components',
     });
@@ -22,7 +30,7 @@ async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
 }
 
 async function bundleCssStyles(opts?: BundleParams) {
-    const command = new Deno.Command('esbuild', {
+    const command = new Deno.Command(esbuildLocation, {
         args: ['--bundle', 'index.css', '--outfile=index.bundle.css'],
         cwd: './src/website/static/css',
     });
