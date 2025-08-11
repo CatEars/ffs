@@ -1,7 +1,9 @@
-@layer main {
+@layer override {
     .gallery {
         display: grid;
         grid-template-columns: var(--file-grid-columns);
         gap: 1rem;
+        padding-right: 1rem;
+        max-width: 20rem;
     }
 }

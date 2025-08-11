@@ -1,4 +1,4 @@
-@layer main {
+@layer override {
     .file-list {
         display: flex;
         flex-direction: column;

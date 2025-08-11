@@ -34,7 +34,7 @@ class FileCard extends BaseWebComponent {
         const fileType = this.getAttribute('file-type') || '';
 
         const image = imageSrc.includes('/thumbnail')
-            ? html`<img height="125" src="${imageSrc}" />`
+            ? html`<img src="${imageSrc}" />`
             : html`<svg class="large-icon">
                   <use href="/static/svg/sprite_sheet.svg#${imageSrc}"></use>
               </svg>`;
@@ -51,15 +51,11 @@ class FileCard extends BaseWebComponent {
         }
         return html`
             <style>
-                :root {
-                    max-width: 5rem;
-                }
                 a {
                     display: flex;
                     flex-direction: column;
                     text-decoration: none;
                     color: var(--font-color);
-                    max-width: 13rem;
                 }
                 a > div {
                     display: flex;
@@ -79,7 +75,9 @@ class FileCard extends BaseWebComponent {
                     padding: 0.2rem;
                     overflow: hidden;
                     white-space: nowrap;
+                    word-break: break-all;
                     text-overflow: ellipsis;
+                    max-width: var(--file-card-max-size);
                 }
             </style>
             <a href="${href}">

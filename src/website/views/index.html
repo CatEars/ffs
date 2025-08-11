@@ -1,7 +1,6 @@
 <!-- layout ./templates/base-landing.html -->
 <app-main>
     <app-header>Friendly File Server (FFS)</app-header>
-    <app-subheader>Logon</app-subheader>
     <form method="POST" action="/api/user-logon">
         <div class="form-column">
             <label for="username">Username</label>
@@ -12,7 +11,7 @@
             <input id="password" name="password" type="password" />
         </div>
         <div class="form-column">
-            <button type="submit">Log on</button>
+            <button class="hero-button" type="submit">Log on</button>
         </div>
     </form>
 </app-main>
