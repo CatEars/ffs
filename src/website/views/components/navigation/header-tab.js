@@ -10,7 +10,6 @@ class HeaderTab extends BaseWebComponent {
             currentLocation += '/';
         }
         const selected = currentLocation.startsWith(href);
-        console.log('HREF', href, 'LOCA', currentLocation, 'SEL', selected);
 
         return html` <style>
                 a {
@@ -18,6 +17,9 @@ class HeaderTab extends BaseWebComponent {
                     font-size: 16px;
                     text-decoration: none;
                     line-height: 16px;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                    padding-bottom: 0.5rem;
                 }
                 div {
                     width: 100%;
@@ -27,11 +29,17 @@ class HeaderTab extends BaseWebComponent {
                     justify-content: end;
                     align-items: center;
                 }
-                a.selected {
+                div.selected {
+                    background-color: gray;
+                    border-left: 1px solid black;
+                    border-bottom: 1px solid black;
+                    border-right: 1px solid black;
+                    border-bottom-left-radius: 5px;
+                    border-bottom-right-radius: 5px;
                 }
             </style>
-            <div>
-                <a href="${href}" class="${selected ? 'selected' : ''}"><slot></slot></a>
+            <div class="${selected ? 'selected' : ''}">
+                <a href="${href}"><slot></slot></a>
             </div>`;
     }
 }

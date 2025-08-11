@@ -1,10 +1,7 @@
 @layer main {
     .header {
-        padding: 0.5rem;
         display: flex;
         flex-direction: row;
-        gap: 0.5rem;
-        height: 1.5rem;
     }
 
     .header > a,
@@ -16,12 +13,14 @@
         flex-direction: column;
         justify-content: end;
         line-height: 16px;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
     }
 
     .header > .main-link {
         font-weight: 800;
         font-size: 26px;
+        line-height: 26px;
+        padding-top: 1rem;
+        padding-left: 0.5rem;
+        padding-right: 1rem;
     }
 }
