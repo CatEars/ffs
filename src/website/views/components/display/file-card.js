@@ -56,28 +56,39 @@ class FileCard extends BaseWebComponent {
                     flex-direction: column;
                     text-decoration: none;
                     color: var(--font-color);
+                    max-width: var(--file-card-max-width);
+                    max-height: var(--file-card-max-height);
                 }
                 a > div {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
+                    min-height: 0;
+                    overflow: hidden;
                     margin-bottom: 0rem;
                     padding-bottom: 0rem;
                     border: 1px solid grey;
                     border-top-left-radius: 5px;
                     border-top-right-radius: 5px;
+                    width: calc(100% - 2px);
+                }
+                img {
+                    object-fit: cover;
+                    width: 100%;
+                    min-height: 0;
                 }
                 a > span {
                     border: 1px solid grey;
                     border-top: none;
                     border-bottom-left-radius: 5px;
                     border-bottom-right-radius: 5px;
-                    padding: 0.2rem;
                     overflow: hidden;
                     white-space: nowrap;
                     word-break: break-all;
                     text-overflow: ellipsis;
-                    max-width: var(--file-card-max-size);
+                    min-height: 1.5rem;
+                    padding-left: 0.2rem;
+                    padding-right: 0.2rem;
                 }
             </style>
             <a href="${href}">

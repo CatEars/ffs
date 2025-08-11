@@ -2,7 +2,8 @@
     @layer main {
         :root {
             --file-grid-columns: repeat(8, 1fr);
-            --file-card-max-size: 11.5rem;
+            --file-card-max-width: 11.5rem;
+            --file-card-max-height: 10rem;
         }
     }
 }
