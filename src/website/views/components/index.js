@@ -4,6 +4,7 @@ import AppMain from './layout/app-main.js';
 import AutoColumn from './layout/auto-column.js';
 import BreadcrumbNav from './navigation/breadcrumb-nav.js';
 import FileCard from './display/file-card.js';
+import HeaderTab from './navigation/header-tab.js';
 import MediaViewer from './media-viewer.js';
 import SwitchControl from './control/switch-control.js';
 import RadioControl from './control/radio-control.js';
@@ -17,6 +18,7 @@ const components = [
     ['auto-column', AutoColumn],
     ['breadcrumb-nav', BreadcrumbNav],
     ['file-card', FileCard],
+    ['header-tab', HeaderTab],
     ['media-viewer', MediaViewer],
     ['switch-control', SwitchControl],
     ['radio-control', RadioControl],

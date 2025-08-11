@@ -60,7 +60,7 @@ async function registerPluginPages(
 
 async function writeNavbarExtensions(navbarLinks: NavbarLink[]) {
     const links = navbarLinks.map((link) =>
-        `<a href="${link.webPath}" class="nav-link">${link.displayText}</a>`
+        `<header-tab href="${link.webPath}">${link.displayText}</header-tab>`
     );
     await Deno.writeTextFile(
         resolve(viewPath, 'templates/header/links-added-by-plugins.html'),
