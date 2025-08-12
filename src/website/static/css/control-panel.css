@@ -1,0 +1,29 @@
+@layer override {
+    .form-row > div:has(radio-control) {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .sort-row > radio-control {
+        border: 1px solid gray;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+    }
+
+    .sort-row > radio-control:first-of-type {
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+
+    .sort-row > radio-control:last-of-type {
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+    }
+
+    radio-control {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}

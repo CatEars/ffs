@@ -2,53 +2,53 @@
 <app-main x-data="{ commands: [] }">
     <script>
         async function getCommands() {
-        const result = await fetch('/api/custom-commands');
-        const commands = await result.json();
-        const joined = [];
-        for (let idx = 0; idx < commands.length; ++idx) {
-            const cmd = commands[idx];
-            const args = Array.from({ length: cmd.nargs }, (_) => '');
-            joined.push({ cmd, args });
-        }
-        return joined;
-    }
-
-    function resolveArgumentArray(commands, cmdIdx, argumentArray) {
-        return argumentArray.map((x, idx) => {
-            if (x.startsWith('$')) {
-                const argIdx = Number.parseInt(x.substring(1));
-                const argValue = commands[cmdIdx].args[argIdx - 1];
-                if (argValue === '') {
-                    return x;
-                } else {
-                    return `\"${argValue}\"`;
-                }
-            } else {
-                return x;
+            const result = await fetch('/api/custom-commands');
+            const commands = await result.json();
+            const joined = [];
+            for (let idx = 0; idx < commands.length; ++idx) {
+                const cmd = commands[idx];
+                const args = Array.from({ length: cmd.nargs }, (_) => '');
+                joined.push({ cmd, args });
             }
-        });
-    }
+            return joined;
+        }
 
-    function formatCommand(commands, idx) {
-        const { cmd } = commands[idx];
-        const formattedArguments = resolveArgumentArray(commands, idx, cmd['args']);
-        return `${cmd['program']} ${formattedArguments.join(' ')}`;
-    }
+        function resolveArgumentArray(commands, cmdIdx, argumentArray) {
+            return argumentArray.map((x, idx) => {
+                if (x.startsWith('$')) {
+                    const argIdx = Number.parseInt(x.substring(1));
+                    const argValue = commands[cmdIdx].args[argIdx - 1];
+                    if (argValue === '') {
+                        return x;
+                    } else {
+                        return `\"${argValue}\"`;
+                    }
+                } else {
+                    return x;
+                }
+            });
+        }
 
-    async function submitCommand(commands, idx) {
-        const toSubmit = {
-            id: idx,
-            args: commands[idx].args,
-        };
-        const result = await fetch('/api/custom-commands/run', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(toSubmit),
-        });
-        return await result.text();
-    }
+        function formatCommand(commands, idx) {
+            const { cmd } = commands[idx];
+            const formattedArguments = resolveArgumentArray(commands, idx, cmd['args']);
+            return `${cmd['program']} ${formattedArguments.join(' ')}`;
+        }
+
+        async function submitCommand(commands, idx) {
+            const toSubmit = {
+                id: idx,
+                args: commands[idx].args,
+            };
+            const result = await fetch('/api/custom-commands/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(toSubmit),
+            });
+            return await result.text();
+        }
     </script>
     <div style="display: none" x-init="commands = await getCommands();"></div>
     <app-header>Commands</app-header>

@@ -46,9 +46,7 @@
         style="display: none"
         x-effect="files = await getFiles(getCurrentPath()); filesToGrey = findFilesToGrey()"
     ></div>
-
     <app-header>
-        <h1 slot="starter">Files</h1>
         <breadcrumb-nav
             slot="ender"
             x-bind:trail="root"
@@ -61,6 +59,7 @@
         x-bind:max-pages="getNumPages(files)"
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
+
     <div x-show="isGalleryMode">
         <!-- include ./gallery.partial.html -->
     </div>

@@ -27,7 +27,8 @@ async function generateSvgSpriteSheet() {
                 if (pathMatch) {
                     const pathData = pathMatch[1];
 
-                    const symbol = `  <symbol id="${iconId}" viewBox="0 -960 960 960">
+                    const symbol =
+                        `  <symbol id="${iconId}" fill="currentColor" viewBox="0 -960 960 960">
     <path d="${pathData}" />
   </symbol>`;
 

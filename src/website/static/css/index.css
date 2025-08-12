@@ -12,6 +12,7 @@
 @import url('./gallery.css');
 @import url('./file-manager.css');
 @import url('./logon.css');
+@import url('./control-panel.css');
 
 /* Screen specific variables */
 @import url('./screen-specific/l.css');
