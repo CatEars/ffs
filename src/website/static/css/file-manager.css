@@ -11,7 +11,7 @@
         display: grid;
         grid-template-columns: 2rem 2rem 1fr;
         align-content: center;
-        max-width: 0.95vw;
+        max-width: 95vw;
     }
 
     .file-row > div > a {
