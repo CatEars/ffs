@@ -1,8 +1,8 @@
 import AppHeader from './text/app-header.js';
 import AppSubheader from './text/app-subheader.js';
 import AppMain from './layout/app-main.js';
-import AutoColumn from './layout/auto-column.js';
 import BreadcrumbNav from './navigation/breadcrumb-nav.js';
+import DropDown from './display/drop-down.js';
 import FileCard from './display/file-card.js';
 import HeaderTab from './navigation/header-tab.js';
 import MediaViewer from './display/media-viewer.js';
@@ -15,8 +15,8 @@ const components = [
     ['app-header', AppHeader],
     ['app-subheader', AppSubheader],
     ['app-main', AppMain],
-    ['auto-column', AutoColumn],
     ['breadcrumb-nav', BreadcrumbNav],
+    ['drop-down', DropDown],
     ['file-card', FileCard],
     ['header-tab', HeaderTab],
     ['media-viewer', MediaViewer],
