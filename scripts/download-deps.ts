@@ -1,4 +1,4 @@
-const dls = [
+const dls: { url: string; target: string; prependedLicense?: string }[] = [
     {
         url: 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
         target: './src/website/static/alpine.min.js',
@@ -33,23 +33,23 @@ SOFTWARE.
     },
     {
         url: 'https://esm.sh/preact@10.27.0/es2022/preact.mjs',
-        target: './src/website/views/components/vendor/preact.mjs',
+        target: './src/website/components/vendor/preact.mjs',
     },
     {
         url: 'https://esm.sh/preact@10.27.0/es2022/preact.mjs.map',
-        target: './src/website/views/components/vendor/preact.mjs.map',
+        target: './src/website/components/vendor/preact.mjs.map',
     },
     {
         url: 'https://esm.sh/htm@3.1.1/es2022/htm.mjs',
-        target: './src/website/views/components/vendor/htm.mjs',
+        target: './src/website/components/vendor/htm.mjs',
     },
     {
         url: 'https://esm.sh/htm@3.1.1/es2022/htm.mjs.map',
-        target: './src/website/views/components/vendor/htm.mjs.map',
+        target: './src/website/components/vendor/htm.mjs.map',
     },
 ];
 
-for (const { url, target, prependedLicense, replace } of dls) {
+for (const { url, target, prependedLicense } of dls) {
     try {
         Deno.removeSync(target);
     } catch (_error) {
@@ -63,12 +63,6 @@ for (const { url, target, prependedLicense, replace } of dls) {
     if (prependedLicense) {
         console.log('  Prepending license');
         text = prependedLicense + text;
-    }
-    if (replace) {
-        for (const { pattern, into } of replace) {
-            console.log(`  Replacing '${pattern}' with '${into}'`);
-            text = text.replaceAll(pattern, into);
-        }
     }
     Deno.writeFileSync(target, new TextEncoder().encode(text));
 }

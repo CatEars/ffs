@@ -9,12 +9,6 @@ const maxage = devModeEnabled ? 0 : anHour;
 
 export async function registerStaticRoutes(router: Router) {
     await registerUnder(router, './src/website/static', '/static');
-    // Imported javascript libraries are put under `vendor` folder
-    await registerUnder(
-        router,
-        './src/website/views/components/vendor',
-        '/components/vendor',
-    );
 
     // Special case: favicon
     logger.info('Registering /favicon.ico');

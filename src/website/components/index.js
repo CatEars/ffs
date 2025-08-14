@@ -5,7 +5,7 @@ import AutoColumn from './layout/auto-column.js';
 import BreadcrumbNav from './navigation/breadcrumb-nav.js';
 import FileCard from './display/file-card.js';
 import HeaderTab from './navigation/header-tab.js';
-import MediaViewer from './media-viewer.js';
+import MediaViewer from './display/media-viewer.js';
 import SwitchControl from './control/switch-control.js';
 import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
