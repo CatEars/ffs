@@ -1,4 +1,4 @@
-import { BaseWebComponent } from './base.js';
+import { BaseWebComponent } from '../base.js';
 
 class MediaViewer extends BaseWebComponent {
     static get observedAttributes() {
