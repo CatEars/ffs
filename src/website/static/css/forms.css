@@ -58,4 +58,8 @@
     .form-column > button:disabled {
         background-color: #666;
     }
+
+    .full-width {
+        width: 100%;
+    }
 }

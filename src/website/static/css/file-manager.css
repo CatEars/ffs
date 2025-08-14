@@ -17,4 +17,8 @@
     .file-row > div > a {
         color: var(--font-color);
     }
+
+    drop-down {
+        margin-top: 1rem;
+    }
 }

@@ -45,7 +45,7 @@
     }
 </script>
 <!-- include ./upload-form.partial.html -->
-<div id="control-panel">
+<div id="action-panel">
     <div class="form-row">
         <button
             @click="cutFiles(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = findFilesToGrey()"
@@ -81,14 +81,14 @@
             </svg>
         </button>
     </div>
-    <div class="form-row">
-        <div class="dropdown">
-            <input class="dropdown-toggle" type="checkbox" id="dropdown-toggle" name="dropdown-toggle" />
-            <label class="dropdown-label" for="dropdown-toggle">Rename</label>
-            <div class="dropdown-content">
-                <p>Hello</p>
-            </div>
-        </div>
+    <div class="form-row full-width">
+        <drop-down>
+            <p>Hello</p>
+            <p>Hello</p>
+            <p>Hello</p>
+            <p>Hello</p>
+            <p>Hello</p>
+        </drop-down>
     </div>
     <p x-text="filesDisplay"></p>
 </div>
