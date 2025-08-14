@@ -1,5 +1,4 @@
 import { BaseWebComponent } from '../base.js';
-import BaseRadio from './BaseRadio.js';
 
 class RadioControl extends BaseWebComponent {
     static get observedAttributes() {
@@ -26,19 +25,12 @@ class RadioControl extends BaseWebComponent {
                 color: rgb(100, 150, 255);
             }
         </style>`;
-        if (imgSrc) {
-            return html`${styles}
-            <${BaseRadio} checked="${checked}">
-                <svg class="icon">
-                    <use href="/static/svg/sprite_sheet.svg#${imgSrc}"></use>
-                </svg>
-            </${BaseRadio}>`;
-        } else {
-            return html`${styles}
-            <${BaseRadio} checked="${checked}">
-                ${text}
-            </${BaseRadio}>`;
-        }
+        const child = imgSrc
+            ? html`<svg class="icon">
+                  <use href="/static/svg/sprite_sheet.svg#${imgSrc}"></use>
+              </svg>`
+            : html`${text}`;
+        return html`${styles} <label class="${checked ? 'checked' : ''}"> ${child} </label>`;
     }
 }
 
