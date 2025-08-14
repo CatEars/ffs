@@ -1,7 +1,9 @@
+import { dirname } from '@std/path/dirname';
+
 const dls: { url: string; target: string; prependedLicense?: string }[] = [
     {
         url: 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js',
-        target: './src/website/static/alpine.min.js',
+        target: './src/website/static/js/alpine.min.js',
         prependedLicense: `/** 
 # MIT License
 
@@ -55,6 +57,7 @@ for (const { url, target, prependedLicense } of dls) {
     } catch (_error) {
         // Intentionally left empty
     }
+    await Deno.mkdir(dirname(target), { recursive: true });
     const targetFile = await Deno.open(target, { create: true, write: true });
     console.log('Downloading', url, '->', target);
     const req = await fetch(url);

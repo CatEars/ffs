@@ -11,8 +11,9 @@ function myLocation() {
 const esbuildLocation = join(myLocation(), 'vendor', 'bin', 'esbuild');
 
 async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
+    await Deno.mkdir('./src/website/static/js', { recursive: true });
     const command = new Deno.Command(esbuildLocation, {
-        args: ['--bundle', 'index.js', '--outfile=../static/index.bundle.js'],
+        args: ['--bundle', 'index.js', '--outfile=../static/js/index.bundle.js'],
         cwd: './src/website/components',
     });
 
