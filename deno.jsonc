@@ -20,7 +20,7 @@
         "create-personal-files": "deno run --allow-all scripts/create-empty-personal-files.ts",
         "remove-personal-files": "deno run --allow-all scripts/remove-personal-files.ts",
         "generate-default-test-bench": "deno run --allow-all scripts/generate-default-test-bench.ts",
-        "generate-svg-spritesheet": "deno run --allow-all scripts/generate-svg-sprite-sheet.ts",
+        "generate-svg-sprite-sheet": "deno run --allow-all scripts/generate-svg-sprite-sheet.ts",
         "run": {
             "command": "deno run --allow-all scripts/dev-main.ts"
         },
