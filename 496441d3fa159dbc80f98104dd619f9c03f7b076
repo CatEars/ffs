@@ -1,7 +1,5 @@
 [ ] Rotate logs
 
-[ ] Use X-Forwarded-For when logging IP to access log (or else proxies are not gonna be nice)
-
 [ ] Rename files in manage view
 
 [ ] Create directories (with naming)
