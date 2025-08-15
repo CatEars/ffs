@@ -45,7 +45,7 @@
     }
 </script>
 <!-- include ./upload-form.partial.html -->
-<div id="action-panel">
+<column-layout id="action-panel">
     <div class="form-row">
         <button
             @click="cutFiles(); filesDisplay = getCuttingBoardDisplay(); filesToGrey = findFilesToGrey()"
@@ -81,17 +81,15 @@
             </svg>
         </button>
     </div>
-    <div class="form-row full-width">
-        <drop-down>
-            <p>Hello</p>
-            <p>Hello</p>
-            <p>Hello</p>
-            <p>Hello</p>
-            <p>Hello</p>
-        </drop-down>
-    </div>
+    <drop-down>
+        <p>Hello</p>
+        <p>Hello</p>
+        <p>Hello</p>
+        <p>Hello</p>
+        <p>Hello</p>
+    </drop-down>
     <p x-text="filesDisplay"></p>
-</div>
+</column-layout>
 <section class="file-list">
     <template
         x-for="(file, idx) in sortedBy(files, sorting, directoriesFirst, currentPage)"

@@ -10,18 +10,22 @@ import SwitchControl from './control/switch-control.js';
 import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
 import { loadSharedStylesheets } from './base.js';
+import RowLayout from './layout/row-layout.js';
+import ColumnLayout from './layout/column-layout.js';
 
 const components = [
     ['app-header', AppHeader],
     ['app-subheader', AppSubheader],
     ['app-main', AppMain],
     ['breadcrumb-nav', BreadcrumbNav],
+    ['column-layout', ColumnLayout],
     ['drop-down', DropDown],
     ['file-card', FileCard],
     ['header-tab', HeaderTab],
     ['media-viewer', MediaViewer],
     ['switch-control', SwitchControl],
     ['radio-control', RadioControl],
+    ['row-layout', RowLayout],
     ['paginate-control', PaginateControl],
 ];
 

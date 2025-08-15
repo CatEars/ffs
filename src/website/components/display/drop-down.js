@@ -21,6 +21,14 @@ class DropDown extends BaseWebComponent {
                 .outer {
                     width: 100%;
                     border: 1px solid gray;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .dropdown-label {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    margin-left: 0.25rem;
                 }
                 .dropdown-content {
                     margin-left: 1rem;
