@@ -99,12 +99,16 @@
         <p slot="header">Rename</p>
         <form action="/api/file/rename" method="POST" id="rename-form">
             <input id="source" name="source" type="hidden" />
-            <p>Select a single file to rename, input the new name of the file, then submit.</p>
-            <label>
-                New Name of File
+            <div class="form-column">
+                <p>Select a single file to rename, input the new name of the file, then submit.</p>
+            </div>
+            <div class="form-column">
+                <label for="target">New Name of File</label>
                 <input id="target" name="target" type="text" />
-            </label>
-            <button @click="renameFile()" type="button">Rename</button>
+            </div>
+            <div class="form-column">
+                <button @click="renameFile()" type="button">Rename</button>
+            </div>
         </form>
     </drop-down>
     <p x-text="filesDisplay"></p>

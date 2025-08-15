@@ -34,6 +34,7 @@ class DropDown extends BaseWebComponent {
                 .dropdown-content {
                     margin-left: 1rem;
                     margin-right: 1rem;
+                    margin-bottom: 1rem;
                 }
             </style>
             <div class="outer">
