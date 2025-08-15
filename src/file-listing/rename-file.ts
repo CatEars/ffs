@@ -46,5 +46,6 @@ export function registerRenameFileRoute(router: Router) {
         }
 
         await move(from.fullPath, to.fullPath);
+        ctx.response.redirect(ctx.request.headers.get('Referer')?.toString() || '/home');
     });
 }

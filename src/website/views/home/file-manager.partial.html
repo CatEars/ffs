@@ -43,6 +43,20 @@
         document.getElementById('link-paths').value = JSON.stringify(paths);
         document.getElementById('link-form').submit();
     }
+
+    function renameFile() {
+        const myPath = getCurrentPath();
+        const checkedFiles = getCheckedFiles();
+        if (checkedFiles.length === 0) {
+            return;
+        }
+        const elementToRename = checkedFiles[0];
+        const renameForm = document.getElementById('rename-form');
+        document.getElementById('source').value = `${myPath}/${elementToRename}`;
+        console.log(document.getElementById('source'));
+        console.log(document.getElementById('target'));
+        renameForm.submit();
+    }
 </script>
 <!-- include ./upload-form.partial.html -->
 <column-layout id="action-panel">
@@ -56,8 +70,8 @@
             </svg>
         </button>
         <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
-            <input id="files-to-move" name="files-to-move" type="hidden"></input>
-            <input id="destination" name="destination" type="hidden"></input>
+            <input id="files-to-move" name="files-to-move" type="hidden" />
+            <input id="destination" name="destination" type="hidden" />
         </form>
         <button @click="pasteFiles()" type="button">
             <svg class="medium-icon">
@@ -82,11 +96,16 @@
         </button>
     </div>
     <drop-down>
-        <p>Hello</p>
-        <p>Hello</p>
-        <p>Hello</p>
-        <p>Hello</p>
-        <p>Hello</p>
+        <p slot="header">Rename</p>
+        <form action="/api/file/rename" method="POST" id="rename-form">
+            <input id="source" name="source" type="hidden" />
+            <p>Select a single file to rename, input the new name of the file, then submit.</p>
+            <label>
+                New Name of File
+                <input id="target" name="target" type="text" />
+            </label>
+            <button @click="renameFile()" type="button">Rename</button>
+        </form>
     </drop-down>
     <p x-text="filesDisplay"></p>
 </column-layout>

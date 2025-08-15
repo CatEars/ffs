@@ -29,6 +29,7 @@ class DropDown extends BaseWebComponent {
                     flex-direction: row;
                     align-items: center;
                     margin-left: 0.25rem;
+                    gap: 1rem;
                 }
                 .dropdown-content {
                     margin-left: 1rem;
@@ -49,6 +50,7 @@ class DropDown extends BaseWebComponent {
                     <svg class="icon icon-expanded">
                         <use href="/static/svg/sprite_sheet.svg#collapse_content"></use>
                     </svg>
+                    <slot name="header"></slot>
                 </label>
 
                 <div class="dropdown-content">
