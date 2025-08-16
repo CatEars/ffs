@@ -25,11 +25,22 @@ export type StatResult = {
     info: Deno.FileInfo;
 };
 
+export type ChangeRootResult = {
+    type: 'invalid';
+} | {
+    type: 'valid';
+    root: FileTree;
+};
+
 export class FileTree {
     private readonly root: string;
 
     constructor(root: string) {
         this.root = Deno.realPathSync(root);
+    }
+
+    rootPath(): string {
+        return this.root;
     }
 
     isValid(): boolean {
@@ -107,5 +118,27 @@ export class FileTree {
                 };
             }
         }
+    }
+
+    changeRoot(...relativePaths: string[]): ChangeRootResult {
+        const result = this.resolvePath(...relativePaths);
+        if (
+            result.type === 'invalid' || !result.exists ||
+            !Deno.statSync(result.fullPath).isDirectory
+        ) {
+            return { type: 'invalid' };
+        }
+        return {
+            type: 'valid',
+            root: new FileTree(result.fullPath),
+        };
+    }
+
+    withSubfolderOrThrow(relativePath: string): FileTree {
+        const result = this.changeRoot(relativePath);
+        if (result.type === 'invalid') {
+            throw new Error(`Expected to be able to change root to ${relativePath} but could not`);
+        }
+        return result.root;
     }
 }

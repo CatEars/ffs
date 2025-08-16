@@ -1,17 +1,16 @@
 import { Router } from 'jsr:@oak/oak/router';
-import { getStoreRoot } from '../config.ts';
 import { HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
 import { apiProtect } from '../security/api-protect.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
-import { FileTree } from '../files/file-tree.ts';
 import { FileIdentification, identifyFileFromDirEntry } from './file-type.ts';
+import { getRootFileTree } from './resolve-file-tree.ts';
 
 type ApiFile = Deno.DirEntry & FileIdentification & {
     date: Date;
 };
 
 export function registerDirectoryRoutes(router: Router) {
-    const fileTree = new FileTree(getStoreRoot());
+    const fileTree = getRootFileTree();
 
     router.get('/api/directory', baseMiddlewares(), apiProtect, (ctx) => {
         const pathToCheck = ctx.request.url.searchParams.get('path');

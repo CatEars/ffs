@@ -6,9 +6,10 @@ import { baseMiddlewares } from '../base-middlewares.ts';
 import { apiProtect } from '../security/api-protect.ts';
 import { FileTree } from '../files/file-tree.ts';
 import { logger } from '../logging/logger.ts';
+import { getRootFileTree } from './resolve-file-tree.ts';
 
 export function registerUploadFileRoute(router: Router) {
-    const fileTree = new FileTree(getStoreRoot());
+    const fileTree = getRootFileTree();
 
     router.post(
         '/api/file/upload',

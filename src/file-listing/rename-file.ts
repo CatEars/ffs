@@ -6,14 +6,13 @@ import {
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 } from '../utils/http-codes.ts';
-import { getStoreRoot } from '../config.ts';
-import { FileTree } from '../files/file-tree.ts';
 import { join } from '@std/path/join';
 import { dirname } from '@std/path/dirname';
 import { move } from '@std/fs/move';
+import { getRootFileTree } from './resolve-file-tree.ts';
 
 export function registerRenameFileRoute(router: Router) {
-    const fileTree = new FileTree(getStoreRoot());
+    const fileTree = getRootFileTree();
 
     router.post('/api/file/rename', baseMiddlewares(), apiProtect, async (ctx) => {
         const form = await ctx.request.body.formData();

@@ -17,15 +17,15 @@ type Pbkdf2Auth = {
     key: string;
 };
 
-type UserDefinition = Pbkdf2Auth | InsecureBasicAuth;
+type UserAuth = Pbkdf2Auth | InsecureBasicAuth;
 
 let hasReadUsersFile = false;
-const knownUsers: UserDefinition[] = [];
+const knownUsers: UserAuth[] = [];
 const instanceSalt = new Uint8Array(32);
 crypto.getRandomValues(instanceSalt);
 const instanceUserHashes = new Map<string, string>();
 
-async function calculateUserHash(user: UserDefinition, apiKey: string): Promise<string> {
+async function calculateUserHash(user: UserAuth, apiKey: string): Promise<string> {
     const key = encodeBase64(user.username) + ':' + encodeBase64(apiKey);
     const salt = instanceSalt;
     const keyBytes = new TextEncoder().encode(key);
@@ -36,7 +36,7 @@ async function calculateUserHash(user: UserDefinition, apiKey: string): Promise<
     return encodeBase64(hashBuffer);
 }
 
-async function deriveApiKey(user: UserDefinition) {
+async function deriveApiKey(user: UserAuth) {
     const hashedKey = await calculateUserHash(user, user.key);
     instanceUserHashes.set(hashedKey, user.username);
     return hashedKey;
