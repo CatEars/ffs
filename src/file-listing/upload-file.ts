@@ -2,20 +2,16 @@ import * as path from '@std/path';
 import { Router } from '@oak/oak/router';
 import { getStoreRoot } from '../config.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { apiProtect } from '../security/api-protect.ts';
-import { FileTree } from '../files/file-tree.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { logger } from '../logging/logger.ts';
-import { getRootFileTree } from './resolve-file-tree.ts';
 
 export function registerUploadFileRoute(router: Router) {
-    const fileTree = getRootFileTree();
-
     router.post(
         '/api/file/upload',
         baseMiddlewares(),
-        apiProtect,
+        ...protectedMiddlewares(),
         async (ctx) => {
+            const fileTree = ctx.state.fileTree;
             const data = await ctx.request.body.formData();
             const directory = data.get('directory')?.toString() || getStoreRoot();
             const file = data.get('file');

@@ -1,6 +1,5 @@
 import { Router } from '@oak/oak';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { apiProtect } from '../security/api-protect.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { HTTP_200_OK, HTTP_400_BAD_REQUEST } from '../utils/http-codes.ts';
 import { logger } from '../logging/logger.ts';
 import { getCustomCommands } from './custom-command.ts';
@@ -10,7 +9,7 @@ export function registerCommandsApi(router: Router) {
 
     const commands = getCustomCommands();
 
-    router.get('/api/custom-commands', baseMiddlewares(), apiProtect, (ctx) => {
+    router.get('/api/custom-commands', baseMiddlewares(), ...protectedMiddlewares(), (ctx) => {
         ctx.response.body = commands;
     });
 
@@ -22,7 +21,7 @@ export function registerCommandsApi(router: Router) {
     router.post(
         '/api/custom-commands/run',
         baseMiddlewares(),
-        apiProtect,
+        ...protectedMiddlewares(),
         async (ctx) => {
             const body = await ctx.request.body.json();
             const id = body['id'];

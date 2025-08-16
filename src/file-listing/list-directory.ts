@@ -1,18 +1,16 @@
 import { Router } from 'jsr:@oak/oak/router';
 import { HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
-import { apiProtect } from '../security/api-protect.ts';
-import { baseMiddlewares } from '../base-middlewares.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { FileIdentification, identifyFileFromDirEntry } from './file-type.ts';
-import { getRootFileTree } from './resolve-file-tree.ts';
+import { FfsApplicationState } from '../user-config/index.ts';
 
 type ApiFile = Deno.DirEntry & FileIdentification & {
     date: Date;
 };
 
-export function registerDirectoryRoutes(router: Router) {
-    const fileTree = getRootFileTree();
-
-    router.get('/api/directory', baseMiddlewares(), apiProtect, (ctx) => {
+export function registerDirectoryRoutes(router: Router<FfsApplicationState>) {
+    router.get('/api/directory', baseMiddlewares(), ...protectedMiddlewares(), (ctx) => {
+        const fileTree = ctx.state.fileTree;
         const pathToCheck = ctx.request.url.searchParams.get('path');
         if (!pathToCheck) {
             ctx.response.status = HTTP_404_NOT_FOUND;

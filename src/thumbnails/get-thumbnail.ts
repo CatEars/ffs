@@ -1,7 +1,6 @@
 import { Router } from '@oak/oak';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { apiProtect } from '../security/api-protect.ts';
-import { getCacheRoot, getStoreRoot } from '../config.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
+import { getCacheRoot } from '../config.ts';
 import { canGenerateThumbnailFor } from './generate-thumbnail.ts';
 import { prioritizeThumbnail } from './index.ts';
 import { withThumbnailExtension } from '../files/cache-folder.ts';
@@ -37,11 +36,11 @@ async function waitUntilFilepathExistsOrBail(
 }
 
 export function registerGetThumbnail(router: Router) {
-    const storeFileTree = new FileTree(getStoreRoot());
     const cacheRoot = getCacheRoot();
     const cacheFileTree = new FileTree(cacheRoot);
 
-    router.get('/api/thumbnail', baseMiddlewares(), apiProtect, async (ctx) => {
+    router.get('/api/thumbnail', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
+        const storeFileTree = ctx.state.fileTree;
         const path = ctx.request.url.searchParams.get('path');
         if (!path || !canGenerateThumbnailFor(path)) {
             ctx.response.status = HTTP_400_BAD_REQUEST;

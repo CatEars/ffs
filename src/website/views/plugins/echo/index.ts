@@ -1,11 +1,10 @@
-import { baseMiddlewares } from '../../../../base-middlewares.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../../../../base-middlewares.ts';
 import { logger } from '../../../../logging/logger.ts';
-import { apiProtect } from '../../../../security/api-protect.ts';
 import { ApplicationContext } from '../../../collect-all-pages.ts';
 
 export const enabled = false;
 
-export const middlewares = [apiProtect];
+export const middlewares = protectedMiddlewares();
 
 export function register(context: ApplicationContext): Promise<void> {
     logger.info('Adding /plugins/echo navbar link');
@@ -18,7 +17,7 @@ export function register(context: ApplicationContext): Promise<void> {
     context.router.post(
         '/api/echo',
         baseMiddlewares(),
-        apiProtect,
+        ...protectedMiddlewares(),
         async (ctx) => {
             const body = await ctx.request.body.json();
             const response = body.message

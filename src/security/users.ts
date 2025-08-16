@@ -1,23 +1,27 @@
 import { encodeBase64 } from 'jsr:@std/encoding@1/base64';
 import { getUsersFilePath } from '../config.ts';
 import { pbkdf2Hash } from './password-hash.ts';
+import { UserConfig } from '../user-config/index.ts';
 
-type InsecureBasicAuth = {
-    type: 'insecure-basic_auth';
+type BaseAuth = {
     username: string;
+    config?: UserConfig;
+};
+
+type InsecureBasicAuth = BaseAuth & {
+    type: 'insecure-basic_auth';
     password: string;
     key: string;
 };
 
-type Pbkdf2Auth = {
+type Pbkdf2Auth = BaseAuth & {
     type: 'pbkdf2';
-    username: string;
     salt: string;
     b64Hash: string;
     key: string;
 };
 
-type UserAuth = Pbkdf2Auth | InsecureBasicAuth;
+export type UserAuth = Pbkdf2Auth | InsecureBasicAuth;
 
 let hasReadUsersFile = false;
 const knownUsers: UserAuth[] = [];

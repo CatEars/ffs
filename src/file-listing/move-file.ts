@@ -1,14 +1,11 @@
 import { Router } from '@oak/oak';
 import { move } from '@std/fs';
 import { logger } from '../logging/logger.ts';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { apiProtect } from '../security/api-protect.ts';
-import { getRootFileTree } from './resolve-file-tree.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 
 export function registerMoveFileRoute(router: Router) {
-    const fileTree = getRootFileTree();
-
-    router.post('/api/file/move', baseMiddlewares(), apiProtect, async (ctx) => {
+    router.post('/api/file/move', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
+        const fileTree = ctx.state.fileTree;
         const formData = await ctx.request.body.formData();
 
         const filesToMoveRaw = formData.get('files-to-move');

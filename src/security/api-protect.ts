@@ -3,8 +3,20 @@ import { Context } from '@oak/oak/context';
 import { shouldAbandonSecurity } from '../config.ts';
 import { HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
 import { getUserMatchingApiKey } from './users.ts';
+import { FfsApplicationState } from '../user-config/index.ts';
 
-export const apiProtect: Middleware = async (ctx: Context, next: Next) => {
+const resolveUserAndRespond = (apiKey: string, ctx: Context<FfsApplicationState>, next: Next) => {
+    const user = getUserMatchingApiKey(apiKey);
+    if (user) {
+        ctx.state.userConfig = user.config;
+        return next();
+    } else {
+        ctx.response.redirect('/');
+        return;
+    }
+};
+
+export const apiProtect: Middleware<FfsApplicationState> = async (ctx, next) => {
     if (shouldAbandonSecurity()) {
         return next();
     }
@@ -12,25 +24,14 @@ export const apiProtect: Middleware = async (ctx: Context, next: Next) => {
     const authCookie = await ctx.cookies.get('FFS-Authorization');
     if (authCookie) {
         const apiKey = authCookie;
-        const user = getUserMatchingApiKey(apiKey);
-        if (user) {
-            return next();
-        } else {
-            ctx.response.redirect('/');
-            return;
-        }
+        return resolveUserAndRespond(apiKey, ctx, next);
     }
 
     const authHeader = ctx.request.headers.get('Authorization');
     if (authHeader && authHeader.startsWith('FFS ')) {
         const apiKey = authHeader.substring('FFS '.length);
-        const user = getUserMatchingApiKey(apiKey);
-        if (user) {
-            return next();
-        } else {
-            ctx.response.redirect('/');
-            return;
-        }
+        return resolveUserAndRespond(apiKey, ctx, next);
     }
+
     ctx.response.status = HTTP_401_UNAUTHORIZED;
 };

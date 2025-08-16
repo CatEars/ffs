@@ -1,6 +1,5 @@
 import { Router } from '@oak/oak';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { apiProtect } from '../security/api-protect.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import {
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
@@ -9,12 +8,10 @@ import {
 import { join } from '@std/path/join';
 import { dirname } from '@std/path/dirname';
 import { move } from '@std/fs/move';
-import { getRootFileTree } from './resolve-file-tree.ts';
 
 export function registerRenameFileRoute(router: Router) {
-    const fileTree = getRootFileTree();
-
-    router.post('/api/file/rename', baseMiddlewares(), apiProtect, async (ctx) => {
+    router.post('/api/file/rename', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
+        const fileTree = ctx.state.fileTree;
         const form = await ctx.request.body.formData();
 
         const fileToRename = form.get('source');

@@ -1,12 +1,10 @@
 import { Router } from '@oak/oak/router';
-import { apiProtect } from '../security/api-protect.ts';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { getRootFileTree } from './resolve-file-tree.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
+import { FfsApplicationState } from '../user-config/index.ts';
 
-export function registerFileRoutes(router: Router) {
-    const fileTree = getRootFileTree();
-
-    router.get('/api/file', baseMiddlewares(), apiProtect, async (ctx) => {
+export function registerFileRoutes(router: Router<FfsApplicationState>) {
+    router.get('/api/file', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
+        const fileTree = ctx.state.fileTree;
         const path = ctx.request.url.searchParams.get('path');
         if (!path) {
             ctx.response.status = 404;
