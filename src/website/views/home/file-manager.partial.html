@@ -55,6 +55,12 @@
         document.getElementById('source').value = `${myPath}/${elementToRename}`;
         renameForm.submit();
     }
+
+    function makeDirectory() {
+        const myPath = getCurrentPath();
+        document.getElementById('make-directory-path').value = myPath;
+        document.getElementById('make-directory-form').submit();
+    }
 </script>
 <!-- include ./upload-form.partial.html -->
 <column-layout id="action-panel">
@@ -106,6 +112,19 @@
             </div>
             <div class="form-column">
                 <button @click="renameFile()" type="button">Rename</button>
+            </div>
+        </form>
+    </drop-down>
+    <drop-down>
+        <p slot="header">Make Directory</p>
+        <form id="make-directory-form" action="/api/directory/make" method="POST">
+            <input type="hidden" name="path" id="make-directory-path" />
+            <div class="form-column">
+                <label for="name">Directory Name</label>
+                <input type="text" name="name" id="name" />
+            </div>
+            <div class="form-column">
+                <button @click="makeDirectory()" type="button">Create Directory</button>
             </div>
         </form>
     </drop-down>
