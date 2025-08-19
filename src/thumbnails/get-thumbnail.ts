@@ -41,8 +41,13 @@ export function registerGetThumbnail(router: Router) {
 
     router.get('/api/thumbnail', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const storeFileTree = ctx.state.fileTree;
-        const path = ctx.request.url.searchParams.get('path');
-        if (!path || !canGenerateThumbnailFor(path)) {
+        const pathFromUrl = ctx.request.url.searchParams.get('path');
+        if (!pathFromUrl) {
+            ctx.response.status = HTTP_400_BAD_REQUEST;
+            return;
+        }
+        const path = decodeURIComponent(pathFromUrl);
+        if (!canGenerateThumbnailFor(path)) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
             return;
         }

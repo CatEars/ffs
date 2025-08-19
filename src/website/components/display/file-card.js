@@ -24,6 +24,11 @@ function resolveEmojiForMediaFile(fileType) {
     }
 }
 
+function urlEncodeThumbnailComponent(url) {
+    const x = url.split('path=')[1];
+    return `/api/thumbnail?path=${encodeURIComponent(x)}`;
+}
+
 class FileCard extends BaseWebComponent {
     static observedAttributes = ['filename', 'root', 'image-src', 'file-type'];
 
@@ -34,7 +39,7 @@ class FileCard extends BaseWebComponent {
         const fileType = this.getAttribute('file-type') || '';
 
         const image = imageSrc.includes('/thumbnail')
-            ? html`<img src="${imageSrc}" />`
+            ? html`<img src="${urlEncodeThumbnailComponent(imageSrc)}" />`
             : html`<svg class="large-icon">
                   <use href="/static/svg/sprite_sheet.svg#${imageSrc}"></use>
               </svg>`;
