@@ -8,5 +8,4 @@
 
 [ ] Do not use `paths` in URL to share files, as that can be quite long and max limit is 2048
 
-[ ] Fix bug with logon where `instance` hashes are only set on login, but should work fine between
-restarts.
+[ ] stripResourceTypeName needs to take care of '/' encoding
