@@ -13,10 +13,10 @@ import {
 import { startup } from './startup.ts';
 import { registerSitemapRoute } from './sitemap/index.ts';
 import { registerAllCustomCommandApi } from './custom-commands/index.ts';
-import { resetSecuritySaltEveryTwentyFiveHours } from './security/users.ts';
 import { registerAllFileShareRoutes } from './share-file/index.ts';
 import { FfsApplicationState, registerUserConfigStateSetter } from './user-config/index.ts';
 import { getRootFileTree, resolveUserFileTreeIntoState } from './file-listing/resolve-file-tree.ts';
+import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -30,13 +30,15 @@ await initializeLoggers();
 const app = new Application<FfsApplicationState>();
 const router = new Router();
 
+setOnUserAuthenticationHook((ctx, user) => {
+    ctx.state.userConfig = user.config;
+});
 registerUserConfigStateSetter((ctx) => {
     // Set default file tree to store root, later invocation may update it
     ctx.state.fileTree = getRootFileTree();
 });
 registerUserConfigStateSetter(resolveUserFileTreeIntoState);
 
-resetSecuritySaltEveryTwentyFiveHours();
 registerAllFileListing(router);
 registerAllFileShareRoutes(router);
 registerAllLogonRoutes(router);

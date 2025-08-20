@@ -13,10 +13,8 @@ export function getRootFileTree() {
 
 export const resolveUserFileTreeIntoState: UserConfigToStateSetter = (ctx) => {
     if (ctx.state && ctx.state.userConfig && ctx.state.userConfig.userRootPath) {
-        const result = ctx.state.fileTree.changeRoot(ctx.state.userConfig.userRootPath);
-        if (result.type === 'invalid') {
-            throw new Error(`Failed to change file root to ${ctx.state.userConfig.userRootPath}`);
-        }
-        ctx.state.fileTree = result.root;
+        ctx.state.fileTree = ctx.state.fileTree.withSubfolderOrThrow(
+            ctx.state.userConfig.userRootPath,
+        );
     }
 };

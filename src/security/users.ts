@@ -1,7 +1,8 @@
-import { encodeBase64 } from 'jsr:@std/encoding@1/base64';
 import { getUsersFilePath } from '../config.ts';
 import { pbkdf2Hash } from './password-hash.ts';
 import { UserConfig } from '../user-config/index.ts';
+import { ResourceManager } from './resources.ts';
+import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
 
 type BaseAuth = {
     username: string;
@@ -23,27 +24,14 @@ type Pbkdf2Auth = BaseAuth & {
 
 export type UserAuth = Pbkdf2Auth | InsecureBasicAuth;
 
+const userResourceManager = new ResourceManager('users');
+
 let hasReadUsersFile = false;
 const knownUsers: UserAuth[] = [];
-const instanceSalt = new Uint8Array(32);
-crypto.getRandomValues(instanceSalt);
-const instanceUserHashes = new Map<string, string>();
-
-async function calculateUserHash(user: UserAuth, apiKey: string): Promise<string> {
-    const key = encodeBase64(user.username) + ':' + encodeBase64(apiKey);
-    const salt = instanceSalt;
-    const keyBytes = new TextEncoder().encode(key);
-    const combinedBytes = new Uint8Array(salt.length + keyBytes.length);
-    combinedBytes.set(salt, 0);
-    combinedBytes.set(keyBytes, salt.length);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', combinedBytes);
-    return encodeBase64(hashBuffer);
-}
 
 async function deriveApiKey(user: UserAuth) {
-    const hashedKey = await calculateUserHash(user, user.key);
-    instanceUserHashes.set(hashedKey, user.username);
-    return hashedKey;
+    const userClaim = userResourceManager.nameForResource(user.username);
+    return await signAndUrlEncodeClaims([userClaim]);
 }
 
 export function getMatchingUser(
@@ -69,14 +57,15 @@ export function getMatchingUser(
     return Promise.resolve(undefined);
 }
 
-export function getUserMatchingApiKey(apiKey: string) {
+export async function getUserMatchingApiKey(apiKey: string) {
     ensureUsersFileRead();
-    const userMatchingKey = instanceUserHashes.get(apiKey);
-    if (!userMatchingKey) {
+    const validatedKey = await verifyAndUrlDecodeClaims(apiKey);
+    if (!validatedKey) {
         return;
     }
     for (const user of knownUsers) {
-        if (user.username === userMatchingKey) {
+        const resourceName = userResourceManager.nameForResource(user.username);
+        if (userResourceManager.mayAccess(validatedKey, resourceName)) {
             return user;
         }
     }
@@ -104,10 +93,4 @@ function ensureUsersFileRead() {
 function pbkdf2Compare(user: Pbkdf2Auth, password: string) {
     const result = pbkdf2Hash(password, user.salt);
     return user.b64Hash === result;
-}
-
-export function resetSecuritySaltEveryTwentyFiveHours() {
-    setInterval(() => {
-        crypto.getRandomValues(instanceSalt);
-    }, 1000 * 60 * 60 * 25);
 }
