@@ -150,11 +150,15 @@ export class HtmlTemplate {
             return renderCache[this.sourceFilePath];
         }
         if (!existsSync(this.sourceFilePath)) {
-            logger.info(
-                'Tried to render',
-                this.sourceFilePath,
-                'but file does not exist, render empty string instead',
-            );
+            if (!this.sourceFilePath.includes('.personal.')) {
+                // Files that include `*.personal.*` are optional
+                // Lets not log a ton when these do not exist
+                logger.info(
+                    'Tried to render',
+                    this.sourceFilePath,
+                    'but file does not exist, render empty string instead',
+                );
+            }
             return renderCache[this.sourceFilePath] = '';
         }
         let sourceCode = textDecoder.decode(
