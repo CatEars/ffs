@@ -19,7 +19,7 @@
         "salt": "890ecb11-41ad-4f48-ac3d-1760e04f153c",
         "key": "881ec4c1-7207-4532-9957-3b4254283515",
         "config": {
-            "userRootPath": "./testbench"
+            "access": ["/file/./testbench"]
         }
     }
 ]

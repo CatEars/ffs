@@ -4,7 +4,6 @@ import { AccessLevel, rootAccessLevel } from './security/resources.ts';
 
 export type UserConfig = {
     access: AccessLevel[];
-    userRootPath: string;
 };
 
 export type FfsApplicationState = {
@@ -18,7 +17,6 @@ export function setAccessFromUserConfigOrDefaultToRootAccess(
 ) {
     const userConfig: UserConfig = {
         access: [],
-        userRootPath: '.',
     };
     if (config?.access) {
         userConfig.access = config.access;

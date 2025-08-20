@@ -2,6 +2,7 @@ import { Context } from '@oak/oak/context';
 import { getStoreRoot } from '../config.ts';
 import { FileTree } from '../files/file-tree.ts';
 import { FfsApplicationState } from '../application-state.ts';
+import { ResourceManager } from '../security/resources.ts';
 
 let _fileTree: FileTree | null = null;
 export function getRootFileTree() {
@@ -12,11 +13,15 @@ export function getRootFileTree() {
     return _fileTree;
 }
 
+const fileResourceManger = new ResourceManager('file');
+
 export function resolveUserFileTreeFromState(ctx: Context<FfsApplicationState>) {
     ctx.state.fileTree = getRootFileTree();
-    if (ctx.state.userConfig && ctx.state.userConfig.userRootPath) {
-        ctx.state.fileTree = ctx.state.fileTree.withSubfolderOrThrow(
-            ctx.state.userConfig.userRootPath,
-        );
+    const fileAccess = fileResourceManger.getFirstMatchingAccessLevel(ctx.state.userConfig.access);
+    if (fileAccess) {
+        const resolvedFileAccess = fileResourceManger.stripResourceTypeName(fileAccess);
+        if (resolvedFileAccess !== fileResourceManger.rootResourceName()) {
+            ctx.state.fileTree = ctx.state.fileTree.withSubfolderOrThrow(resolvedFileAccess);
+        }
     }
 }

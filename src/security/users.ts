@@ -24,7 +24,7 @@ type Pbkdf2Auth = BaseAuth & {
 
 export type UserAuth = Pbkdf2Auth | InsecureBasicAuth;
 
-const userResourceManager = new ResourceManager('users');
+const userResourceManager = new ResourceManager('user');
 
 let hasReadUsersFile = false;
 const knownUsers: UserAuth[] = [];
