@@ -2,6 +2,8 @@ export type ResourceType = string;
 
 export type Resource = `/${ResourceType}/${string}`;
 
+export type AccessLevel = '/' | `/${ResourceType}/` | Resource;
+
 const knownResourceTypes: Set<ResourceType> = new Set();
 
 export class ResourceManager {
@@ -12,7 +14,7 @@ export class ResourceManager {
         this.resourceTypeName = resourceTypeName;
     }
 
-    mayAccess(accessLevels: Resource[], resource: Resource): boolean {
+    mayAccess(accessLevels: AccessLevel[], resource: Resource): boolean {
         return accessLevels.some((x) => resource.startsWith(x));
     }
 
@@ -21,7 +23,7 @@ export class ResourceManager {
         return `/${this.resourceTypeName}/${names}`;
     }
 
-    rootResourceName(): Resource {
+    rootResourceName(): AccessLevel {
         return this.nameForResource();
     }
 }
@@ -29,3 +31,5 @@ export class ResourceManager {
 export function getKnownResourceTypes() {
     return knownResourceTypes;
 }
+
+export const rootAccessLevel: AccessLevel = '/';

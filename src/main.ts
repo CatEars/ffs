@@ -14,8 +14,11 @@ import { startup } from './startup.ts';
 import { registerSitemapRoute } from './sitemap/index.ts';
 import { registerAllCustomCommandApi } from './custom-commands/index.ts';
 import { registerAllFileShareRoutes } from './share-file/index.ts';
-import { FfsApplicationState, registerUserConfigStateSetter } from './user-config/index.ts';
-import { getRootFileTree, resolveUserFileTreeIntoState } from './file-listing/resolve-file-tree.ts';
+import {
+    FfsApplicationState,
+    setAccessFromUserConfigOrDefaultToRootAccess,
+} from './application-state.ts';
+import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
@@ -31,13 +34,9 @@ const app = new Application<FfsApplicationState>();
 const router = new Router();
 
 setOnUserAuthenticationHook((ctx, user) => {
-    ctx.state.userConfig = user.config;
+    setAccessFromUserConfigOrDefaultToRootAccess(ctx, user.config);
+    resolveUserFileTreeFromState(ctx);
 });
-registerUserConfigStateSetter((ctx) => {
-    // Set default file tree to store root, later invocation may update it
-    ctx.state.fileTree = getRootFileTree();
-});
-registerUserConfigStateSetter(resolveUserFileTreeIntoState);
 
 registerAllFileListing(router);
 registerAllFileShareRoutes(router);

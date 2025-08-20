@@ -16,7 +16,7 @@ type Config = {
     cacheRoot: string;
     requestLogsFile: string;
     customCommandsFile: string;
-    instanceSecret: string;
+    instanceSecret?: string;
 };
 
 function getEnvValueOrThrow(key: string) {
@@ -79,7 +79,9 @@ export function setConfig(config: Config) {
     Deno.env.set(usersFileKey, config.usersFilePath);
     Deno.env.set(requestLogsKey, config.requestLogsFile);
     Deno.env.set(customCommandsFileKey, config.customCommandsFile);
-    Deno.env.set(instanceSecretKey, config.instanceSecret);
+    if (config.instanceSecret) {
+        Deno.env.set(instanceSecretKey, config.instanceSecret);
+    }
 }
 
 export function validateConfig() {

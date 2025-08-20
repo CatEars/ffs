@@ -3,7 +3,7 @@ import { Context } from '@oak/oak/context';
 import { shouldAbandonSecurity } from '../config.ts';
 import { HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
 import { getUserMatchingApiKey, UserAuth } from './users.ts';
-import { FfsApplicationState } from '../user-config/index.ts';
+import { FfsApplicationState } from '../application-state.ts';
 
 type UserAuthenticationHook = (ctx: Context<FfsApplicationState>, user: UserAuth) => void;
 

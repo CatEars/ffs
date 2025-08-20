@@ -1,12 +1,12 @@
 import { getUsersFilePath } from '../config.ts';
 import { pbkdf2Hash } from './password-hash.ts';
-import { UserConfig } from '../user-config/index.ts';
+import { UserConfig } from '../application-state.ts';
 import { ResourceManager } from './resources.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
 
 type BaseAuth = {
     username: string;
-    config?: UserConfig;
+    config?: Partial<UserConfig>;
 };
 
 type InsecureBasicAuth = BaseAuth & {

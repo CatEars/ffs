@@ -2,7 +2,7 @@ import { Router } from 'jsr:@oak/oak/router';
 import { HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { FileIdentification, identifyFileFromDirEntry } from './file-type.ts';
-import { FfsApplicationState } from '../user-config/index.ts';
+import { FfsApplicationState } from '../application-state.ts';
 
 type ApiFile = Deno.DirEntry & FileIdentification & {
     date: Date;

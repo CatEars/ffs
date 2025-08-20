@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak';
-import { FfsApplicationState } from '../user-config/index.ts';
+import { FfsApplicationState } from '../application-state.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import {
     HTTP_400_BAD_REQUEST,
