@@ -21,8 +21,15 @@ export class ResourceManager {
     }
 
     nameForResource(...resourceNames: string[]): Resource {
-        const names = resourceNames.join('/');
-        return `/${this.resourceTypeName}/${names}`;
+        // '/' has special meaning in the name, indicating a subresource, therefore
+        // individual names must be encoded to never include '/', use '//' as encoding for it.
+        // without encoding => /file/a/b/c/ (folders a, b, c) or /file/a/b/c/ (folders a, 'b/c') or /file/a/b/c/ (folder 'a/b/c')
+        // with encoding, /file/a/b/c/ (folders a, b, c) or /file/a/b//c/ (folders a, 'b/c') or /file/a//b//c/ (folder 'a/b/c')
+        const names = resourceNames.map((x) => x.replaceAll('/', '//')).join('/');
+        // names MUST end with '/' or e.g. names=['a'] would grant access to names=['abc']
+        // with '/' =>  /x/a/ vs. /x/abc/ (no match)
+        // without  =>  /x/a  vs. /x/abc  (match!)
+        return `/${this.resourceTypeName}/${names}/`;
     }
 
     rootResourceName() {
