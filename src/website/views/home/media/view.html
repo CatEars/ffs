@@ -1,6 +1,8 @@
 <!-- layout /templates/base.html -->
 <app-main>
-    <div x-data="{ src: getUrlParam('path', '.') }">
-        <media-viewer x-bind:src="src"></media-viewer>
-    </div>
+    <script type="module">
+        const mediaViewer = document.createElement('media-viewer');
+        mediaViewer.setAttribute('src', getUrlParam('path', '.'));
+        document.querySelector('app-main').appendChild(mediaViewer);
+    </script>
 </app-main>

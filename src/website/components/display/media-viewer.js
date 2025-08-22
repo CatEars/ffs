@@ -24,19 +24,28 @@ class MediaViewer extends BaseWebComponent {
 
         const srcPath = `/api/file?path=${encodeURIComponent(src)}`;
 
-        return html`<div>
+        return html`
             <style>
                 .media-holder {
                     max-height: 90vh;
                     max-width: 90vw;
                 }
+                div {
+                    margin-top: 2rem;
+                    margin-bottom: 2rem;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
             </style>
-            ${mimeType.startsWith('image')
-                ? html`<img class="media-holder" src=${srcPath} />`
-                : html`<video controls class="col-12 media-holder">
-                      <source src="${srcPath}" type="${mimeType}" />
-                  </video>`}
-        </div> `;
+            <div>
+                ${mimeType.startsWith('image')
+                    ? html`<img class="media-holder" src=${srcPath} />`
+                    : html`<video controls class="col-12 media-holder">
+                          <source src="${srcPath}" type="${mimeType}" />
+                      </video>`}
+            </div>
+        `;
     }
 }
 
