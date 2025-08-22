@@ -1,7 +1,6 @@
 <!-- layout /templates/base.html -->
 <app-main
     x-data="{
-        isGalleryMode: getSessionStorage('gallery-mode', true),
         sorting: getLocalStorage('file-sort-order', 'newest'), 
         directoriesFirst: getLocalStorage('show-directories-first', true),
         files: [], 
@@ -166,6 +165,47 @@
                 .filter((x) => x.path === myPath)
                 .map((x) => x.fileName);
         }
+
+        const state = new Proxy(
+            {
+                galleryMode: getSessionStorage('gallery-mode', true),
+            },
+            {
+                set(target, property, value) {
+                    console.log('UPDATEING', property, 'as', value);
+                    if (property === 'galleryMode') {
+                        renderGalleryOrFileManager(value);
+                    }
+
+                    return Reflect.set(target, property, value);
+                },
+            }
+        );
+
+        function renderGalleryOrFileManager(galleryMode) {
+            console.log(document.querySelector('#gallery-holder'));
+            console.log(document.querySelector('#file-manager-holder'));
+            document
+                .querySelector('#gallery-holder')
+                .setAttribute('data-visibility', galleryMode ? 'show' : 'hidden');
+            document
+                .querySelector('#file-manager-holder')
+                .setAttribute('data-visibility', galleryMode ? 'hidden' : 'show');
+        }
+
+        function showGalleryMode() {
+            console.log('TRUE');
+            state.galleryMode = true;
+        }
+
+        function showFileManagerMode() {
+            console.log('FALSE');
+            state.galleryMode = false;
+        }
+
+        function isGalleryMode() {
+            return state.galleryMode;
+        }
     </script>
     <div
         style="display: none"
@@ -185,10 +225,10 @@
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
 
-    <div x-show="isGalleryMode">
+    <div id="gallery-holder" data-visibility="show">
         <!-- include ./gallery.partial.html -->
     </div>
-    <div x-show="!isGalleryMode">
+    <div id="file-manager-holder" data-visibility="hidden">
         <!-- include ./file-manager.partial.html -->
     </div>
     <paginate-control
@@ -196,4 +236,7 @@
         x-bind:max-pages="getNumPages(files)"
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
+    <script>
+        renderGalleryOrFileManager(state.galleryMode);
+    </script>
 </app-main>
