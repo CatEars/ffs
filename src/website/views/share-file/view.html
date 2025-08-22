@@ -1,5 +1,5 @@
 <!-- layout /templates/base.html -->
-<script>
+<script type="module">
     async function getFilesFromParams() {
         const paths = getUrlParam('paths');
         const hmac = getUrlParam('hmac');
@@ -12,19 +12,30 @@
         const hmac = getUrlParam('hmac');
         return `/api/share-file/download?paths=${paths}&hmac=${hmac}&index=${index}`;
     }
+
+    const files = await getFilesFromParams();
+
+    const list = document.getElementById('file-list');
+    for (let idx = 0; idx < files.length; ++idx) {
+        const file = files[idx];
+        const fileRow = document.getElementById('file-row').content.cloneNode(true);
+        const link = fileRow.querySelector('a');
+
+        link.text = file;
+        link.href = buildDownloadHref(idx);
+
+        list.appendChild(fileRow);
+    }
 </script>
-<app-main x-data="{ files: [] }">
-    <div style="display: none" x-init="files = await getFilesFromParams()"></div>
+<app-main>
     <app-header>Shared Files</app-header>
     <p>
         <b>Instructions:</b> This is the share link, by copying the URL and giving it to a friend,
         you are able to share this view with them. They can only access what is shown here.
     </p>
-    <ul>
-        <template x-for="(file, idx) in files">
-            <li style="margin-top: 3px">
-                <a x-bind:href="buildDownloadHref(idx)"><span x-text="file"></span></a>
-            </li>
+    <ul id="file-list">
+        <template id="file-row">
+            <li><a></a></li>
         </template>
     </ul>
 </app-main>
