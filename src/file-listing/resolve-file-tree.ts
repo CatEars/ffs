@@ -21,7 +21,7 @@ export function resolveUserFileTreeFromState(ctx: Context<FfsApplicationState>) 
     if (fileAccess) {
         const resolvedFileAccess = fileResourceManger.stripResourceTypeName(fileAccess);
         if (resolvedFileAccess !== fileResourceManger.rootResourceName()) {
-            ctx.state.fileTree = ctx.state.fileTree.withSubfolderOrThrow(resolvedFileAccess);
+            ctx.state.fileTree = ctx.state.fileTree.withSubfolderOrThrow(...resolvedFileAccess);
         }
     }
 }

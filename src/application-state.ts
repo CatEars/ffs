@@ -1,6 +1,6 @@
 import { Context } from '@oak/oak/context';
 import { FileTree } from './files/file-tree.ts';
-import { AccessLevel, rootAccessLevel } from './security/resources.ts';
+import { AccessLevel, getRootAccessLevel } from './security/resources.ts';
 
 export type UserConfig = {
     access: AccessLevel[];
@@ -21,7 +21,7 @@ export function setAccessFromUserConfigOrDefaultToRootAccess(
     if (config?.access) {
         userConfig.access = config.access;
     } else {
-        userConfig.access = [rootAccessLevel];
+        userConfig.access = getRootAccessLevel();
     }
     ctx.state.userConfig = userConfig;
 }

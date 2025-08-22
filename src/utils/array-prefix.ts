@@ -1,4 +1,4 @@
-export function isPrefix(prefix: string[], target: string[]) {
+export function isArrayPrefix(prefix: string[], target: string[]) {
     if (prefix.length > target.length) {
         return false;
     }

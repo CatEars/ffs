@@ -1,7 +1,7 @@
 import { getInstanceSecret } from '../config.ts';
 import { decodeBase64Url, encodeBase64Url } from 'jsr:@std/encoding/base64url';
 import { decodeBase64, encodeBase64 } from 'jsr:@std/encoding@^1.0.10/base64';
-import { Resource } from './resources.ts';
+import { AccessLevel } from './resources.ts';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -25,7 +25,7 @@ async function getCryptoKey() {
     return _cachedKey;
 }
 
-export type Claims = Resource[];
+export type Claims = AccessLevel[];
 
 async function signClaim(claim: string) {
     const key = await getCryptoKey();
@@ -63,8 +63,4 @@ export async function verifyAndUrlDecodeClaims(claimStr: string) {
     }
 
     return JSON.parse(stringifiedClaims) as Claims;
-}
-
-export function mayAccessResource(claims: Claims, resource: Resource) {
-    return claims.some((x) => resource.startsWith(x));
 }

@@ -134,8 +134,8 @@ export class FileTree {
         };
     }
 
-    withSubfolderOrThrow(relativePath: string): FileTree {
-        const result = this.changeRoot(relativePath);
+    withSubfolderOrThrow(...relativePath: string[]): FileTree {
+        const result = this.changeRoot(...relativePath);
         if (result.type === 'invalid') {
             throw new Error(`Expected to be able to change root to ${relativePath} but could not`);
         }
