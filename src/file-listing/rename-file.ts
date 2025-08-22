@@ -8,6 +8,7 @@ import {
 import { join } from '@std/path/join';
 import { dirname } from '@std/path/dirname';
 import { move } from '@std/fs/move';
+import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerRenameFileRoute(router: Router) {
     router.post('/api/file/rename', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
@@ -42,6 +43,8 @@ export function registerRenameFileRoute(router: Router) {
         }
 
         await move(from.fullPath, to.fullPath);
-        ctx.response.redirect(ctx.request.headers.get('Referer')?.toString() || '/home');
+        returnToSender(ctx, {
+            defaultPath: '/home/',
+        });
     });
 }

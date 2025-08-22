@@ -2,6 +2,7 @@ import { Router } from '@oak/oak';
 import { move } from '@std/fs';
 import { logger } from '../logging/logger.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
+import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerMoveFileRoute(router: Router) {
     router.post('/api/file/move', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
@@ -54,8 +55,8 @@ export function registerMoveFileRoute(router: Router) {
             }
         }
 
-        ctx.response.redirect(
-            ctx.request.headers.get('Referer') || '/file-manager/',
-        );
+        returnToSender(ctx, {
+            defaultPath: '/file-namager/',
+        });
     });
 }

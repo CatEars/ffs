@@ -6,6 +6,7 @@ import {
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 } from '../utils/http-codes.ts';
+import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerMakeDirectoryRoute(router: Router<FfsApplicationState>) {
     router.post(
@@ -40,9 +41,9 @@ export function registerMakeDirectoryRoute(router: Router<FfsApplicationState>) 
             }
 
             await Deno.mkdir(resolved.fullPath);
-            ctx.response.redirect(
-                ctx.request.headers.get('Referer') || '/home/',
-            );
+            returnToSender(ctx, {
+                defaultPath: '/home/',
+            });
         },
     );
 }

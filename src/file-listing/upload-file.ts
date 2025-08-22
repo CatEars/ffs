@@ -4,6 +4,7 @@ import { getStoreRoot } from '../config.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { logger } from '../logging/logger.ts';
+import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerUploadFileRoute(router: Router) {
     router.post(
@@ -44,9 +45,9 @@ export function registerUploadFileRoute(router: Router) {
             const finalPath = path.resolve(directoryPath, fileName);
             logger.info(`Uploading file to ${finalPath}`);
             await Deno.writeFile(finalPath, file.stream());
-            ctx.response.redirect(
-                ctx.request.headers.get('Referer') || '/file-manager/',
-            );
+            returnToSender(ctx, {
+                defaultPath: '/file-manager',
+            });
         },
     );
 }
