@@ -1,8 +1,11 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { HTTP_200_OK, HTTP_400_BAD_REQUEST } from '../utils/http-codes.ts';
+import { HTTP_400_BAD_REQUEST } from '../utils/http-codes.ts';
 import { logger } from '../logging/logger.ts';
 import { getCustomCommands } from './custom-command.ts';
+import { returnToSender } from '../utils/return-to-sender.ts';
+
+const decoder = new TextDecoder();
 
 export function registerCommandsApi(router: Router) {
     logger.info('Registering /api/custom-commands/*');
@@ -23,17 +26,19 @@ export function registerCommandsApi(router: Router) {
         baseMiddlewares(),
         ...protectedMiddlewares(),
         async (ctx) => {
-            const body = await ctx.request.body.json();
-            const id = body['id'];
-            const args = body['args'];
+            const body = await ctx.request.body.formData();
+            const idFromBody = body.get('index');
+            const args = body.getAll('arg');
             if (
-                id === undefined || typeof id !== 'number' || args === undefined ||
+                idFromBody === undefined || typeof idFromBody !== 'string' ||
+                typeof Number.parseInt(idFromBody) !== 'number' || args === undefined ||
                 typeof args !== 'object'
             ) {
                 ctx.response.status = HTTP_400_BAD_REQUEST;
                 return;
             }
 
+            const id = Number.parseInt(idFromBody);
             const command = commands[id];
             if (!command) {
                 ctx.response.status = HTTP_400_BAD_REQUEST;
@@ -56,8 +61,11 @@ export function registerCommandsApi(router: Router) {
             );
             const { stdout } = result.outputSync();
 
-            ctx.response.status = HTTP_200_OK;
-            ctx.response.body = new TextDecoder().decode(stdout);
+            returnToSender(ctx, {
+                search: {
+                    message: decoder.decode(stdout),
+                },
+            });
         },
     );
 }

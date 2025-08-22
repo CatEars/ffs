@@ -1,6 +1,6 @@
 <!-- layout /templates/base.html -->
-<app-main x-data="{ commands: [] }">
-    <script>
+<app-main id="main" x-data="{ commands: [] }">
+    <script type="module">
         async function getCommands() {
             const result = await fetch('/api/custom-commands');
             const commands = await result.json();
@@ -35,24 +35,54 @@
             return `${cmd['program']} ${formattedArguments.join(' ')}`;
         }
 
-        async function submitCommand(commands, idx) {
-            const toSubmit = {
-                id: idx,
-                args: commands[idx].args,
-            };
-            const result = await fetch('/api/custom-commands/run', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(toSubmit),
-            });
-            return await result.text();
+        const main = document.getElementById('main');
+        const commands = await getCommands();
+        for (let idx = 0; idx < commands.length; ++idx) {
+            const formCopy = document.getElementById('command-form').content.cloneNode(true);
+            formCopy.querySelector('input[name="index"]').value = `${idx}`;
+            formCopy.querySelector('span').textContent = formatCommand(commands, idx);
+            for (let argIdx = 0; argIdx < commands[idx].cmd.nargs; ++argIdx) {
+                const rowCopy = document.getElementById('argument-row').content.cloneNode(true);
+                rowCopy.querySelector('span').textContent = '$' + (argIdx + 1) + ':';
+                formCopy.querySelector('ol').appendChild(rowCopy);
+            }
+            main.appendChild(formCopy);
+        }
+
+        const successMessage = getUrlParam('message');
+        if (successMessage) {
+            const displayCopy = document.getElementById('success-display').content.cloneNode(true);
+            displayCopy.querySelector('pre').textContent = decodeURIComponent(successMessage);
+            main.appendChild(displayCopy);
         }
     </script>
-    <div style="display: none" x-init="commands = await getCommands();"></div>
     <app-header>Commands</app-header>
-    <template x-for="idx in Array.from({ length: commands.length }, (_, i) => i)">
-        <!-- include ./custom-command.partial.html -->
+
+    <template id="command-form">
+        <form method="POST" action="/api/custom-commands/run">
+            <input type="hidden" name="index" />
+            <div class="form-row">
+                <p>Example:</p>
+            </div>
+            <div class="form-row">
+                <span style="font-family: monospace; white-space: pre-wrap"></span>
+            </div>
+            <div class="form-column">
+                <ol></ol>
+            </div>
+            <button type="submit">Run</button>
+        </form>
+    </template>
+    <template id="argument-row">
+        <li>
+            <label><span></span><input name="arg" type="text" /></label>
+        </li>
+    </template>
+    <template id="success-display">
+        <hr />
+        <div>
+            <p>Output:</p>
+            <pre></pre>
+        </div>
     </template>
 </app-main>
