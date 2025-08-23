@@ -165,44 +165,6 @@
                 .filter((x) => x.path === myPath)
                 .map((x) => x.fileName);
         }
-
-        const state = new Proxy(
-            {
-                galleryMode: getSessionStorage('gallery-mode', true),
-            },
-            {
-                set(target, property, value) {
-                    if (property === 'galleryMode') {
-                        renderGalleryOrFileManager(value);
-                    }
-
-                    return Reflect.set(target, property, value);
-                },
-            }
-        );
-
-        function renderGalleryOrFileManager(galleryMode) {
-            console.log('Gallery mode is:', galleryMode);
-            document
-                .querySelector('#gallery-holder')
-                .setAttribute('data-visibility', galleryMode ? 'show' : 'hidden');
-            document
-                .querySelector('#file-manager-holder')
-                .setAttribute('data-visibility', galleryMode ? 'hidden' : 'show');
-            document.querySelector('#view-mode-switch').setAttribute('checked', galleryMode);
-        }
-
-        function showGalleryMode() {
-            state.galleryMode = true;
-        }
-
-        function showFileManagerMode() {
-            state.galleryMode = false;
-        }
-
-        function isGalleryMode() {
-            return state.galleryMode;
-        }
     </script>
     <div
         style="display: none"
@@ -225,7 +187,7 @@
     <div id="gallery-holder" data-visibility="show">
         <!-- include ./gallery.partial.html -->
     </div>
-    <div id="file-manager-holder" data-visibility="hidden">
+    <div id="file-manager-holder" $data-visibility="galleryMode" data-visibility="hidden">
         <!-- include ./file-manager.partial.html -->
     </div>
     <paginate-control
@@ -233,7 +195,97 @@
         x-bind:max-pages="getNumPages(files)"
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
-    <script>
-        renderGalleryOrFileManager(state.galleryMode);
+    <script type="module">
+        class ReactivityMegaphone {
+            constructor() {
+                this.pairs = [];
+                this.dollars = [];
+                this.state = null;
+            }
+
+            pair(stateProxy, callable) {
+                this.pairs.push([stateProxy.property, callable]);
+            }
+
+            onUpdate(target, property, value) {
+                console.log('updating', this.dollars, property, value);
+                for (const dollar of this.dollars) {
+                    if (dollar.value === property) {
+                        const attributeName = dollar.name.substring(1);
+                        dollar.element.setAttribute(attributeName, `${value}`);
+                    }
+                }
+                for (const [propertyName, callable] of this.pairs) {
+                    if (property === propertyName) {
+                        callable(value);
+                    }
+                }
+            }
+
+            declareState(state) {
+                if (this.state !== null) {
+                    throw new Error('You may only declare state once!');
+                }
+                this.state = state;
+                const me = this;
+                return new Proxy(state, {
+                    set(target, property, value) {
+                        me.onUpdate(target, property, value);
+                        return Reflect.set(target, property, value);
+                    },
+                    get(target, property, receiver) {
+                        return {
+                            value: target[property],
+                            property,
+                        };
+                    },
+                });
+            }
+
+            init() {
+                const dollars = [];
+                for (const element of document.querySelectorAll('*')) {
+                    for (const attribute of element.attributes) {
+                        if (attribute.name.startsWith('$')) {
+                            attribute.value;
+                            dollars.push({
+                                element,
+                                name: attribute.name,
+                                value: attribute.value,
+                            });
+                        }
+                    }
+                }
+                this.dollars = dollars;
+
+                for (const key of Object.keys(this.state)) {
+                    this.onUpdate(this.state, key, this.state[key]);
+                }
+            }
+        }
+
+        const megaphone = new ReactivityMegaphone();
+        const state = megaphone.declareState({
+            galleryMode: getSessionStorage('gallery-mode', true),
+            fileManagerMode: false,
+        });
+
+        function renderGalleryOrFileManager(galleryMode) {
+            document
+                .querySelector('#gallery-holder')
+                .setAttribute('data-visibility', galleryMode ? 'show' : 'hidden');
+            document
+                .querySelector('#file-manager-holder')
+                .setAttribute('data-visibility', galleryMode ? 'hidden' : 'show');
+        }
+
+        function onGalleryModeChange(evt) {
+            state.galleryMode = evt.detail.checked;
+        }
+        document.querySelector('#view-mode-switch').addEventListener('change', onGalleryModeChange);
+
+        megaphone.pair(state.galleryMode, renderGalleryOrFileManager);
+        megaphone.pair(state.galleryMode, (galleryMode) => (state.fileManagerMode = !galleryMode));
+        megaphone.init();
     </script>
 </app-main>
