@@ -1,10 +1,11 @@
 import { BaseWebComponent } from '../base.js';
+import { isAttributeTrue } from '../util.js';
 
 class SwitchControl extends BaseWebComponent {
     static observedAttributes = ['checked'];
 
     render(html) {
-        const checked = !!(this.getAttribute('checked') || '');
+        const checked = isAttributeTrue(this.getAttribute('checked'));
         const onChange = () => {
             this.dispatchEvent(
                 new CustomEvent('change', {
@@ -13,7 +14,7 @@ class SwitchControl extends BaseWebComponent {
                     detail: {
                         checked: !checked,
                     },
-                }),
+                })
             );
         };
         return html`

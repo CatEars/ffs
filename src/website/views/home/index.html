@@ -172,7 +172,6 @@
             },
             {
                 set(target, property, value) {
-                    console.log('UPDATEING', property, 'as', value);
                     if (property === 'galleryMode') {
                         renderGalleryOrFileManager(value);
                     }
@@ -183,23 +182,21 @@
         );
 
         function renderGalleryOrFileManager(galleryMode) {
-            console.log(document.querySelector('#gallery-holder'));
-            console.log(document.querySelector('#file-manager-holder'));
+            console.log('Gallery mode is:', galleryMode);
             document
                 .querySelector('#gallery-holder')
                 .setAttribute('data-visibility', galleryMode ? 'show' : 'hidden');
             document
                 .querySelector('#file-manager-holder')
                 .setAttribute('data-visibility', galleryMode ? 'hidden' : 'show');
+            document.querySelector('#view-mode-switch').setAttribute('checked', galleryMode);
         }
 
         function showGalleryMode() {
-            console.log('TRUE');
             state.galleryMode = true;
         }
 
         function showFileManagerMode() {
-            console.log('FALSE');
             state.galleryMode = false;
         }
 
