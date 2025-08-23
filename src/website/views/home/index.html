@@ -165,6 +165,31 @@
                 .filter((x) => x.path === myPath)
                 .map((x) => x.fileName);
         }
+
+        function navigateToHomePath(path, index) {
+            const elements = path.split('/');
+            const selectedLocation = elements.slice(0, index + 1).join('/');
+            const webPath = `/home/?path=${selectedLocation}`;
+            window.location.href = webPath;
+        }
+
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            currentPath: getCurrentPath(),
+            galleryMode: getSessionStorage('gallery-mode', true),
+            galleryVisibility: megaphone.view((state) => (state.galleryMode ? 'show' : 'hidden')),
+            fileManagerVisibility: megaphone.view((state) =>
+                state.galleryMode ? 'hidden' : 'show'
+            ),
+        });
+
+        function onGalleryModeChange(evt) {
+            state.galleryMode = evt.detail.checked;
+        }
+
+        function onCrumbClick(evt) {
+            navigateToHomePath(evt.detail.trail, evt.detail.index);
+        }
     </script>
     <div
         style="display: none"
@@ -173,8 +198,8 @@
     <app-header>
         <breadcrumb-nav
             slot="ender"
-            x-bind:trail="root"
-            @crumb-click="evt => navigateToHomePath(evt.detail.trail, evt.detail.index)"
+            $trail="currentPath"
+            +crumb-click="onCrumbClick"
         ></breadcrumb-nav>
     </app-header>
     <!-- include ./control-panel.partial.html -->
@@ -184,10 +209,10 @@
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
 
-    <div id="gallery-holder" $data-visibility="galleryHolderVisibility">
+    <div $data-visibility="galleryVisibility">
         <!-- include ./gallery.partial.html -->
     </div>
-    <div id="file-manager-holder" $data-visibility="fileManagerHolderVisibility">
+    <div $data-visibility="fileManagerVisibility">
         <!-- include ./file-manager.partial.html -->
     </div>
     <paginate-control
@@ -195,174 +220,4 @@
         x-bind:max-pages="getNumPages(files)"
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
-    <script type="module">
-        function getStateSelectorDependencies(sampleState, stateSelector) {
-            const dependencies = new Set();
-            const fakeState = new Proxy(sampleState, {
-                get(target, property, receiver) {
-                    dependencies.add(property);
-                    return Reflect.get(target, property, receiver);
-                },
-            });
-            stateSelector(fakeState);
-            const elements = [];
-            for (const dep of dependencies) {
-                elements.push(dep);
-            }
-            return elements;
-        }
-
-        class ComputedView {
-            constructor(stateSelector) {
-                this.stateSelector = stateSelector;
-            }
-
-            dependencies(state) {
-                return getStateSelectorDependencies(state, this.stateSelector);
-            }
-
-            evaluate(state) {
-                return this.stateSelector(state);
-            }
-        }
-
-        class ReactivityMegaphone {
-            constructor() {
-                this.dependents = {};
-                this.watches = [];
-                this.dollars = [];
-                this.state = null;
-            }
-
-            #addDependent(value, dependentValue) {
-                if (!this.dependents[value]) {
-                    this.dependents[value] = [];
-                }
-                this.dependents[value].push(dependentValue);
-            }
-
-            #getDependents(value) {
-                if (!this.dependents[value]) {
-                    return [];
-                }
-                return this.dependents[value];
-            }
-
-            #getWatchTree(value) {
-                return topologicalSort(this.dependents, value);
-            }
-
-            #resolveState(stateValue) {
-                if (stateValue instanceof ComputedView) {
-                    return stateValue.evaluate(this.state);
-                }
-
-                return stateValue;
-            }
-
-            watch(stateProxy, callable) {
-                this.watches.push([stateProxy.property, callable]);
-            }
-
-            onUpdate(target, property, value) {
-                for (const dollar of this.dollars) {
-                    if (dollar.value === property) {
-                        const attributeName = dollar.name.substring(1);
-                        dollar.element.setAttribute(attributeName, `${value}`);
-                    }
-                }
-
-                for (const [propertyName, callable] of this.watches) {
-                    if (property === propertyName) {
-                        callable(value);
-                    }
-                }
-            }
-
-            #updateStateAndDependents(target, property, value) {
-                this.onUpdate(target, property, value);
-                const dependents = this.#getDependents(property);
-                for (const dep of dependents) {
-                    const subDependentValue = this.#resolveState(this.state[dep]);
-                    this.onUpdate(target, dep, subDependentValue);
-                }
-            }
-
-            declareState(state) {
-                if (this.state !== null) {
-                    throw new Error('You may only declare state once!');
-                }
-                this.state = state;
-                for (const elementKey in state) {
-                    const element = state[elementKey];
-                    if (element instanceof ComputedView) {
-                        const elementDependencies = element.dependencies(state);
-                        for (const dep of elementDependencies) {
-                            this.#addDependent(dep, elementKey);
-                        }
-                    }
-                }
-                const me = this;
-                return new Proxy(state, {
-                    set(target, property, value) {
-                        const updatedValue = Reflect.set(target, property, value);
-                        me.#updateStateAndDependents(target, property, value);
-                        return updatedValue;
-                    },
-                    get(target, property, receiver) {
-                        return {
-                            value: me.#resolveState(target[property]),
-                            property,
-                        };
-                    },
-                });
-            }
-
-            init() {
-                const dollars = [];
-                for (const element of document.querySelectorAll('*')) {
-                    for (const attribute of element.attributes) {
-                        if (attribute.name.startsWith('$')) {
-                            attribute.value;
-                            dollars.push({
-                                element,
-                                name: attribute.name,
-                                value: attribute.value,
-                            });
-                        }
-                    }
-                }
-                this.dollars = dollars;
-
-                for (const key of Object.keys(this.state)) {
-                    this.#updateStateAndDependents(
-                        this.state,
-                        key,
-                        this.#resolveState(this.state[key])
-                    );
-                }
-            }
-
-            view(stateSelector) {
-                return new ComputedView(stateSelector);
-            }
-        }
-
-        const megaphone = new ReactivityMegaphone();
-        const state = megaphone.declareState({
-            galleryMode: getSessionStorage('gallery-mode', true),
-            galleryHolderVisibility: megaphone.view((state) =>
-                state.galleryMode ? 'show' : 'hidden'
-            ),
-            fileManagerHolderVisibility: megaphone.view((state) =>
-                state.galleryMode ? 'hidden' : 'show'
-            ),
-        });
-        function onGalleryModeChange(evt) {
-            state.galleryMode = evt.detail.checked;
-        }
-        document.querySelector('#view-mode-switch').addEventListener('change', onGalleryModeChange);
-        megaphone.init();
-        console.log(window);
-    </script>
 </app-main>

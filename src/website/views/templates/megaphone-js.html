@@ -1,0 +1,168 @@
+<!-- Megaphone is a homebrewn reactivity framework -->
+<script>
+    function getStateSelectorDependencies(sampleState, stateSelector) {
+        const dependencies = new Set();
+        const fakeState = new Proxy(sampleState, {
+            get(target, property, receiver) {
+                dependencies.add(property);
+                return Reflect.get(target, property, receiver);
+            },
+        });
+        stateSelector(fakeState);
+        const elements = [];
+        for (const dep of dependencies) {
+            elements.push(dep);
+        }
+        return elements;
+    }
+
+    class ComputedView {
+        constructor(stateSelector) {
+            this.stateSelector = stateSelector;
+        }
+
+        dependencies(state) {
+            return getStateSelectorDependencies(state, this.stateSelector);
+        }
+
+        evaluate(state) {
+            return this.stateSelector(state);
+        }
+    }
+
+    class Megaphone {
+        static _megaphones = [];
+
+        constructor() {
+            Megaphone._megaphones.push(this);
+            this.dependents = {};
+            this.watches = [];
+            this.dollars = [];
+            this.state = null;
+        }
+
+        #addDependent(value, dependentValue) {
+            if (!this.dependents[value]) {
+                this.dependents[value] = [];
+            }
+            this.dependents[value].push(dependentValue);
+        }
+
+        #getDependents(value) {
+            if (!this.dependents[value]) {
+                return [];
+            }
+            return this.dependents[value];
+        }
+
+        #getWatchTree(value) {
+            return topologicalSort(this.dependents, value);
+        }
+
+        #resolveState(stateValue) {
+            if (stateValue instanceof ComputedView) {
+                return stateValue.evaluate(this.state);
+            }
+
+            return stateValue;
+        }
+
+        watch(stateProxy, callable) {
+            this.watches.push([stateProxy.property, callable]);
+        }
+
+        onUpdate(target, property, value) {
+            for (const dollar of this.dollars) {
+                if (dollar.value === property) {
+                    const attributeName = dollar.name.substring(1);
+                    dollar.element.setAttribute(attributeName, `${value}`);
+                }
+            }
+
+            for (const [propertyName, callable] of this.watches) {
+                if (property === propertyName) {
+                    callable(value);
+                }
+            }
+        }
+
+        #updateStateAndDependents(target, property, value) {
+            this.onUpdate(target, property, value);
+            const dependents = this.#getDependents(property);
+            for (const dep of dependents) {
+                const subDependentValue = this.#resolveState(this.state[dep]);
+                this.onUpdate(target, dep, subDependentValue);
+            }
+        }
+
+        declareState(state) {
+            if (this.state !== null) {
+                throw new Error('You may only declare state once!');
+            }
+            this.state = state;
+            for (const elementKey in state) {
+                const element = state[elementKey];
+                if (element instanceof ComputedView) {
+                    const elementDependencies = element.dependencies(state);
+                    for (const dep of elementDependencies) {
+                        this.#addDependent(dep, elementKey);
+                    }
+                }
+            }
+            const me = this;
+            return new Proxy(state, {
+                set(target, property, value) {
+                    const updatedValue = Reflect.set(target, property, value);
+                    me.#updateStateAndDependents(target, property, value);
+                    return updatedValue;
+                },
+                get(target, property, receiver) {
+                    return {
+                        value: me.#resolveState(target[property]),
+                        property,
+                    };
+                },
+            });
+        }
+
+        init() {
+            const dollars = [];
+            for (const element of document.querySelectorAll('*')) {
+                for (const attribute of element.attributes) {
+                    if (attribute.name.startsWith('$')) {
+                        dollars.push({
+                            element,
+                            name: attribute.name,
+                            value: attribute.value,
+                        });
+                    } else if (attribute.name.startsWith('+')) {
+                        const eventName = attribute.name.substring(1);
+                        const func = window[attribute.value];
+                        console.log(
+                            'registering evt listener on',
+                            element,
+                            'for',
+                            eventName,
+                            'as',
+                            func
+                        );
+                        element.addEventListener(eventName, func);
+                    }
+                }
+            }
+            this.dollars = dollars;
+
+            for (const key of Object.keys(this.state)) {
+                this.#updateStateAndDependents(
+                    this.state,
+                    key,
+                    this.#resolveState(this.state[key])
+                );
+            }
+        }
+
+        view(stateSelector) {
+            return new ComputedView(stateSelector);
+        }
+    }
+</script>

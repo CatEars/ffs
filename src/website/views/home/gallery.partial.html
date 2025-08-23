@@ -1,11 +1,3 @@
-<script>
-    function navigateToHomePath(path, index) {
-        const elements = path.split('/');
-        const selectedLocation = elements.slice(0, index + 1).join('/');
-        const webPath = `/home/?path=${selectedLocation}`;
-        window.location.href = webPath;
-    }
-</script>
 <section class="gallery">
     <template
         x-for="(file) in sortedBy(files, sorting, directoriesFirst, currentPage)"
