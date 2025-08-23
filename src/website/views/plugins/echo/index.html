@@ -2,21 +2,20 @@
 <div class="container">
     <script>
         async function submitEchoText(evt) {
-        evt.preventDefault();
-        const msg = document.getElementById('message').value;
-        console.log(msg);
-        const result = await fetch('/api/echo', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: msg,
-            }),
-        });
-        const body = await result.json();
-        return body.message;
-    }
+            evt.preventDefault();
+            const msg = document.getElementById('message').value;
+            const result = await fetch('/api/echo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: msg,
+                }),
+            });
+            const body = await result.json();
+            return body.message;
+        }
     </script>
     <div x-data="{ displayText: '' }">
         <div class="row">

@@ -184,10 +184,10 @@
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
 
-    <div id="gallery-holder" data-visibility="show">
+    <div id="gallery-holder" $data-visibility="galleryHolderVisibility">
         <!-- include ./gallery.partial.html -->
     </div>
-    <div id="file-manager-holder" $data-visibility="galleryMode" data-visibility="hidden">
+    <div id="file-manager-holder" $data-visibility="fileManagerHolderVisibility">
         <!-- include ./file-manager.partial.html -->
     </div>
     <paginate-control
@@ -196,29 +196,95 @@
         @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
     ></paginate-control>
     <script type="module">
+        function getStateSelectorDependencies(sampleState, stateSelector) {
+            const dependencies = new Set();
+            const fakeState = new Proxy(sampleState, {
+                get(target, property, receiver) {
+                    dependencies.add(property);
+                    return Reflect.get(target, property, receiver);
+                },
+            });
+            stateSelector(fakeState);
+            const elements = [];
+            for (const dep of dependencies) {
+                elements.push(dep);
+            }
+            return elements;
+        }
+
+        class ComputedView {
+            constructor(stateSelector) {
+                this.stateSelector = stateSelector;
+            }
+
+            dependencies(state) {
+                return getStateSelectorDependencies(state, this.stateSelector);
+            }
+
+            evaluate(state) {
+                return this.stateSelector(state);
+            }
+        }
+
         class ReactivityMegaphone {
             constructor() {
-                this.pairs = [];
+                this.dependents = {};
+                this.watches = [];
                 this.dollars = [];
                 this.state = null;
             }
 
-            pair(stateProxy, callable) {
-                this.pairs.push([stateProxy.property, callable]);
+            #addDependent(value, dependentValue) {
+                if (!this.dependents[value]) {
+                    this.dependents[value] = [];
+                }
+                this.dependents[value].push(dependentValue);
+            }
+
+            #getDependents(value) {
+                if (!this.dependents[value]) {
+                    return [];
+                }
+                return this.dependents[value];
+            }
+
+            #getWatchTree(value) {
+                return topologicalSort(this.dependents, value);
+            }
+
+            #resolveState(stateValue) {
+                if (stateValue instanceof ComputedView) {
+                    return stateValue.evaluate(this.state);
+                }
+
+                return stateValue;
+            }
+
+            watch(stateProxy, callable) {
+                this.watches.push([stateProxy.property, callable]);
             }
 
             onUpdate(target, property, value) {
-                console.log('updating', this.dollars, property, value);
                 for (const dollar of this.dollars) {
                     if (dollar.value === property) {
                         const attributeName = dollar.name.substring(1);
                         dollar.element.setAttribute(attributeName, `${value}`);
                     }
                 }
-                for (const [propertyName, callable] of this.pairs) {
+
+                for (const [propertyName, callable] of this.watches) {
                     if (property === propertyName) {
                         callable(value);
                     }
+                }
+            }
+
+            #updateStateAndDependents(target, property, value) {
+                this.onUpdate(target, property, value);
+                const dependents = this.#getDependents(property);
+                for (const dep of dependents) {
+                    const subDependentValue = this.#resolveState(this.state[dep]);
+                    this.onUpdate(target, dep, subDependentValue);
                 }
             }
 
@@ -227,15 +293,25 @@
                     throw new Error('You may only declare state once!');
                 }
                 this.state = state;
+                for (const elementKey in state) {
+                    const element = state[elementKey];
+                    if (element instanceof ComputedView) {
+                        const elementDependencies = element.dependencies(state);
+                        for (const dep of elementDependencies) {
+                            this.#addDependent(dep, elementKey);
+                        }
+                    }
+                }
                 const me = this;
                 return new Proxy(state, {
                     set(target, property, value) {
-                        me.onUpdate(target, property, value);
-                        return Reflect.set(target, property, value);
+                        const updatedValue = Reflect.set(target, property, value);
+                        me.#updateStateAndDependents(target, property, value);
+                        return updatedValue;
                     },
                     get(target, property, receiver) {
                         return {
-                            value: target[property],
+                            value: me.#resolveState(target[property]),
                             property,
                         };
                     },
@@ -259,33 +335,34 @@
                 this.dollars = dollars;
 
                 for (const key of Object.keys(this.state)) {
-                    this.onUpdate(this.state, key, this.state[key]);
+                    this.#updateStateAndDependents(
+                        this.state,
+                        key,
+                        this.#resolveState(this.state[key])
+                    );
                 }
+            }
+
+            view(stateSelector) {
+                return new ComputedView(stateSelector);
             }
         }
 
         const megaphone = new ReactivityMegaphone();
         const state = megaphone.declareState({
             galleryMode: getSessionStorage('gallery-mode', true),
-            fileManagerMode: false,
+            galleryHolderVisibility: megaphone.view((state) =>
+                state.galleryMode ? 'show' : 'hidden'
+            ),
+            fileManagerHolderVisibility: megaphone.view((state) =>
+                state.galleryMode ? 'hidden' : 'show'
+            ),
         });
-
-        function renderGalleryOrFileManager(galleryMode) {
-            document
-                .querySelector('#gallery-holder')
-                .setAttribute('data-visibility', galleryMode ? 'show' : 'hidden');
-            document
-                .querySelector('#file-manager-holder')
-                .setAttribute('data-visibility', galleryMode ? 'hidden' : 'show');
-        }
-
         function onGalleryModeChange(evt) {
             state.galleryMode = evt.detail.checked;
         }
         document.querySelector('#view-mode-switch').addEventListener('change', onGalleryModeChange);
-
-        megaphone.pair(state.galleryMode, renderGalleryOrFileManager);
-        megaphone.pair(state.galleryMode, (galleryMode) => (state.fileManagerMode = !galleryMode));
         megaphone.init();
+        console.log(window);
     </script>
 </app-main>
