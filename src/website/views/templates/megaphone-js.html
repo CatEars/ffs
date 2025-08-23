@@ -39,6 +39,7 @@
             this.watches = [];
             this.dollars = [];
             this.state = null;
+            this.initialized = false;
         }
 
         #addDependent(value, dependentValue) {
@@ -126,6 +127,10 @@
         }
 
         init() {
+            if (this.initialized) {
+                return;
+            }
+            this.initialized = true;
             const dollars = [];
             for (const element of document.querySelectorAll('*')) {
                 for (const attribute of element.attributes) {
@@ -137,15 +142,7 @@
                         });
                     } else if (attribute.name.startsWith('+')) {
                         const eventName = attribute.name.substring(1);
-                        const func = window[attribute.value];
-                        console.log(
-                            'registering evt listener on',
-                            element,
-                            'for',
-                            eventName,
-                            'as',
-                            func
-                        );
+                        const func = this.state[attribute.value];
                         element.addEventListener(eventName, func);
                     }
                 }

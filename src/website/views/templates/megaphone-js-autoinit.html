@@ -1,4 +1,15 @@
 <script>
+    let time = 0;
+    const checkInterval = setInterval(() => {
+        ++time;
+        for (const megaphone of Megaphone._megaphones) {
+            megaphone.init();
+        }
+
+        if (time >= 10) {
+            clearInterval(checkInterval);
+        }
+    }, 5);
     for (const megaphone of Megaphone._megaphones) {
         megaphone.init();
     }

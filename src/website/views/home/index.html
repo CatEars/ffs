@@ -172,6 +172,15 @@
             const webPath = `/home/?path=${selectedLocation}`;
             window.location.href = webPath;
         }
+    </script>
+    <script type="module">
+        function onGalleryModeChange(evt) {
+            state.galleryMode = evt.detail.checked;
+        }
+
+        function onCrumbClick(evt) {
+            navigateToHomePath(evt.detail.trail, evt.detail.index);
+        }
 
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
@@ -181,15 +190,12 @@
             fileManagerVisibility: megaphone.view((state) =>
                 state.galleryMode ? 'hidden' : 'show'
             ),
+            files: [],
+            onGalleryModeChange,
+            onCrumbClick,
         });
 
-        function onGalleryModeChange(evt) {
-            state.galleryMode = evt.detail.checked;
-        }
-
-        function onCrumbClick(evt) {
-            navigateToHomePath(evt.detail.trail, evt.detail.index);
-        }
+        state.files = await getFiles(getCurrentPath());
     </script>
     <div
         style="display: none"
