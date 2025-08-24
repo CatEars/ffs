@@ -1,38 +1,60 @@
-<form x-data="{ names: [] }" action="/api/file/upload" method="POST" enctype="multipart/form-data">
+<form action="/api/file/upload" method="POST" enctype="multipart/form-data">
+    <script type="module">
+        function getFilenamesFromEvent(evt) {
+            const result = [];
+            for (const file of evt.target.files) {
+                result.push(file.name);
+            }
+            state.names = result;
+        }
+
+        function clickHiddenFileBrowseButton(evt) {
+            evt.preventDefault();
+            document.getElementById('file').click();
+        }
+
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            names: [],
+            getFilenamesFromEvent,
+            clickHiddenFileBrowseButton,
+            uploadDisabled: megaphone.view((state) => state.names.length === 0),
+        });
+
+        megaphone.renderEach(state.names, '#upload-name-display', (name) => {
+            const clone = document.querySelector('#upload-name-template').content.cloneNode(true);
+            clone.querySelector('div').innerText = name;
+            return clone;
+        });
+    </script>
     <div class="form-row">
         <input
             style="display: none"
-            @change="names = getFilenamesFromEvent(event)"
+            +change="getFilenamesFromEvent"
             type="file"
             id="file"
             name="file"
         />
-        <button @click="document.getElementById('file').click()" id="browseButton">
+        <button +click="clickHiddenFileBrowseButton" id="browseButton">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#attach"></use>
             </svg>
         </button>
-        <button x-bind:disabled="names.length === 0" type="submit">
+        <button $disabled="uploadDisabled" type="submit">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
             </svg>
         </button>
     </div>
     <div>
-        <template x-for="name in names">
-            <div x-text="name"></div>
-        </template>
+        <div id="upload-name-display">
+            <template id="upload-name-template">
+                <div></div>
+            </template>
+        </div>
     </div>
     <input type="hidden" id="directory" name="directory" />
     <script>
-        function getFilenamesFromEvent(evt) {
-            const result = [];
-            for (const file of evt.target.files) {
-                result.push(file.name);
-            }
-            return result;
-        }
-
         document.getElementById('directory').value = decodeURIComponent(getCurrentPath());
     </script>
 </form>

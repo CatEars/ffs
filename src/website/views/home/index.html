@@ -4,8 +4,6 @@
         sorting: getLocalStorage('file-sort-order', 'newest'), 
         directoriesFirst: getLocalStorage('show-directories-first', true),
         files: [], 
-        filesDisplay: getCuttingBoardDisplay(), 
-        filesToGrey: [],
         root: getCurrentPath(), 
         currentPage: getCurrentPage()
      }"
@@ -146,10 +144,6 @@
             return getSessionStorage('cutting-board', []);
         }
 
-        function getCuttingBoardDisplay() {
-            return `${getCuttingBoard().length} files in cutting board`;
-        }
-
         function resetCuttingBoard() {
             storeToCuttingBoard([]);
         }
@@ -159,18 +153,74 @@
             return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
         }
 
-        function findFilesToGrey() {
-            const myPath = decodeURIComponent(getCurrentPath());
-            return getCuttingBoard()
-                .filter((x) => x.path === myPath)
-                .map((x) => x.fileName);
-        }
-
         function navigateToHomePath(path, index) {
             const elements = path.split('/');
             const selectedLocation = elements.slice(0, index + 1).join('/');
             const webPath = `/home/?path=${selectedLocation}`;
             window.location.href = webPath;
+        }
+
+        function getLinkTo(file) {
+            const currentPath = decodeURIComponent(getCurrentPath());
+            const path = calculatePath(currentPath, file.name);
+            return `/home/?path=${path}`;
+        }
+
+        function getCheckedFiles() {
+            const clickedFiles = [];
+            for (const element of document.querySelectorAll('.file-to-cut')) {
+                if (element.checked) {
+                    clickedFiles.push(element.value);
+                }
+                element.checked = false;
+            }
+            return clickedFiles;
+        }
+
+        function cutFiles() {
+            const myPath = getCurrentPath();
+            const clickedFiles = getCheckedFiles();
+            const filesToStore = clickedFiles.map((elem) => ({
+                path: myPath,
+                fileName: elem,
+            }));
+            if (filesToStore.length > 0) {
+                storeToCuttingBoard(filesToStore);
+            }
+        }
+
+        function pasteFiles() {
+            const path = decodeURIComponent(getCurrentPath());
+            const board = getCuttingBoard();
+            resetCuttingBoard();
+            document.getElementById('files-to-move').value = JSON.stringify(board);
+            document.getElementById('destination').value = path;
+            document.getElementById('paste-form').submit();
+        }
+
+        function createFileShare() {
+            const myPath = getCurrentPath();
+            const paths = getCheckedFiles().map((x) => `${myPath}/${x}`);
+            document.getElementById('link-paths').value = JSON.stringify(paths);
+            document.getElementById('link-form').submit();
+        }
+
+        function renameFile() {
+            const myPath = getCurrentPath();
+            const checkedFiles = getCheckedFiles();
+            if (checkedFiles.length === 0) {
+                return;
+            }
+            const elementToRename = checkedFiles[0];
+            const renameForm = document.getElementById('rename-form');
+            document.getElementById('source').value = `${myPath}/${elementToRename}`;
+            renameForm.submit();
+        }
+
+        function makeDirectory() {
+            const myPath = getCurrentPath();
+            document.getElementById('make-directory-path').value = myPath;
+            document.getElementById('make-directory-form').submit();
         }
     </script>
     <script type="module">
@@ -193,14 +243,15 @@
             files: [],
             onGalleryModeChange,
             onCrumbClick,
+            pasteFiles,
+            createFileShare,
+            renameFile,
+            makeDirectory,
         });
 
         state.files = await getFiles(getCurrentPath());
     </script>
-    <div
-        style="display: none"
-        x-effect="files = await getFiles(getCurrentPath()); filesToGrey = findFilesToGrey()"
-    ></div>
+    <div style="display: none" x-effect="files = await getFiles(getCurrentPath())"></div>
     <app-header>
         <breadcrumb-nav
             slot="ender"

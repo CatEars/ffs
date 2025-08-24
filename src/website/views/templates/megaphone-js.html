@@ -153,7 +153,9 @@
                     } else if (attribute.name.startsWith('+')) {
                         const eventName = attribute.name.substring(1);
                         const func = this.state[attribute.value];
-                        element.addEventListener(eventName, func);
+                        if (func) {
+                            element.addEventListener(eventName, func);
+                        }
                     }
                 }
             }
@@ -170,6 +172,29 @@
 
         view(stateSelector) {
             return new ComputedView(stateSelector);
+        }
+
+        #clearChildNodes(container) {
+            let child = container.firstChild;
+            while (child) {
+                const nextSibling = child.nextSibling;
+
+                if (child.nodeName.toLowerCase() !== 'template') {
+                    container.removeChild(child);
+                }
+
+                child = nextSibling;
+            }
+        }
+
+        renderEach(state, into, renderFunc) {
+            this.watch(state, (value) => {
+                const element = document.querySelector(into);
+                this.#clearChildNodes(element);
+                for (const v of value) {
+                    element.appendChild(renderFunc(v));
+                }
+            });
         }
     }
 </script>
