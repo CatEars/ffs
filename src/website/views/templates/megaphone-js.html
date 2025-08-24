@@ -1,19 +1,29 @@
 <!-- Megaphone is a homebrewn reactivity framework -->
 <script>
-    function getStateSelectorDependencies(sampleState, stateSelector) {
-        const dependencies = new Set();
-        const fakeState = new Proxy(sampleState, {
-            get(target, property, receiver) {
-                dependencies.add(property);
-                return Reflect.get(target, property, receiver);
-            },
-        });
-        stateSelector(fakeState);
-        const elements = [];
-        for (const dep of dependencies) {
-            elements.push(dep);
+    function getStateSelectorDependencies(stateSelector) {
+        const selectorBody = stateSelector.toString();
+        let declaration, body;
+        if (selectorBody.startsWith('function')) {
+            [, declaration, body] = selectorBody.split(' ');
+            body = selectorBody.substring(selectorBody.indexOf('{'));
+            declaration = declaration.split('(')[1].replaceAll(')', '').replaceAll('{', '').trim();
+        } else {
+            [declaration, body] = selectorBody.split('=>');
+            declaration = declaration.replaceAll('(', '').replaceAll(')', '').trim();
         }
-        return elements;
+
+        const stateVariableName = declaration;
+        const pattern = `${stateVariableName}\\s*\\.([a-zA-Z0-9]+)`;
+        const regex = new RegExp(pattern, 'g');
+
+        let match;
+        const properties = new Set();
+
+        while ((match = regex.exec(body)) !== null) {
+            properties.add(match[1]);
+        }
+
+        return Array.from(properties);
     }
 
     class ComputedView {
@@ -21,8 +31,8 @@
             this.stateSelector = stateSelector;
         }
 
-        dependencies(state) {
-            return getStateSelectorDependencies(state, this.stateSelector);
+        dependencies() {
+            return getStateSelectorDependencies(this.stateSelector);
         }
 
         evaluate(state) {
@@ -104,7 +114,7 @@
             for (const elementKey in state) {
                 const element = state[elementKey];
                 if (element instanceof ComputedView) {
-                    const elementDependencies = element.dependencies(state);
+                    const elementDependencies = element.dependencies();
                     for (const dep of elementDependencies) {
                         this.#addDependent(dep, elementKey);
                     }
