@@ -8,6 +8,4 @@
 
 [ ] Do not use `paths` in URL to share files, as that can be quite long and max limit is 2048
 
-[ ] Have chains of updates for reactivity framework, e.g. a depends on b depends on c works
-
-[ ] For reactivity framework, update in topologically nice order (no dependent updates) for init
+[ ] For reactivity framework, ensure that single updates are topologically sorted. e.g. if one prop depends on 4 other props only 1 update not 4
