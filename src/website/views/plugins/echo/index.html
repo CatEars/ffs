@@ -20,16 +20,16 @@
 
         async function onSubmitEcho(evt) {
             const text = await submitEchoText(evt);
-            state.displayText = [text];
+            state.displayText = text;
         }
 
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            displayText: [],
+            displayText: '',
             onSubmitEcho,
         });
 
-        megaphone.renderEach(state.displayText, '#display', (text) => {
+        megaphone.render(state.displayText, '#display', (text) => {
             const clone = document.querySelector('#display-content').content.cloneNode(true);
             clone.querySelector('span').innerText = text;
             return clone;

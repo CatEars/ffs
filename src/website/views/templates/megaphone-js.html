@@ -248,5 +248,24 @@
                 }
             });
         }
+
+        render(state, into, renderFunc) {
+            this.watch(state, (value) => {
+                const element = document.querySelector(into);
+                this.#clearChildNodes(element);
+                element.appendChild(renderFunc(v));
+            });
+        }
+
+        webComponent(componentName, attributeGenerator) {
+            return (value) => {
+                const attributes = attributeGenerator(value);
+                const element = document.createElement(componentName);
+                for (const key of Object.keys(attributes)) {
+                    element.setAttribute(key, attributes[key]);
+                }
+                return element;
+            };
+        }
     }
 </script>

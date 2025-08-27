@@ -272,14 +272,16 @@
             makeDirectory,
         });
 
-        megaphone.renderEach(state.sortedFiles, '#gallery', (file) => {
-            const fileCard = document.createElement('file-card');
-            fileCard.setAttribute('filename', file.name);
-            fileCard.setAttribute('file-type', file.fileType);
-            fileCard.setAttribute('image-src', file.imageSrc);
-            fileCard.setAttribute('root', currentPath);
-            return fileCard;
-        });
+        megaphone.renderEach(
+            state.sortedFiles,
+            '#gallery',
+            megaphone.webComponent('file-card', (file) => ({
+                filename: file.name,
+                'file-type': file.fileType,
+                'image-src': file.imageSrc,
+                root: currentPath,
+            }))
+        );
 
         megaphone.renderEach(state.sortedFiles, '#file-list', (file) => {
             const clone = document.querySelector('#file-row-entry').content.cloneNode(true);
