@@ -39,7 +39,6 @@
             return this.stateSelector(
                 new Proxy(state, {
                     get(target, property, receiver) {
-                        console.log('COMPUTED VIEW', target, property, '=', target[property]);
                         return target[property].value;
                     },
                 })
@@ -55,7 +54,16 @@
         }
 
         get() {
-            return JSON.parse(this.storageVault.getItem(this.key)) || this.defaultValue;
+            const value = this.storageVault.getItem(this.key);
+            if (value === null) {
+                return this.defaultValue;
+            }
+
+            try {
+                return JSON.parse(value);
+            } catch {
+                return this.defaultValue;
+            }
         }
 
         set(value) {
