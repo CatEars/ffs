@@ -36,7 +36,30 @@
         }
 
         evaluate(state) {
-            return this.stateSelector(state);
+            return this.stateSelector(
+                new Proxy(state, {
+                    get(target, property, receiver) {
+                        console.log('COMPUTED VIEW', target, property, '=', target[property]);
+                        return target[property].value;
+                    },
+                })
+            );
+        }
+    }
+
+    class BrowserStorage {
+        constructor(storageVault, key, defaultValue) {
+            this.storageVault = storageVault;
+            this.key = key;
+            this.defaultValue = defaultValue;
+        }
+
+        get() {
+            return JSON.parse(this.storageVault.getItem(this.key)) || this.defaultValue;
+        }
+
+        set(value) {
+            this.storageVault.setItem(this.key, JSON.stringify(value));
         }
     }
 
@@ -49,6 +72,7 @@
             this.watches = [];
             this.dollars = [];
             this.state = null;
+            this.stateProxy = null;
             this.initialized = false;
         }
 
@@ -72,7 +96,9 @@
 
         #resolveState(stateValue) {
             if (stateValue instanceof ComputedView) {
-                return stateValue.evaluate(this.state);
+                return stateValue.evaluate(this.stateProxy);
+            } else if (stateValue instanceof BrowserStorage) {
+                return stateValue.get();
             }
 
             return stateValue;
@@ -111,6 +137,7 @@
                 throw new Error('You may only declare state once!');
             }
             this.state = state;
+
             for (const elementKey in state) {
                 const element = state[elementKey];
                 if (element instanceof ComputedView) {
@@ -118,10 +145,15 @@
                     for (const dep of elementDependencies) {
                         this.#addDependent(dep, elementKey);
                     }
+                } else if (element instanceof BrowserStorage) {
+                    this.watch({ property: elementKey }, (newValue) => {
+                        element.set(newValue);
+                    });
                 }
             }
+
             const me = this;
-            return new Proxy(state, {
+            this.stateProxy = new Proxy(state, {
                 set(target, property, value) {
                     const updatedValue = Reflect.set(target, property, value);
                     me.#updateStateAndDependents(target, property, value);
@@ -134,6 +166,7 @@
                     };
                 },
             });
+            return this.stateProxy;
         }
 
         init() {
@@ -172,6 +205,14 @@
 
         view(stateSelector) {
             return new ComputedView(stateSelector);
+        }
+
+        sessionStorage(key, defaultValue) {
+            return new BrowserStorage(window.sessionStorage, key, defaultValue);
+        }
+
+        localStorage(key, defaultValue) {
+            return new BrowserStorage(window.localStorage, key, defaultValue);
         }
 
         #clearChildNodes(container) {

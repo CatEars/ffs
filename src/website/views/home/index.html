@@ -235,7 +235,7 @@
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
             currentPath: getCurrentPath(),
-            galleryMode: getSessionStorage('gallery-mode', true),
+            galleryMode: megaphone.sessionStorage('gallery-mode', true),
             galleryVisibility: megaphone.view((state) => (state.galleryMode ? 'show' : 'hidden')),
             fileManagerVisibility: megaphone.view((state) =>
                 state.galleryMode ? 'hidden' : 'show'
