@@ -1,7 +1,7 @@
 <!-- include ./upload-form.partial.html -->
 <column-layout id="action-panel">
     <div class="form-row">
-        <button @click="cutFiles" type="button">
+        <button +click="cutFiles" type="button">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#content_cut"></use>
             </svg>
@@ -15,7 +15,7 @@
                 <use href="/static/svg/sprite_sheet.svg#content_paste"></use>
             </svg>
         </button>
-        <button type="button" @click="resetCuttingBoard">
+        <button type="button" +click="resetCuttingBoard">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#undo"></use>
             </svg>
@@ -59,29 +59,23 @@
         </form>
     </drop-down>
 </column-layout>
-<section class="file-list">
-    <template
-        x-for="(file, idx) in sortedBy(files, sorting, directoriesFirst, currentPage)"
-        :key="file.name"
-    >
+<section id="file-list" class="file-list">
+    <template id="file-row-entry">
         <div class="file-row">
             <div>
-                <input class="file-to-cut" type="checkbox" x-bind:value="file.name" />
-                <label x-bind:for="file.name"></label>
+                <input class="file-to-cut" type="checkbox" />
             </div>
             <svg class="small-icon">
-                <use
-                    x-bind:href="`/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`"
-                ></use>
+                <use></use>
             </svg>
-            <div>
-                <template x-if="file.isDirectory">
-                    <a x-bind:href="getLinkTo(file)">
-                        <span x-text="file.name"></span>
+            <div class="file-row-text">
+                <template id="directory-row">
+                    <a>
+                        <span></span>
                     </a>
                 </template>
-                <template x-if="!file.isDirectory">
-                    <span x-text="file.name"></span>
+                <template id="file-row">
+                    <span></span>
                 </template>
             </div>
         </div>

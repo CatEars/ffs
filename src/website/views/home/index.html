@@ -1,13 +1,5 @@
 <!-- layout /templates/base.html -->
-<app-main
-    x-data="{
-        sorting: getLocalStorage('file-sort-order', 'newest'), 
-        directoriesFirst: getLocalStorage('show-directories-first', true),
-        files: [], 
-        root: getCurrentPath(), 
-        currentPage: getCurrentPage()
-     }"
->
+<app-main>
     <script>
         const defaultPageSize = 120;
 
@@ -148,11 +140,6 @@
             storeToCuttingBoard([]);
         }
 
-        function fileInCuttingBoard(file) {
-            const myPath = decodeURIComponent(getCurrentPath());
-            return getCuttingBoard().some((x) => x.path === myPath && x.fileName === file.name);
-        }
-
         function navigateToHomePath(path, index) {
             const elements = path.split('/');
             const selectedLocation = elements.slice(0, index + 1).join('/');
@@ -232,26 +219,91 @@
             navigateToHomePath(evt.detail.trail, evt.detail.index);
         }
 
+        function onSortDirectoriesFirstChange(evt) {
+            state.directoriesFirst = evt.detail.checked;
+        }
+
+        function createSortingSetter(value) {
+            return () => {
+                state.sorting = value;
+            };
+        }
+
+        function onPageShift(evt) {
+            state.currentPage = evt.detail.page;
+        }
+
         const megaphone = new Megaphone();
+        const currentPath = getCurrentPath();
         const state = megaphone.declareState({
-            currentPath: getCurrentPath(),
             galleryMode: megaphone.sessionStorage('gallery-mode', true),
             galleryVisibility: megaphone.view((state) => (state.galleryMode ? 'show' : 'hidden')),
             fileManagerVisibility: megaphone.view((state) =>
                 state.galleryMode ? 'hidden' : 'show'
             ),
             files: [],
+            maxPages: megaphone.view((state) => getNumPages(state.files)),
+            sorting: megaphone.localStorage('file-sort-order', 'newest'),
+            directoriesFirst: megaphone.localStorage('show-directories-first', true),
+            currentPage: getCurrentPage(),
+            sortedFiles: megaphone.view((state) =>
+                sortedBy(state.files, state.sorting, state.directoriesFirst, state.currentPage)
+            ),
+
+            sortingByNewest: megaphone.view((state) => state.sorting === 'newest'),
+            sortingByOldest: megaphone.view((state) => state.sorting === 'oldest'),
+            sortingByAtoZ: megaphone.view((state) => state.sorting === 'a-z'),
+            sortingByZtoA: megaphone.view((state) => state.sorting === 'z-a'),
+            sortByNewest: createSortingSetter('newest'),
+            sortByOldest: createSortingSetter('oldest'),
+            sortByAtoZ: createSortingSetter('a-z'),
+            sortByZtoA: createSortingSetter('z-a'),
+
+            onSortDirectoriesFirstChange,
             onGalleryModeChange,
             onCrumbClick,
+            onPageShift,
             pasteFiles,
+            cutFiles,
+            resetCuttingBoard,
             createFileShare,
             renameFile,
             makeDirectory,
         });
 
-        state.files = await getFiles(getCurrentPath());
+        megaphone.renderEach(state.sortedFiles, '#gallery', (file) => {
+            const fileCard = document.createElement('file-card');
+            fileCard.setAttribute('filename', file.name);
+            fileCard.setAttribute('file-type', file.fileType);
+            fileCard.setAttribute('image-src', file.imageSrc);
+            fileCard.setAttribute('root', currentPath);
+            return fileCard;
+        });
+
+        megaphone.renderEach(state.sortedFiles, '#file-list', (file) => {
+            const clone = document.querySelector('#file-row-entry').content.cloneNode(true);
+            clone.querySelector('input').value = file.name;
+            clone
+                .querySelector('use')
+                .setAttribute(
+                    'href',
+                    `/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`
+                );
+            if (file.isDirectory) {
+                const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
+                textRow.querySelector('a').setAttribute('href', getLinkTo(file));
+                textRow.querySelector('span').innerText = file.name;
+                clone.querySelector('div.file-row-text').appendChild(textRow);
+            } else {
+                const textRow = clone.querySelector('#file-row').content.cloneNode(true);
+                textRow.querySelector('span').innerText = file.name;
+                clone.querySelector('div.file-row-text').appendChild(textRow);
+            }
+            return clone;
+        });
+
+        state.files = await getFiles(currentPath);
     </script>
-    <div style="display: none" x-effect="files = await getFiles(getCurrentPath())"></div>
     <app-header>
         <breadcrumb-nav
             slot="ender"
@@ -261,20 +313,20 @@
     </app-header>
     <!-- include ./control-panel.partial.html -->
     <paginate-control
-        x-bind:page="currentPage"
-        x-bind:max-pages="getNumPages(files)"
-        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+        $page="currentPage"
+        $max-pages="maxPages"
+        +page-shift="onPageShift"
     ></paginate-control>
 
     <div $data-visibility="galleryVisibility">
-        <!-- include ./gallery.partial.html -->
+        <section id="gallery" class="gallery"></section>
     </div>
     <div $data-visibility="fileManagerVisibility">
         <!-- include ./file-manager.partial.html -->
     </div>
     <paginate-control
-        x-bind:page="currentPage"
-        x-bind:max-pages="getNumPages(files)"
-        @page-shift="evt => currentPage = setCurrentPage(evt.detail.page)"
+        $page="currentPage"
+        $max-pages="maxPages"
+        +page-shift="onPageShift"
     ></paginate-control>
 </app-main>

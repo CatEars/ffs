@@ -1,4 +1,5 @@
 import { BaseWebComponent } from '../base.js';
+import { isAttributeTrue } from '../util.js';
 
 class RadioControl extends BaseWebComponent {
     static get observedAttributes() {
@@ -7,7 +8,7 @@ class RadioControl extends BaseWebComponent {
 
     render(html) {
         const imgSrc = this.getAttribute('imgsrc') || '';
-        const checked = this.getAttribute('checked') || '';
+        const checked = isAttributeTrue(this.getAttribute('checked') || '');
         const text = this.getAttribute('text') || '';
         const styles = html` <style>
             svg {

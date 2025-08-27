@@ -3,32 +3,21 @@
         <div class="sort-row">
             <radio-control
                 imgSrc="child"
-                @click="sorting = setLocalStorage('file-sort-order', 'newest')"
-                x-bind:checked="sorting === 'newest'"
+                +click="sortByNewest"
+                $checked="sortingByNewest"
             ></radio-control>
             <radio-control
                 imgSrc="elderly"
-                @click="sorting = setLocalStorage('file-sort-order', 'oldest')"
-                x-bind:checked="sorting === 'oldest'"
+                +click="sortByOldest"
+                $checked="sortingByOldest"
             ></radio-control>
-            <radio-control
-                text="A-Z"
-                @click="sorting = setLocalStorage('file-sort-order', 'a-z')"
-                x-bind:checked="sorting === 'a-z'"
-            ></radio-control>
-            <radio-control
-                text="Z-A"
-                @click="sorting = setLocalStorage('file-sort-order', 'z-a')"
-                x-bind:checked="sorting === 'z-a'"
-            ></radio-control>
+            <radio-control text="A-Z" +click="sortByAtoZ" $checked="sortingByAtoZ"></radio-control>
+            <radio-control text="Z-A" +click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
         </div>
-        <switch-control
-            x-bind:checked="directoriesFirst"
-            @change="directoriesFirst = setLocalStorage('show-directories-first', !directoriesFirst)"
-        >
+        <switch-control $checked="directoriesFirst" +change="onSortDirectoriesFirstChange">
             Directories First
         </switch-control>
-        <switch-control id="view-mode-switch" $checked="galleryMode" +change="onGalleryModeChange">
+        <switch-control $checked="galleryMode" +change="onGalleryModeChange">
             Gallery
         </switch-control>
     </div>

@@ -27,8 +27,9 @@
     }
 
     class ComputedView {
-        constructor(stateSelector) {
+        constructor(stateSelector, megaphone) {
             this.stateSelector = stateSelector;
+            this.megaphone = megaphone;
         }
 
         dependencies() {
@@ -36,10 +37,12 @@
         }
 
         evaluate(state) {
+            const me = this;
             return this.stateSelector(
                 new Proxy(state, {
                     get(target, property, receiver) {
-                        return target[property].value;
+                        const state = me.megaphone._resolveState(target[property]);
+                        return state.value;
                     },
                 })
             );
@@ -102,7 +105,7 @@
             return topologicalSort(this.dependents, value);
         }
 
-        #resolveState(stateValue) {
+        _resolveState(stateValue) {
             if (stateValue instanceof ComputedView) {
                 return stateValue.evaluate(this.stateProxy);
             } else if (stateValue instanceof BrowserStorage) {
@@ -135,7 +138,7 @@
             this.onUpdate(target, property, value);
             const dependents = this.#getDependents(property);
             for (const dep of dependents) {
-                const subDependentValue = this.#resolveState(this.state[dep]);
+                const subDependentValue = this._resolveState(this.state[dep]);
                 this.onUpdate(target, dep, subDependentValue);
             }
         }
@@ -169,7 +172,7 @@
                 },
                 get(target, property, receiver) {
                     return {
-                        value: me.#resolveState(target[property]),
+                        value: me._resolveState(target[property]),
                         property,
                     };
                 },
@@ -206,13 +209,13 @@
                 this.#updateStateAndDependents(
                     this.state,
                     key,
-                    this.#resolveState(this.state[key])
+                    this._resolveState(this.state[key])
                 );
             }
         }
 
         view(stateSelector) {
-            return new ComputedView(stateSelector);
+            return new ComputedView(stateSelector, this);
         }
 
         sessionStorage(key, defaultValue) {
