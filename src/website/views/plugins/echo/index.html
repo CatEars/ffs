@@ -1,6 +1,7 @@
 <!-- layout /templates/base.html -->
-<div class="container">
-    <script>
+<app-main>
+    <app-header>Echo</app-header>
+    <script type="module">
         async function submitEchoText(evt) {
             evt.preventDefault();
             const msg = document.getElementById('message').value;
@@ -16,28 +17,37 @@
             const body = await result.json();
             return body.message;
         }
+
+        async function onSubmitEcho(evt) {
+            const text = await submitEchoText(evt);
+            state.displayText = [text];
+        }
+
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            displayText: [],
+            onSubmitEcho,
+        });
+
+        megaphone.renderEach(state.displayText, '#display', (text) => {
+            const clone = document.querySelector('#display-content').content.cloneNode(true);
+            clone.querySelector('span').innerText = text;
+            return clone;
+        });
     </script>
-    <div x-data="{ displayText: '' }">
-        <div class="row">
-            <form>
-                <div class="form-group mb-3">
-                    <label class="mb-3" for="message">Message:</label>
-                    <input class="form-control" type="text" id="message" name="message" />
-                </div>
-                <button
-                    type="submit"
-                    class="btn btn-primary mb-3"
-                    @click="submitEchoText(event).then(msg => displayText = msg)"
-                >
-                    Submit
-                </button>
-            </form>
-        </div>
-        <template x-if="displayText.length > 0">
-            <div class="row">
-                <p>The server response:</p>
-                <i><p x-text="displayText"></p></i>
+    <div>
+        <form>
+            <div class="form-row">
+                <label for="message">Message:</label>
+                <input type="text" id="message" name="message" />
             </div>
+            <button type="submit" +click="onSubmitEcho">Submit</button>
+        </form>
+    </div>
+    <div id="display">
+        <template id="display-content">
+            <p>The server response:</p>
+            <i><span></span></i>
         </template>
     </div>
-</div>
+</app-main>
