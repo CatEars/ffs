@@ -2,6 +2,8 @@ import AppHeader from './text/app-header.js';
 import AppSubheader from './text/app-subheader.js';
 import AppMain from './layout/app-main.js';
 import BreadcrumbNav from './navigation/breadcrumb-nav.js';
+import CliCommand from './display/cli-command.js';
+import ColumnLayout from './layout/column-layout.js';
 import DropDown from './display/drop-down.js';
 import FileCard from './display/file-card.js';
 import HeaderTab from './navigation/header-tab.js';
@@ -11,13 +13,13 @@ import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
 import { loadSharedStylesheets } from './base.js';
 import RowLayout from './layout/row-layout.js';
-import ColumnLayout from './layout/column-layout.js';
 
 const components = [
     ['app-header', AppHeader],
     ['app-subheader', AppSubheader],
     ['app-main', AppMain],
     ['breadcrumb-nav', BreadcrumbNav],
+    ['cli-command', CliCommand],
     ['column-layout', ColumnLayout],
     ['drop-down', DropDown],
     ['file-card', FileCard],

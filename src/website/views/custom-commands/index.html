@@ -13,64 +13,34 @@
             return joined;
         }
 
-        function resolveArgumentArray(commands, cmdIdx, argumentArray) {
-            return argumentArray.map((x, idx) => {
-                if (x.startsWith('$')) {
-                    const argIdx = Number.parseInt(x.substring(1));
-                    const argValue = commands[cmdIdx].args[argIdx - 1];
-                    if (argValue === '') {
-                        return x;
-                    } else {
-                        return `\"${argValue}\"`;
-                    }
-                } else {
-                    return x;
-                }
-            });
-        }
-
-        function formatCommand(commands, idx) {
-            const { cmd } = commands[idx];
-            const formattedArguments = resolveArgumentArray(commands, idx, cmd['args']);
-            return `${cmd['program']} ${formattedArguments.join(' ')}`;
-        }
-
-        /*
-        const main = document.getElementById('main');
-        const commands = await getCommands();
-        for (let idx = 0; idx < commands.length; ++idx) {
-            const formCopy = document.getElementById('command-form').content.cloneNode(true);
-            formCopy.querySelector('input[name="index"]').value = `${idx}`;
-            formCopy.querySelector('span').textContent = formatCommand(commands, idx);
-            for (let argIdx = 0; argIdx < commands[idx].cmd.nargs; ++argIdx) {
-                const rowCopy = document.getElementById('argument-row').content.cloneNode(true);
-                rowCopy.querySelector('span').textContent = '$' + (argIdx + 1) + ':';
-                formCopy.querySelector('ol').appendChild(rowCopy);
-            }
-            main.appendChild(formCopy);
-        }
-
-        */
-
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
             commands: [],
             message: megaphone.urlParam('message', null),
         });
 
-        megaphone.renderEach(state.commands, '#command-list', (command) => {});
+        megaphone.renderEach(
+            state.commands,
+            '#command-list',
+            megaphone.webComponent('cli-command', (command) => ({
+                command: JSON.stringify(command.cmd),
+                action: '/api/custom-commands/run',
+                method: 'POST',
+            }))
+        );
         megaphone.render(state.message, '#output-display', (message) => {
-            console.log('I whill render', message);
             if (message) {
                 const clone = document.querySelector('#success-display').content.cloneNode(true);
                 clone.querySelector('pre').textContent = message;
-                console.log('RENDERED', clone);
                 return clone;
             }
         });
         megaphone.init();
 
-        state.commands = await getCommands();
+        state.commands = (await getCommands()).map((cmd, idx) => ({
+            ...cmd,
+            cmd: { ...cmd.cmd, index: idx },
+        }));
     </script>
     <app-header>Commands</app-header>
 
@@ -100,10 +70,4 @@
             </div>
         </template>
     </section>
-    <template id="command-form"> </template>
-    <template id="argument-row">
-        <li>
-            <label><span></span><input name="arg" type="text" /></label>
-        </li>
-    </template>
 </app-main>
