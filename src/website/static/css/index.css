@@ -16,6 +16,7 @@
 @import url('./control-panel.css');
 
 /* Screen specific variables */
+@import url('./screen-specific/xl.css');
 @import url('./screen-specific/l.css');
 @import url('./screen-specific/m.css');
 @import url('./screen-specific/s.css');

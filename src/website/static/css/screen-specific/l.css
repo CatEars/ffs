@@ -1,7 +1,7 @@
-@media (min-width: 1477px) {
+@media (min-width: 1477px) and (max-width: 2015px) {
     @layer main {
         :root {
-            --file-grid-columns: repeat(8, 1fr);
+            --file-grid-columns: repeat(6, 1fr);
             --file-card-max-width: 11.5rem;
             --file-card-max-height: 10rem;
         }

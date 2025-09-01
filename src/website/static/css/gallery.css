@@ -2,7 +2,13 @@
     .gallery {
         display: grid;
         grid-template-columns: var(--file-grid-columns);
+        justify-items: center;
+
         gap: 1rem;
         padding-right: 1rem;
+    }
+
+    file-card {
+        min-width: var(--file-card-max-width);
     }
 }
