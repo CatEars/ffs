@@ -28,6 +28,7 @@ class BreadcrumbNav extends BaseWebComponent {
                 ol {
                     display: flex;
                     flex-direction: row;
+                    flex-wrap: wrap;
                     align-content: center;
                     list-style-type: none;
                     gap: 1rem;
