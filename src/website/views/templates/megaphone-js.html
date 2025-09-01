@@ -316,6 +316,16 @@
             });
         }
 
+        renderIf(state, into, renderFunc) {
+            this.watch(state, (value) => {
+                const element = document.querySelector(into);
+                this.#clearChildNodes(element);
+                if (value) {
+                    this.#renderAndAppend(element, value, renderFunc);
+                }
+            });
+        }
+
         webComponent(componentName, attributeGenerator) {
             return (value) => {
                 const attributes = attributeGenerator(value);

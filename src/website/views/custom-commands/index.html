@@ -1,16 +1,9 @@
 <!-- layout /templates/base.html -->
-<app-main id="main" x-data="{ commands: [] }">
+<app-main>
     <script type="module">
         async function getCommands() {
             const result = await fetch('/api/custom-commands');
-            const commands = await result.json();
-            const joined = [];
-            for (let idx = 0; idx < commands.length; ++idx) {
-                const cmd = commands[idx];
-                const args = Array.from({ length: cmd.nargs }, (_) => '');
-                joined.push({ cmd, args });
-            }
-            return joined;
+            return await result.json();
         }
 
         const megaphone = new Megaphone();
@@ -23,44 +16,27 @@
             state.commands,
             '#command-list',
             megaphone.webComponent('cli-command', (command) => ({
-                command: JSON.stringify(command.cmd),
+                command: JSON.stringify(command),
                 action: '/api/custom-commands/run',
                 method: 'POST',
             }))
         );
-        megaphone.render(state.message, '#output-display', (message) => {
-            if (message) {
-                const clone = document.querySelector('#success-display').content.cloneNode(true);
-                clone.querySelector('pre').textContent = message;
-                return clone;
-            }
+
+        megaphone.renderIf(state.message, '#output-display', (message) => {
+            const clone = document.querySelector('#success-display').content.cloneNode(true);
+            clone.querySelector('pre').textContent = message;
+            return clone;
         });
+
         megaphone.init();
 
         state.commands = (await getCommands()).map((cmd, idx) => ({
             ...cmd,
-            cmd: { ...cmd.cmd, index: idx },
+            index: idx,
         }));
     </script>
     <app-header>Commands</app-header>
-
-    <section id="command-list">
-        <template id="command-row">
-            <form method="POST" action="/api/custom-commands/run">
-                <input type="hidden" name="index" />
-                <div class="form-row">
-                    <p>Example:</p>
-                </div>
-                <div class="form-row">
-                    <span style="font-family: monospace; white-space: pre-wrap"></span>
-                </div>
-                <div class="form-column">
-                    <ol></ol>
-                </div>
-                <button type="submit">Run</button>
-            </form>
-        </template>
-    </section>
+    <section id="command-list"></section>
     <section id="output-display">
         <template id="success-display">
             <hr />

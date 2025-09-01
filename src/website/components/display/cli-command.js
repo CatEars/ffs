@@ -48,7 +48,7 @@ class CliCommand extends BaseWebComponent {
                         )}
                     </ol>
                 </div>
-                <button type="submit" onclick="${(evt) => onRunCommand(evt)}">Run</button>
+                <button type="submit">Run</button>
             </form>
         `;
     }
