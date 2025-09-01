@@ -8,6 +8,7 @@ class AppMain extends BaseWebComponent {
                     display: flex;
                     flex-direction: column;
                     margin-left: 1rem;
+                    margin-right: 1rem;
                 }
             </style>
             <main>

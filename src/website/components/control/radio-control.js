@@ -21,6 +21,7 @@ class RadioControl extends BaseWebComponent {
             label {
                 user-select: none;
                 color: gray;
+                cursor: pointer;
             }
             label.checked {
                 color: rgb(100, 150, 255);
