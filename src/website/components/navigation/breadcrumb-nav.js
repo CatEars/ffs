@@ -40,6 +40,9 @@ class BreadcrumbNav extends BaseWebComponent {
                     content: '/';
                     margin-left: 1rem;
                 }
+                li.breadcrumb-item > span {
+                    cursor: default;
+                }
             </style>
             <nav>
                 <ol class="breadcrumb">

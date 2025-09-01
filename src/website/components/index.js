@@ -13,6 +13,7 @@ import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
 import { loadSharedStylesheets } from './base.js';
 import RowLayout from './layout/row-layout.js';
+import HorizontalRow from './layout/horizontal-row.js';
 
 const components = [
     ['app-header', AppHeader],
@@ -24,6 +25,7 @@ const components = [
     ['drop-down', DropDown],
     ['file-card', FileCard],
     ['header-tab', HeaderTab],
+    ['horizontal-row', HorizontalRow],
     ['media-viewer', MediaViewer],
     ['switch-control', SwitchControl],
     ['radio-control', RadioControl],

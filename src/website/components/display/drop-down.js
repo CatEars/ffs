@@ -30,6 +30,7 @@ class DropDown extends BaseWebComponent {
                     align-items: center;
                     margin-left: 0.25rem;
                     gap: 1rem;
+                    cursor: pointer;
                 }
                 .dropdown-content {
                     margin-left: 1rem;

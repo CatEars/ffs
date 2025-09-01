@@ -21,4 +21,8 @@
     drop-down {
         margin-top: 1rem;
     }
+
+    .action-buttons > button {
+        cursor: pointer;
+    }
 }
