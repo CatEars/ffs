@@ -74,6 +74,50 @@
         }
     }
 
+    class UrlParamStorageAdapter {
+        constructor(updateHistory = false) {
+            this.updateHistory = updateHistory;
+        }
+
+        getItem(key) {
+            const urlParams = new URLSearchParams(location.search);
+            const storedValue = urlParams.get(key);
+            if (storedValue === null) {
+                return storedValue;
+            }
+            try {
+                // If valid json, return as is, else stringify
+                JSON.parse(storedValue);
+                return storedValue;
+            } catch {
+                return JSON.stringify(storedValue);
+            }
+        }
+
+        setItem(key, value) {
+            let theValue = JSON.parse(value);
+            if (theValue === null || theValue === undefined) {
+                // do nothing
+            } else if (!(theValue instanceof String)) {
+                // Strings are stored "raw" while objects aren't
+                theValue = value;
+            }
+
+            const url = new URL(window.location.href);
+            if (theValue === undefined || theValue === null) {
+                url.searchParams.delete(key);
+            } else {
+                url.searchParams.set(key, theValue);
+            }
+
+            if (this.updateHistory) {
+                history.pushState({}, '', url.toString());
+            } else {
+                history.replaceState({}, '', url.toString());
+            }
+        }
+    }
+
     class Megaphone {
         static _megaphones = [];
 
@@ -85,6 +129,26 @@
             this.state = null;
             this.stateProxy = null;
             this.initialized = false;
+        }
+
+        #renderAndAppend(element, valueToRender, renderFunction) {
+            const rendered = renderFunction(valueToRender);
+            if (rendered) {
+                element.appendChild(rendered);
+            }
+        }
+
+        #clearChildNodes(container) {
+            let child = container.firstChild;
+            while (child) {
+                const nextSibling = child.nextSibling;
+
+                if (child.nodeName.toLowerCase() !== 'template') {
+                    container.removeChild(child);
+                }
+
+                child = nextSibling;
+            }
         }
 
         #addDependent(value, dependentValue) {
@@ -103,6 +167,15 @@
 
         #getWatchTree(value) {
             return topologicalSort(this.dependents, value);
+        }
+
+        #updateStateAndDependents(target, property, value) {
+            this.onUpdate(target, property, value);
+            const dependents = this.#getDependents(property);
+            for (const dep of dependents) {
+                const subDependentValue = this._resolveState(this.state[dep]);
+                this.onUpdate(target, dep, subDependentValue);
+            }
         }
 
         _resolveState(stateValue) {
@@ -131,15 +204,6 @@
                 if (property === propertyName) {
                     callable(value);
                 }
-            }
-        }
-
-        #updateStateAndDependents(target, property, value) {
-            this.onUpdate(target, property, value);
-            const dependents = this.#getDependents(property);
-            for (const dep of dependents) {
-                const subDependentValue = this._resolveState(this.state[dep]);
-                this.onUpdate(target, dep, subDependentValue);
             }
         }
 
@@ -226,17 +290,8 @@
             return new BrowserStorage(window.localStorage, key, defaultValue);
         }
 
-        #clearChildNodes(container) {
-            let child = container.firstChild;
-            while (child) {
-                const nextSibling = child.nextSibling;
-
-                if (child.nodeName.toLowerCase() !== 'template') {
-                    container.removeChild(child);
-                }
-
-                child = nextSibling;
-            }
+        urlParam(key, defaultValue) {
+            return new BrowserStorage(new UrlParamStorageAdapter(), key, defaultValue);
         }
 
         renderEach(state, into, renderFunc) {
@@ -244,7 +299,7 @@
                 const element = document.querySelector(into);
                 this.#clearChildNodes(element);
                 for (const v of value) {
-                    element.appendChild(renderFunc(v));
+                    this.#renderAndAppend(element, v, renderFunc);
                 }
             });
         }
@@ -253,7 +308,7 @@
             this.watch(state, (value) => {
                 const element = document.querySelector(into);
                 this.#clearChildNodes(element);
-                element.appendChild(renderFunc(v));
+                this.#renderAndAppend(element, value, renderFunc);
             });
         }
 

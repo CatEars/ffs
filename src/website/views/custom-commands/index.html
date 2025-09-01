@@ -35,6 +35,7 @@
             return `${cmd['program']} ${formattedArguments.join(' ')}`;
         }
 
+        /*
         const main = document.getElementById('main');
         const commands = await getCommands();
         for (let idx = 0; idx < commands.length; ++idx) {
@@ -49,40 +50,67 @@
             main.appendChild(formCopy);
         }
 
-        const successMessage = getUrlParam('message');
+        */
+
+        /*const successMessage = getUrlParam('message');
         if (successMessage) {
             const displayCopy = document.getElementById('success-display').content.cloneNode(true);
             displayCopy.querySelector('pre').textContent = decodeURIComponent(successMessage);
             main.appendChild(displayCopy);
-        }
+        }*/
+
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            commands: [],
+            message: megaphone.urlParam('message', null),
+        });
+
+        megaphone.renderEach(state.commands, '#command-list', (command) => {});
+        megaphone.render(state.message, '#output-display', (message) => {
+            console.log('I whill render', message);
+            if (message) {
+                const clone = document.querySelector('#success-display').content.cloneNode(true);
+                clone.querySelector('pre').textContent = message;
+                console.log('RENDERED', clone);
+                return clone;
+            }
+        });
+        megaphone.init();
+
+        state.commands = await getCommands();
     </script>
     <app-header>Commands</app-header>
 
-    <template id="command-form">
-        <form method="POST" action="/api/custom-commands/run">
-            <input type="hidden" name="index" />
-            <div class="form-row">
-                <p>Example:</p>
+    <section id="command-list">
+        <template id="command-row">
+            <form method="POST" action="/api/custom-commands/run">
+                <input type="hidden" name="index" />
+                <div class="form-row">
+                    <p>Example:</p>
+                </div>
+                <div class="form-row">
+                    <span style="font-family: monospace; white-space: pre-wrap"></span>
+                </div>
+                <div class="form-column">
+                    <ol></ol>
+                </div>
+                <button type="submit">Run</button>
+            </form>
+        </template>
+    </section>
+    <section id="output-display">
+        <template id="success-display">
+            <hr />
+            <div>
+                <p>Output:</p>
+                <pre></pre>
             </div>
-            <div class="form-row">
-                <span style="font-family: monospace; white-space: pre-wrap"></span>
-            </div>
-            <div class="form-column">
-                <ol></ol>
-            </div>
-            <button type="submit">Run</button>
-        </form>
-    </template>
+        </template>
+    </section>
+    <template id="command-form"> </template>
     <template id="argument-row">
         <li>
             <label><span></span><input name="arg" type="text" /></label>
         </li>
-    </template>
-    <template id="success-display">
-        <hr />
-        <div>
-            <p>Output:</p>
-            <pre></pre>
-        </div>
     </template>
 </app-main>
