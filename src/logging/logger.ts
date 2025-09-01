@@ -26,19 +26,58 @@ function generateLogLine(
     return [prefix + ' %c' + joined, css];
 }
 
-export const logger = {
-    debug: function debug(...msg: Loggable[]) {
-        console.debug(...generateLogLine(prefix(), 'color: grey', msg));
-    },
+class FifoCache extends Array {
+    private readonly maxSize: number;
 
-    info: function info(...msg: Loggable[]) {
-        console.log(...generateLogLine(prefix(), 'color: rgb(255, 255, 255)', msg));
-    },
+    constructor(size: number) {
+        super();
+        this.maxSize = size;
+    }
 
-    warn: function warn(...msg: Loggable[]) {
-        console.warn(...generateLogLine(prefix(), 'color: red', msg));
-    },
-};
+    override push(...items: Loggable[]): number {
+        const extraLen = items.length;
+        while (this.length > this.maxSize - extraLen) {
+            this.shift();
+        }
+
+        return super.push(...items);
+    }
+}
+
+class RecordingLogWrapper {
+    private readonly wrappedConsole: Console;
+    private readonly logCache: FifoCache = new FifoCache(
+        1000,
+    );
+
+    constructor(wrappedConsole: Console) {
+        this.wrappedConsole = wrappedConsole;
+    }
+
+    debug(...msg: Loggable[]) {
+        const log = generateLogLine(prefix(), 'color: grey', msg);
+        this.wrappedConsole.debug(...log);
+        this.logCache.push([prefix(), ...msg]);
+    }
+
+    info(...msg: Loggable[]) {
+        const log = generateLogLine(prefix(), 'color: rgb(255, 255, 255)', msg);
+        this.wrappedConsole.log(...log);
+        this.logCache.push([prefix(), ...msg]);
+    }
+
+    warn(...msg: Loggable[]) {
+        const log = generateLogLine(prefix(), 'color: red', msg);
+        this.wrappedConsole.warn(...log);
+        this.logCache.push([prefix(), ...msg]);
+    }
+
+    inspectRecentLogs(): string[][] {
+        return this.logCache;
+    }
+}
+
+export const logger = new RecordingLogWrapper(console);
 
 class FileLogger {
     private readonly pathGetter: () => string;

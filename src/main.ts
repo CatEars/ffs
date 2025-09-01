@@ -20,6 +20,7 @@ import {
 } from './application-state.ts';
 import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
+import { registerAllAppLogsEndpoints } from './app-logs/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -45,6 +46,7 @@ await registerAllWebsiteRoutes(router);
 registerAllThumbnailRoutes(router);
 registerSitemapRoute(router);
 registerAllCustomCommandApi(router);
+registerAllAppLogsEndpoints(router);
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();
