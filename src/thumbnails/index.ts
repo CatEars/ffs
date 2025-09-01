@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak/router';
-import { logger } from '../logging/logger.ts';
+import { backgroundProcessLogger, logger } from '../logging/logger.ts';
 import { ThumbnailRequest } from './types.ts';
 import { registerGetThumbnail } from './get-thumbnail.ts';
 
@@ -40,9 +40,34 @@ export function startThumbnailBackgroundProcess() {
 
     thumbnailProcess = new Deno.Command('deno', {
         args: subProcessFlags.concat(['src/thumbnails/background-task.ts']),
+        stdout: 'piped',
         stdin: 'piped',
     }).spawn();
+
     thumbnailProcessStdin = thumbnailProcess.stdin.getWriter();
+
+    const prefix = `<pid=${thumbnailProcess.pid}|thumbnail>`;
+    function writeBackgroundTaskOutput(message: string) {
+        backgroundProcessLogger.debug(prefix, message.trimEnd());
+    }
+
+    const decoder = new TextDecoder();
+    thumbnailProcess.stdout.pipeTo(
+        new WritableStream({
+            write: (chunk: Uint8Array) => {
+                const decodedString = decoder.decode(chunk, { stream: true });
+                if (decodedString) {
+                    writeBackgroundTaskOutput(decodedString);
+                }
+            },
+            close: () => {
+                const finalString = decoder.decode();
+                if (finalString) {
+                    writeBackgroundTaskOutput(finalString);
+                }
+            },
+        }),
+    );
 }
 
 export async function prioritizeThumbnail(filePath: string) {
