@@ -285,7 +285,11 @@
 
         megaphone.renderEach(state.sortedFiles, '#file-list', (file) => {
             const clone = document.querySelector('#file-row-entry').content.cloneNode(true);
-            clone.querySelector('input').value = file.name;
+            const input = clone.querySelector('input');
+            input.value = file.name;
+            clone.querySelector('span.checkmark').addEventListener('click', () => {
+                input.checked = !input.checked;
+            });
             clone
                 .querySelector('use')
                 .setAttribute(
