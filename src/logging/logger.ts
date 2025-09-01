@@ -29,7 +29,7 @@ function generateLogLine(
     messages: Loggable[],
 ) {
     const joined = messages.map(stringify).join(' ');
-    return [prefix + ' %c' + joined, css];
+    return [(prefix + ' %c').trimStart() + joined, css];
 }
 
 class FifoCache extends Array {
@@ -53,31 +53,53 @@ class FifoCache extends Array {
 class RecordingLogWrapper {
     private readonly wrappedConsole: Logger;
     private readonly logCache: FifoCache = new FifoCache(1000);
+    private noPrefix: boolean;
 
-    constructor(wrappedConsole: Logger) {
+    constructor(wrappedConsole: Logger, noPrefix: boolean = false) {
         this.wrappedConsole = wrappedConsole;
+        this.noPrefix = noPrefix;
     }
 
     debug(...msg: Loggable[]) {
-        const log = generateLogLine(prefix(), 'color: grey', msg);
+        const log = this.generate('color: grey', msg);
         this.wrappedConsole.debug(...log);
-        this.logCache.push([prefix()].concat(msg));
+        this.addToCache(msg);
     }
 
     info(...msg: Loggable[]) {
-        const log = generateLogLine(prefix(), 'color: rgb(255, 255, 255)', msg);
+        const log = this.generate('color: rgb(255, 255, 255)', msg);
         this.wrappedConsole.log(...log);
-        this.logCache.push([prefix()].concat(msg));
+        this.addToCache(msg);
     }
 
     warn(...msg: Loggable[]) {
-        const log = generateLogLine(prefix(), 'color: red', msg);
+        const log = this.generate('color: red', msg);
         this.wrappedConsole.warn(...log);
-        this.logCache.push([prefix()].concat(msg));
+        this.addToCache(msg);
+    }
+
+    addToCache(msg: Loggable[]) {
+        if (this.noPrefix) {
+            this.logCache.push(msg);
+        } else {
+            this.logCache.push([prefix()].concat(msg));
+        }
     }
 
     inspectRecentLogs(): string[][] {
         return this.logCache;
+    }
+
+    generate(color: string, msg: Loggable[]) {
+        if (this.noPrefix) {
+            return generateLogLine('', color, msg);
+        } else {
+            return generateLogLine(prefix(), color, msg);
+        }
+    }
+
+    skipPrefix() {
+        this.noPrefix = true;
     }
 }
 

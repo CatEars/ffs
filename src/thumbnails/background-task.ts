@@ -12,6 +12,7 @@ import { resolve } from '@std/path/resolve';
 
 const cacheRoot = getCacheRoot();
 const storeRoot = getStoreRoot();
+logger.skipPrefix();
 logger.info(
     'Background task for thumbnail generation started. Storing thumbnails in cache at',
     cacheRoot,
