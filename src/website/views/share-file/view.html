@@ -13,19 +13,23 @@
         return `/api/share-file/download?paths=${paths}&hmac=${hmac}&index=${index}`;
     }
 
-    const files = await getFilesFromParams();
+    const megaphone = new Megaphone();
+    const state = megaphone.declareState({
+        fileData: [],
+    });
 
-    const list = document.getElementById('file-list');
-    for (let idx = 0; idx < files.length; ++idx) {
-        const file = files[idx];
-        const fileRow = document.getElementById('file-row').content.cloneNode(true);
+    megaphone.renderEach(state.fileData, '#file-list', (fileLink, index) => {
+        const fileRow = document.querySelector('#file-row').content.cloneNode(true);
         const link = fileRow.querySelector('a');
 
-        link.text = file;
-        link.href = buildDownloadHref(idx);
+        link.text = fileLink;
+        link.href = buildDownloadHref(index);
 
-        list.appendChild(fileRow);
-    }
+        return fileRow;
+    });
+    megaphone.init();
+
+    state.fileData = await getFilesFromParams();
 </script>
 <app-main>
     <app-header>Shared Files</app-header>

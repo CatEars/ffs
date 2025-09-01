@@ -131,8 +131,11 @@
             this.initialized = false;
         }
 
-        #renderAndAppend(element, valueToRender, renderFunction) {
-            const rendered = renderFunction(valueToRender);
+        #renderAndAppend(element, valueToRender, renderFunction, index = null) {
+            const rendered =
+                index === null
+                    ? renderFunction(valueToRender)
+                    : renderFunction(valueToRender, index);
             if (rendered) {
                 element.appendChild(rendered);
             }
@@ -298,8 +301,9 @@
             this.watch(state, (value) => {
                 const element = document.querySelector(into);
                 this.#clearChildNodes(element);
-                for (const v of value) {
-                    this.#renderAndAppend(element, v, renderFunc);
+                for (let idx = 0; idx < value.length; ++idx) {
+                    const v = value[idx];
+                    this.#renderAndAppend(element, v, renderFunc, idx);
                 }
             });
         }
