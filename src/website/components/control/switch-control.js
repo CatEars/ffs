@@ -20,22 +20,21 @@ class SwitchControl extends BaseWebComponent {
         return html`
             <style>
                 label {
-                    height: 100%;
-                    min-width: 24px;
+                    display: flex;
+                    flex-direction: row;
+                    gap: 1.5rem;
                 }
             </style>
-            <div class="form-row">
-                <label>
-                    <input
-                        type="checkbox"
-                        role="switch"
-                        id="switchCheckChecked"
-                        checked="${checked}"
-                        onchange="${() => onChange()}"
-                    />
-                </label>
-                <div><slot></slot></div>
-            </div>
+            <label>
+                <input
+                    type="checkbox"
+                    role="switch"
+                    id="switchCheckChecked"
+                    checked="${checked}"
+                    onchange="${() => onChange()}"
+                />
+                <slot></slot>
+            </label>
         `;
     }
 }
