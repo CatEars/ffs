@@ -1,10 +1,13 @@
 import { BaseWebComponent } from '../base.js';
+import { isAttributeTrue } from '../util.js';
 
 class IconHover extends BaseWebComponent {
-    static observedAttributes = ['url'];
+    static observedAttributes = ['url', 'disabled'];
 
     render(html) {
-        const url = this.getAttribute('url');
+        const url =
+            this.getAttribute('url') ||
+            (isAttributeTrue(this.getAttribute('disabled')) ? '' : '/static/svg/image.svg');
         if (!url) {
             return html`<slot></slot>`;
         }

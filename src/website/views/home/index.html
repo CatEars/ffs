@@ -317,8 +317,10 @@
                 );
             const imageSource = getFileImageSource(currentPath, file);
             const iconHover = clone.querySelector('icon-hover');
-            if (imageSource) {
+            if (file.isFile) {
                 iconHover.setAttribute('url', imageSource);
+            } else if (file.isDirectory) {
+                iconHover.setAttribute('disabled', 'true');
             }
             if (file.isDirectory) {
                 const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
