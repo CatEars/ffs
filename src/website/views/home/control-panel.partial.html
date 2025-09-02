@@ -1,5 +1,5 @@
 <form>
-    <div class="form-row">
+    <gapped-row>
         <row-layout>
             <radio-control
                 imgSrc="child"
@@ -15,8 +15,8 @@
             <radio-control text="Z-A" +click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
         </row-layout>
         <p>- Sort order</p>
-    </div>
-    <div class="form-row">
+    </gapped-row>
+    <gapped-row>
         <row-layout>
             <radio-control
                 text="20"
@@ -45,15 +45,15 @@
             ></radio-control>
         </row-layout>
         <p>- Page size</p>
-    </div>
-    <div class="form-row">
+    </gapped-row>
+    <row-layout>
         <switch-control $checked="directoriesFirst" +change="onSortDirectoriesFirstChange">
             Sort directories first
         </switch-control>
-    </div>
-    <div class="form-row">
+    </row-layout>
+    <row-layout>
         <switch-control $checked="galleryMode" +change="onGalleryModeChange">
             Gallery Mode
         </switch-control>
-    </div>
+    </row-layout>
 </form>
