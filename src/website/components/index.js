@@ -15,6 +15,7 @@ import { loadSharedStylesheets } from './base.js';
 import RowLayout from './layout/row-layout.js';
 import HorizontalRow from './layout/horizontal-row.js';
 import GappedRow from './layout/gapped-row.js';
+import IconHover from './display/icon-hover.js';
 
 const components = [
     ['app-header', AppHeader],
@@ -28,6 +29,7 @@ const components = [
     ['gapped-row', GappedRow],
     ['header-tab', HeaderTab],
     ['horizontal-row', HorizontalRow],
+    ['icon-hover', IconHover],
     ['media-viewer', MediaViewer],
     ['switch-control', SwitchControl],
     ['radio-control', RadioControl],

@@ -315,6 +315,11 @@
                     'href',
                     `/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`
                 );
+            const imageSource = getFileImageSource(currentPath, file);
+            const iconHover = clone.querySelector('icon-hover');
+            if (imageSource) {
+                iconHover.setAttribute('url', imageSource);
+            }
             if (file.isDirectory) {
                 const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
                 textRow.querySelector('a').setAttribute('href', getLinkTo(file));
