@@ -2,7 +2,7 @@
 
 services:
     ffs:
-        image: catears/ffs
+        image: catears/ffs:latest
         volumes:
             - ./:/files
             - ./users-file.json:/config/users-file.json:ro

@@ -43,7 +43,7 @@ function isLikelyFirstTimeUser() {
 
 async function setFirstTimeUserValuesIfLikely() {
     if (isLikelyFirstTimeUser()) {
-        printWelcomeHelper();
+        likelyFirstTimeUser = true;
         setConfig({
             cacheRoot: await resolveCacheFolder(),
             storeRoot: '.',
@@ -64,7 +64,7 @@ async function setFirstTimeUserValuesIfLikely() {
     }
 }
 
-function printWelcomeHelper() {
+export function printWelcomeHelper() {
     logger.warn('Seems like this is the first time you are using FFS.');
     logger.warn(
         'Go to   http://localhost:8080   and log on with:',
@@ -77,3 +77,7 @@ function printWelcomeHelper() {
     );
     logger.warn('in the project README.md. It is accessible from localhost:8080');
 }
+
+// Since we update env by manipulating it, and this depends on env,
+// let it be manually set rather than computed
+export let likelyFirstTimeUser = false;

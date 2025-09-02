@@ -10,7 +10,7 @@ import {
     registerAllThumbnailRoutes,
     startThumbnailBackgroundProcess,
 } from './thumbnails/index.ts';
-import { startup } from './startup.ts';
+import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
 import { registerSitemapRoute } from './sitemap/index.ts';
 import { registerAllCustomCommandApi } from './custom-commands/index.ts';
 import { registerAllFileShareRoutes } from './share-file/index.ts';
@@ -58,6 +58,10 @@ if (areThumbnailsAvailable()) {
 
 app.use(router.routes());
 app.use(router.allowedMethods());
+
+if (likelyFirstTimeUser) {
+    printWelcomeHelper();
+}
 
 const port = 8080;
 logger.info(`Starting server on port ${port}`);
