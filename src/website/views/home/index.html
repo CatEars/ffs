@@ -1,8 +1,6 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script>
-        const defaultPageSize = 120;
-
         function mapDateStrToDate(entries) {
             for (const entry of entries) {
                 entry.date = new Date(entry.date);
@@ -30,17 +28,17 @@
             return [];
         }
 
-        function paginate(array, page, pageSize = defaultPageSize) {
+        function paginate(array, page, pageSize) {
             const startIndex = (page - 1) * pageSize;
             const endIndex = startIndex + pageSize;
             return array.slice(startIndex, endIndex);
         }
 
-        function getNumPages(array, pageSize = defaultPageSize) {
+        function getNumPages(array, pageSize) {
             return Math.ceil(array.length / pageSize);
         }
 
-        function sortedBy(files, sorting, directoriesFirst, page, pageSize = defaultPageSize) {
+        function sortedBy(files, sorting, directoriesFirst, page, pageSize) {
             const copy = JSON.parse(JSON.stringify(files));
             mapDateStrToDate(copy);
 
@@ -233,9 +231,16 @@
             state.currentPage = evt.detail.page;
         }
 
+        function generatePageSizeUpdater(value) {
+            return () => {
+                state.pageSize = value;
+            };
+        }
+
         const megaphone = new Megaphone();
         const currentPath = getCurrentPath();
         const state = megaphone.declareState({
+            pageSize: megaphone.localStorage('default-page-size', 100),
             currentPath,
             galleryMode: megaphone.sessionStorage('gallery-mode', true),
             galleryVisibility: megaphone.view((state) => (state.galleryMode ? 'show' : 'hidden')),
@@ -243,12 +248,18 @@
                 state.galleryMode ? 'hidden' : 'show'
             ),
             files: [],
-            maxPages: megaphone.view((state) => getNumPages(state.files)),
+            maxPages: megaphone.view((state) => getNumPages(state.files, state.pageSize)),
             sorting: megaphone.localStorage('file-sort-order', 'newest'),
             directoriesFirst: megaphone.localStorage('show-directories-first', true),
             currentPage: getCurrentPage(),
             sortedFiles: megaphone.view((state) =>
-                sortedBy(state.files, state.sorting, state.directoriesFirst, state.currentPage)
+                sortedBy(
+                    state.files,
+                    state.sorting,
+                    state.directoriesFirst,
+                    state.currentPage,
+                    state.pageSize
+                )
             ),
 
             sortingByNewest: megaphone.view((state) => state.sorting === 'newest'),
@@ -259,6 +270,16 @@
             sortByOldest: createSortingSetter('oldest'),
             sortByAtoZ: createSortingSetter('a-z'),
             sortByZtoA: createSortingSetter('z-a'),
+
+            setPageSizeTo20: generatePageSizeUpdater(20),
+            setPageSizeTo50: generatePageSizeUpdater(50),
+            setPageSizeTo100: generatePageSizeUpdater(100),
+            setPageSizeTo250: generatePageSizeUpdater(250),
+
+            pageSizeIs20: megaphone.view((state) => state.pageSize === 20),
+            pageSizeIs50: megaphone.view((state) => state.pageSize === 50),
+            pageSizeIs100: megaphone.view((state) => state.pageSize === 100),
+            pageSizeIs250: megaphone.view((state) => state.pageSize === 250),
 
             onSortDirectoriesFirstChange,
             onGalleryModeChange,
