@@ -14,11 +14,15 @@
             <radio-control text="A-Z" +click="sortByAtoZ" $checked="sortingByAtoZ"></radio-control>
             <radio-control text="Z-A" +click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
         </div>
+    </div>
+    <div class="form-row">
         <switch-control $checked="directoriesFirst" +change="onSortDirectoriesFirstChange">
-            Directories First
+            Sort directories first
         </switch-control>
+    </div>
+    <div class="form-row">
         <switch-control $checked="galleryMode" +change="onGalleryModeChange">
-            Gallery
+            Gallery Mode
         </switch-control>
     </div>
 </form>

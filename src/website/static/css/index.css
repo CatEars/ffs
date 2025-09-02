@@ -1,4 +1,4 @@
-@layer landing, main, override;
+@layer landing, base, main, override;
 
 /* General */
 @import url('./theme.css');
@@ -8,6 +8,7 @@
 @import url('./header.css');
 @import url('./forms.css');
 @import url('./data.css');
+@import url('./js-component/index.css');
 
 /* View specific */
 @import url('./gallery.css');
