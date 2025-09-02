@@ -21,7 +21,7 @@ class SwitchControl extends BaseWebComponent {
             <style>
                 label {
                     height: 100%;
-                    width: 100%;
+                    min-width: 24px;
                 }
             </style>
             <div class="form-row">
