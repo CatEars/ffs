@@ -20,4 +20,12 @@
         padding-top: 0.25rem;
         padding-bottom: 0.25rem;
     }
+
+    radio-control:has(+ radio-control) {
+        margin-right: 0;
+    }
+
+    radio-control + radio-control {
+        margin-left: 0;
+    }
 }

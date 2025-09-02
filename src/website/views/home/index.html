@@ -275,11 +275,13 @@
             setPageSizeTo50: generatePageSizeUpdater(50),
             setPageSizeTo100: generatePageSizeUpdater(100),
             setPageSizeTo250: generatePageSizeUpdater(250),
+            setPageSizeTo1000: generatePageSizeUpdater(1000),
 
             pageSizeIs20: megaphone.view((state) => state.pageSize === 20),
             pageSizeIs50: megaphone.view((state) => state.pageSize === 50),
             pageSizeIs100: megaphone.view((state) => state.pageSize === 100),
             pageSizeIs250: megaphone.view((state) => state.pageSize === 250),
+            pageSizeIs1000: megaphone.view((state) => state.pageSize === 1000),
 
             onSortDirectoriesFirstChange,
             onGalleryModeChange,

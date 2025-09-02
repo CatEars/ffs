@@ -1,6 +1,6 @@
 <form>
     <div class="form-row">
-        <div class="sort-row">
+        <row-layout>
             <radio-control
                 imgSrc="child"
                 +click="sortByNewest"
@@ -13,11 +13,11 @@
             ></radio-control>
             <radio-control text="A-Z" +click="sortByAtoZ" $checked="sortingByAtoZ"></radio-control>
             <radio-control text="Z-A" +click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
-        </div>
+        </row-layout>
         <p>- Sort order</p>
     </div>
     <div class="form-row">
-        <div class="sort-row">
+        <row-layout>
             <radio-control
                 text="20"
                 +click="setPageSizeTo20"
@@ -38,7 +38,12 @@
                 +click="setPageSizeTo250"
                 $checked="pageSizeIs250"
             ></radio-control>
-        </div>
+            <radio-control
+                text="1000"
+                +click="setPageSizeTo1000"
+                $checked="pageSizeIs1000"
+            ></radio-control>
+        </row-layout>
         <p>- Page size</p>
     </div>
     <div class="form-row">
