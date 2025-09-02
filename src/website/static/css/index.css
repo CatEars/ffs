@@ -9,6 +9,7 @@
 @import url('./forms.css');
 @import url('./data.css');
 @import url('./js-component/index.css');
+@import url('./input.css');
 
 /* View specific */
 @import url('./gallery.css');

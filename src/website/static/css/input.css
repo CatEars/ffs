@@ -1,0 +1,15 @@
+@layer main {
+    label {
+        &:has(input[type='checkbox']) {
+            background-image: url('../svg/check_box_outline.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        &:has(input[type='checkbox']:checked) {
+            background-image: url('../svg/check_box.svg');
+        }
+        input[type='checkbox'] {
+            appearance: none;
+        }
+    }
+}

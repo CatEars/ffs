@@ -32,7 +32,7 @@ async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
 
 async function bundleCssStyles(opts?: BundleParams) {
     const command = new Deno.Command(esbuildLocation, {
-        args: ['--bundle', 'index.css', '--outfile=index.bundle.css'],
+        args: ['--bundle', 'index.css', '--loader:.svg=dataurl', '--outfile=index.bundle.css'],
         cwd: './src/website/static/css',
     });
 

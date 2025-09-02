@@ -18,18 +18,23 @@ class SwitchControl extends BaseWebComponent {
             );
         };
         return html`
-            <div class="form-check form-check-inline form-switch">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    role="switch"
-                    id="switchCheckChecked"
-                    checked="${checked}"
-                    onchange="${() => onChange()}"
-                />
-                <label class="form-check-label" for="switchCheckChecked">
-                    <slot></slot>
+            <style>
+                label {
+                    height: 100%;
+                    width: 100%;
+                }
+            </style>
+            <div class="form-row">
+                <label>
+                    <input
+                        type="checkbox"
+                        role="switch"
+                        id="switchCheckChecked"
+                        checked="${checked}"
+                        onchange="${() => onChange()}"
+                    />
                 </label>
+                <div><slot></slot></div>
             </div>
         `;
     }
