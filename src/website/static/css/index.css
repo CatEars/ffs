@@ -2,6 +2,7 @@
 
 /* General */
 @import url('./theme.css');
+@import url('./defaults.css');
 @import url('./on-page-load-fixes.css');
 @import url('./icons.css');
 @import url('./fonts.css');

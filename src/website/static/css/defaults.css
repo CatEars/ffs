@@ -1,0 +1,5 @@
+@layer base {
+    a {
+        color: var(--font-color);
+    }
+}

@@ -28,7 +28,7 @@ class CliCommand extends BaseWebComponent {
             commandDisplay.textContent = updatedCommand;
         };
 
-        const elem = html`
+        return html`
             <style>
                 ol {
                     display: flex;
@@ -69,7 +69,6 @@ class CliCommand extends BaseWebComponent {
                 <button type="submit">Run</button>
             </form>
         `;
-        return elem;
     }
 }
 
