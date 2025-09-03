@@ -47,7 +47,3 @@ wget -O /tmp/catears-ffs-latest.tar.gz $RELEASE_NAME
 gzip -fd /tmp/catears-ffs-latest.tar.gz
 
 docker load -i /tmp/catears-ffs-latest.tar
-
-echo 'starting FFS on port 8080'
-
-docker run --rm -p 8080:8080 catears/ffs:latest
