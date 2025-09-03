@@ -38,11 +38,11 @@
             ]
         },
         "build-docker": {
-            "command": "docker build --no-cache . -t catears/ffs",
+            "command": "./scripts/build-docker.sh",
             "dependencies": ["ensure-dist", "remove-personal-files", "bundle-component-library"]
         },
         "build-dist": {
-            "command": "rm -rf dist/* && docker save catears/ffs | gzip > dist/ffs.$(git describe --tags --abbrev=0).tar.gz",
+            "command": "./scripts/build-dist.sh",
             "dependencies": ["build-docker"]
         },
         "release": {

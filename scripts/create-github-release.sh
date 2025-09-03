@@ -13,6 +13,7 @@ curl -L \
 
 release_id=$(cat /tmp/release.json | jq .id)
 ARCHIVE_NAME=ffs.$VERSION.tar.gz
+TINY_ARCHIVE_NAME=ffs.$VERSION.tiny.tar.gz
 
 echo "Uploading docker $ARCHIVE_NAME archive as release asset to release $release_id"
 curl -L \
@@ -34,3 +35,12 @@ curl -L \
   "https://uploads.github.com/repos/catears/ffs/releases/$release_id/assets?name=ffs.latest.tar.gz" \
   --data-binary "@dist/$ARCHIVE_NAME"
 
+echo "Uploading docker $TINY_ARCHIVE_NAME as release asset to release $release_id"
+curl -L \
+  -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $FFS_RELEASE_TOKEN" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  -H "Content-Type: application/octet-stream" \
+  "https://uploads.github.com/repos/catears/ffs/releases/$release_id/assets?name=$TINY_ARCHIVE_NAME" \
+  --data-binary "@dist/$TINY_ARCHIVE_NAME"

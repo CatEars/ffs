@@ -38,7 +38,7 @@ function isLikelyFirstTimeUser() {
         cacheRootKey,
     ];
 
-    return vals.every((x) => !Deno.env.get(x));
+    return vals.some((x) => !Deno.env.get(x));
 }
 
 async function setFirstTimeUserValuesIfLikely() {
