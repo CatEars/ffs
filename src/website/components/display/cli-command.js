@@ -9,10 +9,26 @@ class CliCommand extends BaseWebComponent {
 
     render(html) {
         const command = JSON.parse(this.getAttribute('command') || '{}');
+        const formattedCommand = formatCommand(command);
         const method = this.getAttribute('method');
         const action = this.getAttribute('action');
 
-        return html`
+        const onInputChange = () => {
+            const commandDisplay = this.shadowRoot.querySelector('#command-display');
+            const inputs = this.shadowRoot.querySelectorAll('input[type="text"]');
+            let updatedCommand = formattedCommand;
+
+            for (const inputIdx of range(inputs.length)) {
+                const input = inputs[inputIdx];
+                const typedValue = input.value;
+                if (typedValue) {
+                    updatedCommand = updatedCommand.replaceAll(`$${inputIdx + 1}`, typedValue);
+                }
+            }
+            commandDisplay.textContent = updatedCommand;
+        };
+
+        const elem = html`
             <style>
                 ol {
                     display: flex;
@@ -35,7 +51,9 @@ class CliCommand extends BaseWebComponent {
             <form action="${action}" method="${method}">
                 <input type="hidden" name="index" value="${command.index}" />
                 <div class="form-row">
-                    <span>Example: <span>${formatCommand(command)}</span></span>
+                    <span
+                        >Example: <span id="command-display">${formatCommand(command)}</span></span
+                    >
                 </div>
                 <div>
                     <ol>
@@ -43,7 +61,7 @@ class CliCommand extends BaseWebComponent {
                             (x) =>
                                 html`<label>
                                     <span>$${x + 1}</span>
-                                    <input name="arg" type="text" />
+                                    <input onchange="${onInputChange}" name="arg" type="text" />
                                 </label>`
                         )}
                     </ol>
@@ -51,6 +69,7 @@ class CliCommand extends BaseWebComponent {
                 <button type="submit">Run</button>
             </form>
         `;
+        return elem;
     }
 }
 
