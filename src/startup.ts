@@ -35,7 +35,6 @@ function isLikelyFirstTimeUser() {
     const vals = [
         usersFileKey,
         storeRootKey,
-        cacheRootKey,
     ];
 
     return vals.some((x) => !Deno.env.get(x));

@@ -39,10 +39,10 @@ class CliCommand extends BaseWebComponent {
                 </div>
                 <div>
                     <ol>
-                        ${command.args.map(
+                        ${range(command.nargs).map(
                             (x) =>
                                 html`<label>
-                                    <span>${x}</span>
+                                    <span>$${x + 1}</span>
                                     <input name="arg" type="text" />
                                 </label>`
                         )}

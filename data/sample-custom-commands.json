@@ -8,5 +8,10 @@
         "program": "echo",
         "nargs": 2,
         "args": ["$1", "$2"]
+    },
+    {
+        "program": "echo",
+        "nargs": 2,
+        "args": ["Hello", "$2", ":", "$1"]
     }
 ]
