@@ -124,8 +124,8 @@
         constructor() {
             Megaphone._megaphones.push(this);
             this.dependents = {};
-            this.watches = [];
-            this.dollars = [];
+            this.watches = new Map();
+            this.dollars = new Map();
             this.state = null;
             this.stateProxy = null;
             this.initialized = false;
@@ -213,19 +213,24 @@
         }
 
         watch(stateProxy, callable) {
-            this.watches.push([stateProxy.property, callable]);
+            if (!this.watches.has(stateProxy.property)) {
+                this.watches.set(stateProxy.property, [callable]);
+            } else {
+                this.watches.get(stateProxy.property).push(callable);
+            }
         }
 
         onUpdate(target, property, value) {
-            for (const dollar of this.dollars) {
-                if (dollar.value === property) {
-                    const attributeName = dollar.name.substring(1);
-                    dollar.element.setAttribute(attributeName, `${value}`);
+            const propertyDollars = this.dollars.get(property);
+            if (propertyDollars) {
+                for (const { element, name } of propertyDollars) {
+                    element.setAttribute(name, `${value}`);
                 }
             }
 
-            for (const [propertyName, callable] of this.watches) {
-                if (property === propertyName) {
+            const propertyWatches = this.watches.get(property);
+            if (propertyWatches) {
+                for (const callable of propertyWatches) {
                     callable(value);
                 }
             }
@@ -273,14 +278,16 @@
                 return;
             }
             this.initialized = true;
-            const dollars = [];
+            const dollars = new Map();
             for (const element of document.querySelectorAll('*')) {
                 for (const attribute of element.attributes) {
                     if (attribute.name.startsWith('$')) {
-                        dollars.push({
+                        if (!dollars.has(attribute.value)) {
+                            dollars.set(attribute.value, []);
+                        }
+                        dollars.get(attribute.value).push({
                             element,
-                            name: attribute.name,
-                            value: attribute.value,
+                            name: attribute.name.substring(1),
                         });
                     } else if (attribute.name.startsWith('@')) {
                         const eventName = attribute.name.substring(1);
@@ -293,6 +300,7 @@
             }
             this.dollars = dollars;
 
+            // TODO: This very likely performs more updates than needed.
             for (const key of Object.keys(this.state)) {
                 this.#updateStateAndDependents(
                     this.state,
