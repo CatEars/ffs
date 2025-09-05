@@ -168,14 +168,35 @@
             return this.dependents[value];
         }
 
-        #getWatchTree(value) {
-            return topologicalSort(this.dependents, value);
+        #findUpdateOrder(property) {
+            const sortedList = [];
+            const visited = new Set();
+
+            const topologicalSort = (prop) => {
+                if (visited.has(prop)) {
+                    return;
+                }
+
+                visited.add(prop);
+
+                const dependents = this.#getDependents(prop);
+
+                for (const dependent of dependents) {
+                    topologicalSort(dependent);
+                }
+
+                sortedList.push(prop);
+            };
+
+            topologicalSort(property);
+
+            return sortedList.reverse();
         }
 
         #updateStateAndDependents(target, property, value) {
             this.onUpdate(target, property, value);
-            const dependents = this.#getDependents(property);
-            for (const dep of dependents) {
+            const updateOrder = this.#findUpdateOrder(property).filter((x) => x != property);
+            for (const dep of updateOrder) {
                 const subDependentValue = this._resolveState(this.state[dep]);
                 this.onUpdate(target, dep, subDependentValue);
             }
