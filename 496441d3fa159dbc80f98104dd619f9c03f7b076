@@ -10,3 +10,5 @@
 	[ ] And clear cache!
 
 [ ] Download directories
+
+[ ] Make Command use SSE (or similar) for running commands
