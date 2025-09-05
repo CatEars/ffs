@@ -1,8 +1,21 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
-        const mediaViewer = document.createElement('media-viewer');
-        mediaViewer.setAttribute('src', getUrlParam('path', '.'));
-        document.querySelector('app-main').appendChild(mediaViewer);
+        const megaphone = new Megaphone();
+
+        const state = megaphone.declareState({
+            src: megaphone.urlParam('path', '.'),
+        });
+
+        megaphone.render(
+            state.src,
+            '#media-holder',
+            megaphone.webComponent('media-viewer', (src) => ({
+                src,
+            }))
+        );
+
+        megaphone.init();
     </script>
+    <div id="media-holder"></div>
 </app-main>
