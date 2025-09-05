@@ -3,16 +3,16 @@
         <row-layout>
             <radio-control
                 imgSrc="child"
-                +click="sortByNewest"
+                @click="sortByNewest"
                 $checked="sortingByNewest"
             ></radio-control>
             <radio-control
                 imgSrc="elderly"
-                +click="sortByOldest"
+                @click="sortByOldest"
                 $checked="sortingByOldest"
             ></radio-control>
-            <radio-control text="A-Z" +click="sortByAtoZ" $checked="sortingByAtoZ"></radio-control>
-            <radio-control text="Z-A" +click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
+            <radio-control text="A-Z" @click="sortByAtoZ" $checked="sortingByAtoZ"></radio-control>
+            <radio-control text="Z-A" @click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
         </row-layout>
         <p>- Sort order</p>
     </gapped-row>
@@ -20,39 +20,39 @@
         <row-layout>
             <radio-control
                 text="20"
-                +click="setPageSizeTo20"
+                @click="setPageSizeTo20"
                 $checked="pageSizeIs20"
             ></radio-control>
             <radio-control
                 text="50"
-                +click="setPageSizeTo50"
+                @click="setPageSizeTo50"
                 $checked="pageSizeIs50"
             ></radio-control>
             <radio-control
                 text="100"
-                +click="setPageSizeTo100"
+                @click="setPageSizeTo100"
                 $checked="pageSizeIs100"
             ></radio-control>
             <radio-control
                 text="250"
-                +click="setPageSizeTo250"
+                @click="setPageSizeTo250"
                 $checked="pageSizeIs250"
             ></radio-control>
             <radio-control
                 text="1000"
-                +click="setPageSizeTo1000"
+                @click="setPageSizeTo1000"
                 $checked="pageSizeIs1000"
             ></radio-control>
         </row-layout>
         <p>- Page size</p>
     </gapped-row>
     <row-layout>
-        <switch-control $checked="directoriesFirst" +change="onSortDirectoriesFirstChange">
+        <switch-control $checked="directoriesFirst" @change="onSortDirectoriesFirstChange">
             Sort directories first
         </switch-control>
     </row-layout>
     <row-layout>
-        <switch-control $checked="galleryMode" +change="onGalleryModeChange">
+        <switch-control $checked="galleryMode" @change="onGalleryModeChange">
             Gallery Mode
         </switch-control>
     </row-layout>

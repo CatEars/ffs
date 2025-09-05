@@ -261,7 +261,7 @@
                             name: attribute.name,
                             value: attribute.value,
                         });
-                    } else if (attribute.name.startsWith('+')) {
+                    } else if (attribute.name.startsWith('@')) {
                         const eventName = attribute.name.substring(1);
                         const func = this.state[attribute.value];
                         if (func) {

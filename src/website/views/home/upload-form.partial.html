@@ -30,12 +30,12 @@
     <div class="form-row action-buttons">
         <input
             style="display: none"
-            +change="getFilenamesFromEvent"
+            @change="getFilenamesFromEvent"
             type="file"
             id="file"
             name="file"
         />
-        <button +click="clickHiddenFileBrowseButton" id="browseButton">
+        <button @click="clickHiddenFileBrowseButton" id="browseButton">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#attach"></use>
             </svg>
