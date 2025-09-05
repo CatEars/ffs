@@ -14,9 +14,13 @@ export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
         suffix: '.webp',
     });
     ensureDir(dirname(outputPath));
+    let append = '';
+    if (thumbnail.filePath.toLocaleLowerCase().endsWith('.gif')) {
+        append = '[0]'; // generate static image for GIFs
+    }
     const command = new Deno.Command('convert', {
         args: [
-            thumbnail.filePath,
+            thumbnail.filePath + append,
             '-thumbnail',
             '128x128',
             '-quality',
