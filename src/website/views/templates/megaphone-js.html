@@ -168,7 +168,7 @@
             return this.dependents[value];
         }
 
-        #findUpdateOrder(property) {
+        #findUpdateOrder(properties) {
             const sortedList = [];
             const visited = new Set();
 
@@ -188,17 +188,26 @@
                 sortedList.push(prop);
             };
 
-            topologicalSort(property);
+            for (const property of properties) {
+                topologicalSort(property);
+            }
 
             return sortedList.reverse();
         }
 
         #updateStateAndDependents(target, property, value) {
             this.onUpdate(target, property, value);
-            const updateOrder = this.#findUpdateOrder(property).filter((x) => x != property);
+            const updateOrder = this.#findUpdateOrder([property]).filter((x) => x != property);
             for (const dep of updateOrder) {
                 const subDependentValue = this._resolveState(this.state[dep]);
                 this.onUpdate(target, dep, subDependentValue);
+            }
+        }
+
+        #performInitialUpdate() {
+            const updateOrder = this.#findUpdateOrder(Object.keys(this.state));
+            for (const key of updateOrder) {
+                this.onUpdate(this.state, key, this._resolveState(this.state[key]));
             }
         }
 
@@ -300,14 +309,7 @@
             }
             this.dollars = dollars;
 
-            // TODO: This very likely performs more updates than needed.
-            for (const key of Object.keys(this.state)) {
-                this.#updateStateAndDependents(
-                    this.state,
-                    key,
-                    this._resolveState(this.state[key])
-                );
-            }
+            this.#performInitialUpdate();
         }
 
         view(stateSelector) {
