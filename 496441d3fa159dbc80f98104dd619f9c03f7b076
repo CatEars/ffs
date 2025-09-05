@@ -10,6 +10,7 @@
 
 [ ] For reactivity framework, ensure that single updates are topologically sorted. e.g. if one prop depends on 4 other props only 1 update not 4
 
-[ ] Add `Config` tab that can auto-generate config for a new installation
+[ ] Add `Config`/`Admin` tab that can auto-generate config for a new installation
+	[ ] And clear cache!
 
 [ ] Download directories
