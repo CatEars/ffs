@@ -11,15 +11,18 @@
             logs: [],
         });
 
-        megaphone.renderEach(state.logs, '#logs', (log) => {
-            const clone = document.querySelector('#log').content.cloneNode(true);
-            clone.querySelector('h2').innerText = log.name;
-            const entries = log.entries;
-            const logLines = entries.map((x) => x.join(' ')).join('\n');
-            clone.querySelector('pre').innerText = logLines;
+        megaphone.renderEach(
+            state.logs,
+            '#logs',
+            megaphone.template('#log', (clone, log) => {
+                clone.querySelector('h2').innerText = log.name;
 
-            return clone;
-        });
+                const logLines = log.entries.map((x) => x.join(' ')).join('\n');
+                clone.querySelector('pre').innerText = logLines;
+
+                return clone;
+            })
+        );
 
         megaphone.init();
         state.logs = await getLogs();

@@ -21,11 +21,14 @@
             uploadDisabled: megaphone.view((state) => state.names.length === 0),
         });
 
-        megaphone.renderEach(state.names, '#upload-name-display', (name) => {
-            const clone = document.querySelector('#upload-name-template').content.cloneNode(true);
-            clone.querySelector('div').innerText = name;
-            return clone;
-        });
+        megaphone.renderEach(
+            state.names,
+            '#upload-name-display',
+            megaphone.template('#upload-name-template', (clone, name) => {
+                clone.querySelector('div').innerText = name;
+                return clone;
+            })
+        );
     </script>
     <div class="form-row action-buttons">
         <input

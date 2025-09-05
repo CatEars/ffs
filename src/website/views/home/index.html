@@ -332,36 +332,39 @@
             }))
         );
 
-        megaphone.renderEach(state.sortedFiles, '#file-list', (file) => {
-            const clone = document.querySelector('#file-row-entry').content.cloneNode(true);
-            clone.querySelector('input').value = file.name;
-            clone
-                .querySelector('use')
-                .setAttribute(
-                    'href',
-                    `/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`
-                );
-            const imageSource = getFileImageSource(currentPath, file);
-            const iconHover = clone.querySelector('icon-hover');
-            if (file.isFile) {
-                iconHover.setAttribute('url', imageSource);
-            } else if (file.isDirectory) {
-                iconHover.setAttribute('disabled', 'true');
-            }
+        megaphone.renderEach(
+            state.sortedFiles,
+            '#file-list',
+            megaphone.template('#file-row-entry', (clone, file) => {
+                clone.querySelector('input').value = file.name;
+                clone
+                    .querySelector('use')
+                    .setAttribute(
+                        'href',
+                        `/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`
+                    );
+                const imageSource = getFileImageSource(currentPath, file);
+                const iconHover = clone.querySelector('icon-hover');
+                if (file.isFile) {
+                    iconHover.setAttribute('url', imageSource);
+                } else if (file.isDirectory) {
+                    iconHover.setAttribute('disabled', 'true');
+                }
 
-            if (file.isDirectory) {
-                const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
-                textRow.querySelector('a').setAttribute('href', getLinkTo(file));
-                textRow.querySelector('span').innerText = file.name;
-                clone.querySelector('div.file-row-text').appendChild(textRow);
-            } else {
-                const textRow = clone.querySelector('#file-row').content.cloneNode(true);
-                textRow.querySelector('span').innerText = file.name;
-                clone.querySelector('div.file-row-text').appendChild(textRow);
-            }
+                if (file.isDirectory) {
+                    const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
+                    textRow.querySelector('a').setAttribute('href', getLinkTo(file));
+                    textRow.querySelector('span').innerText = file.name;
+                    clone.querySelector('div.file-row-text').appendChild(textRow);
+                } else {
+                    const textRow = clone.querySelector('#file-row').content.cloneNode(true);
+                    textRow.querySelector('span').innerText = file.name;
+                    clone.querySelector('div.file-row-text').appendChild(textRow);
+                }
 
-            return clone;
-        });
+                return clone;
+            })
+        );
 
         megaphone.init();
 

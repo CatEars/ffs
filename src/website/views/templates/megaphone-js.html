@@ -367,5 +367,15 @@
                 return element;
             };
         }
+
+        template(documentId, renderFunc) {
+            return (elementToRender, idx) => {
+                const templateClone = document.querySelector(documentId).content.cloneNode(true);
+                if (idx === undefined || idx === null) {
+                    return renderFunc(templateClone, elementToRender);
+                }
+                return renderFunc(templateClone, elementToRender, idx);
+            };
+        }
     }
 </script>

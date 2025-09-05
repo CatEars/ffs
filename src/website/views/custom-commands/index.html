@@ -22,11 +22,14 @@
             }))
         );
 
-        megaphone.renderIf(state.message, '#output-display', (message) => {
-            const clone = document.querySelector('#success-display').content.cloneNode(true);
-            clone.querySelector('pre').textContent = message;
-            return clone;
-        });
+        megaphone.renderIf(
+            state.message,
+            '#output-display',
+            megaphone.template('#success-display', (clone, message) => {
+                clone.querySelector('pre').textContent = message;
+                return clone;
+            })
+        );
 
         megaphone.init();
 

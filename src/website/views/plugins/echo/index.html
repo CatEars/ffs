@@ -29,11 +29,14 @@
             onSubmitEcho,
         });
 
-        megaphone.render(state.displayText, '#display', (text) => {
-            const clone = document.querySelector('#display-content').content.cloneNode(true);
-            clone.querySelector('span').innerText = text;
-            return clone;
-        });
+        megaphone.render(
+            state.displayText,
+            '#display',
+            megaphone.template('#display-content', (clone, text) => {
+                clone.querySelector('span').innerText = text;
+                return clone;
+            })
+        );
 
         megaphone.init();
     </script>

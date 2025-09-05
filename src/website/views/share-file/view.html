@@ -18,15 +18,18 @@
         fileData: [],
     });
 
-    megaphone.renderEach(state.fileData, '#file-list', (fileLink, index) => {
-        const fileRow = document.querySelector('#file-row').content.cloneNode(true);
-        const link = fileRow.querySelector('a');
+    megaphone.renderEach(
+        state.fileData,
+        '#file-list',
+        megaphone.template('#file-row', (fileRow, fileLink, index) => {
+            const link = fileRow.querySelector('a');
 
-        link.text = fileLink;
-        link.href = buildDownloadHref(index);
+            link.text = fileLink;
+            link.href = buildDownloadHref(index);
 
-        return fileRow;
-    });
+            return fileRow;
+        })
+    );
     megaphone.init();
 
     state.fileData = await getFilesFromParams();
