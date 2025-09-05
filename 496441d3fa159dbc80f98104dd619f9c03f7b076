@@ -2,8 +2,6 @@
 
 [ ] Built-in `docs` page
 
-[ ] Add thumbnail support for more video files
-
 [ ] Automate changelog of features and fixes
 
 [ ] Do not use `paths` in URL to share files, as that can be quite long and max limit is 2048
