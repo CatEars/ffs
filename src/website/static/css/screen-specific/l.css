@@ -3,6 +3,8 @@
         :root {
             --file-card-max-width: 11.5rem;
             --file-card-max-height: 10rem;
+
+            --thumbnail-hover-max-width: 17.5rem;
         }
     }
 }

@@ -25,4 +25,8 @@
     .action-buttons > button {
         cursor: pointer;
     }
+
+    .file-checkbox {
+        height: 26px;
+    }
 }
