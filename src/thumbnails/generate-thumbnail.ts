@@ -8,9 +8,18 @@ type Thumbnailer = {
     handler: (thumbnail: ThumbnailRequest) => Promise<void>;
 };
 
+// LINK-FILE-EXTENSIONS
 const nailers: Thumbnailer[] = [
     {
-        extNames: ['.mp4', '.m4v'],
+        extNames: [
+            '.mp4',
+            '.m4v',
+            '.mov',
+            '.avi',
+            '.webm',
+            '.mkv',
+            '.mpg',
+        ],
         handler: createMp4Thumbnail,
     },
     {

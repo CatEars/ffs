@@ -94,11 +94,25 @@
         }
 
         function isImageFile(file) {
-            return ['.png', '.jpg', '.jpeg', '.gif'].some((x) => file.endsWith(x));
+            // LINK-FILE-EXTENSIONS
+            return [
+                '.png',
+                '.jpg',
+                '.jpeg',
+                '.tiff',
+                '.webp',
+                '.gif',
+                '.avif',
+                '.bmp',
+                '.ico',
+                '.psd',
+            ].some((x) => file.endsWith(x));
         }
 
         function isMovieFile(file) {
-            return ['.mp4', '.m4v'].some((x) => file.endsWith(x));
+            return ['.mp4', '.m4v', '.mov', '.avi', '.webm', '.mkv', '.mpg'].some((x) =>
+                file.endsWith(x)
+            );
         }
 
         function isMediaFile(file) {
