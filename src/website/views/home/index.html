@@ -183,6 +183,17 @@
             document.getElementById('paste-form').submit();
         }
 
+        function deleteFiles() {
+            const myPath = getCurrentPath();
+            const clickedFiles = getCheckedFiles();
+            const filesToRemove = clickedFiles.map((elem) => ({
+                path: myPath,
+                fileName: elem,
+            }));
+            document.getElementById('files-to-remove').value = JSON.stringify(filesToRemove);
+            document.getElementById('delete-form').submit();
+        }
+
         function createFileShare() {
             const myPath = getCurrentPath();
             const paths = getCheckedFiles().map((x) => `${myPath}/${x}`);
@@ -293,6 +304,7 @@
             createFileShare,
             renameFile,
             makeDirectory,
+            deleteFiles,
         });
 
         megaphone.renderEach(
@@ -322,6 +334,7 @@
             } else if (file.isDirectory) {
                 iconHover.setAttribute('disabled', 'true');
             }
+
             if (file.isDirectory) {
                 const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
                 textRow.querySelector('a').setAttribute('href', getLinkTo(file));
@@ -332,6 +345,7 @@
                 textRow.querySelector('span').innerText = file.name;
                 clone.querySelector('div.file-row-text').appendChild(textRow);
             }
+
             return clone;
         });
 

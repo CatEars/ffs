@@ -5,6 +5,7 @@ import { registerUploadFileRoute } from './upload-file.ts';
 import { registerMoveFileRoute } from './move-file.ts';
 import { registerRenameFileRoute } from './rename-file.ts';
 import { registerMakeDirectoryRoute } from './make-directory.ts';
+import { registerFileDeletionRoute } from './delete-file.ts';
 
 export function registerAllFileListing(router: Router) {
     registerDirectoryRoutes(router);
@@ -13,4 +14,5 @@ export function registerAllFileListing(router: Router) {
     registerMoveFileRoute(router);
     registerRenameFileRoute(router);
     registerMakeDirectoryRoute(router);
+    registerFileDeletionRoute(router);
 }
