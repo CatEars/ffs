@@ -1,6 +1,6 @@
 import { BaseWebComponent } from '../base.js';
 
-class HorizontalRow extends BaseWebComponent {
+class HorizontalRuler extends BaseWebComponent {
     render(html) {
         return html`
             <style>
@@ -13,4 +13,4 @@ class HorizontalRow extends BaseWebComponent {
     }
 }
 
-export default HorizontalRow;
+export default HorizontalRuler;

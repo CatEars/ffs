@@ -13,7 +13,7 @@ import RadioControl from './control/radio-control.js';
 import PaginateControl from './control/paginate-control.js';
 import { loadSharedStylesheets } from './base.js';
 import RowLayout from './layout/row-layout.js';
-import HorizontalRow from './layout/horizontal-row.js';
+import HorizontalRuler from './layout/horizontal-ruler.js';
 import GappedRow from './layout/gapped-row.js';
 import IconHover from './display/icon-hover.js';
 
@@ -28,7 +28,7 @@ const components = [
     ['file-card', FileCard],
     ['gapped-row', GappedRow],
     ['header-tab', HeaderTab],
-    ['horizontal-row', HorizontalRow],
+    ['horizontal-ruler', HorizontalRuler],
     ['icon-hover', IconHover],
     ['media-viewer', MediaViewer],
     ['switch-control', SwitchControl],
