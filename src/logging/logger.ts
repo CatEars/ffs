@@ -16,8 +16,15 @@ function prefix(): string {
 }
 
 function stringify(obj: Loggable): string {
-    if (typeof obj === 'string') {
+    if (obj instanceof String || typeof obj === 'string') {
         return obj.replaceAll('\n', '\\n');
+    } else if (obj instanceof Error) {
+        const x = `<${obj.name}|${obj.message}`;
+        if (obj.cause) {
+            return `${x}|${obj.cause}>`;
+        } else {
+            return `${x}>`;
+        }
     } else {
         return JSON.stringify(obj);
     }
@@ -29,7 +36,8 @@ function generateLogLine(
     messages: Loggable[],
 ) {
     const joined = messages.map(stringify).join(' ');
-    return [(prefix + ' %c').trimStart() + joined, css];
+    const clearance = css.length > 0 ? ' %c' : ' ';
+    return [(prefix + clearance).trimStart() + joined, css];
 }
 
 class FifoCache extends Array {
@@ -80,9 +88,11 @@ class RecordingLogWrapper {
 
     addToCache(msg: Loggable[]) {
         if (this.noPrefix) {
-            this.logCache.push(msg);
+            const logLine = generateLogLine('', '', msg);
+            this.logCache.push(logLine);
         } else {
-            this.logCache.push([prefix()].concat(msg));
+            const logLine = generateLogLine(prefix(), '', msg);
+            this.logCache.push(logLine);
         }
     }
 
