@@ -63,6 +63,8 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
             '1',
             '-vsync',
             'vfr',
+            '-err_detect',
+            'ignore_err',
             '-y',
             tempFile,
         ],

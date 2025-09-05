@@ -80,7 +80,6 @@ export async function prioritizeThumbnail(filePath: string) {
 
             await thumbnailProcessStdin?.write(bytes);
         } catch (err) {
-            console.warn(err);
             logger.warn(
                 'Tried to prioritize thumbnail',
                 filePath,
