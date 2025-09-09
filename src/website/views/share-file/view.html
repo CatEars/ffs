@@ -1,21 +1,10 @@
 <!-- layout /templates/base.html -->
 <script type="module">
-    async function getFilesFromParams() {
-        const paths = getUrlParam('paths');
-        const hmac = getUrlParam('hmac');
-        const result = await fetch(`/api/share-file/list?paths=${paths}&hmac=${hmac}`);
-        return await result.json();
-    }
-
-    function buildDownloadHref(index) {
-        const paths = getUrlParam('paths');
-        const hmac = getUrlParam('hmac');
-        return `/api/share-file/download?paths=${paths}&hmac=${hmac}&index=${index}`;
-    }
-
     const megaphone = new Megaphone();
+    const paths = getUrlParam('paths');
+    const hmac = getUrlParam('hmac');
     const state = megaphone.declareState({
-        fileData: [],
+        fileData: megaphone.jsonApi(`/api/share-file/list?paths=${paths}&hmac=${hmac}`, []),
     });
 
     megaphone.renderEach(
@@ -25,7 +14,7 @@
             const link = fileRow.querySelector('a');
 
             link.text = fileLink;
-            link.href = buildDownloadHref(index);
+            link.href = `/api/share-file/download?paths=${paths}&hmac=${hmac}&index=${index}`;
 
             return fileRow;
         })

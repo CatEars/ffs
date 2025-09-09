@@ -1,14 +1,10 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
-        async function getLogs() {
-            const result = await fetch('/api/logs');
-            return (await result.json()).logs;
-        }
-
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            logs: [],
+            dlLogs: megaphone.jsonApi('/api/logs', { logs: [] }),
+            logs: megaphone.view((state) => state.dlLogs.logs),
         });
 
         megaphone.renderEach(
@@ -25,7 +21,6 @@
         );
 
         megaphone.init();
-        state.logs = await getLogs();
     </script>
     <app-header>Logs</app-header>
     <section id="logs">
