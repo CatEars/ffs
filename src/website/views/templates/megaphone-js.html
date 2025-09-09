@@ -118,6 +118,29 @@
         }
     }
 
+    class JsonApiValue {
+        constructor(key, defaultValue) {
+            this.key = key;
+            this.defaultValue = defaultValue;
+            this.mostRecentValue = defaultValue;
+        }
+
+        async init() {
+            try {
+                const result = await fetch(this.key);
+                if (result.status === 200) {
+                    this.mostRecentValue = await result.json();
+                }
+            } catch (err) {
+                console.warn('Failed to fetch', this.key, err);
+            }
+        }
+
+        get() {
+            return this.mostRecentValue;
+        }
+    }
+
     class Megaphone {
         static _megaphones = [];
 
@@ -129,6 +152,7 @@
             this.state = null;
             this.stateProxy = null;
             this.initialized = false;
+            this.asyncInits = [];
         }
 
         #renderAndAppend(element, valueToRender, renderFunction, index = null) {
@@ -204,17 +228,33 @@
             }
         }
 
-        #performInitialUpdate() {
+        #updateAll() {
             const updateOrder = this.#findUpdateOrder(Object.keys(this.state));
             for (const key of updateOrder) {
                 this.onUpdate(this.state, key, this._resolveState(this.state[key]));
             }
         }
 
+        #runInitTasks() {
+            const initTasks = [];
+            for (const initTask of this.asyncInits) {
+                initTasks.push(initTask.init());
+            }
+
+            Promise.all(initTasks).then(() => this.#updateAll());
+        }
+
+        #performInitialUpdate() {
+            this.#updateAll();
+            this.#runInitTasks();
+        }
+
         _resolveState(stateValue) {
             if (stateValue instanceof ComputedView) {
                 return stateValue.evaluate(this.stateProxy);
             } else if (stateValue instanceof BrowserStorage) {
+                return stateValue.get();
+            } else if (stateValue instanceof JsonApiValue) {
                 return stateValue.get();
             }
 
@@ -251,6 +291,8 @@
             }
             this.state = state;
 
+            const asyncTasks = [];
+
             for (const elementKey in state) {
                 const element = state[elementKey];
                 if (element instanceof ComputedView) {
@@ -262,6 +304,8 @@
                     this.watch({ property: elementKey }, (newValue) => {
                         element.set(newValue);
                     });
+                } else if (element instanceof JsonApiValue) {
+                    this.asyncInits.push(element);
                 }
             }
 
@@ -279,6 +323,7 @@
                     };
                 },
             });
+
             return this.stateProxy;
         }
 
@@ -326,6 +371,10 @@
 
         urlParam(key, defaultValue) {
             return new BrowserStorage(new UrlParamStorageAdapter(), key, defaultValue);
+        }
+
+        jsonApi(key, defaultValue) {
+            return new JsonApiValue(key, defaultValue);
         }
 
         renderEach(state, into, renderFunc) {

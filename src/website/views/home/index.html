@@ -1,31 +1,23 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script>
-        function mapDateStrToDate(entries) {
-            for (const entry of entries) {
-                entry.date = new Date(entry.date);
-            }
+        function filesWithUnstringifiedDate(files) {
+            return files.map((file) => ({ ...file, date: new Date(file.date) }));
         }
 
-        async function getFiles(rootPath) {
-            const response = await fetch(`/api/directory?path=${rootPath}`);
-            if (response.status === 200) {
-                const result = await response.json();
-                mapDateStrToDate(result);
-                if (rootPath === '.') {
-                    return result;
-                }
-                const resultWithParent = [
-                    {
-                        name: '..',
-                        isDirectory: true,
-                        fileType: 'directory',
-                        imageSrc: 'folder',
-                    },
-                ].concat(result);
-                return resultWithParent;
+        function includeParentUnlessRoot(files, currentPath) {
+            if (currentPath === '.') {
+                return files;
             }
-            return [];
+
+            return [
+                {
+                    name: '..',
+                    isDirectory: true,
+                    fileType: 'directory',
+                    imageSrc: 'folder',
+                },
+            ].concat(files);
         }
 
         function paginate(array, page, pageSize) {
@@ -39,9 +31,6 @@
         }
 
         function sortedBy(files, sorting, directoriesFirst, page, pageSize) {
-            const copy = JSON.parse(JSON.stringify(files));
-            mapDateStrToDate(copy);
-
             const sortingFunction =
                 sorting === 'oldest'
                     ? (a, b) => a.date - b.date
@@ -53,11 +42,11 @@
                     ? (a, b) => -a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
                     : () => {};
 
-            copy.sort(sortingFunction);
+            let copy = files.toSorted(sortingFunction);
             if (directoriesFirst) {
                 const directoryFirstSorter = (a, b) =>
                     a.isDirectory && !b.isDirectory ? -1 : !a.isDirectory && b.isDirectory ? 1 : 0;
-                copy.sort(directoryFirstSorter);
+                copy = copy.toSorted(directoryFirstSorter);
             }
 
             return paginate(copy, page, pageSize);
@@ -272,7 +261,10 @@
             fileManagerVisibility: megaphone.view((state) =>
                 state.galleryMode ? 'hidden' : 'show'
             ),
-            files: [],
+            dlFiles: megaphone.jsonApi(`/api/directory?path=${currentPath}`, []),
+            files: megaphone.view((state) =>
+                includeParentUnlessRoot(filesWithUnstringifiedDate(state.dlFiles), currentPath)
+            ),
             maxPages: megaphone.view((state) => getNumPages(state.files, state.pageSize)),
             sorting: megaphone.localStorage('file-sort-order', 'newest'),
             directoriesFirst: megaphone.localStorage('show-directories-first', true),
@@ -367,8 +359,6 @@
         );
 
         megaphone.init();
-
-        state.files = await getFiles(currentPath);
     </script>
     <app-header>
         <breadcrumb-nav
