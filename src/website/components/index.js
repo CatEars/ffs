@@ -1,26 +1,27 @@
+import { loadSharedStylesheets } from './base.js';
 import AppHeader from './text/app-header.js';
-import AppSubheader from './text/app-subheader.js';
 import AppMain from './layout/app-main.js';
+import AppSubheader from './text/app-subheader.js';
 import BreadcrumbNav from './navigation/breadcrumb-nav.js';
 import CliCommand from './display/cli-command.js';
 import ColumnLayout from './layout/column-layout.js';
 import DropDown from './display/drop-down.js';
 import FileCard from './display/file-card.js';
-import HeaderTab from './navigation/header-tab.js';
-import MediaViewer from './display/media-viewer.js';
-import SwitchControl from './control/switch-control.js';
-import RadioControl from './control/radio-control.js';
-import PaginateControl from './control/paginate-control.js';
-import { loadSharedStylesheets } from './base.js';
-import RowLayout from './layout/row-layout.js';
-import HorizontalRuler from './layout/horizontal-ruler.js';
 import GappedRow from './layout/gapped-row.js';
+import HeaderTab from './navigation/header-tab.js';
+import HorizontalRuler from './layout/horizontal-ruler.js';
 import IconHover from './display/icon-hover.js';
+import LogDropDown from './display/log-drop-down.js';
+import MediaViewer from './display/media-viewer.js';
+import PaginateControl from './control/paginate-control.js';
+import RadioControl from './control/radio-control.js';
+import RowLayout from './layout/row-layout.js';
+import SwitchControl from './control/switch-control.js';
 
 const components = [
     ['app-header', AppHeader],
-    ['app-subheader', AppSubheader],
     ['app-main', AppMain],
+    ['app-subheader', AppSubheader],
     ['breadcrumb-nav', BreadcrumbNav],
     ['cli-command', CliCommand],
     ['column-layout', ColumnLayout],
@@ -30,11 +31,12 @@ const components = [
     ['header-tab', HeaderTab],
     ['horizontal-ruler', HorizontalRuler],
     ['icon-hover', IconHover],
+    ['log-drop-down', LogDropDown],
     ['media-viewer', MediaViewer],
-    ['switch-control', SwitchControl],
+    ['paginate-control', PaginateControl],
     ['radio-control', RadioControl],
     ['row-layout', RowLayout],
-    ['paginate-control', PaginateControl],
+    ['switch-control', SwitchControl],
 ];
 
 function register(name, Component) {

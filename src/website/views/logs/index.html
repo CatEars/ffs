@@ -10,25 +10,14 @@
         megaphone.renderEach(
             state.logs,
             '#logs',
-            megaphone.template('#log', (clone, log) => {
-                clone.querySelector('h2').innerText = log.name;
-
-                const logLines = log.entries.map((x) => x.join(' ')).join('\n');
-                clone.querySelector('pre').innerText = logLines;
-
-                return clone;
-            })
+            megaphone.webComponent('log-drop-down', (log) => ({
+                header: log.name,
+                text: log.entries.map((x) => x.join(' ')).join('\n'),
+            }))
         );
 
         megaphone.init();
     </script>
     <app-header>Logs</app-header>
-    <section id="logs">
-        <template id="log">
-            <drop-down>
-                <h2 slot="header"></h2>
-                <pre></pre>
-            </drop-down>
-        </template>
-    </section>
+    <section id="logs"></section>
 </app-main>
