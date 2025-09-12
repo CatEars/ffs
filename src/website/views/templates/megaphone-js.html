@@ -1,48 +1,51 @@
 <!-- Megaphone is a homebrewn reactivity framework -->
 <script>
-    function getStateSelectorDependencies(stateSelector) {
-        const selectorBody = stateSelector.toString();
-        let declaration, body;
-        if (selectorBody.startsWith('function')) {
-            [, declaration, body] = selectorBody.split(' ');
-            body = selectorBody.substring(selectorBody.indexOf('{'));
-            declaration = declaration.split('(')[1].replaceAll(')', '').replaceAll('{', '').trim();
-        } else {
-            [declaration, body] = selectorBody.split('=>');
-            declaration = declaration.replaceAll('(', '').replaceAll(')', '').trim();
-        }
-
-        const stateVariableName = declaration;
-        const pattern = `${stateVariableName}\\s*\\.([a-zA-Z0-9]+)`;
-        const regex = new RegExp(pattern, 'g');
-
-        let match;
-        const properties = new Set();
-
-        while ((match = regex.exec(body)) !== null) {
-            properties.add(match[1]);
-        }
-
-        return Array.from(properties);
-    }
-
     class ComputedView {
         constructor(stateSelector, megaphone) {
             this.stateSelector = stateSelector;
             this.megaphone = megaphone;
         }
 
-        dependencies() {
-            return getStateSelectorDependencies(this.stateSelector);
+        #getStateSelectorDependencies(stateSelector) {
+            const selectorBody = stateSelector.toString();
+            let declaration, body;
+            if (selectorBody.startsWith('function')) {
+                [, declaration, body] = selectorBody.split(' ');
+                body = selectorBody.substring(selectorBody.indexOf('{'));
+                declaration = declaration
+                    .split('(')[1]
+                    .replaceAll(')', '')
+                    .replaceAll('{', '')
+                    .trim();
+            } else {
+                [declaration, body] = selectorBody.split('=>');
+                declaration = declaration.replaceAll('(', '').replaceAll(')', '').trim();
+            }
+
+            const stateVariableName = declaration;
+            const pattern = `${stateVariableName}\\s*\\.([a-zA-Z0-9]+)`;
+            const regex = new RegExp(pattern, 'g');
+
+            let match;
+            const properties = new Set();
+
+            while ((match = regex.exec(body)) !== null) {
+                properties.add(match[1]);
+            }
+
+            return Array.from(properties);
         }
 
-        evaluate(state) {
+        dependencies() {
+            return this.#getStateSelectorDependencies(this.stateSelector);
+        }
+
+        get() {
             const me = this;
             return this.stateSelector(
-                new Proxy(state, {
+                new Proxy(me.megaphone.state, {
                     get(target, property, receiver) {
-                        const state = me.megaphone._resolveState(target[property]);
-                        return state.value;
+                        return target[property].get();
                     },
                 })
             );
@@ -142,6 +145,16 @@
         }
     }
 
+    class PlainValue {
+        constructor(value) {
+            this.value = value;
+        }
+
+        get() {
+            return this.value;
+        }
+    }
+
     class Megaphone {
         static _megaphones = [];
 
@@ -224,7 +237,7 @@
             this.onUpdate(target, property, value);
             const updateOrder = this.#findUpdateOrder([property]).filter((x) => x != property);
             for (const dep of updateOrder) {
-                const subDependentValue = this._resolveState(this.state[dep]);
+                const subDependentValue = this.state[dep].get();
                 this.onUpdate(target, dep, subDependentValue);
             }
         }
@@ -232,7 +245,7 @@
         #updateAll() {
             const updateOrder = this.#findUpdateOrder(Object.keys(this.state));
             for (const key of updateOrder) {
-                this.onUpdate(this.state, key, this._resolveState(this.state[key]));
+                this.onUpdate(this.state, key, this.state[key].get());
             }
         }
 
@@ -248,18 +261,6 @@
         #performInitialUpdate() {
             this.#updateAll();
             this.#runInitTasks();
-        }
-
-        _resolveState(stateValue) {
-            if (stateValue instanceof ComputedView) {
-                return stateValue.evaluate(this.stateProxy);
-            } else if (stateValue instanceof BrowserStorage) {
-                return stateValue.get();
-            } else if (stateValue instanceof JsonApiValue) {
-                return stateValue.get();
-            }
-
-            return stateValue;
         }
 
         watch(stateProxy, callable) {
@@ -307,6 +308,8 @@
                     });
                 } else if (element instanceof JsonApiValue) {
                     this.asyncInits.push(element);
+                } else {
+                    state[elementKey] = new PlainValue(element);
                 }
             }
 
@@ -319,7 +322,7 @@
                 },
                 get(target, property, receiver) {
                     return {
-                        value: me._resolveState(target[property]),
+                        value: target[property].get(),
                         property,
                     };
                 },
