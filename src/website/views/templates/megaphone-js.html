@@ -51,6 +51,14 @@
             );
         }
 
+        set(value) {
+            throw new Error(
+                'This is a computed value computed via ' +
+                    this.stateSelector.toString() +
+                    ' and therefore should never be set'
+            );
+        }
+
         onDeclareState(megaphone, elementProperty) {
             const { property } = elementProperty;
             const elementDependencies = this.dependencies();
@@ -156,6 +164,10 @@
             }
         }
 
+        set(value) {
+            this.mostRecentValue = value;
+        }
+
         get() {
             return this.options.view(this.mostRecentValue);
         }
@@ -168,6 +180,10 @@
     class PlainValue {
         constructor(value) {
             this.value = value;
+        }
+
+        set(val) {
+            this.value = val;
         }
 
         get() {
@@ -269,7 +285,7 @@
 
         #updateStateAndDependents(target, property, value) {
             this.#onUpdate(target, property, value);
-            const updateOrder = this.#findUpdateOrder([property]).filter((x) => x != property);
+            const updateOrder = this.#findUpdateOrder([property]);
             for (const dep of updateOrder) {
                 const subDependentValue = this.state[dep].get();
                 this.#onUpdate(target, dep, subDependentValue);
@@ -324,7 +340,7 @@
                         const eventName = attribute.name.substring(1);
                         const func = this.state[attribute.value];
                         if (func) {
-                            element.addEventListener(eventName, func);
+                            element.addEventListener(eventName, func.get());
                         }
                     }
                 }
@@ -368,9 +384,9 @@
             const me = this;
             this.stateProxy = new Proxy(state, {
                 set(target, property, value) {
-                    const updatedValue = Reflect.set(target, property, value);
+                    const updatedValue = target[property].set(value);
                     me.#updateStateAndDependents(target, property, value);
-                    return updatedValue;
+                    return value;
                 },
                 get(target, property, receiver) {
                     return {
