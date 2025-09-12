@@ -3,8 +3,13 @@
     <script type="module">
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            dlLogs: megaphone.jsonApi('/api/logs', { logs: [] }),
-            logs: megaphone.view((state) => state.dlLogs.logs),
+            logs: megaphone.jsonApi(
+                '/api/logs',
+                { logs: [] },
+                {
+                    view: (dl) => dl.logs,
+                }
+            ),
         });
 
         megaphone.renderEach(

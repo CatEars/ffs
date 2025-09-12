@@ -119,9 +119,10 @@
     }
 
     class JsonApiValue {
-        constructor(key, defaultValue) {
+        constructor(key, defaultValue, options) {
             this.key = key;
             this.defaultValue = defaultValue;
+            this.options = options;
             this.mostRecentValue = defaultValue;
         }
 
@@ -137,7 +138,7 @@
         }
 
         get() {
-            return this.mostRecentValue;
+            return this.options.view(this.mostRecentValue);
         }
     }
 
@@ -373,8 +374,12 @@
             return new BrowserStorage(new UrlParamStorageAdapter(), key, defaultValue);
         }
 
-        jsonApi(key, defaultValue) {
-            return new JsonApiValue(key, defaultValue);
+        jsonApi(key, defaultValue, options) {
+            options ??= {};
+            if (!options.view) {
+                options.view = Megaphone.identity;
+            }
+            return new JsonApiValue(key, defaultValue, options);
         }
 
         renderEach(state, into, renderFunc) {
@@ -425,6 +430,10 @@
                 }
                 return renderFunc(templateClone, elementToRender, idx);
             };
+        }
+
+        static identity(x) {
+            return x;
         }
     }
 </script>

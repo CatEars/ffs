@@ -261,10 +261,10 @@
             fileManagerVisibility: megaphone.view((state) =>
                 state.galleryMode ? 'hidden' : 'show'
             ),
-            dlFiles: megaphone.jsonApi(`/api/directory?path=${currentPath}`, []),
-            files: megaphone.view((state) =>
-                includeParentUnlessRoot(filesWithUnstringifiedDate(state.dlFiles), currentPath)
-            ),
+            files: megaphone.jsonApi(`/api/directory?path=${currentPath}`, [], {
+                view: (files) =>
+                    includeParentUnlessRoot(filesWithUnstringifiedDate(files), currentPath),
+            }),
             maxPages: megaphone.view((state) => getNumPages(state.files, state.pageSize)),
             sorting: megaphone.localStorage('file-sort-order', 'newest'),
             directoriesFirst: megaphone.localStorage('show-directories-first', true),

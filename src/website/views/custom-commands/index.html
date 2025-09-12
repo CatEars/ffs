@@ -3,13 +3,13 @@
     <script type="module">
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            commandsDl: megaphone.jsonApi('/api/custom-commands', []),
-            commands: megaphone.view((state) =>
-                state.commandsDl.map((cmd, idx) => ({
-                    ...cmd,
-                    idx,
-                }))
-            ),
+            commands: megaphone.jsonApi('/api/custom-commands', [], {
+                view: (commands) =>
+                    commands.map((cmd, idx) => ({
+                        ...cmd,
+                        idx,
+                    })),
+            }),
             message: megaphone.urlParam('message', null),
         });
 
