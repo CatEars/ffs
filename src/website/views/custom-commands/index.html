@@ -1,14 +1,15 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
-        async function getCommands() {
-            const result = await fetch('/api/custom-commands');
-            return await result.json();
-        }
-
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            commands: [],
+            commandsDl: megaphone.jsonApi('/api/custom-commands', []),
+            commands: megaphone.view((state) =>
+                state.commandsDl.map((cmd, idx) => ({
+                    ...cmd,
+                    idx,
+                }))
+            ),
             message: megaphone.urlParam('message', null),
         });
 
@@ -32,11 +33,6 @@
         );
 
         megaphone.init();
-
-        state.commands = (await getCommands()).map((cmd, idx) => ({
-            ...cmd,
-            index: idx,
-        }));
     </script>
     <app-header>Commands</app-header>
     <section id="command-list"></section>
