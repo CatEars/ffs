@@ -193,6 +193,51 @@
         onDeclareState() {}
     }
 
+    class MegaphoneDebugger {
+        static _claimedStateNames = new Map();
+
+        constructor() {
+            this.number = this.#generateRandomNumber();
+            this.debugEnabled = false;
+        }
+
+        #generateRandomNumber() {
+            const min = 1;
+            const max = 1000000;
+            const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            return randomNumber;
+        }
+
+        claimStateKeys(keys) {
+            for (const key of keys) {
+                const existingValue = MegaphoneDebugger._claimedStateNames.get(key);
+                if (existingValue) {
+                    this.warn(
+                        `Conflict in state (between ${this.number} and ${existingValue}) with state named '${key}'. You are overlapping in names between two megaphone.declareState() invocations and BOTH will try to update it. Names in states must be unique between overlapping megaphone instances!`
+                    );
+                } else {
+                    MegaphoneDebugger._claimedStateNames.set(key, this.number);
+                }
+            }
+        }
+
+        warn(...msgs) {
+            console.warn(`Megaphone(${this.number})`, ...msgs);
+        }
+
+        updateValue(element, attribute, value) {
+            if (this.debugEnabled) {
+                console.info(
+                    `Megaphone(${this.number})`,
+                    'UPDATE',
+                    element,
+                    'attribute -->',
+                    value
+                );
+            }
+        }
+    }
+
     class Megaphone {
         static _megaphones = [];
 
@@ -205,6 +250,8 @@
             this.stateProxy = null;
             this.initialized = false;
             this.initTasks = [];
+            this.rootNode = document;
+            this.debugger = new MegaphoneDebugger();
         }
 
         #isBoundValueMarker(name) {
@@ -312,7 +359,12 @@
             const boundElementValue = this.boundValues.get(property);
             if (boundElementValue) {
                 for (const { element, name } of boundElementValue) {
-                    element.setAttribute(name, `${value}`);
+                    this.debugger.updateValue(element, name, value);
+                    if (value === undefined || value === null) {
+                        element.removeAttribute(name);
+                    } else {
+                        element.setAttribute(name, `${value}`);
+                    }
                 }
             }
 
@@ -326,17 +378,27 @@
 
         #bindValuesAndEventListeners() {
             const boundValues = new Map();
-            for (const element of document.querySelectorAll('*')) {
+            const knownStateKeys = new Set(Object.keys(this.state));
+            this.debugger.claimStateKeys(knownStateKeys);
+
+            for (const element of this.rootNode.querySelectorAll('*')) {
                 for (const attribute of element.attributes) {
                     if (this.#isBoundValueMarker(attribute.name)) {
+                        if (!knownStateKeys.has(attribute.value)) {
+                            continue;
+                        }
                         if (!boundValues.has(attribute.value)) {
                             boundValues.set(attribute.value, []);
                         }
+
                         boundValues.get(attribute.value).push({
                             element,
                             name: attribute.name.substring(1),
                         });
                     } else if (this.#isEventListenerMarker(attribute.name)) {
+                        if (!knownStateKeys.has(attribute.value)) {
+                            continue;
+                        }
                         const eventName = attribute.name.substring(1);
                         const func = this.state[attribute.value];
                         if (func) {
@@ -397,6 +459,19 @@
             });
 
             return this.stateProxy;
+        }
+
+        confine(element) {
+            if (!element || !element.querySelectorAll) {
+                throw new Error(
+                    'You are trying to `confine()` the megaphone instance to something that is not an element'
+                );
+            }
+            this.rootNode = element;
+        }
+
+        debug() {
+            this.debugger.debugEnabled = true;
         }
 
         init() {

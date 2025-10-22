@@ -1,4 +1,4 @@
-<form action="/api/file/upload" method="POST" enctype="multipart/form-data">
+<form id="upload-form" action="/api/file/upload" method="POST" enctype="multipart/form-data">
     <script type="module">
         function getFilenamesFromEvent(evt) {
             const result = [];
@@ -14,11 +14,15 @@
         }
 
         const megaphone = new Megaphone();
+        megaphone.confine(document.getElementById('upload-form'));
+
         const state = megaphone.declareState({
             names: [],
             getFilenamesFromEvent,
             clickHiddenFileBrowseButton,
-            uploadDisabled: megaphone.view((state) => state.names.length === 0),
+            uploadDisabled: megaphone.view((state) =>
+                state.names.length === 0 ? true : undefined
+            ),
         });
 
         megaphone.renderEach(
@@ -29,6 +33,8 @@
                 return clone;
             })
         );
+
+        megaphone.init();
     </script>
     <div class="form-row action-buttons">
         <input
