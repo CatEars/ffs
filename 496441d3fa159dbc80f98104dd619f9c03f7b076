@@ -14,6 +14,3 @@
 [ ] Make Command use SSE (or similar) for running commands
 
 [ ] Playlist mode for videos / music files in same folder
-
-[ ] Refactor so that links to other parts of the app is part of the component system.
-  particularly file-link and file-card
