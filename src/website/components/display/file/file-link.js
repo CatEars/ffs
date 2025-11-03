@@ -1,4 +1,4 @@
-import { BaseWebComponent } from '../base.js';
+import { BaseWebComponent } from '../../base.js';
 
 function calculatePath(root, fileName) {
     if (fileName === '..') {

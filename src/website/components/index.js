@@ -6,7 +6,7 @@ import BreadcrumbNav from './navigation/breadcrumb-nav.js';
 import CliCommand from './display/cli-command.js';
 import ColumnLayout from './layout/column-layout.js';
 import DropDown from './display/drop-down.js';
-import FileCard from './display/file-card.js';
+import FileCard from './display/file/file-card.js';
 import GappedRow from './layout/gapped-row.js';
 import HeaderTab from './navigation/header-tab.js';
 import HorizontalRuler from './layout/horizontal-ruler.js';
@@ -17,7 +17,7 @@ import PaginateControl from './control/paginate-control.js';
 import RadioControl from './control/radio-control.js';
 import RowLayout from './layout/row-layout.js';
 import SwitchControl from './control/switch-control.js';
-import FileLink from './display/file-link.js';
+import FileLink from './display/file/file-link.js';
 
 const components = [
     ['app-header', AppHeader],
