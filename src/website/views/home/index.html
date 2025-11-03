@@ -58,7 +58,6 @@
 
         function calculatePath(root, fileName) {
             if (fileName === '..') {
-                const l = ''.lastI;
                 const lastIndex = root.lastIndexOf('/');
                 if (lastIndex === -1) {
                     return root;
@@ -148,10 +147,17 @@
             window.location.href = webPath;
         }
 
-        function getLinkTo(file) {
+        function getBaseLinkTo(file) {
             const currentPath = decodeURIComponent(getCurrentPath());
-            const path = calculatePath(currentPath, file.name);
-            return `/home/?path=${path}`;
+            return calculatePath(currentPath, file.name);
+        }
+
+        function getMediaLinkTo(file) {
+            return `/home/media/view?path=${getBaseLinkTo(file)}`;
+        }
+
+        function getHomeLinkTo(file) {
+            return `/home/?path=${getBaseLinkTo(file)}`;
         }
 
         function getCheckedFiles() {
@@ -343,16 +349,12 @@
                     iconHover.setAttribute('disabled', 'true');
                 }
 
-                if (file.isDirectory) {
-                    const textRow = clone.querySelector('#directory-row').content.cloneNode(true);
-                    textRow.querySelector('a').setAttribute('href', getLinkTo(file));
-                    textRow.querySelector('span').innerText = file.name;
-                    clone.querySelector('div.file-row-text').appendChild(textRow);
-                } else {
-                    const textRow = clone.querySelector('#file-row').content.cloneNode(true);
-                    textRow.querySelector('span').innerText = file.name;
-                    clone.querySelector('div.file-row-text').appendChild(textRow);
-                }
+                const fileLink = clone.querySelector('#file-link-row').content.cloneNode(true);
+                const fl = fileLink.querySelector('file-link');
+                fl.setAttribute('filename', file.name);
+                fl.setAttribute('file-type', file.fileType);
+                fl.setAttribute('root', decodeURIComponent(getCurrentPath()));
+                clone.querySelector('div.file-row-text').appendChild(fl);
 
                 return clone;
             })

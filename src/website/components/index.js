@@ -17,6 +17,7 @@ import PaginateControl from './control/paginate-control.js';
 import RadioControl from './control/radio-control.js';
 import RowLayout from './layout/row-layout.js';
 import SwitchControl from './control/switch-control.js';
+import FileLink from './display/file-link.js';
 
 const components = [
     ['app-header', AppHeader],
@@ -27,6 +28,7 @@ const components = [
     ['column-layout', ColumnLayout],
     ['drop-down', DropDown],
     ['file-card', FileCard],
+    ['file-link', FileLink],
     ['gapped-row', GappedRow],
     ['header-tab', HeaderTab],
     ['horizontal-ruler', HorizontalRuler],
