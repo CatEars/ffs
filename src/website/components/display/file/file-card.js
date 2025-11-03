@@ -1,28 +1,5 @@
 import { BaseWebComponent } from '../../base.js';
-
-function calculatePath(root, fileName) {
-    if (fileName === '..') {
-        const lastIndex = root.lastIndexOf('/');
-        if (lastIndex === -1) {
-            return root;
-        }
-        return root.substring(0, lastIndex);
-    } else {
-        return encodeURIComponent(`${root}/${fileName}`);
-    }
-}
-
-function resolveEmojiForMediaFile(fileType) {
-    if (fileType === 'sound') {
-        return '🎵';
-    } else if (fileType === 'image') {
-        return '📷';
-    } else if (fileType === 'video') {
-        return '📽️';
-    } else {
-        return '';
-    }
-}
+import { embellishFilename, getNavigationLink } from './linking.js';
 
 function urlEncodeThumbnailComponent(url) {
     const x = url.split('path=')[1];
@@ -43,17 +20,10 @@ class FileCard extends BaseWebComponent {
             : html`<svg class="large-icon">
                   <use href="/static/svg/sprite_sheet.svg#${imageSrc}"></use>
               </svg>`;
-        let href = '';
-        let displayText = filename;
-        if (fileType === 'directory') {
-            href = `/home/?path=${calculatePath(root, filename)}`;
-            displayText += '/';
-        } else if (fileType === 'sound' || fileType === 'image' || fileType === 'video') {
-            href = `/home/media/view?path=${encodeURIComponent(root + '/' + filename)}`;
-            displayText = resolveEmojiForMediaFile(fileType) + ' ' + filename;
-        } else {
-            href = `/api/file?path=${encodeURIComponent(root + '/' + filename)}`;
-        }
+
+        const href = getNavigationLink(root, filename, fileType);
+        const displayText = embellishFilename(filename, fileType);
+
         return html`
             <style>
                 a {
