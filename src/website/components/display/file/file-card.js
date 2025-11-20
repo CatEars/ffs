@@ -28,16 +28,19 @@ class FileCard extends BaseWebComponent {
             <style>
                 a {
                     display: flex;
+                    flex-grow: 1;
                     flex-direction: column;
                     text-decoration: none;
                     color: var(--font-color);
-                    max-width: var(--file-card-max-width);
+                    height: var(--file-card-max-height);
                     max-height: var(--file-card-max-height);
                 }
                 a > div {
                     display: flex;
                     flex-direction: column;
+                    flex-grow: 1;
                     align-items: center;
+                    justify-content: center;
                     min-height: 0;
                     overflow: hidden;
                     margin-bottom: 0rem;
@@ -45,7 +48,6 @@ class FileCard extends BaseWebComponent {
                     border: 1px solid grey;
                     border-top-left-radius: 5px;
                     border-top-right-radius: 5px;
-                    width: calc(100% - 2px);
                 }
                 img {
                     object-fit: cover;
@@ -64,6 +66,7 @@ class FileCard extends BaseWebComponent {
                     min-height: 1.5rem;
                     padding-left: 0.2rem;
                     padding-right: 0.2rem;
+                    flex-grow: 0;
                 }
             </style>
             <a href="${href}">
