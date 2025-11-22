@@ -25,15 +25,14 @@ export function identifyFileFromDirEntry(
     fullPath: string,
     entry: Deno.DirEntry,
 ): FileIdentification {
+    const lowercaseName = entry.name.toLocaleLowerCase();
+    const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${fullPath}` : '';
     if (entry.isDirectory) {
         return {
             fileType: 'directory',
-            imageSrc: 'folder',
+            imageSrc: imageSrc || 'folder',
         };
-    }
-    const lowercaseName = entry.name.toLocaleLowerCase();
-    const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${fullPath}` : '';
-    if (isVideoFile(lowercaseName)) {
+    } else if (isVideoFile(lowercaseName)) {
         return {
             fileType: 'video',
             imageSrc: imageSrc || 'videocam',
