@@ -80,8 +80,4 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
         'Generated thumbnail',
         outputPath,
     );
-
-    return {
-        outputPath,
-    };
 }

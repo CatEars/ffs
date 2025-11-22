@@ -1,5 +1,5 @@
 import { ThumbnailRequest } from './types.ts';
-import { basename, dirname, extname, join } from '@std/path';
+import { dirname, extname } from '@std/path';
 import { createMp4Thumbnail } from './nailers/mp4.ts';
 import { createImageMagickThumbnail } from './nailers/static-images.ts';
 import { collectAsync } from '../utils/collect-async.ts';
@@ -7,16 +7,12 @@ import { logger } from '../logging/logger.ts';
 import { getThumbnailPath } from '../files/cache-folder.ts';
 import { existsSync } from '@std/fs/exists';
 
-type ThumbnailResult = {
-    outputPath: string;
-};
-
 type ThumbnailType = 'image' | 'video';
 
 type Thumbnailer = {
     extNames: string[];
     thumbnailType: ThumbnailType;
-    handler: (thumbnail: ThumbnailRequest) => Promise<ThumbnailResult | undefined>;
+    handler: (thumbnail: ThumbnailRequest) => Promise<void>;
 };
 
 // LINK-FILE-EXTENSIONS
@@ -54,34 +50,41 @@ const nailers: Thumbnailer[] = [
 
 const extNames = nailers.flatMap((x) => x.extNames);
 
-async function promoteThumbnail(request: ThumbnailRequest, result: ThumbnailResult) {
+async function promoteThumbnail(request: ThumbnailRequest) {
+    const outputPath = getThumbnailPath(request.filePath);
     const parentDir = dirname(request.filePath);
     const targetPath = getThumbnailPath(parentDir);
-    await Deno.copyFile(result.outputPath, targetPath);
-    logger.info('Promoting thumbnail for', result.outputPath, 'to directory', targetPath);
+    await Deno.copyFile(outputPath, targetPath);
+    logger.info('Promoting thumbnail for', outputPath, 'to directory', targetPath);
 }
 
-async function promoteThumbnailToParentFolderIfRelevant(
+function findFileType(filePath: string) {
+    const fileExt = extname(filePath);
+    const matchingNailers = nailers.filter((x) => x.extNames.includes(fileExt));
+    if (matchingNailers.length === 0) {
+        return null;
+    }
+
+    return matchingNailers[0].thumbnailType;
+}
+
+export async function promoteThumbnailToParentFolderIfRelevant(
     request: ThumbnailRequest,
-    thumbnailType: ThumbnailType,
-    result: ThumbnailResult,
 ) {
     // If we created a video thumbnail and there are no other videos -> copy thumbnail to parent
     // Else if we created an image thumbnail and this is the only image -> copy thumbnail to parent
 
+    const thumbnailType = findFileType(request.filePath);
     const sharedDir = dirname(request.filePath);
     const entries = await collectAsync(Deno.readDir(sharedDir));
-    const extnames = entries.map((entry) => extname(entry.name));
-    const types = extnames.map((extname) =>
-        (nailers.filter((nailer) => nailer.extNames.includes(extname))[0] || {}).thumbnailType
-    );
+    const types = entries.map((entry) => findFileType(entry.name));
     const numVideos = types.filter((x) => x === 'video').length;
     const numImages = types.filter((x) => x === 'image').length;
 
     const isOnlyVideo = thumbnailType === 'video' && numVideos === 1;
     const isOnlyImage = thumbnailType === 'image' && numImages === 1;
     if (isOnlyVideo || isOnlyImage) {
-        await promoteThumbnail(request, result);
+        await promoteThumbnail(request);
     }
 }
 
@@ -89,14 +92,11 @@ export async function generateThumbnail(thumbnail: ThumbnailRequest) {
     const ext = extname(thumbnail.filePath);
     for (const nailer of nailers) {
         if (nailer.extNames.includes(ext)) {
-            const result = await nailer.handler(thumbnail);
-            if (result) {
-                await promoteThumbnailToParentFolderIfRelevant(
-                    thumbnail,
-                    nailer.thumbnailType,
-                    result,
-                );
-            }
+            await nailer.handler(thumbnail);
+            await promoteThumbnailToParentFolderIfRelevant(
+                thumbnail,
+            );
+
             return;
         }
     }

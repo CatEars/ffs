@@ -42,7 +42,4 @@ export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
         'Generated thumbnail',
         outputPath,
     );
-    return {
-        outputPath,
-    };
 }
