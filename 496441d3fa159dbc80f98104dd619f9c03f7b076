@@ -14,3 +14,5 @@
 [ ] Make Command use SSE (or similar) for running commands
 
 [ ] Side view of files when in media mode ("playlist")
+
+[ ] Make thumbnail generation prioritized so that low prio thumbnail generation goes a bit slower
