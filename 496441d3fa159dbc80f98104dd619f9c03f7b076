@@ -21,4 +21,4 @@
 
 [ ] Fix thumbnail generation for files with '%' in name
 
-[ ] Redo thumbnails every once in a while
+[ ] Redo thumbnails every once in a while, especially folder-based thumbnails may become stale and misleading
