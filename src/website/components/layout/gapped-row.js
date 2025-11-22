@@ -9,6 +9,7 @@ class GappedRow extends BaseWebComponent {
                     flex-direction: row;
                     gap: 1rem;
                     align-items: center;
+                    flex-wrap: wrap;
                 }
             </style>
             <div>
