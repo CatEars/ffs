@@ -20,3 +20,5 @@
 [ ] Use elipsis for directory traversal and gallery/file-listing view
 
 [ ] Fix thumbnail generation for files with '%' in name
+
+[ ] Spread thumbnails one level up (e.g. movies in a folder). Use "Level" of thumbnail (video > image) and if only 1, spread one level.
