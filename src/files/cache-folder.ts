@@ -36,6 +36,15 @@ export function getThumbnailPath(filePath: string) {
     return resolve(cacheRoot, relPath + '.webp');
 }
 
+function isOutdated(filePath: string) {
+    const now = new Date();
+    const twelveHoursAgo = now.getTime() - (12 * 60 * 60 * 1000);
+    const lastModified = Deno.statSync(filePath).mtime;
+    return (lastModified?.getTime() || 0) < twelveHoursAgo;
+}
+
 export function thumbnailExists(filePath: string) {
-    return existsSync(getThumbnailPath(filePath));
+    const thumbnailPath = getThumbnailPath(filePath);
+    const exists = existsSync(thumbnailPath);
+    return exists && !isOutdated(thumbnailPath);
 }

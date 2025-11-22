@@ -24,7 +24,7 @@ logger.info(
 );
 
 const filesToPrioritize: ThumbnailRequest[] = [];
-const fiveMinutes = 1000 * 60 * 60 * 5;
+const fiveMinutes = 1000 * 60 * 5;
 const recentlyParsedThumbnails = new MemoryCache<ThumbnailRequest>(fiveMinutes);
 
 function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
