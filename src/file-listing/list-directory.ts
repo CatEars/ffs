@@ -35,8 +35,7 @@ export function registerDirectoryRoutes(router: Router<FfsApplicationState>) {
                 continue;
             }
 
-            const relativePath = pathToCheck + '/' + result.name;
-            const fileIdentification = identifyFileFromDirEntry(relativePath, result);
+            const fileIdentification = identifyFileFromDirEntry(resolvedPath.fullPath, result);
             results.push({ ...result, ...fileIdentification, date });
         }
 

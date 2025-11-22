@@ -1,4 +1,6 @@
+import { relative } from '@std/path';
 import { canGenerateThumbnailFor } from '../thumbnails/generate-thumbnail.ts';
+import { getStoreRoot } from '../config.ts';
 
 export type FileType = 'video' | 'image' | 'sound' | 'directory' | 'unidentified';
 
@@ -26,7 +28,8 @@ export function identifyFileFromDirEntry(
     entry: Deno.DirEntry,
 ): FileIdentification {
     const lowercaseName = entry.name.toLocaleLowerCase();
-    const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${fullPath}` : '';
+    const relativePath = relative(getStoreRoot(), fullPath);
+    const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${relativePath}` : '';
     if (entry.isDirectory) {
         return {
             fileType: 'directory',

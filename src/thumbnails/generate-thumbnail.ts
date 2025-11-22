@@ -109,12 +109,5 @@ export function canGenerateThumbnailFor(filePath: string) {
         return true;
     }
     const thumbnailPath = getThumbnailPath(filePath);
-    const thumbnailExists = existsSync(thumbnailPath);
-    logger.debug(
-        'Checking if thumbnail exists for non-thumbnailable file entry',
-        filePath,
-        '... Does it exist?',
-        thumbnailExists,
-    );
-    return thumbnailExists;
+    return existsSync(thumbnailPath);
 }
