@@ -1,5 +1,10 @@
 import { stdin } from 'node:process';
-import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
+import {
+    devModeEnabled,
+    getCacheRoot,
+    getStoreRoot,
+    getThumbnailFinderSkipRegex,
+} from '../config.ts';
 import { logger } from '../logging/logger.ts';
 import { ThumbnailRequest } from './types.ts';
 import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
@@ -47,10 +52,21 @@ function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
     }
 }
 
-stdin.addListener('data', parseIncomingThumbnailRequest);
+function buildFileTreeOptions() {
+    const fileTreeOptions = {
+        skip: ([] as RegExp[]),
+    };
+    const thumbnailSkipPattern = getThumbnailFinderSkipRegex();
+    if (thumbnailSkipPattern) {
+        fileTreeOptions.skip.push(new RegExp(thumbnailSkipPattern, 'g'));
+    }
+    return fileTreeOptions;
+}
 
 async function findFilesToThumbnail() {
-    const fileTreeWalker = new FileTreeWalker(storeRoot);
+    const fileTreeOptions = buildFileTreeOptions();
+    const fileTreeWalker = new FileTreeWalker(storeRoot, fileTreeOptions);
+
     fileTreeWalker.filter((file) =>
         canGenerateThumbnailFor(file.path) && !thumbnailExists(file.path)
     );
@@ -60,6 +76,8 @@ async function findFilesToThumbnail() {
         });
     }
 }
+
+stdin.addListener('data', parseIncomingThumbnailRequest);
 
 await findFilesToThumbnail();
 setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);

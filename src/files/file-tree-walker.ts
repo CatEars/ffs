@@ -1,4 +1,4 @@
-import { walk, WalkEntry } from '@std/fs/walk';
+import { walk, WalkEntry, WalkOptions } from '@std/fs/walk';
 import { relative } from '@std/path/relative';
 import { dirname } from '@std/path/dirname';
 
@@ -6,9 +6,11 @@ const keepAllWalkEntries = (_: WalkEntry) => true;
 
 export class FileTreeWalker {
     private readonly root: string;
+    private readonly options: WalkOptions;
     private _filter: (entry: WalkEntry) => boolean = keepAllWalkEntries;
-    constructor(root: string) {
+    constructor(root: string, walkOptions?: WalkOptions) {
         this.root = root;
+        this.options = walkOptions || {};
     }
 
     filter(filter: (entry: WalkEntry) => boolean) {
@@ -18,6 +20,7 @@ export class FileTreeWalker {
     async *walk() {
         for await (
             const entry of walk(this.root, {
+                ...this.options,
                 includeDirs: false,
                 includeFiles: true,
                 includeSymlinks: false,

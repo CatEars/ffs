@@ -1,5 +1,5 @@
-import { Application } from 'jsr:@oak/oak/application';
-import { Router } from 'jsr:@oak/oak/router';
+import { Application } from '@oak/oak/application';
+import { Router } from '@oak/oak/router';
 import { registerAllFileListing } from './file-listing/index.ts';
 import { unsecure, validateConfig } from './config.ts';
 import { registerAllLogonRoutes } from './logon/index.ts';

@@ -9,6 +9,7 @@ export const usersFileKey = 'FFS_USERS_FILE';
 export const requestLogsKey = 'FFS_REQUEST_LOGS_FILE';
 export const customCommandsFileKey = 'FFS_CUSTOM_COMMANDS_FILE';
 export const instanceSecretKey = 'FFS_INSTANCE_SECRET';
+export const thumbnailFinderSkipRegexKey = 'FFS_THUMBNAIL_FINDER_SKIP_REGEX';
 
 type Config = {
     storeRoot: string;
@@ -17,6 +18,7 @@ type Config = {
     requestLogsFile: string;
     customCommandsFile: string;
     instanceSecret?: string;
+    thumbnailFinderSkipRegex?: string;
 };
 
 function getEnvValueOrThrow(key: string) {
@@ -45,6 +47,10 @@ export function getRequestLogsFile() {
 
 export function getCustomCommandsFile() {
     return Deno.env.get(customCommandsFileKey) || '';
+}
+
+export function getThumbnailFinderSkipRegex() {
+    return Deno.env.get(thumbnailFinderSkipRegexKey);
 }
 
 const featuresThatDependOnInstanceSecret: string[] = [];
@@ -81,6 +87,9 @@ export function setConfig(config: Config) {
     Deno.env.set(customCommandsFileKey, config.customCommandsFile);
     if (config.instanceSecret) {
         Deno.env.set(instanceSecretKey, config.instanceSecret);
+    }
+    if (config.thumbnailFinderSkipRegex) {
+        Deno.env.set(thumbnailFinderSkipRegexKey, config.thumbnailFinderSkipRegex);
     }
 }
 
