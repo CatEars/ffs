@@ -2,6 +2,22 @@
     <gapped-row>
         <row-layout>
             <radio-control
+                imgSrc="image"
+                @click="onGalleryModeSelected"
+                $checked="galleryModeEnabled"
+            >
+            </radio-control>
+            <radio-control
+                imgSrc="list"
+                @click="onFileManagerModeSelected"
+                $checked="fileManagerModeEnabled"
+            ></radio-control>
+        </row-layout>
+        <p>View mode</p>
+    </gapped-row>
+    <gapped-row>
+        <row-layout>
+            <radio-control
                 imgSrc="child"
                 @click="sortByNewest"
                 $checked="sortingByNewest"
@@ -14,7 +30,7 @@
             <radio-control text="A-Z" @click="sortByAtoZ" $checked="sortingByAtoZ"></radio-control>
             <radio-control text="Z-A" @click="sortByZtoA" $checked="sortingByZtoA"></radio-control>
         </row-layout>
-        <p>- Sort order</p>
+        <p>Sort order</p>
     </gapped-row>
     <gapped-row>
         <row-layout>
@@ -44,16 +60,11 @@
                 $checked="pageSizeIs1000"
             ></radio-control>
         </row-layout>
-        <p>- Page size</p>
+        <p>Page size</p>
     </gapped-row>
     <row-layout>
         <switch-control $checked="directoriesFirst" @change="onSortDirectoriesFirstChange">
-            Sort directories first
-        </switch-control>
-    </row-layout>
-    <row-layout>
-        <switch-control $checked="galleryMode" @change="onGalleryModeChange">
-            Gallery Mode
+            Directories always first
         </switch-control>
     </row-layout>
 </form>

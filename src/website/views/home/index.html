@@ -229,10 +229,6 @@
         }
     </script>
     <script type="module">
-        function onGalleryModeChange(evt) {
-            state.galleryMode = evt.detail.checked;
-        }
-
         function onCrumbClick(evt) {
             navigateToHomePath(evt.detail.trail, evt.detail.index);
         }
@@ -257,16 +253,30 @@
             };
         }
 
+        function onGalleryModeSelected() {
+            state.viewMode = 'gallery';
+        }
+
+        function onFileManagerModeSelected() {
+            state.viewMode = 'files';
+        }
+
         const megaphone = new Megaphone();
         const currentPath = getCurrentPath();
         const state = megaphone.declareState({
             pageSize: megaphone.localStorage('default-page-size', 100),
             currentPath,
-            galleryMode: megaphone.sessionStorage('gallery-mode', true),
-            galleryVisibility: megaphone.view((state) => (state.galleryMode ? 'show' : 'hidden')),
-            fileManagerVisibility: megaphone.view((state) =>
-                state.galleryMode ? 'hidden' : 'show'
+
+            viewMode: megaphone.sessionStorage('view-mode', 'gallery'),
+            galleryModeEnabled: megaphone.view((state) => state.viewMode === 'gallery'),
+            galleryVisibility: megaphone.view((state) =>
+                state.galleryModeEnabled ? 'show' : 'hidden'
             ),
+            fileManagerModeEnabled: megaphone.view((state) => state.viewMode === 'files'),
+            fileManagerVisibility: megaphone.view((state) =>
+                state.fileManagerModeEnabled ? 'show' : 'hidden'
+            ),
+
             files: megaphone.jsonApi(`/api/directory?path=${currentPath}`, [], {
                 view: (files) =>
                     includeParentUnlessRoot(filesWithUnstringifiedDate(files), currentPath),
@@ -306,8 +316,9 @@
             pageSizeIs250: megaphone.view((state) => state.pageSize === 250),
             pageSizeIs1000: megaphone.view((state) => state.pageSize === 1000),
 
+            onGalleryModeSelected,
+            onFileManagerModeSelected,
             onSortDirectoriesFirstChange,
-            onGalleryModeChange,
             onCrumbClick,
             onPageShift,
             pasteFiles,
