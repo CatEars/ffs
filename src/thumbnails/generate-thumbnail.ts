@@ -4,8 +4,7 @@ import { createMp4Thumbnail } from './nailers/mp4.ts';
 import { createImageMagickThumbnail } from './nailers/static-images.ts';
 import { collectAsync } from '../utils/collect-async.ts';
 import { logger } from '../logging/logger.ts';
-import { getThumbnailPath } from '../files/cache-folder.ts';
-import { existsSync } from '@std/fs/exists';
+import { getThumbnailPath, thumbnailExists } from '../files/cache-folder.ts';
 
 type ThumbnailType = 'image' | 'video';
 
@@ -103,11 +102,8 @@ export async function generateThumbnail(thumbnail: ThumbnailRequest) {
 }
 
 export function canGenerateThumbnailFor(filePath: string) {
-    // Files with a matching extension we can do, but for directories we MAY only create thumbnails
-    // return true for any non-matching file that has a .webp
     if (extNames.includes(extname(filePath))) {
         return true;
     }
-    const thumbnailPath = getThumbnailPath(filePath);
-    return existsSync(thumbnailPath);
+    return thumbnailExists(filePath);
 }

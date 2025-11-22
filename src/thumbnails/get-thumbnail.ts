@@ -3,7 +3,7 @@ import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { getCacheRoot } from '../config.ts';
 import { canGenerateThumbnailFor } from './generate-thumbnail.ts';
 import { prioritizeThumbnail } from './index.ts';
-import { withThumbnailExtension } from '../files/cache-folder.ts';
+import { getThumbnailPath } from '../files/cache-folder.ts';
 import { sleep } from '../utils/sleep.ts';
 import {
     HTTP_400_BAD_REQUEST,
@@ -11,6 +11,7 @@ import {
     HTTP_404_NOT_FOUND,
 } from '../utils/http-codes.ts';
 import { FileTree } from '../files/file-tree.ts';
+import { relative } from '@std/path/relative';
 
 async function tryGetFile(fileTree: FileTree, filePath: string) {
     for (let cnt = 0; cnt < 20; ++cnt) {
@@ -46,19 +47,20 @@ export function registerGetThumbnail(router: Router) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
             return;
         }
-        const path = decodeURIComponent(pathFromUrl);
-        if (!canGenerateThumbnailFor(path)) {
-            ctx.response.status = HTTP_400_BAD_REQUEST;
-            return;
-        }
 
+        const path = decodeURIComponent(pathFromUrl);
         const pathExistResult = storeFileTree.resolvePath(path);
         if (pathExistResult.type === 'invalid') {
             ctx.response.status = HTTP_403_FORBIDDEN;
             return;
         }
 
-        const thumbnailPath = withThumbnailExtension(path);
+        if (!canGenerateThumbnailFor(pathExistResult.fullPath)) {
+            ctx.response.status = HTTP_400_BAD_REQUEST;
+            return;
+        }
+
+        const thumbnailPath = getThumbnailPath(pathExistResult.fullPath);
         if (!cacheFileTree.exists(thumbnailPath)) {
             const actualPath = pathExistResult.fullPath;
             await prioritizeThumbnail(actualPath);
@@ -73,7 +75,7 @@ export function registerGetThumbnail(router: Router) {
         }
 
         await ctx.send({
-            path: path + '.webp',
+            path: relative(getCacheRoot(), thumbnailPath),
             root: cacheRoot,
         });
     });

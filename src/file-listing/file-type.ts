@@ -29,6 +29,7 @@ export function identifyFileFromDirEntry(
 ): FileIdentification {
     const lowercaseName = entry.name.toLocaleLowerCase();
     const relativePath = relative(getStoreRoot(), fullPath);
+
     const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${relativePath}` : '';
     if (entry.isDirectory) {
         return {

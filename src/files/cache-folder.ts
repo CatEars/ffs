@@ -39,7 +39,3 @@ export function getThumbnailPath(filePath: string) {
 export function thumbnailExists(filePath: string) {
     return existsSync(getThumbnailPath(filePath));
 }
-
-export function withThumbnailExtension(filePath: string) {
-    return filePath + '.webp';
-}
