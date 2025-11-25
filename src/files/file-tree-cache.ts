@@ -4,7 +4,6 @@ import { logger } from '../logging/logger.ts';
 
 type BaseNode = {
     type: 'file' | 'directory';
-    hash: string;
     cachedAt: number;
 };
 
@@ -14,78 +13,42 @@ type FileNode = BaseNode & {
 };
 
 type DirectorySubNode = {
-    nodeHash: string;
     dirEntry: Deno.DirEntry;
 };
 
 type DirectoryNode = BaseNode & {
     type: 'directory';
+    fileEntry: Deno.FileInfo;
     subNodes: DirectorySubNode[];
 };
 
 type FileSystemNode = FileNode | DirectoryNode;
-
-const encoder = new TextEncoder();
-
-async function convertPathToHash(path: string): Promise<string> {
-    const data = encoder.encode(path);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((x) => x.toString(16).padStart(2, '0')).join('');
-}
 
 export class FileTreeCache {
     private readonly _hashmap: Map<string, FileSystemNode> = new Map();
     private readonly _maxCacheTimeMs: number = 1000 * 60 * 5;
 
     async getByPath(path: string): Promise<FileSystemNode | undefined> {
-        const hash = await convertPathToHash(path);
-        const hashedEntry = await this.getByPath(hash);
-        if (hashedEntry) {
+        const hashedEntry = this._hashmap.get(path);
+        if (hashedEntry && (hashedEntry.cachedAt > Date.now() - this._maxCacheTimeMs)) {
             return hashedEntry;
         }
 
-        return this.cachePathWithKnownHash(path, hash);
-    }
-
-    getByHash(hash: string): Promise<FileSystemNode | undefined> {
-        const entry = this._hashmap.get(hash);
-        const isOutdated = entry && entry.cachedAt < (Date.now() - this._maxCacheTimeMs);
-        if (isOutdated) {
-            return Promise.resolve(undefined);
-        }
-        return Promise.resolve(entry);
-    }
-
-    async getByHashOrPath(hash: string, path: string): Promise<FileSystemNode | undefined> {
-        const hashedEntry = await this.getByHash(hash);
-        if (hashedEntry) {
-            return hashedEntry;
-        }
-
-        return await this.getByPath(path);
+        return await this.cachePath(path);
     }
 
     async cachePath(path: string): Promise<FileSystemNode | undefined> {
-        const hash = await convertPathToHash(path);
-        return await this.cachePathWithKnownHash(path, hash);
-    }
-
-    private async cachePathWithKnownHash(
-        path: string,
-        knownHash: string,
-    ): Promise<FileSystemNode | undefined> {
         try {
-            const fileInfo = await Deno.lstat(path);
+            const fileInfo = await Deno.stat(path);
             if (fileInfo.isDirectory) {
-                return await this.readAndCacheDirectory(path, knownHash);
+                return await this.readAndCacheDirectory(path, fileInfo);
             } else if (fileInfo.isFile) {
                 const fileNode: FileNode = {
                     type: 'file',
-                    hash: knownHash,
                     cachedAt: Date.now(),
                     fileEntry: fileInfo,
                 };
+                this._hashmap.set(path, fileNode);
                 return fileNode;
             } else {
                 return undefined;
@@ -98,21 +61,21 @@ export class FileTreeCache {
         }
     }
 
-    private async readAndCacheDirectory(path: string, knownHash: string): Promise<DirectoryNode> {
+    private async readAndCacheDirectory(
+        path: string,
+        fileInfo: Deno.FileInfo,
+    ): Promise<DirectoryNode> {
         const directoryEntry = await collectAsync(Deno.readDir(path));
-        const subNodes: DirectorySubNode[] = await Promise.all(
-            directoryEntry.map(async (dirEntry) => ({
-                dirEntry,
-                nodeHash: await convertPathToHash(join(path, dirEntry.name)),
-            })),
-        );
+        const subNodes: DirectorySubNode[] = directoryEntry.map((dirEntry) => ({
+            dirEntry,
+        }));
         const directoryNode: DirectoryNode = {
             type: 'directory',
-            hash: knownHash,
+            fileEntry: fileInfo,
             cachedAt: Date.now(),
             subNodes,
         };
-        this._hashmap.set(directoryNode.hash, directoryNode);
+        this._hashmap.set(path, directoryNode);
         return directoryNode;
     }
 
@@ -123,18 +86,18 @@ export class FileTreeCache {
         visited.add(startingPath);
 
         // Use a `min` function to ensure we never search more than a limit
-        const maxDirectorySearchLimit = 100_000;
+        const maxDirectorySearchLimit = 10_000_000;
         for (let idx = 0; idx < Math.min(queue.length, maxDirectorySearchLimit); ++idx) {
             const currentPath = queue[idx];
+            logger.debug('At', currentPath);
             const entry = await this.cachePath(currentPath);
             if (!entry || entry.type === 'file') {
                 continue;
             }
-            const directory: DirectoryNode = entry;
 
-            const subDirectories = directory.subNodes.filter((x) => x.dirEntry.isDirectory);
-            for (const subDirectory of subDirectories) {
-                const nextPath = join(currentPath, subDirectory.dirEntry.name);
+            const directory: DirectoryNode = entry;
+            for (const subNode of directory.subNodes.filter((x) => !x.dirEntry.isSymlink)) {
+                const nextPath = join(currentPath, subNode.dirEntry.name);
                 if (!visited.has(nextPath)) {
                     visited.add(nextPath);
                     queue.push(nextPath);
@@ -143,21 +106,31 @@ export class FileTreeCache {
         }
     }
 
-    async invalidatePathInCache(path: string): Promise<void> {
-        await this.invalidateHashInCache(await convertPathToHash(path));
+    invalidatePathInCache(path: string): void {
+        this._hashmap.delete(path);
     }
 
-    invalidateHashInCache(hash: string): Promise<void> {
-        this._hashmap.delete(hash);
-        return Promise.resolve();
+    estimateSize() {
+        return this._hashmap.size;
     }
 }
 
 export const globalFileTreeCache = new FileTreeCache();
 
+async function runSingleGlobalFileTreeCacheUpdate(rootPath: string) {
+    logger.debug(
+        'Updating file tree cache for quick file access. Pre size:',
+        globalFileTreeCache.estimateSize(),
+    );
+    await globalFileTreeCache.cacheTree(rootPath);
+    logger.debug('Done updating file tree cache. Post size:', globalFileTreeCache.estimateSize());
+}
+
 export function startFileTreeCacheBackgroundProcess(rootPath: string) {
+    setTimeout(async () => {
+        await runSingleGlobalFileTreeCacheUpdate(rootPath);
+    }, 1000 * 2.5);
     setInterval(async () => {
-        logger.debug('Updating file tree cache for quick file access');
-        await globalFileTreeCache.cacheTree(rootPath);
+        await runSingleGlobalFileTreeCacheUpdate(rootPath);
     }, 1000 * 60 * 2.5);
 }

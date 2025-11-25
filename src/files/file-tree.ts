@@ -19,13 +19,15 @@ export type ListDirectoryResult = {
     type: 'none';
 } | ListDirectorySuccess;
 
-export type StatResult = {
-    type: 'invalid';
-} | {
+export type StatResultSuccess = {
     type: 'valid';
     fullPath: string;
     info: Deno.FileInfo;
 };
+
+export type StatResult = {
+    type: 'invalid';
+} | StatResultSuccess;
 
 export type ChangeRootResult = {
     type: 'invalid';
@@ -112,13 +114,14 @@ export class FileTree {
     }
 
     async stat(directory: ListDirectorySuccess, fileName: string): Promise<StatResult> {
-        const normalizedPath = join(this.root, directory.dirPath, fileName);
+        const normalizedPath = join(directory.dirPath, fileName);
         const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
         if (pathCheck.type === 'invalid') {
             return { type: 'invalid' };
         }
+
         const result = await this.treeCache.getByPath(normalizedPath);
-        if (result && result.type === 'file') {
+        if (result && (result.type === 'file' || result.type === 'directory')) {
             return {
                 type: 'valid',
                 fullPath: pathCheck.fullPath,
