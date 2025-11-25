@@ -22,13 +22,13 @@ export function registerUploadFileRoute(router: Router) {
                 return;
             }
             const name = file.name;
-            const listing = fileTree.listDirectory(directory);
+            const listing = await fileTree.listDirectory(directory);
             if (listing.type === 'none') {
                 ctx.response.status = HTTP_404_NOT_FOUND;
                 return;
             }
 
-            const targetFile = fileTree.resolvePath(directory, file.name);
+            const targetFile = await fileTree.resolvePath(directory, file.name);
             if (targetFile.type === 'invalid') {
                 ctx.response.status = HTTP_400_BAD_REQUEST;
                 return;

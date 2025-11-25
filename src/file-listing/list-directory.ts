@@ -9,7 +9,7 @@ type ApiFile = Deno.DirEntry & FileIdentification & {
 };
 
 export function registerDirectoryRoutes(router: Router<FfsApplicationState>) {
-    router.get('/api/directory', baseMiddlewares(), ...protectedMiddlewares(), (ctx) => {
+    router.get('/api/directory', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const fileTree = ctx.state.fileTree;
         const pathToCheck = ctx.request.url.searchParams.get('path');
         if (!pathToCheck) {
@@ -17,7 +17,7 @@ export function registerDirectoryRoutes(router: Router<FfsApplicationState>) {
             return;
         }
 
-        const listing = fileTree.listDirectory(pathToCheck);
+        const listing = await fileTree.listDirectory(pathToCheck);
         if (listing.type === 'none') {
             ctx.response.status = HTTP_404_NOT_FOUND;
             return;
@@ -25,12 +25,12 @@ export function registerDirectoryRoutes(router: Router<FfsApplicationState>) {
 
         const results: ApiFile[] = [];
         for (const result of listing.files) {
-            const fileStat = fileTree.stat(listing, result.name);
+            const fileStat = await fileTree.stat(listing, result.name);
             if (fileStat.type === 'invalid') {
                 continue;
             }
             const date = fileStat.info.ctime || fileStat.info.mtime || new Date(0);
-            const resolvedPath = fileTree.resolvePath(pathToCheck, result.name);
+            const resolvedPath = await fileTree.resolvePath(pathToCheck, result.name);
             if (resolvedPath.type === 'invalid') {
                 continue;
             }

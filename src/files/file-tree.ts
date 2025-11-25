@@ -1,5 +1,6 @@
-import { existsSync } from '@std/fs/exists';
+import { exists, existsSync } from '@std/fs/exists';
 import { resolve } from '@std/path/resolve';
+import { FileTreeCache, globalFileTreeCache } from './file-tree-cache.ts';
 
 export type PathResult = { type: 'invalid' } | {
     type: 'valid';
@@ -34,6 +35,7 @@ export type ChangeRootResult = {
 
 export class FileTree {
     private readonly root: string;
+    private readonly treeCache: FileTreeCache = globalFileTreeCache;
 
     constructor(root: string) {
         this.root = Deno.realPathSync(root);
@@ -43,8 +45,8 @@ export class FileTree {
         return this.root;
     }
 
-    isValid(): boolean {
-        return existsSync(this.root, { isDirectory: true });
+    isValid(): Promise<boolean> {
+        return exists(this.root, { isDirectory: true });
     }
 
     private ensureResolveIsUnderRoot(
@@ -64,19 +66,19 @@ export class FileTree {
         }
     }
 
-    exists(relativePath: string): boolean {
-        const result = this.resolvePath(relativePath);
+    async exists(relativePath: string): Promise<boolean> {
+        const result = await this.resolvePath(relativePath);
         return result.type === 'valid' && result.exists;
     }
 
-    resolvePath(...relativePaths: string[]): PathResult {
+    async resolvePath(...relativePaths: string[]): Promise<PathResult> {
         try {
             const resolved = resolve(this.root, ...relativePaths);
             if (existsSync(resolved)) {
                 const realPath = Deno.realPathSync(resolved);
-                return this.ensureResolveIsUnderRoot(realPath, true);
+                return await this.ensureResolveIsUnderRoot(realPath, true);
             } else {
-                return this.ensureResolveIsUnderRoot(resolved, false);
+                return await this.ensureResolveIsUnderRoot(resolved, false);
             }
         } catch {
             return {
@@ -85,8 +87,8 @@ export class FileTree {
         }
     }
 
-    listDirectory(relativePath: string): ListDirectoryResult {
-        const dir = this.resolvePath(relativePath);
+    async listDirectory(relativePath: string): Promise<ListDirectoryResult> {
+        const dir = await this.resolvePath(relativePath);
         if (dir.type === 'invalid') {
             return { type: 'none' };
         }
@@ -101,8 +103,8 @@ export class FileTree {
         }
     }
 
-    stat(directory: ListDirectorySuccess, fileName: string): StatResult {
-        const resolved = this.resolvePath(directory.dirPath, fileName);
+    async stat(directory: ListDirectorySuccess, fileName: string): Promise<StatResult> {
+        const resolved = await this.resolvePath(directory.dirPath, fileName);
         if (resolved.type === 'invalid') {
             return { type: 'invalid' };
         } else {
@@ -120,8 +122,8 @@ export class FileTree {
         }
     }
 
-    changeRoot(...relativePaths: string[]): ChangeRootResult {
-        const result = this.resolvePath(...relativePaths);
+    async changeRoot(...relativePaths: string[]): Promise<ChangeRootResult> {
+        const result = await this.resolvePath(...relativePaths);
         if (
             result.type === 'invalid' || !result.exists ||
             !Deno.statSync(result.fullPath).isDirectory
@@ -134,8 +136,8 @@ export class FileTree {
         };
     }
 
-    withSubfolderOrThrow(...relativePath: string[]): FileTree {
-        const result = this.changeRoot(...relativePath);
+    async withSubfolderOrThrow(...relativePath: string[]): Promise<FileTree> {
+        const result = await this.changeRoot(...relativePath);
         if (result.type === 'invalid') {
             throw new Error(`Expected to be able to change root to ${relativePath} but could not`);
         }

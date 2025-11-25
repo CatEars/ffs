@@ -5,9 +5,9 @@ import { HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
 import { getUserMatchingApiKey, UserAuth } from './users.ts';
 import { FfsApplicationState } from '../application-state.ts';
 
-type UserAuthenticationHook = (ctx: Context<FfsApplicationState>, user: UserAuth) => void;
+type UserAuthenticationHook = (ctx: Context<FfsApplicationState>, user: UserAuth) => Promise<void>;
 
-let onUserAuthenticateHook: UserAuthenticationHook = () => {};
+let onUserAuthenticateHook: UserAuthenticationHook = () => Promise.resolve();
 
 export function setOnUserAuthenticationHook(func: UserAuthenticationHook) {
     onUserAuthenticateHook = func;
@@ -20,7 +20,7 @@ const resolveUserAndRespond = async (
 ) => {
     const user = await getUserMatchingApiKey(apiKey);
     if (user) {
-        onUserAuthenticateHook(ctx, user);
+        await onUserAuthenticateHook(ctx, user);
         return next();
     } else {
         ctx.response.redirect('/');

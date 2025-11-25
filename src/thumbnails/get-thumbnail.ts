@@ -15,7 +15,7 @@ import { relative } from '@std/path/relative';
 
 async function tryGetFile(fileTree: FileTree, filePath: string) {
     for (let cnt = 0; cnt < 20; ++cnt) {
-        if (fileTree.exists(filePath)) {
+        if (await fileTree.exists(filePath)) {
             return true;
         }
         await sleep(200);
@@ -49,7 +49,7 @@ export function registerGetThumbnail(router: Router) {
         }
 
         const path = decodeURIComponent(pathFromUrl);
-        const pathExistResult = storeFileTree.resolvePath(path);
+        const pathExistResult = await storeFileTree.resolvePath(path);
         if (pathExistResult.type === 'invalid') {
             ctx.response.status = HTTP_403_FORBIDDEN;
             return;

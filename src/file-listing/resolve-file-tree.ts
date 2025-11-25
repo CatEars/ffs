@@ -15,13 +15,15 @@ export function getRootFileTree() {
 
 const fileResourceManger = new ResourceManager('file');
 
-export function resolveUserFileTreeFromState(ctx: Context<FfsApplicationState>) {
+export async function resolveUserFileTreeFromState(ctx: Context<FfsApplicationState>) {
     ctx.state.fileTree = getRootFileTree();
     const fileAccess = fileResourceManger.getFirstMatchingAccessLevel(ctx.state.userConfig.access);
     if (fileAccess) {
         const resolvedFileAccess = fileResourceManger.stripResourceTypeName(fileAccess);
         if (resolvedFileAccess !== fileResourceManger.rootResourceName()) {
-            ctx.state.fileTree = ctx.state.fileTree.withSubfolderOrThrow(...resolvedFileAccess);
+            ctx.state.fileTree = await ctx.state.fileTree.withSubfolderOrThrow(
+                ...resolvedFileAccess,
+            );
         }
     }
 }

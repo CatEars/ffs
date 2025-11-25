@@ -26,7 +26,7 @@ export function registerFileDeletionRoute(router: Router) {
         }
 
         for (const { path, fileName } of filesToRemove) {
-            const resolvedFrom = fileTree.resolvePath(path, fileName);
+            const resolvedFrom = await fileTree.resolvePath(path, fileName);
             if (resolvedFrom.type === 'invalid') {
                 continue;
             }

@@ -29,11 +29,11 @@ export function registerMoveFileRoute(router: Router) {
         }
 
         for (const { path, fileName } of filesToMove) {
-            const resolvedFrom = fileTree.resolvePath(path, fileName);
+            const resolvedFrom = await fileTree.resolvePath(path, fileName);
             if (resolvedFrom.type === 'invalid') {
                 continue;
             }
-            const resolvedTo = fileTree.resolvePath(destination.toString(), fileName);
+            const resolvedTo = await fileTree.resolvePath(destination.toString(), fileName);
             if (resolvedTo.type === 'invalid') {
                 continue;
             }

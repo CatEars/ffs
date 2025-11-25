@@ -34,9 +34,9 @@ await initializeLoggers();
 const app = new Application<FfsApplicationState>();
 const router = new Router();
 
-setOnUserAuthenticationHook((ctx, user) => {
+setOnUserAuthenticationHook(async (ctx, user) => {
     setAccessFromUserConfigOrDefaultToRootAccess(ctx, user.config);
-    resolveUserFileTreeFromState(ctx);
+    await resolveUserFileTreeFromState(ctx);
 });
 
 registerAllFileListing(router);

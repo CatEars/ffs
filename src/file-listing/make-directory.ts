@@ -26,8 +26,8 @@ export function registerMakeDirectoryRoute(router: Router<FfsApplicationState>) 
                 return;
             }
 
-            const rootPath = fileTree.listDirectory(path);
-            const resolved = fileTree.resolvePath(path, directoryName);
+            const rootPath = await fileTree.listDirectory(path);
+            const resolved = await fileTree.resolvePath(path, directoryName);
             if (rootPath.type === 'none' || resolved.type === 'invalid') {
                 ctx.response.status = HTTP_404_NOT_FOUND;
                 ctx.response.body = { error: 'Could not find path to create directory in' };

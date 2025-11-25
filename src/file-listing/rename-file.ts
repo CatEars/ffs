@@ -27,8 +27,8 @@ export function registerRenameFileRoute(router: Router) {
         const source = fileToRename.toString();
         const target = join(dirname(source), targetName.toString());
 
-        const from = fileTree.resolvePath(source);
-        const to = fileTree.resolvePath(target);
+        const from = await fileTree.resolvePath(source);
+        const to = await fileTree.resolvePath(target);
 
         if (from.type === 'invalid' || to.type === 'invalid') {
             ctx.response.status = HTTP_404_NOT_FOUND;
