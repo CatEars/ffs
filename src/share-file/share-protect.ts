@@ -1,6 +1,6 @@
 import { Middleware } from '@oak/oak';
+import { decodeBase64Url } from '@std/encoding/base64url';
 import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
-import { decodeBase64Url } from 'jsr:@std/encoding/base64url';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from '../security/claims.ts';
 import { ResourceManager } from '../security/resources.ts';
 

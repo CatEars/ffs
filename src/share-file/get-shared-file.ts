@@ -1,7 +1,7 @@
 import { Router } from '@oak/oak/router';
+import { decodeBase64Url } from '@std/encoding/base64url';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { shareProtect } from './share-protect.ts';
-import { decodeBase64Url } from 'jsr:@std/encoding@^1.0.10/base64url';
 import { HTTP_400_BAD_REQUEST } from '../utils/http-codes.ts';
 import { getStoreRoot } from '../config.ts';
 
