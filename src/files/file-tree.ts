@@ -1,6 +1,7 @@
-import { exists, existsSync } from '@std/fs/exists';
+import { exists } from '@std/fs/exists';
 import { resolve } from '@std/path/resolve';
 import { FileTreeCache, globalFileTreeCache } from './file-tree-cache.ts';
+import { join } from '@std/path';
 
 export type PathResult = { type: 'invalid' } | {
     type: 'valid';
@@ -74,11 +75,11 @@ export class FileTree {
     async resolvePath(...relativePaths: string[]): Promise<PathResult> {
         try {
             const resolved = resolve(this.root, ...relativePaths);
-            if (existsSync(resolved)) {
-                const realPath = Deno.realPathSync(resolved);
-                return await this.ensureResolveIsUnderRoot(realPath, true);
+            if (await exists(resolved)) {
+                const realPath = await Deno.realPath(resolved);
+                return this.ensureResolveIsUnderRoot(realPath, true);
             } else {
-                return await this.ensureResolveIsUnderRoot(resolved, false);
+                return this.ensureResolveIsUnderRoot(resolved, false);
             }
         } catch {
             return {
@@ -88,37 +89,45 @@ export class FileTree {
     }
 
     async listDirectory(relativePath: string): Promise<ListDirectoryResult> {
-        const dir = await this.resolvePath(relativePath);
-        if (dir.type === 'invalid') {
-            return { type: 'none' };
+        const normalizedPath = join(this.root, relativePath);
+        const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
+        if (pathCheck.type === 'invalid') {
+            return {
+                type: 'none',
+            };
         }
-        try {
+
+        const cached = await this.treeCache.getByPath(normalizedPath);
+        if (cached && cached.type === 'directory') {
             return {
                 type: 'found',
-                dirPath: dir.fullPath,
-                files: Deno.readDirSync(dir.fullPath).toArray(),
+                dirPath: pathCheck.fullPath,
+                files: cached.subNodes.map((entry) => entry.dirEntry),
             };
-        } catch {
-            return { type: 'none' };
+        } else {
+            return {
+                type: 'none',
+            };
         }
     }
 
     async stat(directory: ListDirectorySuccess, fileName: string): Promise<StatResult> {
-        const resolved = await this.resolvePath(directory.dirPath, fileName);
-        if (resolved.type === 'invalid') {
+        const normalizedPath = join(this.root, directory.dirPath, fileName);
+        const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
+        if (pathCheck.type === 'invalid') {
             return { type: 'invalid' };
+        }
+        const result = await this.treeCache.getByPath(normalizedPath);
+        if (result && result.type === 'file') {
+            return {
+                type: 'valid',
+                fullPath: pathCheck.fullPath,
+                info: result.fileEntry,
+            };
         } else {
-            try {
-                return {
-                    type: 'valid',
-                    fullPath: resolved.fullPath,
-                    info: Deno.statSync(resolved.fullPath),
-                };
-            } catch {
-                return {
-                    type: 'invalid',
-                };
-            }
+            return {
+                type: 'invalid',
+            };
         }
     }
 
@@ -126,7 +135,7 @@ export class FileTree {
         const result = await this.resolvePath(...relativePaths);
         if (
             result.type === 'invalid' || !result.exists ||
-            !Deno.statSync(result.fullPath).isDirectory
+            !(await Deno.lstat(result.fullPath)).isDirectory
         ) {
             return { type: 'invalid' };
         }

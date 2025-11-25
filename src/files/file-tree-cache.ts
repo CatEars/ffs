@@ -1,5 +1,6 @@
 import { join } from '@std/path/join';
 import { collectAsync } from '../utils/collect-async.ts';
+import { logger } from '../logging/logger.ts';
 
 type BaseNode = {
     type: 'file' | 'directory';
@@ -156,6 +157,7 @@ export const globalFileTreeCache = new FileTreeCache();
 
 export function startFileTreeCacheBackgroundProcess(rootPath: string) {
     setInterval(async () => {
+        logger.debug('Updating file tree cache for quick file access');
         await globalFileTreeCache.cacheTree(rootPath);
     }, 1000 * 60 * 2.5);
 }

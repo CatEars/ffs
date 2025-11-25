@@ -1,7 +1,7 @@
 import { Application } from '@oak/oak/application';
 import { Router } from '@oak/oak/router';
 import { registerAllFileListing } from './file-listing/index.ts';
-import { unsecure, validateConfig } from './config.ts';
+import { getStoreRoot, unsecure, validateConfig } from './config.ts';
 import { registerAllLogonRoutes } from './logon/index.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
 import { initializeLoggers, logger } from './logging/logger.ts';
@@ -21,6 +21,7 @@ import {
 import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { registerAllAppLogsEndpoints } from './app-logs/index.ts';
+import { startFileTreeCacheBackgroundProcess } from './files/file-tree-cache.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -55,6 +56,7 @@ if (areThumbnailsAvailable()) {
         'ffmpeg is not available, so will not generate thumbnails in the background',
     );
 }
+startFileTreeCacheBackgroundProcess(getStoreRoot());
 
 app.use(router.routes());
 app.use(router.allowedMethods());
