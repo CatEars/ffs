@@ -35,6 +35,7 @@ async function convertPathToHash(path: string): Promise<string> {
 
 export class FileTreeCache {
     private readonly _hashmap: Map<string, FileSystemNode> = new Map();
+    private readonly _maxCacheTimeMs: number = 1000 * 60 * 5;
 
     async getByPath(path: string): Promise<FileSystemNode | undefined> {
         const hash = await convertPathToHash(path);
@@ -48,6 +49,10 @@ export class FileTreeCache {
 
     getByHash(hash: string): Promise<FileSystemNode | undefined> {
         const entry = this._hashmap.get(hash);
+        const isOutdated = entry && entry.cachedAt < (Date.now() - this._maxCacheTimeMs);
+        if (isOutdated) {
+            return Promise.resolve(undefined);
+        }
         return Promise.resolve(entry);
     }
 
@@ -145,4 +150,12 @@ export class FileTreeCache {
         this._hashmap.delete(hash);
         return Promise.resolve();
     }
+}
+
+export const globalFileTreeCache = new FileTreeCache();
+
+export function startFileTreeCacheBackgroundProcess(rootPath: string) {
+    setInterval(async () => {
+        await globalFileTreeCache.cacheTree(rootPath);
+    }, 1000 * 60 * 2.5);
 }
