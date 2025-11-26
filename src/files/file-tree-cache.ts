@@ -1,6 +1,8 @@
 import { join } from '@std/path/join';
 import { collectAsync } from '../utils/collect-async.ts';
 import { logger } from '../logging/logger.ts';
+import { collectMap } from '../utils/collect-map.ts';
+import { formatBytes } from '../utils/format-bytes.ts';
 
 type BaseNode = {
     type: 'file' | 'directory';
@@ -89,7 +91,6 @@ export class FileTreeCache {
         const maxDirectorySearchLimit = 10_000_000;
         for (let idx = 0; idx < Math.min(queue.length, maxDirectorySearchLimit); ++idx) {
             const currentPath = queue[idx];
-            logger.debug('At', currentPath);
             const entry = await this.cachePath(currentPath);
             if (!entry || entry.type === 'file') {
                 continue;
@@ -111,7 +112,8 @@ export class FileTreeCache {
     }
 
     estimateSize() {
-        return this._hashmap.size;
+        const estimatedSize = JSON.stringify(collectMap(this._hashmap.values())).length;
+        return formatBytes(estimatedSize);
     }
 }
 
