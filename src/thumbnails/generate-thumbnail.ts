@@ -1,12 +1,17 @@
 import { ThumbnailRequest } from './types.ts';
-import { dirname, extname } from '@std/path';
-import { createMp4Thumbnail } from './nailers/mp4.ts';
-import { createImageMagickThumbnail } from './nailers/static-images.ts';
-import { collectAsync } from '../utils/collect-async.ts';
-import { logger } from '../logging/logger.ts';
-import { getThumbnailPath, thumbnailExists } from '../files/cache-folder.ts';
+import { extname } from '@std/path';
+import {
+    acceptedFileExtensions as acceptedVideoExtensions,
+    createMp4Thumbnail,
+} from './nailers/mp4.ts';
+import {
+    acceptedFileExtensions as acceptedImageExtensions,
+    createImageMagickThumbnail,
+} from './nailers/static-images.ts';
+import { thumbnailExists } from '../files/cache-folder.ts';
+import { copyMostFitingThumbnailFromDirectory } from './nailers/directory.ts';
 
-type ThumbnailType = 'image' | 'video';
+type ThumbnailType = 'image' | 'video' | 'directory';
 
 type Thumbnailer = {
     extNames: string[];
@@ -17,85 +22,35 @@ type Thumbnailer = {
 // LINK-FILE-EXTENSIONS
 const nailers: Thumbnailer[] = [
     {
-        extNames: [
-            '.mp4',
-            '.m4v',
-            '.mov',
-            '.avi',
-            '.webm',
-            '.mkv',
-            '.mpg',
-        ],
+        extNames: acceptedVideoExtensions,
         thumbnailType: 'video',
         handler: createMp4Thumbnail,
     },
     {
-        extNames: [
-            '.png',
-            '.jpg',
-            '.jpeg',
-            '.tiff',
-            '.webp',
-            '.gif',
-            '.avif',
-            '.bmp',
-            '.ico',
-            '.psd',
-        ],
+        extNames: acceptedImageExtensions,
         thumbnailType: 'image',
         handler: createImageMagickThumbnail,
+    },
+    {
+        extNames: [],
+        thumbnailType: 'directory',
+        handler: copyMostFitingThumbnailFromDirectory,
     },
 ];
 
 const extNames = nailers.flatMap((x) => x.extNames);
 
-async function promoteThumbnail(request: ThumbnailRequest) {
-    const outputPath = getThumbnailPath(request.filePath);
-    const parentDir = dirname(request.filePath);
-    const targetPath = getThumbnailPath(parentDir);
-    await Deno.copyFile(outputPath, targetPath);
-    logger.info('Promoting thumbnail for', outputPath, 'to directory', targetPath);
-}
-
-function findFileType(filePath: string) {
-    const fileExt = extname(filePath);
-    const matchingNailers = nailers.filter((x) => x.extNames.includes(fileExt));
-    if (matchingNailers.length === 0) {
-        return null;
-    }
-
-    return matchingNailers[0].thumbnailType;
-}
-
-export async function promoteThumbnailToParentFolderIfRelevant(
-    request: ThumbnailRequest,
-) {
-    // If we created a video thumbnail and there are no other videos -> copy thumbnail to parent
-    // Else if we created an image thumbnail and this is the only image -> copy thumbnail to parent
-
-    const thumbnailType = findFileType(request.filePath);
-    const sharedDir = dirname(request.filePath);
-    const entries = await collectAsync(Deno.readDir(sharedDir));
-    const types = entries.map((entry) => findFileType(entry.name));
-    const numVideos = types.filter((x) => x === 'video').length;
-    const numImages = types.filter((x) => x === 'image').length;
-
-    const isOnlyVideo = thumbnailType === 'video' && numVideos === 1;
-    const isOnlyImage = thumbnailType === 'image' && numImages === 1;
-    if (isOnlyVideo || isOnlyImage) {
-        await promoteThumbnail(request);
-    }
-}
-
 export async function generateThumbnail(thumbnail: ThumbnailRequest) {
     const ext = extname(thumbnail.filePath);
     for (const nailer of nailers) {
-        if (nailer.extNames.includes(ext)) {
+        if (
+            thumbnail.isFile && nailer.thumbnailType !== 'directory' &&
+            nailer.extNames.includes(ext)
+        ) {
             await nailer.handler(thumbnail);
-            await promoteThumbnailToParentFolderIfRelevant(
-                thumbnail,
-            );
-
+            return;
+        } else if (thumbnail.isDirectory && nailer.thumbnailType === 'directory') {
+            await nailer.handler(thumbnail);
             return;
         }
     }

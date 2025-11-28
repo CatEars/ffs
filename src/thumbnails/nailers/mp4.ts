@@ -12,6 +12,16 @@ type Mp4Info = {
     width: number;
 };
 
+export const acceptedFileExtensions = [
+    '.mp4',
+    '.m4v',
+    '.mov',
+    '.avi',
+    '.webm',
+    '.mkv',
+    '.mpg',
+];
+
 async function getMp4Duration(thumbnail: ThumbnailRequest): Promise<Mp4Info> {
     const command = new Deno.Command('ffprobe', {
         args: [

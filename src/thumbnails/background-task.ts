@@ -65,14 +65,42 @@ function buildFileTreeOptions() {
 
 async function findFilesToThumbnail() {
     const fileTreeOptions = buildFileTreeOptions();
-    const fileTreeWalker = new FileTreeWalker(storeRoot, fileTreeOptions);
+    const fileTreeWalker = new FileTreeWalker(storeRoot, {
+        ...fileTreeOptions,
+        includeFiles: true,
+        includeDirs: false,
+        includeSymlinks: false,
+    });
 
     fileTreeWalker.filter((file) =>
         canGenerateThumbnailFor(file.path) && !thumbnailExists(file.path)
     );
+
     for await (const file of fileTreeWalker.walk()) {
         filesToPrioritize.push({
             filePath: resolve(storeRoot, '.' + file.parent, file.name),
+            isFile: true,
+            isDirectory: false,
+        });
+    }
+}
+
+async function findDirectoriesToThumbnail() {
+    const fileTreeOptions = buildFileTreeOptions();
+    const fileTreeWalker = new FileTreeWalker(storeRoot, {
+        ...fileTreeOptions,
+        includeFiles: false,
+        includeDirs: true,
+        includeSymlinks: false,
+    });
+
+    fileTreeWalker.filter((file) => !thumbnailExists(file.path));
+
+    for await (const directory of fileTreeWalker.walk()) {
+        filesToPrioritize.push({
+            filePath: resolve(storeRoot, '.' + directory.parent, directory.name),
+            isFile: false,
+            isDirectory: true,
         });
     }
 }
@@ -80,7 +108,9 @@ async function findFilesToThumbnail() {
 stdin.addListener('data', parseIncomingThumbnailRequest);
 
 await findFilesToThumbnail();
+await findDirectoriesToThumbnail();
 setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);
+setInterval(findDirectoriesToThumbnail, devModeEnabled ? 10_000 : 60_000);
 
 while (true) {
     while (filesToPrioritize.length > 0) {

@@ -20,10 +20,10 @@ export class FileTreeWalker {
     async *walk() {
         for await (
             const entry of walk(this.root, {
-                ...this.options,
                 includeDirs: false,
                 includeFiles: true,
                 includeSymlinks: false,
+                ...this.options,
             })
         ) {
             if (!this._filter(entry)) {
