@@ -1,8 +1,33 @@
-import { relative, resolve } from '@std/path';
-import { getCacheRoot, getStoreRoot } from '../config.ts';
-import { existsSync } from '@std/fs/exists';
+import { join, relative, resolve } from '@std/path';
+import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
+import { FileTreeWalker } from './file-tree-walker.ts';
+import { logger } from '../logging/logger.ts';
+import { existsSync } from 'node:fs';
 
 const cachePrefix = 'ffs-cachedir-';
+const knownThumbnails = new Map<string, Deno.FileInfo>();
+let initialScanCompleted = false;
+
+async function scanForThumbnails() {
+    const root = getCacheRoot();
+    const fileTreeWalker = new FileTreeWalker(root, {
+        includeFiles: true,
+        includeSymlinks: false,
+        includeDirs: false,
+        match: [new RegExp('\.webp$', 'gi')],
+    });
+
+    for await (const entry of fileTreeWalker.walk()) {
+        const fullPath = join(root, entry.parent, entry.name);
+        try {
+            knownThumbnails.set(fullPath, await Deno.stat(fullPath));
+        } catch (err) {
+            logger.debug('got', err, 'when trying to scan for thumbnails');
+        }
+    }
+
+    initialScanCompleted = true;
+}
 
 async function priorTempDirectory() {
     try {
@@ -36,15 +61,27 @@ export function getThumbnailPath(filePath: string) {
     return resolve(cacheRoot, relPath + '.webp');
 }
 
-function isOutdated(filePath: string) {
+function isOutdated(thumbnailFileInfo: Deno.FileInfo) {
     const now = new Date();
     const twelveHoursAgo = now.getTime() - (12 * 60 * 60 * 1000);
-    const lastModified = Deno.statSync(filePath).mtime;
+    const lastModified = thumbnailFileInfo.mtime;
     return (lastModified?.getTime() || 0) < twelveHoursAgo;
 }
 
-export function thumbnailExists(filePath: string) {
+export function thumbnailExists(filePath: string): boolean {
     const thumbnailPath = getThumbnailPath(filePath);
-    const exists = existsSync(thumbnailPath);
-    return exists && !isOutdated(thumbnailPath);
+    if (initialScanCompleted) {
+        const entry = knownThumbnails.get(thumbnailPath);
+        return !!entry && !isOutdated(entry);
+    } else if (existsSync(thumbnailPath)) {
+        const entry = Deno.statSync(thumbnailPath);
+        return entry && !isOutdated(entry);
+    } else {
+        return false;
+    }
+}
+
+export function startThumbnailScanning() {
+    setTimeout(scanForThumbnails, devModeEnabled ? 1 : 2_500);
+    setInterval(scanForThumbnails, devModeEnabled ? 10_000 : 60_000);
 }
