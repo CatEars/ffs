@@ -24,3 +24,5 @@
 [ ] Redo thumbnails every once in a while, especially folder-based thumbnails may become stale and misleading
 
 [ ] Figure out good timing of calling thumbnails outdated (and cache times for files)
+
+[ ] Use websocket and custom protocol for uploading
