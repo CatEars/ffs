@@ -15,8 +15,6 @@
 
 [ ] Side view of files when in media mode ("playlist")
 
-[ ] Make thumbnail generation prioritized so that low prio thumbnail generation goes a bit slower
-
 [ ] Use elipsis for directory traversal and gallery/file-listing view
 
 [ ] Fix thumbnail generation for files with '%' in name
