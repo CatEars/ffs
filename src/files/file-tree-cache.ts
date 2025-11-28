@@ -31,9 +31,26 @@ export class FileTreeCache {
     private readonly _maxCacheTimeMs: number = 1000 * 60 * 5;
 
     async getByPath(path: string): Promise<FileSystemNode | undefined> {
-        const hashedEntry = this._hashmap.get(path);
-        if (hashedEntry && (hashedEntry.cachedAt > Date.now() - this._maxCacheTimeMs)) {
-            return hashedEntry;
+        const cachedEntry = this._hashmap.get(path);
+
+        if (cachedEntry) {
+            const isUpToDate = cachedEntry.cachedAt > Date.now() - this._maxCacheTimeMs;
+            if (isUpToDate) {
+                // Lets give directories a stat, this tells us if there are changes to the file tree
+                // Lets skip stating files, this makes directory navigation faster at the cost of
+                // date times on files not being up to date within 5 minute window
+                if (cachedEntry.type === 'file') {
+                    return cachedEntry;
+                }
+
+                const statInfo = await Deno.stat(path);
+                const unchangedSinceCached = statInfo.mtime &&
+                    statInfo.mtime.getTime() <= cachedEntry.cachedAt;
+
+                if (unchangedSinceCached) {
+                    return cachedEntry;
+                }
+            }
         }
 
         return await this.cachePath(path);
