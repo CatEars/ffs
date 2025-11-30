@@ -3,8 +3,19 @@
     <script type="module">
         const megaphone = new Megaphone();
 
+        function onCrumbClick(evt) {
+            const { detail } = evt;
+            console.log('EVT', detail);
+            const { trail, index } = detail;
+            const elements = trail.split('/');
+            const selectedLocation = elements.slice(0, index + 1).join('/');
+            const webPath = `/home/?path=${selectedLocation}`;
+            window.location.href = webPath;
+        }
+
         const state = megaphone.declareState({
             src: megaphone.urlParam('path', '.'),
+            onCrumbClick,
         });
 
         megaphone.render(
@@ -17,5 +28,9 @@
 
         megaphone.init();
     </script>
-    <div id="media-holder"></div>
+    <app-header>
+        <breadcrumb-nav slot="ender" $trail="src" @crumb-click="onCrumbClick"> </breadcrumb-nav>
+    </app-header>
+    <horizontal-ruler></horizontal-ruler>
+    <article id="media-holder"></article>
 </app-main>
