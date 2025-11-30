@@ -10,7 +10,7 @@ export type FileIdentification = {
 };
 
 function isVideoFile(filename: string): boolean {
-    return ['mp4', 'mv4'].some((x) => filename.endsWith(x));
+    return ['mp4', 'mv4', 'm4v'].some((x) => filename.endsWith(x));
 }
 
 function isSoundFile(filename: string): boolean {

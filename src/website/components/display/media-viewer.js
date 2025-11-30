@@ -13,7 +13,7 @@ class MediaViewer extends BaseWebComponent {
         const mimeType = src.endsWith('mp4')
             ? 'video/mp4'
             : src.endsWith('m4v')
-            ? 'video/m4v'
+            ? 'video/mp4'
             : src.endsWith('png')
             ? 'image/png'
             : src.endsWith('jpg') || src.endsWith('jpeg')
