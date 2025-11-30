@@ -24,3 +24,5 @@
 [ ] Figure out good timing of calling thumbnails outdated (and cache times for files)
 
 [ ] Use websocket and custom protocol for uploading
+
+[ ] Fix downloaded files to match their name and not be named file.x
