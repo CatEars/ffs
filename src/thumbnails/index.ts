@@ -2,6 +2,7 @@ import { Router } from '@oak/oak/router';
 import { backgroundProcessLogger, logger } from '../logging/logger.ts';
 import { ThumbnailRequest } from './types.ts';
 import { registerGetThumbnail } from './get-thumbnail.ts';
+import { extname } from '@std/path/extname';
 
 function isFfmpegAvailable() {
     const proc = runFfmpegVersion();
@@ -73,8 +74,14 @@ export function startThumbnailBackgroundProcess() {
 export async function prioritizeThumbnail(filePath: string) {
     if (thumbnailProcess !== null) {
         try {
+            // This isn't necessarily true, but for prioritizing thumbnails
+            // it is okay enough. E.g. ".d" directories are an exception to this.
+            const isFile = extname(filePath).length > 0;
+            const isDirectory = !isFile;
             const data: ThumbnailRequest = {
                 filePath,
+                isFile,
+                isDirectory,
             };
             const bytes = new TextEncoder().encode(JSON.stringify(data) + '\n');
 

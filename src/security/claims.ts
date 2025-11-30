@@ -1,6 +1,6 @@
 import { getInstanceSecret } from '../config.ts';
-import { decodeBase64Url, encodeBase64Url } from 'jsr:@std/encoding/base64url';
-import { decodeBase64, encodeBase64 } from 'jsr:@std/encoding@^1.0.10/base64';
+import { decodeBase64Url, encodeBase64Url } from '@std/encoding/base64url';
+import { decodeBase64, encodeBase64 } from '@std/encoding/base64';
 import { AccessLevel } from './resources.ts';
 
 const encoder = new TextEncoder();
@@ -43,7 +43,7 @@ export async function signAndUrlEncodeClaims(claims: Claims): Promise<string> {
     }));
 }
 
-async function isValidClaim(claim: string, hmac: Uint8Array) {
+async function isValidClaim(claim: string, hmac: Uint8Array<ArrayBuffer>) {
     const key = await getCryptoKey();
     const claimBytes = encoder.encode(claim);
     return await crypto.subtle.verify('HMAC', key, hmac, claimBytes);
