@@ -26,3 +26,5 @@
 [ ] Use websocket and custom protocol for uploading
 
 [ ] Fix downloaded files to match their name and not be named file.x
+
+[ ] Util around file operations to handle issue with eg bad partionioned data
