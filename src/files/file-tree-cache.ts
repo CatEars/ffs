@@ -72,8 +72,8 @@ export class FileTreeCache {
             } else {
                 return undefined;
             }
-        } catch (error) {
-            logger.debug('Unable to properly cache path', path, '...', 'see error', error);
+        } catch {
+            /* Intentionally left empty */
         }
     }
 
