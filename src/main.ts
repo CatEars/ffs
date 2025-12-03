@@ -21,7 +21,6 @@ import {
 import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { registerAllAppLogsEndpoints } from './app-logs/index.ts';
-import { startFileTreeCacheBackgroundProcess } from './files/file-tree-cache.ts';
 import { startThumbnailScanning } from './files/cache-folder.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
@@ -57,7 +56,6 @@ if (areThumbnailsAvailable()) {
         'ffmpeg is not available, so will not generate thumbnails in the background',
     );
 }
-startFileTreeCacheBackgroundProcess(getStoreRoot());
 startThumbnailScanning();
 
 app.use(router.routes());
