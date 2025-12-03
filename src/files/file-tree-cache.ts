@@ -73,10 +73,7 @@ export class FileTreeCache {
                 return undefined;
             }
         } catch (error) {
-            if (error instanceof Deno.errors.NotFound) {
-                return undefined;
-            }
-            throw error;
+            logger.debug('Unable to properly cache path', path, '...', 'see error', error);
         }
     }
 
