@@ -126,8 +126,13 @@ export class FileTreeCache {
     }
 
     estimateSize() {
-        const estimatedSize = JSON.stringify(collectMap(this._hashmap.values())).length;
-        return formatBytes(estimatedSize);
+        try {
+            const estimatedSize = JSON.stringify(collectMap(this._hashmap.values())).length;
+            return formatBytes(estimatedSize);
+        } catch (err) {
+            logger.warn('Tried to estimate file tree cache size but got error', err);
+            return 'unknown';
+        }
     }
 }
 
