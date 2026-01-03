@@ -1,7 +1,7 @@
 import { Application } from '@oak/oak/application';
 import { Router } from '@oak/oak/router';
 import { registerAllFileListing } from './file-listing/index.ts';
-import { getStoreRoot, unsecure, validateConfig } from './config.ts';
+import { getEnableCacheAllDirectories, getStoreRoot, unsecure, validateConfig } from './config.ts';
 import { registerAllLogonRoutes } from './logon/index.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
 import { initializeLoggers, logger } from './logging/logger.ts';
@@ -57,7 +57,9 @@ if (areThumbnailsAvailable()) {
         'ffmpeg is not available, so will not generate thumbnails in the background',
     );
 }
-startFileTreeCacheBackgroundProcess(getStoreRoot());
+if (getEnableCacheAllDirectories()) {
+    startFileTreeCacheBackgroundProcess(getStoreRoot());
+}
 startThumbnailScanning();
 
 app.use(router.routes());
