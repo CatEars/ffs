@@ -14,6 +14,12 @@ This will download the latest release and run a docker image on port 8080 for yo
 
 More advanced setups can be found in the [deploy](./deploy/) folder.
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+For AI agents working on this repository, refer to [.github/copilot-instructions.md](.github/copilot-instructions.md) for detailed technical information and development workflows.
+
 ## Licenses
 
 ### Material Design Icons License
