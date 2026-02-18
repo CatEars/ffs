@@ -34,10 +34,10 @@ class PaginateControl extends BaseWebComponent {
             const delta = 2; // Show 2 pages on each side of current page
             
             // Calculate if we need ellipses
-            // With delta=2, we show: first, ..., curr-2, curr-1, curr, curr+1, curr+2, ..., last
-            // That's potentially 7 unique pages (1, curr-2, curr-1, curr, curr+1, curr+2, maxPages)
-            // If maxPages is small enough that showing all is <= showing with ellipses, show all
-            const needsEllipses = maxPages > (delta * 2 + 1 + 2); // middle range + first + last
+            // Threshold calculation: delta*2 (adjacent pages) + 1 (current) + 2 (first + last) = 7
+            // If maxPages <= 7, all pages fit comfortably without ellipses
+            const ELLIPSIS_THRESHOLD = delta * 2 + 1 + 2;
+            const needsEllipses = maxPages > ELLIPSIS_THRESHOLD;
             
             if (!needsEllipses) {
                 for (let i = 1; i <= maxPages; i++) {
