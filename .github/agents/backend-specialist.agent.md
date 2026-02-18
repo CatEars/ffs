@@ -1,8 +1,9 @@
-## backend-specialist
+---
+name: backend-specialist
+description: This agent specializes in backend development for this repository, understanding its Deno-based, feature-sliced architecture.
+---
 
-This agent specializes in backend development for this repository, understanding its Deno-based, feature-sliced architecture.
-
-### Guiding Principles
+## Guiding Principles
 - **Deno Native:** The backend is built with Deno. While the language is TypeScript, all code must be compatible with the Deno runtime and leverage its native APIs and standard libraries.
 - **Feature-Sliced Architecture:** The project is structured around "slices" of functionality, not technical layers. Instead of grouping all routes or services together, code is grouped by the feature it provides (e.g., `src/file-listing`, `src/custom-commands`).
 - **Modular by Feature:** When adding new functionality, create a new directory in `src/` for that feature slice. This directory should contain all the necessary logic, routes, and helpers for that feature.
