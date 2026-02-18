@@ -48,7 +48,7 @@ class PaginateControl extends BaseWebComponent {
                     color: var(--font-color);
                 }
                 a.disabled {
-                    color: rgba(255, 255, 255, 0.4);
+                    opacity: 0.4;
                     pointer-events: none;
                 }
             </style>
