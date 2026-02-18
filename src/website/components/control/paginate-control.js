@@ -47,6 +47,10 @@ class PaginateControl extends BaseWebComponent {
                     text-decoration: underline;
                     color: var(--font-color);
                 }
+                a.disabled {
+                    color: rgba(255, 255, 255, 0.4);
+                    pointer-events: none;
+                }
             </style>
             <nav>
                 <ul>
