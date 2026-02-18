@@ -204,7 +204,7 @@ Example: `feat: add thumbnail support for WEBP images`
 - Check existing issues and PRs
 - Review the codebase and existing patterns
 - Ask questions in issues or PR comments
-- Refer to `.github/copilot-instructions.md` for detailed technical info
+- Refer to [.github/copilot-instructions.md](.github/copilot-instructions.md) for detailed technical info
 
 ## AI Agent Guidelines
 

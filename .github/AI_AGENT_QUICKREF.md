@@ -123,6 +123,6 @@ CSS files in: `/src/website/static/css/screen-specific/`
 ---
 
 **Full Documentation**: 
-- [copilot-instructions.md](.github/copilot-instructions.md)
+- [copilot-instructions.md](./copilot-instructions.md)
 - [CONTRIBUTING.md](../CONTRIBUTING.md)
-- [COPILOT_PULL_REQUEST.md](.github/COPILOT_PULL_REQUEST.md)
+- [COPILOT_PULL_REQUEST.md](./COPILOT_PULL_REQUEST.md)
