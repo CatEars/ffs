@@ -28,6 +28,41 @@ class PaginateControl extends BaseWebComponent {
             to(currentPage + 1);
         };
 
+        // Generate page numbers to display with ellipses
+        const getPageNumbers = () => {
+            const pages = [];
+            const delta = 2; // Show 2 pages on each side of current page
+            
+            // Calculate if we need ellipses
+            // With delta=2, we show: first, ..., curr-2, curr-1, curr, curr+1, curr+2, ..., last
+            // That's potentially 7 unique pages (1, curr-2, curr-1, curr, curr+1, curr+2, maxPages)
+            // If maxPages is small enough that showing all is <= showing with ellipses, show all
+            const needsEllipses = maxPages > (delta * 2 + 1 + 2); // middle range + first + last
+            
+            if (!needsEllipses) {
+                for (let i = 1; i <= maxPages; i++) {
+                    pages.push(i);
+                }
+                return pages;
+            }
+            
+            // Otherwise, show pages with ellipses
+            for (let i = 1; i <= maxPages; i++) {
+                // Always show first page, last page, current page, and pages within delta
+                if (
+                    i === 1 ||
+                    i === maxPages ||
+                    (i >= currentPage - delta && i <= currentPage + delta)
+                ) {
+                    pages.push(i);
+                }
+            }
+            
+            return pages;
+        };
+
+        const pageNumbers = getPageNumbers();
+
         return html`
             <style>
                 li {
@@ -51,6 +86,10 @@ class PaginateControl extends BaseWebComponent {
                     opacity: var(--disabled-opacity);
                     pointer-events: none;
                 }
+                .ellipsis {
+                    color: var(--font-color);
+                    opacity: var(--disabled-opacity);
+                }
             </style>
             <nav>
                 <ul>
@@ -62,19 +101,22 @@ class PaginateControl extends BaseWebComponent {
                             >${'<'}</a
                         >
                     </li>
-                    ${Array.from({ length: maxPages }).map(
-                        (_, idx) =>
-                            html`
-                                <li>
-                                    <a
-                                        href="#"
-                                        class="${currentPage === idx + 1 ? 'disabled' : ''}"
-                                        onclick="${() => to(idx + 1)}"
-                                        >${idx + 1}</a
-                                    >
-                                </li>
-                            `
-                    )}
+                    ${pageNumbers.map((pageNum, idx) => {
+                        const prevPageNum = idx > 0 ? pageNumbers[idx - 1] : 0;
+                        const showEllipsis = pageNum - prevPageNum > 1;
+                        
+                        return html`
+                            ${showEllipsis ? html`<li class="ellipsis">...</li>` : ''}
+                            <li>
+                                <a
+                                    href="#"
+                                    class="${currentPage === pageNum ? 'disabled' : ''}"
+                                    onclick="${() => to(pageNum)}"
+                                    >${pageNum}</a
+                                >
+                            </li>
+                        `;
+                    })}
                     <li>
                         <a
                             href="#"
