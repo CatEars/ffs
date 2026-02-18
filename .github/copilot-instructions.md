@@ -58,11 +58,13 @@ This project prioritizes mobile usability:
 - Keep UI simple and accessible
 
 ## Pull Request Guidelines
-- **IMPORTANT**: Always create pull requests targeting the `mobile-contrib` branch, not `main`
+- **CRITICAL**: For any mobile-related changes (UI, responsive design, touch interactions, mobile bug fixes), ALWAYS create pull requests targeting the `mobile-contrib` branch
+- For non-mobile changes, target the default branch
 - Keep changes focused and minimal
 - Update tests when modifying functionality
 - Run `deno fmt` and `deno task test` before committing
 - Reference related issues in PR description
+- See `.github/COPILOT_PULL_REQUEST.md` for detailed branch targeting rules
 
 ## Working with Components
 - Frontend uses vanilla JS Web Components (no framework)
