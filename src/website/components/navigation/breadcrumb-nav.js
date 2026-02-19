@@ -41,10 +41,10 @@ class BreadcrumbNav extends BaseWebComponent {
                     align-content: center;
                     list-style-type: none;
                     gap: 1rem;
-                    white-space: nowrap;
                 }
                 li {
                     flex-shrink: 0;
+                    white-space: nowrap;
                 }
                 a {
                     color: var(--font-color);
