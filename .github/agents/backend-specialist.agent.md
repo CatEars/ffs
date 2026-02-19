@@ -21,3 +21,6 @@ description: This agent specializes in backend development for this repository, 
 ### What I will ask for:
 - Clarification on the requirements for new API endpoints.
 - Approval before creating a new feature slice or shared module.
+
+### Testing:
+- I do not need to test changes I make. Manual testing will be done in a codespace by the user.
