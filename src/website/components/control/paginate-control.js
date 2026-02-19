@@ -70,6 +70,7 @@ class PaginateControl extends BaseWebComponent {
                     display: flex;
                     flex-direction: row;
                     gap: 1rem;
+                    padding-left: 0;
                 }
                 a {
                     text-decoration: underline;

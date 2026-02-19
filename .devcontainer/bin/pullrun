@@ -1,0 +1,35 @@
+#!/bin/bash
+
+AUTO_PULL_INTERVAL=30
+
+function auto_pull() {
+    while true; do
+        sleep $AUTO_PULL_INTERVAL
+        echo "[pullrun] Auto-pulling changes..."
+        git pull --rebase --autostash 2>&1 | sed 's/^/[git] /'
+    done
+}
+
+function run_with_restart() {
+    while true; do
+        echo "[pullrun] Starting deno task run..."
+        deno task run
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -eq 0 ]; then
+            echo "[pullrun] Application exited cleanly (exit code 0)"
+            break
+        else
+            echo "[pullrun] Application failed with exit code $EXIT_CODE. Restarting in 3 seconds..."
+            sleep 3
+        fi
+    done
+}
+
+auto_pull &
+AUTO_PULL_PID=$!
+
+trap "kill $AUTO_PULL_PID 2>/dev/null; exit" INT TERM EXIT
+
+run_with_restart
+
+kill $AUTO_PULL_PID 2>/dev/null
