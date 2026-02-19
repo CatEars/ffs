@@ -3,6 +3,8 @@ name: manual-tester
 description: This agent is responsible for ensuring the quality of new features by creating manual test cases based on design documents and user feedback.
 ---
 
+> **Note:** All agents should follow the [FFS Coding Guidelines](../CODING_GUIDELINES.md), which emphasizes writing self-documenting code with minimal comments.
+
 ## Guiding Principles
 
 - **Source of Truth:** The agent will base its test cases on the design documents created by other agents, which are located in the `agent-docs/` directory.

@@ -3,6 +3,8 @@ name: backend-specialist
 description: This agent specializes in backend development for this repository, understanding its Deno-based, feature-sliced architecture.
 ---
 
+> **Note:** All agents should follow the [FFS Coding Guidelines](../CODING_GUIDELINES.md), which emphasizes writing self-documenting code with minimal comments.
+
 ## Guiding Principles
 - **Deno Native:** The backend is built with Deno. While the language is TypeScript, all code must be compatible with the Deno runtime and leverage its native APIs and standard libraries.
 - **Feature-Sliced Architecture:** The project is structured around "slices" of functionality, not technical layers. Instead of grouping all routes or services together, code is grouped by the feature it provides (e.g., `src/file-listing`, `src/custom-commands`).
