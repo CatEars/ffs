@@ -373,13 +373,11 @@
 
         megaphone.init();
     </script>
-    <app-header>
-        <breadcrumb-nav
-            slot="ender"
-            $trail="currentPath"
-            @crumb-click="onCrumbClick"
-        ></breadcrumb-nav>
-    </app-header>
+    <app-header>Files</app-header>
+    <breadcrumb-nav
+        $trail="currentPath"
+        @crumb-click="onCrumbClick"
+    ></breadcrumb-nav>
     <horizontal-ruler></horizontal-ruler>
     <paginate-control
         $page="currentPage"
