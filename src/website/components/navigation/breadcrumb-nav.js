@@ -1,7 +1,7 @@
 import { BaseWebComponent } from '../base.js';
 
 class BreadcrumbNav extends BaseWebComponent {
-    static observedAttributes = ['trail'];
+    static observedAttributes = ['trail', 'hide-last-slash'];
 
     render(html) {
         const trail = this.getAttribute('trail') || '';
@@ -59,6 +59,9 @@ class BreadcrumbNav extends BaseWebComponent {
                 li::after {
                     content: '/';
                     margin-left: 1rem;
+                }
+                :host([hide-last-slash]) li:last-child::after {
+                    content: none;
                 }
                 li.breadcrumb-item > span {
                     cursor: default;
