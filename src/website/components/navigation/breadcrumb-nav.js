@@ -25,13 +25,32 @@ class BreadcrumbNav extends BaseWebComponent {
 
         return html`
             <style>
+                :host {
+                    display: block;
+                    width: 100%;
+                    margin: 1rem 0;
+                }
+                nav {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                    scrollbar-width: none;
+                    width: 100%;
+                }
+                nav::-webkit-scrollbar {
+                    display: none;
+                }
                 ol {
-                    display: flex;
+                    display: inline-flex;
                     flex-direction: row;
-                    flex-wrap: wrap;
                     align-content: center;
                     list-style-type: none;
                     gap: 1rem;
+                    margin: 0;
+                    padding: 0 0.5rem;
+                }
+                li {
+                    flex-shrink: 0;
+                    white-space: nowrap;
                 }
                 a {
                     color: var(--font-color);
