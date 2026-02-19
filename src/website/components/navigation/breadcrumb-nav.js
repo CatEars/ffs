@@ -29,8 +29,8 @@ class BreadcrumbNav extends BaseWebComponent {
                     overflow-x: auto;
                     -webkit-overflow-scrolling: touch;
                     scrollbar-width: none;
-                    mask-image: linear-gradient(to right, black 85%, transparent 100%);
-                    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+                    mask-image: linear-gradient(to right, black 95%, transparent 100%);
+                    -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
                 }
                 nav::-webkit-scrollbar {
                     display: none;
