@@ -25,10 +25,15 @@ class BreadcrumbNav extends BaseWebComponent {
 
         return html`
             <style>
+                :host {
+                    display: block;
+                    width: 100%;
+                }
                 nav {
                     overflow-x: auto;
                     -webkit-overflow-scrolling: touch;
                     scrollbar-width: none;
+                    width: 100%;
                     mask-image: linear-gradient(to right, black 95%, transparent 100%);
                     -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
                 }
@@ -36,11 +41,13 @@ class BreadcrumbNav extends BaseWebComponent {
                     display: none;
                 }
                 ol {
-                    display: flex;
+                    display: inline-flex;
                     flex-direction: row;
                     align-content: center;
                     list-style-type: none;
                     gap: 1rem;
+                    margin: 0;
+                    padding: 0;
                 }
                 li {
                     flex-shrink: 0;
