@@ -28,14 +28,9 @@ class PaginateControl extends BaseWebComponent {
             to(currentPage + 1);
         };
 
-        // Generate page numbers to display with ellipses
         const getPageNumbers = () => {
             const pages = [];
-            const delta = 2; // Show 2 pages on each side of current page
-            
-            // Calculate if we need ellipses
-            // Threshold calculation: delta*2 (adjacent pages) + 1 (current) + 2 (first + last) = 7
-            // If maxPages <= 7, all pages fit comfortably without ellipses
+            const delta = 2;
             const ELLIPSIS_THRESHOLD = delta * 2 + 1 + 2;
             const needsEllipses = maxPages > ELLIPSIS_THRESHOLD;
             
@@ -46,9 +41,7 @@ class PaginateControl extends BaseWebComponent {
                 return pages;
             }
             
-            // Otherwise, show pages with ellipses
             for (let i = 1; i <= maxPages; i++) {
-                // Always show first page, last page, current page, and pages within delta
                 if (
                     i === 1 ||
                     i === maxPages ||
