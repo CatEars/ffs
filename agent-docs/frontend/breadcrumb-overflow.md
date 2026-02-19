@@ -27,12 +27,17 @@ The breadcrumb component now uses CSS overflow properties to enable native horiz
 
 ### CSS Changes
 
-#### Nav Container
+#### Host and Nav Container
 ```css
+:host {
+    display: block;
+    width: 100%;
+}
 nav {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    width: 100%;
     mask-image: linear-gradient(to right, black 95%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
 }
@@ -44,9 +49,11 @@ nav::-webkit-scrollbar {
 #### List Styling
 ```css
 ol {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     /* Removed: flex-wrap: wrap */
+    margin: 0;
+    padding: 0;
 }
 li {
     flex-shrink: 0;
@@ -58,7 +65,10 @@ li {
 
 | Property | Purpose |
 |----------|---------|
+| `:host { width: 100% }` | Constrains the web component to its container width |
+| `nav { width: 100% }` | Sets the scrollable container to full width |
 | `overflow-x: auto` | Creates horizontal scrollable area; enables touch swipe on mobile |
+| `ol { display: inline-flex }` | Allows list to size based on content and exceed container width |
 | `white-space: nowrap` | Prevents text from wrapping within breadcrumb items |
 | `flex-shrink: 0` | Prevents flex items from shrinking to fit viewport, triggering overflow |
 | `-webkit-overflow-scrolling: touch` | Enables momentum scrolling on iOS for native feel |
