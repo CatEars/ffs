@@ -17,7 +17,7 @@ The breadcrumb component now uses CSS overflow properties to enable native horiz
 1. **Native Touch Scrolling:** Uses `overflow-x: auto` which automatically enables swipe-to-scroll on mobile devices
 2. **Momentum Scrolling:** `-webkit-overflow-scrolling: touch` provides smooth, native-feeling scrolling on iOS
 3. **Hidden Scrollbar:** Cleaner appearance without visible scrollbar chrome
-4. **Fade Indicator:** Subtle gradient mask hints at additional content
+4. **Proper Padding:** Uses standard 0.5rem padding on left and right sides
 5. **No JavaScript Required:** Pure CSS solution leveraging native browser capabilities
 
 ## Implementation Details
@@ -38,8 +38,6 @@ nav {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     width: 100%;
-    mask-image: linear-gradient(to right, black 95%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 95%, transparent 100%);
 }
 nav::-webkit-scrollbar {
     display: none;
@@ -53,7 +51,7 @@ ol {
     flex-direction: row;
     /* Removed: flex-wrap: wrap */
     margin: 0;
-    padding: 0;
+    padding: 0 0.5rem;
 }
 li {
     flex-shrink: 0;
@@ -69,19 +67,20 @@ li {
 | `nav { width: 100% }` | Sets the scrollable container to full width |
 | `overflow-x: auto` | Creates horizontal scrollable area; enables touch swipe on mobile |
 | `ol { display: inline-flex }` | Allows list to size based on content and exceed container width |
+| `ol { padding: 0 0.5rem }` | Standard left/right padding matching other components |
 | `white-space: nowrap` | Prevents text from wrapping within breadcrumb items |
 | `flex-shrink: 0` | Prevents flex items from shrinking to fit viewport, triggering overflow |
 | `-webkit-overflow-scrolling: touch` | Enables momentum scrolling on iOS for native feel |
 | `scrollbar-width: none` + `::-webkit-scrollbar` | Hides scrollbar for app-like appearance |
-| `mask-image` gradient | Subtle fade-out effect hints at additional content |
 
 ## Benefits
 
 1. **Better Mobile UX:** Native touch scrolling feels intuitive on mobile devices
 2. **Space Efficient:** Keeps breadcrumbs on single line, saving vertical space
 3. **Consistent:** Works across all modern browsers and devices
-4. **Accessible:** Content remains available to screen readers; gradient is purely visual
+4. **Accessible:** Content remains fully accessible to screen readers
 5. **No Dependencies:** Pure CSS solution with no JavaScript overhead
+6. **Standard Padding:** Uses 0.5rem padding consistent with other components
 
 ## Browser Support
 
@@ -102,7 +101,6 @@ The implementation should be tested with:
 
 ## Accessibility Considerations
 
-- The gradient mask is set to 95% to minimize visual obstruction
-- Content is not hidden from screen readers (mask is visual only)
 - All breadcrumb items remain accessible via keyboard navigation
-- The fade serves as a visual hint without blocking interaction
+- Content is not hidden or obscured from screen readers
+- Standard padding (0.5rem) provides comfortable touch targets on mobile devices
