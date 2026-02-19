@@ -28,6 +28,34 @@ class PaginateControl extends BaseWebComponent {
             to(currentPage + 1);
         };
 
+        const getPageNumbers = () => {
+            const pages = [];
+            const delta = 2;
+            const ELLIPSIS_THRESHOLD = delta * 2 + 1 + 2;
+            const needsEllipses = maxPages > ELLIPSIS_THRESHOLD;
+            
+            if (!needsEllipses) {
+                for (let i = 1; i <= maxPages; i++) {
+                    pages.push(i);
+                }
+                return pages;
+            }
+            
+            for (let i = 1; i <= maxPages; i++) {
+                if (
+                    i === 1 ||
+                    i === maxPages ||
+                    (i >= currentPage - delta && i <= currentPage + delta)
+                ) {
+                    pages.push(i);
+                }
+            }
+            
+            return pages;
+        };
+
+        const pageNumbers = getPageNumbers();
+
         return html`
             <style>
                 li {
@@ -51,6 +79,10 @@ class PaginateControl extends BaseWebComponent {
                     opacity: var(--disabled-opacity);
                     pointer-events: none;
                 }
+                .ellipsis {
+                    color: var(--font-color);
+                    opacity: var(--disabled-opacity);
+                }
             </style>
             <nav>
                 <ul>
@@ -62,19 +94,22 @@ class PaginateControl extends BaseWebComponent {
                             >${'<'}</a
                         >
                     </li>
-                    ${Array.from({ length: maxPages }).map(
-                        (_, idx) =>
-                            html`
-                                <li>
-                                    <a
-                                        href="#"
-                                        class="${currentPage === idx + 1 ? 'disabled' : ''}"
-                                        onclick="${() => to(idx + 1)}"
-                                        >${idx + 1}</a
-                                    >
-                                </li>
-                            `
-                    )}
+                    ${pageNumbers.map((pageNum, idx) => {
+                        const prevPageNum = idx > 0 ? pageNumbers[idx - 1] : 0;
+                        const showEllipsis = pageNum - prevPageNum > 1;
+                        
+                        return html`
+                            ${showEllipsis ? html`<li class="ellipsis">...</li>` : ''}
+                            <li>
+                                <a
+                                    href="#"
+                                    class="${currentPage === pageNum ? 'disabled' : ''}"
+                                    onclick="${() => to(pageNum)}"
+                                    >${pageNum}</a
+                                >
+                            </li>
+                        `;
+                    })}
                     <li>
                         <a
                             href="#"
