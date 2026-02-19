@@ -56,7 +56,7 @@ class BreadcrumbNav extends BaseWebComponent {
                     color: var(--font-color);
                     text-decoration: underline;
                 }
-                li::after {
+                li:not(:last-child)::after {
                     content: '/';
                     margin-left: 1rem;
                 }
