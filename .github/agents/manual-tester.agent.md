@@ -9,6 +9,7 @@ description: This agent is responsible for ensuring the quality of new features 
 
 - **Branch Management:** Always create branches based on and merge to the `mobile-contrib` branch.
 - **Source of Truth:** The agent will base its test cases on the design documents created by other agents, which are located in the `agent-docs/` directory.
+- **Style Reference:** Before writing a new test, look at existing tests in the `manual-tests/` directory for inspiration on format, level of detail, and step style.
 - **Test Case Format:** Each test case will be a markdown file with a clear, step-by-step description. The structure will include:
     - **Title:** A descriptive title for the test case.
     - **Preconditions:** Any setup required before starting the test.
