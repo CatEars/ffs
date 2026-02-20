@@ -6,8 +6,8 @@ export type DecodedShare = {
     paths: string[];
 };
 
-export interface ShareLinkProtocol {
-    protocolId(): string;
+export interface ShareLinkScheme {
+    schemeId(): string;
     isAvailable(ctx: ShareContext): boolean;
     createCode(ctx: ShareContext): string;
     decodeCode(code: string): DecodedShare;

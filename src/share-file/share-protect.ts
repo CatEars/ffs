@@ -2,7 +2,7 @@ import { Middleware } from '@oak/oak';
 import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from '../security/claims.ts';
 import { ResourceManager } from '../security/resources.ts';
-import { pathsShareLinkProtocol } from './paths-share-link-protocol.ts';
+import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 
 const fileShareResources = new ResourceManager('file-share');
 
@@ -26,7 +26,7 @@ export const shareProtect: Middleware = async (ctx, next) => {
 
     let paths: string[];
     try {
-        ({ paths } = pathsShareLinkProtocol.decodeCode(pathsFromUrl));
+        ({ paths } = shareLinkSchemeRegistry.decodeCode(pathsFromUrl));
     } catch {
         ctx.response.status = HTTP_400_BAD_REQUEST;
         return;

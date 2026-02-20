@@ -1,7 +1,7 @@
 import { Router } from '@oak/oak/router';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { generateHmacForFile as generateHmacForFiles } from './share-protect.ts';
-import { pathsShareLinkProtocol } from './paths-share-link-protocol.ts';
+import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 import { HTTP_400_BAD_REQUEST } from '../utils/http-codes.ts';
 
 export function registerCreateFileShareLink(router: Router) {
@@ -9,12 +9,12 @@ export function registerCreateFileShareLink(router: Router) {
         const form = await ctx.request.body.formData();
         const paths = JSON.parse(form.get('paths')?.toString() || '');
         const shareCtx = { paths };
-        if (!pathsShareLinkProtocol.isAvailable(shareCtx)) {
+        if (!shareLinkSchemeRegistry.isAvailable(shareCtx)) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
             return;
         }
         const hmac = await generateHmacForFiles(paths);
-        const code = pathsShareLinkProtocol.createCode(shareCtx);
+        const code = shareLinkSchemeRegistry.createCode(shareCtx);
         ctx.response.redirect(`/share-file/view?paths=${code}&hmac=${hmac}`);
     });
 }

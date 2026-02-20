@@ -1,11 +1,11 @@
 import { decodeBase64Url, encodeBase64Url } from '@std/encoding/base64url';
-import type { DecodedShare, ShareContext, ShareLinkProtocol } from './share-link-protocol.ts';
+import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-protocol.ts';
 
 const MAX_PATHS_LENGTH = 1250;
 const decoder = new TextDecoder();
 
-export class PathsShareLinkProtocol implements ShareLinkProtocol {
-    protocolId(): string {
+export class PathsShareLinkScheme implements ShareLinkScheme {
+    schemeId(): string {
         return 'paths';
     }
 
@@ -23,4 +23,4 @@ export class PathsShareLinkProtocol implements ShareLinkProtocol {
     }
 }
 
-export const pathsShareLinkProtocol = new PathsShareLinkProtocol();
+export const pathsShareLinkScheme = new PathsShareLinkScheme();
