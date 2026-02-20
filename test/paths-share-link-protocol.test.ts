@@ -2,12 +2,12 @@ import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
 import { assertFalse } from '@std/assert/false';
 import { assertThrows } from '@std/assert/throws';
-import { PathsShareLinkScheme } from '../src/share-file/paths-share-link-protocol.ts';
+import { RawPathsShareLinkScheme } from '../src/share-file/raw-paths-share-link-protocol.ts';
 
-const scheme = new PathsShareLinkScheme();
+const scheme = new RawPathsShareLinkScheme();
 
-Deno.test('schemeId returns "paths"', () => {
-    assertEquals(scheme.schemeId(), 'paths');
+Deno.test('schemeId returns "raw-paths"', () => {
+    assertEquals(scheme.schemeId(), 'raw-paths');
 });
 
 Deno.test('isAvailable returns true when total paths length is within limit', () => {

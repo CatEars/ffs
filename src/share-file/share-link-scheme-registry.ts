@@ -1,5 +1,5 @@
 import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-protocol.ts';
-import { pathsShareLinkScheme } from './paths-share-link-protocol.ts';
+import { rawPathsShareLinkScheme } from './raw-paths-share-link-protocol.ts';
 
 const SCHEME_SEPARATOR = ':';
 
@@ -33,4 +33,4 @@ export class ShareLinkSchemeRegistry {
     }
 }
 
-export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([pathsShareLinkScheme]);
+export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([rawPathsShareLinkScheme]);
