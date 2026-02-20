@@ -5,10 +5,10 @@
 - Start the server with `deno task run` and log in
 
 ## Test Data
-| Path | Files | Pages at size 100 |
-|------|-------|-------------------|
-| `testbench/long-filenames` | 20 | 1 |
-| `testbench/many-files` | 17,576 | 176 |
+| Path | Files | Pages at size 1000 | Pages at size 100 |
+|------|-------|-------------------|-------------------|
+| `testbench/long-filenames` | 20 | 1 | 1 |
+| `testbench/many-files` | 17,576 | 18 | 176 |
 
 ## Steps
 
@@ -17,35 +17,36 @@
 1. Navigate to `/home/?path=testbench%2Flong-filenames`  
    → `< [1] >`, both arrows disabled
 
-**Small pagination — no ellipsis**
+**Ellipsis — near start**
 
-2. In Options, set page size to 5  
-   → `< [1] 2 3 4 >`, no ellipsis, `>` enabled
+2. Navigate to `/home/?path=testbench%2Fmany-files`, set page size to 1000  
+   → `< [1] 2 3 ... 18 >`, `<` disabled
 
 3. Click `>`  
-   → `< 1 [2] 3 4 >`, `<` now enabled
+   → `< 1 [2] 3 4 ... 18 >`, `<` now enabled
 
-4. Click page `4`  
-   → `< 1 2 3 [4] >`, `>` disabled
+**Ellipsis — both sides**
 
-**Large pagination — ellipsis**
+4. Navigate to `/home/?path=testbench%2Fmany-files&page=9`  
+   → `< 1 ... 7 8 [9] 10 11 ... 18 >`
 
-5. In Options, reset page size to 100
+**Ellipsis — near end**
 
-6. Navigate to `/home/?path=testbench%2Fmany-files`  
-   → `< [1] 2 3 ... 176 >`, `<` disabled
+5. Navigate to `/home/?path=testbench%2Fmany-files&page=18`  
+   → `< 1 ... 16 17 [18] >`, `>` disabled
 
-7. Click `>`  
-   → `< 1 [2] 3 4 ... 176 >`
+6. Click `[18]` (current page)  
+   → Page unchanged, `>` remains disabled
+
+**Large page count**
+
+7. In Options, set page size to 100
 
 8. Navigate to `/home/?path=testbench%2Fmany-files&page=88`  
-   → `< 1 ... 86 87 [88] 89 90 ... 176 >`, ellipsis on both sides
+   → `< 1 ... 86 87 [88] 89 90 ... 176 >`
 
 9. Click `<`  
    → `< 1 ... 85 86 [87] 88 89 ... 176 >`
 
 10. Click page `176`  
     → `< 1 ... 174 175 [176] >`, `>` disabled
-
-11. Click `[176]` (current page)  
-    → Page unchanged, `>` remains disabled
