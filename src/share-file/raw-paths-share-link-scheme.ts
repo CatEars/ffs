@@ -1,5 +1,5 @@
 import { decodeBase64Url, encodeBase64Url } from '@std/encoding/base64url';
-import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-protocol.ts';
+import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-scheme.ts';
 
 const MAX_PATHS_LENGTH = 1250;
 const decoder = new TextDecoder();

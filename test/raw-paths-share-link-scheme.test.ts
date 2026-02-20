@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
 import { assertFalse } from '@std/assert/false';
 import { assertThrows } from '@std/assert/throws';
-import { RawPathsShareLinkScheme } from '../src/share-file/raw-paths-share-link-protocol.ts';
+import { RawPathsShareLinkScheme } from '../src/share-file/raw-paths-share-link-scheme.ts';
 
 const scheme = new RawPathsShareLinkScheme();
 

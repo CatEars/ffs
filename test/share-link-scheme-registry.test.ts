@@ -7,7 +7,7 @@ import type {
     DecodedShare,
     ShareContext,
     ShareLinkScheme,
-} from '../src/share-file/share-link-protocol.ts';
+} from '../src/share-file/share-link-scheme.ts';
 
 class FakeScheme implements ShareLinkScheme {
     constructor(
