@@ -1,12 +1,10 @@
 import { Middleware } from '@oak/oak';
-import { decodeBase64Url } from '@std/encoding/base64url';
 import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from '../security/claims.ts';
 import { ResourceManager } from '../security/resources.ts';
+import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 
 const fileShareResources = new ResourceManager('file-share');
-
-const decoder = new TextDecoder();
 
 export async function generateHmacForFile(paths: string[]) {
     const claims = paths.map((p) => fileShareResources.nameForResource(p));
@@ -26,8 +24,14 @@ export const shareProtect: Middleware = async (ctx, next) => {
         return;
     }
 
-    const decoded = decoder.decode(decodeBase64Url(pathsFromUrl));
-    const paths = JSON.parse(decoded);
+    let paths: string[];
+    try {
+        ({ paths } = shareLinkSchemeRegistry.decodeCode(pathsFromUrl));
+    } catch {
+        ctx.response.status = HTTP_400_BAD_REQUEST;
+        return;
+    }
+
     const hasAccess = paths.every((path: string) =>
         fileShareResources.mayAccess(validatedPaths, fileShareResources.nameForResource(path))
     );
