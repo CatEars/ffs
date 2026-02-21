@@ -99,6 +99,16 @@ export class FileTree {
             };
         }
 
+        try {
+            const realPath = await Deno.realPath(normalizedPath);
+            const realPathCheck = this.ensureResolveIsUnderRoot(realPath, true);
+            if (realPathCheck.type === 'invalid') {
+                return { type: 'none' };
+            }
+        } catch {
+            return { type: 'none' };
+        }
+
         const cached = await this.treeCache.getByPath(normalizedPath);
         if (cached && cached.type === 'directory') {
             return {
