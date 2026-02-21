@@ -52,20 +52,18 @@ export class FileTree {
         return exists(this.root, { isDirectory: true });
     }
 
-    private ensureResolveIsUnderRoot(
+    private async ensureResolveIsUnderRoot(
         suggestedPath: string,
-        pathHasFile: boolean,
-    ): PathResult {
-        if (suggestedPath.startsWith(this.root)) {
-            return {
-                type: 'valid',
-                fullPath: suggestedPath,
-                exists: pathHasFile,
-            };
-        } else {
-            return {
-                type: 'invalid',
-            };
+    ): Promise<PathResult> {
+        try {
+            const realPath = await Deno.realPath(suggestedPath);
+            return realPath.startsWith(this.root)
+                ? { type: 'valid', fullPath: realPath, exists: true }
+                : { type: 'invalid' };
+        } catch {
+            return suggestedPath.startsWith(this.root)
+                ? { type: 'valid', fullPath: suggestedPath, exists: false }
+                : { type: 'invalid' };
         }
     }
 
@@ -77,12 +75,7 @@ export class FileTree {
     async resolvePath(...relativePaths: string[]): Promise<PathResult> {
         try {
             const resolved = resolve(this.root, ...relativePaths);
-            if (await exists(resolved)) {
-                const realPath = await Deno.realPath(resolved);
-                return this.ensureResolveIsUnderRoot(realPath, true);
-            } else {
-                return this.ensureResolveIsUnderRoot(resolved, false);
-            }
+            return await this.ensureResolveIsUnderRoot(resolved);
         } catch {
             return {
                 type: 'invalid',
@@ -92,21 +85,11 @@ export class FileTree {
 
     async listDirectory(relativePath: string): Promise<ListDirectoryResult> {
         const normalizedPath = join(this.root, relativePath);
-        const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
-        if (pathCheck.type === 'invalid') {
+        const pathCheck = await this.ensureResolveIsUnderRoot(normalizedPath);
+        if (pathCheck.type === 'invalid' || !pathCheck.exists) {
             return {
                 type: 'none',
             };
-        }
-
-        try {
-            const realPath = await Deno.realPath(normalizedPath);
-            const realPathCheck = this.ensureResolveIsUnderRoot(realPath, true);
-            if (realPathCheck.type === 'invalid') {
-                return { type: 'none' };
-            }
-        } catch {
-            return { type: 'none' };
         }
 
         const cached = await this.treeCache.getByPath(normalizedPath);
@@ -125,7 +108,7 @@ export class FileTree {
 
     async stat(directory: ListDirectorySuccess, fileName: string): Promise<StatResult> {
         const normalizedPath = join(directory.dirPath, fileName);
-        const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
+        const pathCheck = await this.ensureResolveIsUnderRoot(normalizedPath);
         if (pathCheck.type === 'invalid') {
             return { type: 'invalid' };
         }
