@@ -2,9 +2,8 @@
 <script type="module">
     const megaphone = new Megaphone();
     const code = getUrlParam('code');
-    const signature = getUrlParam('signature');
     const state = megaphone.declareState({
-        fileData: megaphone.jsonApi(`/api/share-file/list?code=${code}&signature=${signature}`, []),
+        fileData: megaphone.jsonApi(`/api/share-file/list?code=${code}`, []),
     });
 
     megaphone.renderEach(
@@ -14,7 +13,7 @@
             const link = fileRow.querySelector('a');
 
             link.text = fileLink;
-            link.href = `/api/share-file/download?code=${code}&signature=${signature}&index=${index}`;
+            link.href = `/api/share-file/download?code=${code}&index=${index}`;
 
             return fileRow;
         })
