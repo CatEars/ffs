@@ -1,10 +1,9 @@
 <!-- layout /templates/base.html -->
 <script type="module">
     const megaphone = new Megaphone();
-    const paths = getUrlParam('paths');
-    const hmac = getUrlParam('hmac');
+    const code = getUrlParam('code');
     const state = megaphone.declareState({
-        fileData: megaphone.jsonApi(`/api/share-file/list?paths=${paths}&hmac=${hmac}`, []),
+        fileData: megaphone.jsonApi(`/api/share-file/list?code=${code}`, []),
     });
 
     megaphone.renderEach(
@@ -14,7 +13,7 @@
             const link = fileRow.querySelector('a');
 
             link.text = fileLink;
-            link.href = `/api/share-file/download?paths=${paths}&hmac=${hmac}&index=${index}`;
+            link.href = `/api/share-file/download?code=${code}&index=${index}`;
 
             return fileRow;
         })
