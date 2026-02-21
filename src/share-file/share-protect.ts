@@ -1,13 +1,9 @@
 import { Middleware } from '@oak/oak';
 import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from '../security/claims.ts';
-import { ResourceManager } from '../security/resources.ts';
-import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 
-const fileShareResources = new ResourceManager('file-share');
-
-export async function generateHmacForFile(paths: string[]) {
-    const claims = paths.map((p) => fileShareResources.nameForResource(p));
+export async function generateSignatureForCode(code: string) {
+    const claims = [[code]];
     return await signAndUrlEncodeClaims(claims);
 }
 
@@ -18,27 +14,10 @@ export const shareProtect: Middleware = async (ctx, next) => {
         ctx.response.status = HTTP_400_BAD_REQUEST;
         return;
     }
-    const validatedPaths = await verifyAndUrlDecodeClaims(signatureFromUrl);
-    if (!validatedPaths) {
+    const verifiedClaims = await verifyAndUrlDecodeClaims(signatureFromUrl);
+    if (!verifiedClaims || verifiedClaims[0]?.[0] !== codeFromUrl) {
         ctx.response.status = HTTP_401_UNAUTHORIZED;
         return;
     }
-
-    let paths: string[];
-    try {
-        ({ paths } = shareLinkSchemeRegistry.decodeCode(codeFromUrl));
-    } catch {
-        ctx.response.status = HTTP_400_BAD_REQUEST;
-        return;
-    }
-
-    const hasAccess = paths.every((path: string) =>
-        fileShareResources.mayAccess(validatedPaths, fileShareResources.nameForResource(path))
-    );
-
-    if (hasAccess) {
-        return next();
-    } else {
-        ctx.response.status = HTTP_401_UNAUTHORIZED;
-    }
+    return next();
 };
