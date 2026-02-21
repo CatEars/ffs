@@ -53,7 +53,7 @@ Deno.test('File tree can resolve symbolic directory links that are still under t
         fail();
     } else {
         assert(
-            listing.files.some((x) => x.isFile && x.name === 'deno.jsonc'),
+            listing.files.some((x) => x.isFile && x.name === 'deno.json'),
         );
     }
 });

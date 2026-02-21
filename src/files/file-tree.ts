@@ -52,18 +52,20 @@ export class FileTree {
         return exists(this.root, { isDirectory: true });
     }
 
-    private async ensureResolveIsUnderRoot(
+    private ensureResolveIsUnderRoot(
         suggestedPath: string,
-    ): Promise<PathResult> {
-        try {
-            const realPath = await Deno.realPath(suggestedPath);
-            return realPath.startsWith(this.root)
-                ? { type: 'valid', fullPath: realPath, exists: true }
-                : { type: 'invalid' };
-        } catch {
-            return suggestedPath.startsWith(this.root)
-                ? { type: 'valid', fullPath: suggestedPath, exists: false }
-                : { type: 'invalid' };
+        pathHasFile: boolean,
+    ): PathResult {
+        if (suggestedPath.startsWith(this.root)) {
+            return {
+                type: 'valid',
+                fullPath: suggestedPath,
+                exists: pathHasFile,
+            };
+        } else {
+            return {
+                type: 'invalid',
+            };
         }
     }
 
@@ -75,7 +77,12 @@ export class FileTree {
     async resolvePath(...relativePaths: string[]): Promise<PathResult> {
         try {
             const resolved = resolve(this.root, ...relativePaths);
-            return await this.ensureResolveIsUnderRoot(resolved);
+            if (await exists(resolved)) {
+                const realPath = await Deno.realPath(resolved);
+                return this.ensureResolveIsUnderRoot(realPath, true);
+            } else {
+                return this.ensureResolveIsUnderRoot(resolved, false);
+            }
         } catch {
             return {
                 type: 'invalid',
@@ -85,8 +92,8 @@ export class FileTree {
 
     async listDirectory(relativePath: string): Promise<ListDirectoryResult> {
         const normalizedPath = join(this.root, relativePath);
-        const pathCheck = await this.ensureResolveIsUnderRoot(normalizedPath);
-        if (pathCheck.type === 'invalid' || !pathCheck.exists) {
+        const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
+        if (pathCheck.type === 'invalid') {
             return {
                 type: 'none',
             };
@@ -108,7 +115,7 @@ export class FileTree {
 
     async stat(directory: ListDirectorySuccess, fileName: string): Promise<StatResult> {
         const normalizedPath = join(directory.dirPath, fileName);
-        const pathCheck = await this.ensureResolveIsUnderRoot(normalizedPath);
+        const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
         if (pathCheck.type === 'invalid') {
             return { type: 'invalid' };
         }
