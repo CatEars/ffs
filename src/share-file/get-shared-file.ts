@@ -7,7 +7,7 @@ import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 
 export function registerGetSharedFilesRoutes(router: Router) {
     router.get('/api/share-file/list', baseMiddlewares(), shareProtect, (ctx) => {
-        const code = ctx.request.url.searchParams.get('paths') || '';
+        const code = ctx.request.url.searchParams.get('code') || '';
         const { paths } = shareLinkSchemeRegistry.decodeCode(code);
         if (!paths) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
@@ -17,7 +17,7 @@ export function registerGetSharedFilesRoutes(router: Router) {
     });
 
     router.get('/api/share-file/download', baseMiddlewares(), shareProtect, async (ctx) => {
-        const code = ctx.request.url.searchParams.get('paths') || '';
+        const code = ctx.request.url.searchParams.get('code') || '';
         const { paths } = shareLinkSchemeRegistry.decodeCode(code);
         const index = Number.parseInt(ctx.request.url.searchParams.get('index') || '');
         if (!paths || (typeof index !== 'number') || isNaN(index) || !paths[index]) {

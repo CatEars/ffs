@@ -12,13 +12,13 @@ export async function generateHmacForFile(paths: string[]) {
 }
 
 export const shareProtect: Middleware = async (ctx, next) => {
-    const pathsFromUrl = ctx.request.url.searchParams.get('paths');
-    const hmacFromUrl = ctx.request.url.searchParams.get('hmac');
-    if (!pathsFromUrl || !hmacFromUrl) {
+    const codeFromUrl = ctx.request.url.searchParams.get('code');
+    const signatureFromUrl = ctx.request.url.searchParams.get('signature');
+    if (!codeFromUrl || !signatureFromUrl) {
         ctx.response.status = HTTP_400_BAD_REQUEST;
         return;
     }
-    const validatedPaths = await verifyAndUrlDecodeClaims(hmacFromUrl);
+    const validatedPaths = await verifyAndUrlDecodeClaims(signatureFromUrl);
     if (!validatedPaths) {
         ctx.response.status = HTTP_401_UNAUTHORIZED;
         return;
@@ -26,7 +26,7 @@ export const shareProtect: Middleware = async (ctx, next) => {
 
     let paths: string[];
     try {
-        ({ paths } = shareLinkSchemeRegistry.decodeCode(pathsFromUrl));
+        ({ paths } = shareLinkSchemeRegistry.decodeCode(codeFromUrl));
     } catch {
         ctx.response.status = HTTP_400_BAD_REQUEST;
         return;

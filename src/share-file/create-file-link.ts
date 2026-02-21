@@ -15,6 +15,6 @@ export function registerCreateFileShareLink(router: Router) {
         }
         const hmac = await generateHmacForFiles(paths);
         const code = shareLinkSchemeRegistry.createCode(shareCtx);
-        ctx.response.redirect(`/share-file/view?paths=${code}&hmac=${hmac}`);
+        ctx.response.redirect(`/share-file/view?code=${code}&signature=${hmac}`);
     });
 }
