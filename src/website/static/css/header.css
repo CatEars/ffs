@@ -15,10 +15,6 @@
         line-height: 16px;
     }
 
-    .header > header-tab {
-        flex: 1;
-    }
-
     .header > .main-link {
         font-weight: 800;
         font-size: 26px;
