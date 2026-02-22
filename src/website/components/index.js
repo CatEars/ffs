@@ -8,6 +8,7 @@ import ColumnLayout from './layout/column-layout.js';
 import DropDown from './display/drop-down.js';
 import FileCard from './display/file/file-card.js';
 import GappedRow from './layout/gapped-row.js';
+import HeaderNavSelect from './navigation/header-nav-select.js';
 import HeaderTab from './navigation/header-tab.js';
 import HorizontalRuler from './layout/horizontal-ruler.js';
 import IconHover from './display/icon-hover.js';
@@ -30,6 +31,7 @@ const components = [
     ['file-card', FileCard],
     ['file-link', FileLink],
     ['gapped-row', GappedRow],
+    ['header-nav-select', HeaderNavSelect],
     ['header-tab', HeaderTab],
     ['horizontal-ruler', HorizontalRuler],
     ['icon-hover', IconHover],

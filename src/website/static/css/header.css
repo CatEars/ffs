@@ -23,4 +23,8 @@
         padding-left: 0.5rem;
         padding-right: 1rem;
     }
+
+    .header > header-nav-select {
+        display: none;
+    }
 }
