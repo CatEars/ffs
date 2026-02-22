@@ -22,6 +22,8 @@ function manifestPath(hash: string): string {
     return join(manifestsDir(), `${hash}.json`);
 }
 
+const SHA256_HEX_REGEX = /^[0-9a-f]{64}$/;
+
 export class ManifestShareLinkScheme implements ShareLinkScheme {
     schemeId(): string {
         return 'manifest';
@@ -45,6 +47,9 @@ export class ManifestShareLinkScheme implements ShareLinkScheme {
     }
 
     async decodeCode(code: string): Promise<DecodedShare> {
+        if (!SHA256_HEX_REGEX.test(code)) {
+            throw new Error('Invalid manifest code: not a valid SHA-256 hex string');
+        }
         const content = await Deno.readTextFile(manifestPath(code));
         const paths = JSON.parse(content);
         return { paths };

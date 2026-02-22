@@ -54,3 +54,11 @@ Deno.test('createCode and decodeCode work for empty paths array', async () => {
 Deno.test('decodeCode rejects when manifest file does not exist', async () => {
     await assertRejects(() => scheme.decodeCode('0'.repeat(64)));
 });
+
+Deno.test('decodeCode rejects a code containing path traversal characters', async () => {
+    await assertRejects(() => scheme.decodeCode('../../../etc/passwd'));
+});
+
+Deno.test('decodeCode rejects a code that is not a valid SHA256 hex string', async () => {
+    await assertRejects(() => scheme.decodeCode('not-a-hash'));
+});
