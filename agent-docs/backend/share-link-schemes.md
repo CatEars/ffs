@@ -25,16 +25,16 @@ A `ShareLinkScheme` interface is introduced, backed by a `ShareLinkSchemeRegistr
 
 export interface ShareLinkScheme {
     schemeId(): string;
-    isAvailable(ctx: ShareContext): boolean;
-    createCode(ctx: ShareContext): string;
-    decodeCode(code: string): DecodedShare;
+    isAvailable(ctx: ShareContext): Promise<boolean>;
+    createCode(ctx: ShareContext): Promise<string>;
+    decodeCode(code: string): Promise<DecodedShare>;
 }
 ```
 
 | Method | Description |
 |---|---|
 | `schemeId()` | Returns a stable string identifier for this scheme (e.g. `"raw-paths"`) |
-| `isAvailable(ctx)` | Returns `true` if this scheme can encode the given context (e.g. paths within size limits) |
+| `isAvailable(ctx)` | Returns `true` if this scheme can encode the given context (e.g. paths within size limits or sufficient disk space) |
 | `createCode(ctx)` | Encodes the context into an opaque string payload |
 | `decodeCode(code)` | Decodes the payload back into a `DecodedShare` (`{ paths }`) |
 
@@ -53,10 +53,13 @@ When decoding:
 
 ```typescript
 // src/share-file/share-link-scheme-registry.ts
-export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([rawPathsShareLinkScheme]);
+export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([
+    rawPathsShareLinkScheme,
+    manifestShareLinkScheme,
+]);
 ```
 
-Adding a new encoding strategy requires only implementing `ShareLinkScheme` and appending the instance to this list.
+Adding a new encoding strategy requires only implementing `ShareLinkScheme` and inserting the instance at the desired position in this list.
 
 ## Built-in Implementation: `RawPathsShareLinkScheme`
 
@@ -70,12 +73,27 @@ Encodes a list of file paths as a base64url-encoded JSON array.
 - `createCode` — `base64url(JSON.stringify(paths))`
 - `decodeCode` — reverses the above.
 
+## Built-in Implementation: `ManifestShareLinkScheme`
+
+```
+schemeId: "manifest"
+```
+
+Stores file paths as a JSON manifest on disk and uses the SHA-256 hash of the paths as the share code. Used as a fallback when paths are too large for a URL.
+
+- `isAvailable` — returns `true` when `FFS_CACHE_DIR` has ≥ 50 MB free.
+- `createCode` — writes `{ paths: [...] }` to `{FFS_CACHE_DIR}/share-manifests/<hash>.json`; returns the 64-char hex hash.
+- `decodeCode` — validates the code is a SHA-256 hex string (path traversal protection), then reads the manifest file.
+
+See [manifest-share-link-scheme.md](./manifest-share-link-scheme.md) for full details.
+
 ## Files
 
 | File | Role |
 |---|---|
 | `src/share-file/share-link-scheme.ts` | `ShareLinkScheme` interface, `ShareContext` and `DecodedShare` types |
 | `src/share-file/raw-paths-share-link-scheme.ts` | `RawPathsShareLinkScheme` implementation |
+| `src/share-file/manifest-share-link-scheme.ts` | `ManifestShareLinkScheme` implementation |
 | `src/share-file/share-link-scheme-registry.ts` | `ShareLinkSchemeRegistry` and the singleton registry |
 
 ## Call Sites
