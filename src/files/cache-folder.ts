@@ -89,7 +89,8 @@ export function thumbnailExists(filePath: string): boolean {
     }
 }
 
-export function startThumbnailScanning() {
+export async function startThumbnailScanning() {
+    await Deno.mkdir(getThumbnailsDir(), { recursive: true });
     setTimeout(scanForThumbnails, devModeEnabled ? 1 : 2_500);
     setInterval(scanForThumbnails, devModeEnabled ? 10_000 : 60_000);
 }

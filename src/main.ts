@@ -60,7 +60,7 @@ if (areThumbnailsAvailable()) {
 if (getEnableCacheAllDirectories()) {
     startFileTreeCacheBackgroundProcess(getStoreRoot());
 }
-startThumbnailScanning();
+await startThumbnailScanning();
 
 app.use(router.routes());
 app.use(router.allowedMethods());
