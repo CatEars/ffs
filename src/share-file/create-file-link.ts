@@ -9,11 +9,11 @@ export function registerCreateFileShareLink(router: Router) {
         const form = await ctx.request.body.formData();
         const paths = JSON.parse(form.get('paths')?.toString() || '');
         const shareCtx = { paths };
-        if (!shareLinkSchemeRegistry.isAvailable(shareCtx)) {
+        if (!await shareLinkSchemeRegistry.isAvailable(shareCtx)) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
             return;
         }
-        const pathCode = shareLinkSchemeRegistry.createCode(shareCtx);
+        const pathCode = await shareLinkSchemeRegistry.createCode(shareCtx);
         const code = await generateSignedCode(pathCode);
         ctx.response.redirect(`/share-file/view?code=${code}`);
     });

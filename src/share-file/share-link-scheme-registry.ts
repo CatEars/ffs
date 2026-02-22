@@ -1,24 +1,29 @@
 import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-scheme.ts';
 import { rawPathsShareLinkScheme } from './raw-paths-share-link-scheme.ts';
+import { manifestShareLinkScheme } from './manifest-share-link-scheme.ts';
 
 const SCHEME_SEPARATOR = ':';
 
 export class ShareLinkSchemeRegistry {
     constructor(private readonly schemes: ShareLinkScheme[]) {}
 
-    isAvailable(ctx: ShareContext): boolean {
-        return this.schemes.some((s) => s.isAvailable(ctx));
-    }
-
-    createCode(ctx: ShareContext): string {
-        const scheme = this.schemes.find((s) => s.isAvailable(ctx));
-        if (!scheme) {
-            throw new Error('No available share link scheme for the given context');
+    async isAvailable(ctx: ShareContext): Promise<boolean> {
+        for (const s of this.schemes) {
+            if (await s.isAvailable(ctx)) return true;
         }
-        return `${scheme.schemeId()}${SCHEME_SEPARATOR}${scheme.createCode(ctx)}`;
+        return false;
     }
 
-    decodeCode(fullCode: string): DecodedShare {
+    async createCode(ctx: ShareContext): Promise<string> {
+        for (const scheme of this.schemes) {
+            if (await scheme.isAvailable(ctx)) {
+                return `${scheme.schemeId()}${SCHEME_SEPARATOR}${await scheme.createCode(ctx)}`;
+            }
+        }
+        throw new Error('No available share link scheme for the given context');
+    }
+
+    async decodeCode(fullCode: string): Promise<DecodedShare> {
         const separatorIndex = fullCode.indexOf(SCHEME_SEPARATOR);
         if (separatorIndex === -1) {
             throw new Error('Invalid share link code: missing scheme prefix');
@@ -33,4 +38,7 @@ export class ShareLinkSchemeRegistry {
     }
 }
 
-export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([rawPathsShareLinkScheme]);
+export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([
+    rawPathsShareLinkScheme,
+    manifestShareLinkScheme,
+]);

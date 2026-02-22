@@ -8,7 +8,7 @@ export type DecodedShare = {
 
 export interface ShareLinkScheme {
     schemeId(): string;
-    isAvailable(ctx: ShareContext): boolean;
-    createCode(ctx: ShareContext): string;
-    decodeCode(code: string): DecodedShare;
+    isAvailable(ctx: ShareContext): Promise<boolean>;
+    createCode(ctx: ShareContext): Promise<string>;
+    decodeCode(code: string): Promise<DecodedShare>;
 }
