@@ -9,17 +9,17 @@ export class RawPathsShareLinkScheme implements ShareLinkScheme {
         return 'raw-paths';
     }
 
-    isAvailable(ctx: ShareContext): boolean {
-        return JSON.stringify(ctx.paths).length <= MAX_PATHS_LENGTH;
+    isAvailable(ctx: ShareContext): Promise<boolean> {
+        return Promise.resolve(JSON.stringify(ctx.paths).length <= MAX_PATHS_LENGTH);
     }
 
-    createCode(ctx: ShareContext): string {
-        return encodeBase64Url(JSON.stringify(ctx.paths));
+    createCode(ctx: ShareContext): Promise<string> {
+        return Promise.resolve(encodeBase64Url(JSON.stringify(ctx.paths)));
     }
 
-    decodeCode(code: string): DecodedShare {
+    decodeCode(code: string): Promise<DecodedShare> {
         const paths = JSON.parse(decoder.decode(decodeBase64Url(code)));
-        return { paths };
+        return Promise.resolve({ paths });
     }
 }
 

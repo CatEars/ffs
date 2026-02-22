@@ -6,12 +6,12 @@ import { getStoreRoot } from '../config.ts';
 import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 
 export function registerGetSharedFilesRoutes(router: Router) {
-    router.get('/api/share-file/list', baseMiddlewares(), shareProtect, (ctx) => {
+    router.get('/api/share-file/list', baseMiddlewares(), shareProtect, async (ctx) => {
         if (!ctx.state.pathCode) {
             ctx.response.status = HTTP_500_INTERNAL_SERVER_ERROR;
             return;
         }
-        const { paths } = shareLinkSchemeRegistry.decodeCode(ctx.state.pathCode);
+        const { paths } = await shareLinkSchemeRegistry.decodeCode(ctx.state.pathCode);
         if (!paths) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
             return;
@@ -24,7 +24,7 @@ export function registerGetSharedFilesRoutes(router: Router) {
             ctx.response.status = HTTP_500_INTERNAL_SERVER_ERROR;
             return;
         }
-        const { paths } = shareLinkSchemeRegistry.decodeCode(ctx.state.pathCode);
+        const { paths } = await shareLinkSchemeRegistry.decodeCode(ctx.state.pathCode);
         const index = Number.parseInt(ctx.request.url.searchParams.get('index') || '');
         if (!paths || (typeof index !== 'number') || isNaN(index) || !paths[index]) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
