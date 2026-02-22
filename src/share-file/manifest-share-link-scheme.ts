@@ -42,7 +42,7 @@ export class ManifestShareLinkScheme implements ShareLinkScheme {
         const json = JSON.stringify(ctx.paths);
         const hash = await sha256Hex(json);
         await Deno.mkdir(manifestsDir(), { recursive: true });
-        await Deno.writeTextFile(manifestPath(hash), json);
+        await Deno.writeTextFile(manifestPath(hash), JSON.stringify({ paths: ctx.paths }));
         return hash;
     }
 
@@ -51,7 +51,10 @@ export class ManifestShareLinkScheme implements ShareLinkScheme {
             throw new Error('Invalid manifest code: not a valid SHA-256 hex string');
         }
         const content = await Deno.readTextFile(manifestPath(code));
-        const paths = JSON.parse(content);
+        const { paths } = JSON.parse(content);
+        if (!Array.isArray(paths)) {
+            throw new Error('Invalid manifest: missing paths array');
+        }
         return { paths };
     }
 }

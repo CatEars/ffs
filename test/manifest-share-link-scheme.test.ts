@@ -28,7 +28,7 @@ Deno.test('createCode creates a manifest file in the cache directory', async () 
     const code = await scheme.createCode({ paths });
     const manifestFile = join(getCacheRoot(), 'share-manifests', `${code}.json`);
     const content = await Deno.readTextFile(manifestFile);
-    assertEquals(JSON.parse(content), paths);
+    assertEquals(JSON.parse(content), { paths });
 });
 
 Deno.test('createCode produces the same code for the same paths', async () => {
