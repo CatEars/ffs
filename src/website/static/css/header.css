@@ -15,6 +15,10 @@
         line-height: 16px;
     }
 
+    .header > header-tab {
+        flex: 1;
+    }
+
     .header > .main-link {
         font-weight: 800;
         font-size: 26px;
@@ -22,5 +26,9 @@
         padding-top: 1rem;
         padding-left: 0.5rem;
         padding-right: 1rem;
+    }
+
+    .header > header-nav-select {
+        display: none;
     }
 }

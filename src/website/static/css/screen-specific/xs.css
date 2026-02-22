@@ -4,5 +4,15 @@
             --file-card-max-height: 13rem;
             --thumbnail-hover-max-width: 7.5rem;
         }
+
+        .header > header-tab {
+            display: none;
+        }
+
+        .header > header-nav-select {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
     }
 }
