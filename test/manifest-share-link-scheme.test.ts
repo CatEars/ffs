@@ -4,7 +4,7 @@ import { assertRejects } from '@std/assert/rejects';
 import { join } from '@std/path';
 import { ManifestShareLinkScheme } from '../src/share-file/manifest-share-link-scheme.ts';
 import './init-test-config.ts';
-import { getCacheRoot } from '../src/config.ts';
+import { getManifestsDir } from '../src/files/cache-folder.ts';
 
 const scheme = new ManifestShareLinkScheme();
 
@@ -26,7 +26,7 @@ Deno.test('createCode returns a SHA256 hex string', async () => {
 Deno.test('createCode creates a manifest file in the cache directory', async () => {
     const paths = ['folder/file1.txt', 'folder/file2.txt'];
     const code = await scheme.createCode({ paths });
-    const manifestFile = join(getCacheRoot(), 'share-manifests', `${code}.json`);
+    const manifestFile = join(getManifestsDir(), `${code}.json`);
     const content = await Deno.readTextFile(manifestFile);
     assertEquals(JSON.parse(content), { paths });
 });

@@ -5,11 +5,21 @@ import { logger } from '../logging/logger.ts';
 import { existsSync } from 'node:fs';
 
 const cachePrefix = 'ffs-cachedir-';
+const THUMBNAILS_SUBDIR = 'thumbnails';
+const MANIFESTS_SUBDIR = 'share-manifests';
 const knownThumbnails = new Map<string, Deno.FileInfo>();
 let initialScanCompleted = false;
 
+export function getThumbnailsDir(): string {
+    return join(getCacheRoot(), THUMBNAILS_SUBDIR);
+}
+
+export function getManifestsDir(): string {
+    return join(getCacheRoot(), MANIFESTS_SUBDIR);
+}
+
 async function scanForThumbnails() {
-    const root = getCacheRoot();
+    const root = getThumbnailsDir();
     const fileTreeWalker = new FileTreeWalker(root, {
         includeFiles: true,
         includeSymlinks: false,
@@ -55,10 +65,8 @@ export async function resolveCacheFolder() {
 
 export function getThumbnailPath(filePath: string) {
     const storeRoot = getStoreRoot();
-    const cacheRoot = getCacheRoot();
-
     const relPath = relative(storeRoot, filePath);
-    return resolve(cacheRoot, relPath + '.webp');
+    return resolve(getThumbnailsDir(), relPath + '.webp');
 }
 
 function isOutdated(thumbnailFileInfo: Deno.FileInfo) {
