@@ -39,6 +39,6 @@ export class ShareLinkSchemeRegistry {
 }
 
 export const shareLinkSchemeRegistry = new ShareLinkSchemeRegistry([
-    manifestShareLinkScheme,
     rawPathsShareLinkScheme,
+    manifestShareLinkScheme,
 ]);
