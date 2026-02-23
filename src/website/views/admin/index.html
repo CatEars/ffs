@@ -42,17 +42,18 @@
             message: null,
             messageType: null,
             isLoading: false,
+            hasMessage: megaphone.view((state) => state.message !== null),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
             clearThumbnails,
         });
 
         megaphone.renderIf(
-            state.message,
+            state.hasMessage,
             '#message-display',
-            megaphone.template('#message-template', (clone, message) => {
+            megaphone.template('#message-template', (clone) => {
                 const messageEl = clone.querySelector('.message');
-                messageEl.textContent = message;
+                messageEl.textContent = state.message.value;
                 messageEl.className = `message ${state.messageType.value}`;
                 return clone;
             })
