@@ -71,17 +71,17 @@
     <horizontal-ruler></horizontal-ruler>
 
     <section>
-        <h2>Share Link Manifests</h2>
-        <p>Remove all cached share link manifest files. These will be regenerated when share links are accessed.</p>
-        <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
+        <h2>Thumbnails</h2>
+        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
+        <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
 
     <section>
-        <h2>Thumbnails</h2>
-        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-        <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
+        <h2>Share Link Manifests</h2>
+        <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
+        <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
