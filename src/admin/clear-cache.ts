@@ -1,21 +1,8 @@
 import { Router } from '@oak/oak';
-import { join } from '@std/path';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { getManifestsDir, getThumbnailsDir } from '../files/cache-folder.ts';
 import { logger } from '../logging/logger.ts';
-
-async function clearDirectory(dirPath: string) {
-    try {
-        for await (const entry of Deno.readDir(dirPath)) {
-            await Deno.remove(join(dirPath, entry.name), { recursive: true });
-        }
-    } catch (err) {
-        if (!(err instanceof Deno.errors.NotFound)) {
-            throw err;
-        }
-        await Deno.mkdir(dirPath, { recursive: true });
-    }
-}
+import { clearAndEnsureDirectoryExists } from '../utils/clear-and-ensure-dir.ts';
 
 export function registerAdminClearCacheRoutes(router: Router) {
     router.post(
@@ -23,8 +10,7 @@ export function registerAdminClearCacheRoutes(router: Router) {
         baseMiddlewares(),
         ...protectedMiddlewares(),
         async (ctx) => {
-            const dir = getManifestsDir();
-            await clearDirectory(dir);
+            await clearAndEnsureDirectoryExists(getManifestsDir());
             logger.info('Cleared share link manifests directory');
             ctx.response.body = { success: true };
         },
@@ -35,8 +21,7 @@ export function registerAdminClearCacheRoutes(router: Router) {
         baseMiddlewares(),
         ...protectedMiddlewares(),
         async (ctx) => {
-            const dir = getThumbnailsDir();
-            await clearDirectory(dir);
+            await clearAndEnsureDirectoryExists(getThumbnailsDir());
             logger.info('Cleared thumbnails directory');
             ctx.response.body = { success: true };
         },

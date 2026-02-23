@@ -3,6 +3,7 @@ import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
 import { FileTreeWalker } from './file-tree-walker.ts';
 import { logger } from '../logging/logger.ts';
 import { existsSync } from 'node:fs';
+import { clearAndEnsureDirectoryExists } from '../utils/clear-and-ensure-dir.ts';
 
 const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';
@@ -96,12 +97,7 @@ export function thumbnailExists(filePath: string): boolean {
 
 export async function startThumbnailScanning() {
     await Deno.mkdir(getThumbnailsDir(), { recursive: true });
-    await Deno.remove(getThumbnailTempDir(), { recursive: true }).catch((err) => {
-        if (!(err instanceof Deno.errors.NotFound)) {
-            throw err;
-        }
-    });
-    await Deno.mkdir(getThumbnailTempDir(), { recursive: true });
+    await clearAndEnsureDirectoryExists(getThumbnailTempDir());
     setTimeout(scanForThumbnails, devModeEnabled ? 1 : 2_500);
     setInterval(scanForThumbnails, devModeEnabled ? 10_000 : 60_000);
 }
