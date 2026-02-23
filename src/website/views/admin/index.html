@@ -1,0 +1,104 @@
+<!-- layout /templates/base.html -->
+<app-main>
+    <script type="module">
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            message: null,
+            messageType: null,
+            isLoading: false,
+        });
+
+        megaphone.renderIf(
+            state.message,
+            '#message-display',
+            megaphone.template('#message-template', (clone, message) => {
+                const messageEl = clone.querySelector('.message');
+                messageEl.textContent = message;
+                messageEl.className = `message ${state.messageType.value}`;
+                return clone;
+            })
+        );
+
+        async function handleAction(endpoint, actionName) {
+            state.isLoading = true;
+            state.message = null;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    state.messageType = 'success';
+                    state.message = result.message || `${actionName} completed successfully`;
+                } else {
+                    state.messageType = 'error';
+                    state.message = result.error || `${actionName} failed`;
+                }
+            } catch (error) {
+                state.messageType = 'error';
+                state.message = `Error: ${error.message}`;
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        window.clearManifests = () => handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests');
+        window.clearThumbnails = () => handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
+
+        megaphone.init();
+    </script>
+
+    <app-header>Admin</app-header>
+    
+    <section>
+        <p>Administrative actions for managing the FFS file server.</p>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section>
+        <h2>Share Link Manifests</h2>
+        <p>Remove all cached share link manifest files. These will be regenerated when share links are accessed.</p>
+        <button onclick="clearManifests()">Clear Share Link Manifests</button>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section>
+        <h2>Thumbnails</h2>
+        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
+        <button onclick="clearThumbnails()">Clear Thumbnails</button>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section id="message-display">
+        <template id="message-template">
+            <div class="message"></div>
+            <style>
+                .message {
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    border-radius: 4px;
+                    border: 1px solid;
+                }
+                .message.success {
+                    background-color: #d4edda;
+                    border-color: #c3e6cb;
+                    color: #155724;
+                }
+                .message.error {
+                    background-color: #f8d7da;
+                    border-color: #f5c6cb;
+                    color: #721c24;
+                }
+            </style>
+        </template>
+    </section>
+</app-main>
