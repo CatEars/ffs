@@ -96,6 +96,11 @@ export function thumbnailExists(filePath: string): boolean {
 
 export async function startThumbnailScanning() {
     await Deno.mkdir(getThumbnailsDir(), { recursive: true });
+    await Deno.remove(getThumbnailTempDir(), { recursive: true }).catch((err) => {
+        if (!(err instanceof Deno.errors.NotFound)) {
+            throw err;
+        }
+    });
     await Deno.mkdir(getThumbnailTempDir(), { recursive: true });
     setTimeout(scanForThumbnails, devModeEnabled ? 1 : 2_500);
     setInterval(scanForThumbnails, devModeEnabled ? 10_000 : 60_000);
