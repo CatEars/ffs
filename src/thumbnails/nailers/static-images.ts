@@ -1,8 +1,7 @@
 import { ensureDir } from '@std/fs/ensure-dir';
-import { getCacheRoot } from '../../config.ts';
+import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
 import { ThumbnailRequest } from '../types.ts';
 import { dirname } from '@std/path/dirname';
-import { getThumbnailPath } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/logger.ts';
 import { move } from '@std/fs/move';
 
@@ -23,10 +22,9 @@ export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
     const outputPath = getThumbnailPath(thumbnail.filePath);
     const tempFile = await Deno.makeTempFile({
         prefix: 'ffs_imggen',
-        dir: getCacheRoot(),
+        dir: getThumbnailTempDir(),
         suffix: '.webp',
     });
-    ensureDir(dirname(outputPath));
     let append = '';
     if (thumbnail.filePath.toLocaleLowerCase().endsWith('.gif')) {
         append = '[0]'; // generate static image for GIFs
@@ -50,6 +48,7 @@ export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
         await Deno.remove(tempFile);
         return;
     }
+    await ensureDir(dirname(outputPath));
     await move(tempFile, outputPath, { overwrite: true });
     logger.debug(
         'Generated thumbnail',

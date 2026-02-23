@@ -1,0 +1,112 @@
+<!-- layout /templates/base.html -->
+<app-main>
+    <script type="module">
+        async function handleAction(endpoint, actionName) {
+            state.isLoading = true;
+            state.message = null;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    state.messageType = 'success';
+                    state.message = `${actionName} completed successfully`;
+                } else {
+                    const result = await response.json();
+                    state.messageType = 'error';
+                    state.message = result.error || result.message || `${actionName} failed`;
+                }
+            } catch (error) {
+                state.messageType = 'error';
+                state.message = `Error: ${error.message}`;
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        async function clearManifests() {
+            await handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests');
+        }
+
+        async function clearThumbnails() {
+            await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
+        }
+
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            message: null,
+            messageType: null,
+            isLoading: false,
+            hasMessage: megaphone.view((state) => state.message !== null),
+            buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
+            clearManifests,
+            clearThumbnails,
+        });
+
+        megaphone.renderIf(
+            state.hasMessage,
+            '#message-display',
+            megaphone.template('#message-template', (clone) => {
+                const messageEl = clone.querySelector('.message');
+                messageEl.textContent = state.message.value;
+                messageEl.className = `message ${state.messageType.value}`;
+                return clone;
+            })
+        );
+
+        megaphone.init();
+    </script>
+
+    <app-header>Admin</app-header>
+
+    <section>
+        <p>Administrative actions for managing the FFS file server.</p>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section>
+        <h2>Thumbnails</h2>
+        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
+        <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section>
+        <h2>Share Link Manifests</h2>
+        <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
+        <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section id="message-display">
+        <template id="message-template">
+            <div class="message"></div>
+            <style>
+                .message {
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    border-radius: 4px;
+                    border: 1px solid;
+                }
+                .message.success {
+                    background-color: #d4edda;
+                    border-color: #c3e6cb;
+                    color: #155724;
+                }
+                .message.error {
+                    background-color: #f8d7da;
+                    border-color: #f5c6cb;
+                    color: #721c24;
+                }
+            </style>
+        </template>
+    </section>
+</app-main>
