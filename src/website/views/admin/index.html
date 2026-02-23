@@ -1,25 +1,6 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
-        const megaphone = new Megaphone();
-        const state = megaphone.declareState({
-            message: null,
-            messageType: null,
-            isLoading: false,
-            buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
-        });
-
-        megaphone.renderIf(
-            state.message,
-            '#message-display',
-            megaphone.template('#message-template', (clone, message) => {
-                const messageEl = clone.querySelector('.message');
-                messageEl.textContent = message;
-                messageEl.className = `message ${state.messageType.value}`;
-                return clone;
-            })
-        );
-
         async function handleAction(endpoint, actionName) {
             state.isLoading = true;
             state.message = null;
@@ -48,16 +29,40 @@
             }
         }
 
-        window.adminActions = {
-            clearManifests: () => handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests'),
-            clearThumbnails: () => handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails'),
-        };
+        async function clearManifests() {
+            await handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests');
+        }
+
+        async function clearThumbnails() {
+            await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
+        }
+
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            message: null,
+            messageType: null,
+            isLoading: false,
+            buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
+            clearManifests,
+            clearThumbnails,
+        });
+
+        megaphone.renderIf(
+            state.message,
+            '#message-display',
+            megaphone.template('#message-template', (clone, message) => {
+                const messageEl = clone.querySelector('.message');
+                messageEl.textContent = message;
+                messageEl.className = `message ${state.messageType.value}`;
+                return clone;
+            })
+        );
 
         megaphone.init();
     </script>
 
     <app-header>Admin</app-header>
-    
+
     <section>
         <p>Administrative actions for managing the FFS file server.</p>
     </section>
@@ -67,7 +72,7 @@
     <section>
         <h2>Share Link Manifests</h2>
         <p>Remove all cached share link manifest files. These will be regenerated when share links are accessed.</p>
-        <button $disabled="buttonsDisabled" onclick="adminActions.clearManifests()">Clear Share Link Manifests</button>
+        <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
@@ -75,7 +80,7 @@
     <section>
         <h2>Thumbnails</h2>
         <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-        <button $disabled="buttonsDisabled" onclick="adminActions.clearThumbnails()">Clear Thumbnails</button>
+        <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
