@@ -1,17 +1,20 @@
 import { Router } from '@oak/oak';
+import { join } from '@std/path';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { getManifestsDir, getThumbnailsDir } from '../files/cache-folder.ts';
 import { logger } from '../logging/logger.ts';
 
 async function clearDirectory(dirPath: string) {
     try {
-        await Deno.remove(dirPath, { recursive: true });
+        for await (const entry of Deno.readDir(dirPath)) {
+            await Deno.remove(join(dirPath, entry.name), { recursive: true });
+        }
     } catch (err) {
         if (!(err instanceof Deno.errors.NotFound)) {
             throw err;
         }
+        await Deno.mkdir(dirPath, { recursive: true });
     }
-    await Deno.mkdir(dirPath, { recursive: true });
 }
 
 export function registerAdminClearCacheRoutes(router: Router) {
