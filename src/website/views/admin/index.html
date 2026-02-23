@@ -6,7 +6,7 @@
             message: null,
             messageType: null,
             isLoading: false,
-            buttonsDisabled: megaphone.view((state) => state.isLoading ? true : undefined),
+            buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
         });
 
         megaphone.renderIf(

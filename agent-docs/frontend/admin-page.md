@@ -22,6 +22,7 @@ The page uses Megaphone JS for state management and reactivity:
   - `message`: Stores success/error messages to display to the user
   - `messageType`: Tracks whether the message is 'success' or 'error' for styling
   - `isLoading`: Tracks the loading state during API calls
+  - `buttonsDisabled`: Computed view that disables buttons during loading operations
 
 ### Functionality
 The page provides two administrative actions:
@@ -36,11 +37,12 @@ The page provides two administrative actions:
 
 ### User Experience
 - Each button triggers an async `handleAction()` function that:
-  - Sets loading state
+  - Sets loading state and disables buttons to prevent double-clicks
   - Makes a POST request to the appropriate endpoint
-  - Parses the JSON response
+  - Parses the JSON response (only for error responses)
   - Updates the message state based on success/error
   - Displays the result message using Megaphone's `renderIf` directive
+  - Re-enables buttons after the operation completes
 
 - Messages are styled with:
   - Green background for success messages
@@ -52,7 +54,7 @@ The page is protected by authentication middleware (`protectedMiddlewares()`) wh
 
 ## Design Decisions
 
-1. **Simple Button Handlers**: Used `onclick` attributes with global functions instead of more complex event binding, keeping the code straightforward and easy to understand.
+1. **Simple Button Handlers**: Used `onclick` attributes with namespaced functions (`window.adminActions`) instead of more complex event binding, keeping the code straightforward while avoiding global namespace pollution.
 
 2. **Inline Styles**: Message styling is included in the template to keep styles co-located with the component markup.
 
@@ -60,9 +62,10 @@ The page is protected by authentication middleware (`protectedMiddlewares()`) wh
 
 4. **User Feedback**: Clear section headers and descriptions explain what each action does before the user clicks the button.
 
+5. **Loading State Management**: Buttons are disabled during API operations using Megaphone's reactive `$disabled` binding to prevent duplicate requests.
+
 ## Future Enhancements
 Possible improvements could include:
 - Adding confirmation dialogs before executing destructive actions
 - Displaying statistics (e.g., number of files cleared)
 - Adding more admin actions as needed
-- Loading indicators during API calls
