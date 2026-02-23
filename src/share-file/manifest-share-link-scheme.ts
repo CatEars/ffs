@@ -3,6 +3,7 @@ import { availableDiskBytes } from '../utils/disk-space.ts';
 import { getCacheRoot } from '../config.ts';
 import { getManifestsDir } from '../files/cache-folder.ts';
 import { join } from '@std/path';
+import { ensureDir } from '@std/fs/ensure-dir';
 
 const MIN_AVAILABLE_BYTES = 50 * 1024 * 1024;
 
@@ -37,7 +38,7 @@ export class ManifestShareLinkScheme implements ShareLinkScheme {
     async createCode(ctx: ShareContext): Promise<string> {
         const json = JSON.stringify(ctx.paths);
         const hash = await sha256Hex(json);
-        await Deno.mkdir(getManifestsDir(), { recursive: true });
+        await ensureDir(getManifestsDir());
         await Deno.writeTextFile(manifestPath(hash), JSON.stringify({ paths: ctx.paths }));
         return hash;
     }
