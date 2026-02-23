@@ -6,6 +6,7 @@
             message: null,
             messageType: null,
             isLoading: false,
+            buttonsDisabled: megaphone.view((state) => state.isLoading ? true : undefined),
         });
 
         megaphone.renderIf(
@@ -47,8 +48,10 @@
             }
         }
 
-        window.clearManifests = () => handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests');
-        window.clearThumbnails = () => handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
+        window.adminActions = {
+            clearManifests: () => handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests'),
+            clearThumbnails: () => handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails'),
+        };
 
         megaphone.init();
     </script>
@@ -64,7 +67,7 @@
     <section>
         <h2>Share Link Manifests</h2>
         <p>Remove all cached share link manifest files. These will be regenerated when share links are accessed.</p>
-        <button onclick="clearManifests()">Clear Share Link Manifests</button>
+        <button $disabled="buttonsDisabled" onclick="adminActions.clearManifests()">Clear Share Link Manifests</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
@@ -72,7 +75,7 @@
     <section>
         <h2>Thumbnails</h2>
         <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-        <button onclick="clearThumbnails()">Clear Thumbnails</button>
+        <button $disabled="buttonsDisabled" onclick="adminActions.clearThumbnails()">Clear Thumbnails</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
