@@ -9,10 +9,6 @@
             align-items: center;
         }
 
-        .header > .main-link {
-            padding-top: 0;
-        }
-
         .header > header-tab {
             display: none;
         }
