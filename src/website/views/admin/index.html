@@ -31,14 +31,13 @@
                     },
                 });
 
-                const result = await response.json();
-
                 if (response.ok) {
                     state.messageType = 'success';
-                    state.message = result.message || `${actionName} completed successfully`;
+                    state.message = `${actionName} completed successfully`;
                 } else {
+                    const result = await response.json();
                     state.messageType = 'error';
-                    state.message = result.error || `${actionName} failed`;
+                    state.message = result.error || result.message || `${actionName} failed`;
                 }
             } catch (error) {
                 state.messageType = 'error';

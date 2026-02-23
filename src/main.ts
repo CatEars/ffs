@@ -21,6 +21,7 @@ import {
 import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { registerAllAppLogsEndpoints } from './app-logs/index.ts';
+import { registerAllAdminRoutes } from './admin/index.ts';
 import { startFileTreeCacheBackgroundProcess } from './files/file-tree-cache.ts';
 import { startThumbnailScanning } from './files/cache-folder.ts';
 
@@ -49,6 +50,7 @@ registerAllThumbnailRoutes(router);
 registerSitemapRoute(router);
 registerAllCustomCommandApi(router);
 registerAllAppLogsEndpoints(router);
+registerAllAdminRoutes(router);
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();
