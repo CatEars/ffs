@@ -5,10 +5,6 @@
             --thumbnail-hover-max-width: 7.5rem;
         }
 
-        .header {
-            align-items: center;
-        }
-
         .header > header-tab {
             display: none;
         }

@@ -2,6 +2,9 @@
     .header {
         display: flex;
         flex-direction: row;
+        align-items: center;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
     }
 
     .header > a,
@@ -11,7 +14,6 @@
         text-decoration: none;
         display: flex;
         flex-direction: column;
-        justify-content: end;
         line-height: 16px;
     }
 
@@ -19,7 +21,6 @@
         font-weight: 800;
         font-size: 26px;
         line-height: 26px;
-        padding-top: 1rem;
         padding-left: 0.5rem;
         padding-right: 1rem;
     }
