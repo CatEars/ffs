@@ -3,7 +3,10 @@
         "username": "admin",
         "password": "ffsadmin",
         "type": "insecure-basic_auth",
-        "key": "bab5b6be-2aad-11f0-a2ca-3b8bfdd0a613"
+        "key": "bab5b6be-2aad-11f0-a2ca-3b8bfdd0a613",
+        "config": {
+            "canCreateUsers": true
+        }
     },
     {
         "type": "pbkdf2",

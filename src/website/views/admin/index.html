@@ -37,6 +37,38 @@
             await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
         }
 
+        async function createUser() {
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+
+            state.isLoading = true;
+            state.message = null;
+
+            try {
+                const response = await fetch('/api/admin/create-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                if (response.ok) {
+                    state.messageType = 'success';
+                    state.message = `User '${username}' created successfully`;
+                    document.getElementById('new-username').value = '';
+                    document.getElementById('new-password').value = '';
+                } else {
+                    const result = await response.json();
+                    state.messageType = 'error';
+                    state.message = result.error || result.message || 'Create User failed';
+                }
+            } catch (error) {
+                state.messageType = 'error';
+                state.message = `Error: ${error.message}`;
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
             message: null,
@@ -46,6 +78,7 @@
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
             clearThumbnails,
+            createUser,
         });
 
         megaphone.renderIf(
@@ -60,6 +93,15 @@
         );
 
         megaphone.init();
+
+        fetch('/api/user/capabilities').then(async (res) => {
+            if (res.ok) {
+                const caps = await res.json();
+                if (caps.canCreateUsers) {
+                    document.getElementById('create-user-section').style.display = '';
+                }
+            }
+        });
     </script>
 
     <app-header>Admin</app-header>
@@ -82,6 +124,22 @@
         <h2>Share Link Manifests</h2>
         <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
         <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section id="create-user-section" style="display: none">
+        <h2>Create User</h2>
+        <p>Create a new user account with a password.</p>
+        <div>
+            <label for="new-username">Username</label>
+            <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
+        </div>
+        <div>
+            <label for="new-password">Password</label>
+            <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
+        </div>
+        <button $disabled="buttonsDisabled" @click="createUser" type="button">Create User</button>
     </section>
 
     <horizontal-ruler></horizontal-ruler>

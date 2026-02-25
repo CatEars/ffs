@@ -3,6 +3,9 @@ import { pbkdf2Hash } from './password-hash.ts';
 import { UserConfig } from '../application-state.ts';
 import { ResourceManager } from './resources.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
+import { getCreatedUsersDir } from '../files/cache-folder.ts';
+import { join } from '@std/path';
+import { ensureDir } from '@std/fs/ensure-dir';
 
 type BaseAuth = {
     username: string;
@@ -87,7 +90,63 @@ function ensureUsersFileRead() {
         }
     }
 
+    loadUsersFromCacheDir();
+
     hasReadUsersFile = true;
+}
+
+function loadUsersFromCacheDir() {
+    try {
+        const usersDir = getCreatedUsersDir();
+        for (const entry of Deno.readDirSync(usersDir)) {
+            if (entry.isFile && entry.name.endsWith('.json')) {
+                try {
+                    const bytes = Deno.readFileSync(join(usersDir, entry.name));
+                    const user = JSON.parse(new TextDecoder().decode(bytes));
+                    if (user.type === 'pbkdf2') {
+                        knownUsers.push(user as Pbkdf2Auth);
+                    } else if (user.type === 'insecure-basic_auth') {
+                        knownUsers.push(user as InsecureBasicAuth);
+                    }
+                } catch {
+                    // Intentionally left empty
+                }
+            }
+        }
+    } catch {
+        // Intentionally left empty
+    }
+}
+
+export async function createUserInCacheDir(username: string, password: string): Promise<void> {
+    ensureUsersFileRead();
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+        throw new Error('Username can only contain letters, numbers, underscores, and hyphens');
+    }
+
+    if (knownUsers.some((u) => u.username === username)) {
+        throw new Error(`User '${username}' already exists`);
+    }
+
+    const salt = crypto.randomUUID();
+    const b64Hash = pbkdf2Hash(password, salt);
+    const key = crypto.randomUUID();
+
+    const newUser: Pbkdf2Auth = {
+        type: 'pbkdf2',
+        username,
+        b64Hash,
+        salt,
+        key,
+    };
+
+    const usersDir = getCreatedUsersDir();
+    await ensureDir(usersDir);
+    const filePath = join(usersDir, `${username}.json`);
+    await Deno.writeTextFile(filePath, JSON.stringify(newUser, null, 4));
+
+    knownUsers.push(newUser);
 }
 
 function pbkdf2Compare(user: Pbkdf2Auth, password: string) {
