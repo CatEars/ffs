@@ -19,8 +19,7 @@
         font-weight: 800;
         font-size: 26px;
         line-height: 26px;
-        padding-left: 0.5rem;
-        padding-right: 1rem;
+        padding: 0.5rem;
     }
 
     .header > header-nav-select {
