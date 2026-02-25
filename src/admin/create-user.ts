@@ -11,7 +11,7 @@ export function registerAdminCreateUserRoutes(router: Router) {
         ...protectedMiddlewares(),
         (ctx) => {
             ctx.response.body = {
-                canCreateUsers: !!ctx.state.userConfig.canCreateUsers,
+                canCreateUsers: !!ctx.state.userConfig?.canCreateUsers,
             };
         },
     );
@@ -21,7 +21,7 @@ export function registerAdminCreateUserRoutes(router: Router) {
         baseMiddlewares(),
         ...protectedMiddlewares(),
         async (ctx) => {
-            if (!ctx.state.userConfig.canCreateUsers) {
+            if (ctx.state.userConfig && !ctx.state.userConfig.canCreateUsers) {
                 ctx.response.status = HTTP_403_FORBIDDEN;
                 ctx.response.body = { error: 'You do not have permission to create users' };
                 return;
