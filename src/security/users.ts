@@ -118,7 +118,7 @@ function loadUsersFromCacheDir() {
     }
 }
 
-export async function createUserInCacheDir(username: string, password: string): Promise<void> {
+export function createNewUser(username: string, password: string): UserAuth {
     ensureUsersFileRead();
 
     if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
@@ -141,12 +141,15 @@ export async function createUserInCacheDir(username: string, password: string): 
         key,
     };
 
+    knownUsers.push(newUser);
+    return newUser;
+}
+
+export async function storeUserAsCacheUser(user: UserAuth): Promise<void> {
     const usersDir = getCreatedUsersDir();
     await ensureDir(usersDir);
-    const filePath = join(usersDir, `${username}.json`);
-    await Deno.writeTextFile(filePath, JSON.stringify(newUser, null, 4));
-
-    knownUsers.push(newUser);
+    const filePath = join(usersDir, `${user.username}.json`);
+    await Deno.writeTextFile(filePath, JSON.stringify(user, null, 4));
 }
 
 function pbkdf2Compare(user: Pbkdf2Auth, password: string) {

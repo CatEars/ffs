@@ -37,9 +37,17 @@
             await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
         }
 
+        function updateNewUsername(evt) {
+            state.newUsername = evt.target.value;
+        }
+
+        function updateNewPassword(evt) {
+            state.newPassword = evt.target.value;
+        }
+
         async function createUser() {
-            const username = document.getElementById('new-username').value;
-            const password = document.getElementById('new-password').value;
+            const username = state.newUsername.value;
+            const password = state.newPassword.value;
 
             state.isLoading = true;
             state.message = null;
@@ -54,8 +62,8 @@
                 if (response.ok) {
                     state.messageType = 'success';
                     state.message = `User '${username}' created successfully`;
-                    document.getElementById('new-username').value = '';
-                    document.getElementById('new-password').value = '';
+                    state.newUsername = '';
+                    state.newPassword = '';
                 } else {
                     const result = await response.json();
                     state.messageType = 'error';
@@ -74,11 +82,28 @@
             message: null,
             messageType: null,
             isLoading: false,
+            canCreateUsers: false,
+            newUsername: '',
+            newPassword: '',
             hasMessage: megaphone.view((state) => state.message !== null),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
             clearThumbnails,
-            createUser,
+        });
+
+        megaphone.watch(state.newUsername, (value) => {
+            const el = document.querySelector('#new-username');
+            if (el) el.value = value;
+        });
+
+        megaphone.watch(state.newPassword, (value) => {
+            const el = document.querySelector('#new-password');
+            if (el) el.value = value;
+        });
+
+        megaphone.watch(state.buttonsDisabled, (value) => {
+            const btn = document.querySelector('#create-user-btn');
+            if (btn) btn.disabled = !!value;
         });
 
         megaphone.renderIf(
@@ -92,14 +117,23 @@
             })
         );
 
+        megaphone.renderIf(
+            state.canCreateUsers,
+            '#create-user-section',
+            megaphone.template('#create-user-template', (clone) => {
+                clone.querySelector('#new-username').addEventListener('input', updateNewUsername);
+                clone.querySelector('#new-password').addEventListener('input', updateNewPassword);
+                clone.querySelector('#create-user-btn').addEventListener('click', createUser);
+                return clone;
+            })
+        );
+
         megaphone.init();
 
         fetch('/api/user/capabilities').then(async (res) => {
             if (res.ok) {
                 const caps = await res.json();
-                if (caps.canCreateUsers) {
-                    document.getElementById('create-user-section').style.display = '';
-                }
+                state.canCreateUsers = caps.canCreateUsers;
             }
         });
     </script>
@@ -126,21 +160,24 @@
         <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
     </section>
 
-    <horizontal-ruler></horizontal-ruler>
-
-    <section id="create-user-section" style="display: none">
-        <h2>Create User</h2>
-        <p>Create a new user account with a password.</p>
-        <div>
-            <label for="new-username">Username</label>
-            <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
-        </div>
-        <div>
-            <label for="new-password">Password</label>
-            <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
-        </div>
-        <button $disabled="buttonsDisabled" @click="createUser" type="button">Create User</button>
-    </section>
+    <div id="create-user-section">
+        <template id="create-user-template">
+            <horizontal-ruler></horizontal-ruler>
+            <section>
+                <h2>Create User</h2>
+                <p>Create a new user account with a password.</p>
+                <div>
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
+                </div>
+                <div>
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
+                </div>
+                <button id="create-user-btn" type="button">Create User</button>
+            </section>
+        </template>
+    </div>
 
     <horizontal-ruler></horizontal-ruler>
 

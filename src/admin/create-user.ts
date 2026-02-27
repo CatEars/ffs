@@ -1,6 +1,6 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { createUserInCacheDir } from '../security/users.ts';
+import { createNewUser, storeUserAsCacheUser } from '../security/users.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
 import { logger } from '../logging/logger.ts';
 
@@ -37,7 +37,8 @@ export function registerAdminCreateUserRoutes(router: Router) {
             }
 
             try {
-                await createUserInCacheDir(username, password);
+                const newUser = createNewUser(username, password);
+                await storeUserAsCacheUser(newUser);
                 logger.info(`Created new user: ${username}`);
                 ctx.response.body = { success: true };
             } catch (err) {
