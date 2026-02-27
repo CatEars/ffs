@@ -1,9 +1,6 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
-        let usernameInput = null;
-        let passwordInput = null;
-
         async function handleAction(endpoint, actionName) {
             state.isLoading = true;
             state.message = null;
@@ -40,49 +37,19 @@
             await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
         }
 
-        async function createUser() {
-            if (state.isLoading.value) return;
-            const username = usernameInput?.value ?? '';
-            const password = passwordInput?.value ?? '';
-
-            state.isLoading = true;
-            state.message = null;
-
-            try {
-                const response = await fetch('/api/admin/create-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                if (response.ok) {
-                    state.messageType = 'success';
-                    state.message = `User '${username}' created successfully`;
-                    state.createUserFormVersion = state.createUserFormVersion.value + 1;
-                } else {
-                    const result = await response.json();
-                    state.messageType = 'error';
-                    state.message = result.error || result.message || 'Create User failed';
-                }
-            } catch (error) {
-                state.messageType = 'error';
-                state.message = `Error: ${error.message}`;
-            } finally {
-                state.isLoading = false;
-            }
+        const initialSuccess = getUrlParam('success', null);
+        const initialError = getUrlParam('error', null);
+        if (initialSuccess || initialError) {
+            history.replaceState({}, '', window.location.pathname);
         }
 
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            message: null,
-            messageType: null,
+            message: initialSuccess || initialError || null,
+            messageType: initialSuccess ? 'success' : (initialError ? 'error' : null),
             isLoading: false,
             canCreateUsers: false,
-            createUserFormVersion: 1,
             hasMessage: megaphone.view((state) => state.message !== null),
-            showCreateUserForm: megaphone.view((state) =>
-                state.canCreateUsers && state.createUserFormVersion
-            ),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
             clearThumbnails,
@@ -100,14 +67,9 @@
         );
 
         megaphone.renderIf(
-            state.showCreateUserForm,
+            state.canCreateUsers,
             '#create-user-section',
-            megaphone.template('#create-user-template', (clone) => {
-                usernameInput = clone.querySelector('[name=username]');
-                passwordInput = clone.querySelector('[name=password]');
-                clone.querySelector('[data-action=create-user]').addEventListener('click', createUser);
-                return clone;
-            })
+            megaphone.template('#create-user-template', (clone) => clone)
         );
 
         megaphone.init();
@@ -148,15 +110,17 @@
             <section>
                 <h2>Create Ephemeral User</h2>
                 <p>Create a new ephemeral user account with a password.</p>
-                <div>
-                    <label for="new-username">Username</label>
-                    <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
-                </div>
-                <div>
-                    <label for="new-password">Password</label>
-                    <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
-                </div>
-                <button data-action="create-user" type="button">Create User</button>
+                <form action="/api/admin/create-user" method="post">
+                    <div>
+                        <label for="new-username">Username</label>
+                        <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="new-password">Password</label>
+                        <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
+                    </div>
+                    <button type="submit">Create User</button>
+                </form>
             </section>
         </template>
     </div>

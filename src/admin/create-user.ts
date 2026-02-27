@@ -1,8 +1,11 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { createNewUser, storeUserAsEphemeralUser } from '../security/users.ts';
-import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
+import { HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
 import { logger } from '../logging/logger.ts';
+import { returnToSender } from '../utils/return-to-sender.ts';
+
+const ADMIN_PAGE = '/admin/';
 
 export function registerAdminCreateUserRoutes(router: Router) {
     router.get(
@@ -27,12 +30,15 @@ export function registerAdminCreateUserRoutes(router: Router) {
                 return;
             }
 
-            const body = await ctx.request.body.json();
-            const { username, password } = body;
+            const formData = await ctx.request.body.formData();
+            const username = formData.get('username')?.toString() ?? '';
+            const password = formData.get('password')?.toString() ?? '';
 
             if (!username || !password) {
-                ctx.response.status = HTTP_400_BAD_REQUEST;
-                ctx.response.body = { error: 'Username and password are required' };
+                returnToSender(ctx, {
+                    search: { error: 'Username and password are required' },
+                    defaultPath: ADMIN_PAGE,
+                });
                 return;
             }
 
@@ -40,10 +46,15 @@ export function registerAdminCreateUserRoutes(router: Router) {
                 const newUser = createNewUser(username, password);
                 await storeUserAsEphemeralUser(newUser);
                 logger.info(`Created new user: ${username}`);
-                ctx.response.body = { success: true };
+                returnToSender(ctx, {
+                    search: { success: `User '${username}' created successfully` },
+                    defaultPath: ADMIN_PAGE,
+                });
             } catch (err) {
-                ctx.response.status = HTTP_400_BAD_REQUEST;
-                ctx.response.body = { error: (err as Error).message };
+                returnToSender(ctx, {
+                    search: { error: (err as Error).message },
+                    defaultPath: ADMIN_PAGE,
+                });
             }
         },
     );
