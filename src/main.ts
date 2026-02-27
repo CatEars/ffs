@@ -16,7 +16,7 @@ import { registerAllCustomCommandApi } from './custom-commands/index.ts';
 import { registerAllFileShareRoutes } from './share-file/index.ts';
 import {
     FfsApplicationState,
-    setAccessFromUserConfigOrDefaultToRootAccess,
+    setPermissionsFromUserOrDefaultToRootAccess,
 } from './application-state.ts';
 import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
@@ -38,7 +38,7 @@ const app = new Application<FfsApplicationState>();
 const router = new Router();
 
 setOnUserAuthenticationHook(async (ctx, user) => {
-    setAccessFromUserConfigOrDefaultToRootAccess(ctx, user.config);
+    setPermissionsFromUserOrDefaultToRootAccess(ctx, user.permissions);
     await resolveUserFileTreeFromState(ctx);
 });
 

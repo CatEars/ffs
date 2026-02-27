@@ -1,6 +1,6 @@
 import { getUsersFilePath } from '../config.ts';
 import { pbkdf2Hash } from './password-hash.ts';
-import { UserConfig } from '../application-state.ts';
+import { UserPermissions } from '../application-state.ts';
 import { ResourceManager } from './resources.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
 import { getCreatedUsersDir } from '../files/cache-folder.ts';
@@ -9,7 +9,7 @@ import { ensureDir } from '@std/fs/ensure-dir';
 
 type BaseAuth = {
     username: string;
-    config?: Partial<UserConfig>;
+    permissions?: Partial<UserPermissions>;
 };
 
 type InsecureBasicAuth = BaseAuth & {
