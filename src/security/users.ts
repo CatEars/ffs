@@ -3,9 +3,10 @@ import { pbkdf2Hash } from './password-hash.ts';
 import { UserPermissions } from '../application-state.ts';
 import { ResourceManager } from './resources.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
-import { getCreatedUsersDir } from '../files/cache-folder.ts';
+import { getEphemeralUsersDir } from '../files/cache-folder.ts';
 import { join } from '@std/path';
 import { ensureDir } from '@std/fs/ensure-dir';
+import { logger } from '../logging/logger.ts';
 
 type BaseAuth = {
     username: string;
@@ -90,14 +91,14 @@ function ensureUsersFileRead() {
         }
     }
 
-    loadUsersFromCacheDir();
+    loadEphemeralUsers();
 
     hasReadUsersFile = true;
 }
 
-function loadUsersFromCacheDir() {
+function loadEphemeralUsers() {
     try {
-        const usersDir = getCreatedUsersDir();
+        const usersDir = getEphemeralUsersDir();
         for (const entry of Deno.readDirSync(usersDir)) {
             if (entry.isFile && entry.name.endsWith('.json')) {
                 try {
@@ -108,22 +109,21 @@ function loadUsersFromCacheDir() {
                     } else if (user.type === 'insecure-basic_auth') {
                         knownUsers.push(user as InsecureBasicAuth);
                     }
-                } catch {
-                    // Intentionally left empty
+                } catch (err) {
+                    logger.warn(
+                        `Ephemeral user file '${entry.name}' is malformed and was skipped:`,
+                        err,
+                    );
                 }
             }
         }
-    } catch {
-        // Intentionally left empty
+    } catch (err) {
+        logger.warn('Could not read ephemeral users directory (it may not exist yet):', err);
     }
 }
 
 export function createNewUser(username: string, password: string): UserAuth {
     ensureUsersFileRead();
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-        throw new Error('Username can only contain letters, numbers, underscores, and hyphens');
-    }
 
     if (knownUsers.some((u) => u.username === username)) {
         throw new Error(`User '${username}' already exists`);
@@ -145,8 +145,8 @@ export function createNewUser(username: string, password: string): UserAuth {
     return newUser;
 }
 
-export async function storeUserAsCacheUser(user: UserAuth): Promise<void> {
-    const usersDir = getCreatedUsersDir();
+export async function storeUserAsEphemeralUser(user: UserAuth): Promise<void> {
+    const usersDir = getEphemeralUsersDir();
     await ensureDir(usersDir);
     const filePath = join(usersDir, `${user.username}.json`);
     await Deno.writeTextFile(filePath, JSON.stringify(user, null, 4));

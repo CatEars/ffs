@@ -1,6 +1,9 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
+        let usernameInput = null;
+        let passwordInput = null;
+
         async function handleAction(endpoint, actionName) {
             state.isLoading = true;
             state.message = null;
@@ -37,17 +40,10 @@
             await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
         }
 
-        function updateNewUsername(evt) {
-            state.newUsername = evt.target.value;
-        }
-
-        function updateNewPassword(evt) {
-            state.newPassword = evt.target.value;
-        }
-
         async function createUser() {
-            const username = state.newUsername.value;
-            const password = state.newPassword.value;
+            if (state.isLoading.value) return;
+            const username = usernameInput?.value ?? '';
+            const password = passwordInput?.value ?? '';
 
             state.isLoading = true;
             state.message = null;
@@ -62,8 +58,7 @@
                 if (response.ok) {
                     state.messageType = 'success';
                     state.message = `User '${username}' created successfully`;
-                    state.newUsername = '';
-                    state.newPassword = '';
+                    state.createUserFormVersion = state.createUserFormVersion.value + 1;
                 } else {
                     const result = await response.json();
                     state.messageType = 'error';
@@ -83,27 +78,14 @@
             messageType: null,
             isLoading: false,
             canCreateUsers: false,
-            newUsername: '',
-            newPassword: '',
+            createUserFormVersion: 1,
             hasMessage: megaphone.view((state) => state.message !== null),
+            showCreateUserForm: megaphone.view((state) =>
+                state.canCreateUsers && state.createUserFormVersion
+            ),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
             clearThumbnails,
-        });
-
-        megaphone.watch(state.newUsername, (value) => {
-            const el = document.querySelector('#new-username');
-            if (el) el.value = value;
-        });
-
-        megaphone.watch(state.newPassword, (value) => {
-            const el = document.querySelector('#new-password');
-            if (el) el.value = value;
-        });
-
-        megaphone.watch(state.buttonsDisabled, (value) => {
-            const btn = document.querySelector('#create-user-btn');
-            if (btn) btn.disabled = !!value;
         });
 
         megaphone.renderIf(
@@ -118,12 +100,12 @@
         );
 
         megaphone.renderIf(
-            state.canCreateUsers,
+            state.showCreateUserForm,
             '#create-user-section',
             megaphone.template('#create-user-template', (clone) => {
-                clone.querySelector('#new-username').addEventListener('input', updateNewUsername);
-                clone.querySelector('#new-password').addEventListener('input', updateNewPassword);
-                clone.querySelector('#create-user-btn').addEventListener('click', createUser);
+                usernameInput = clone.querySelector('[name=username]');
+                passwordInput = clone.querySelector('[name=password]');
+                clone.querySelector('[data-action=create-user]').addEventListener('click', createUser);
                 return clone;
             })
         );
@@ -164,8 +146,8 @@
         <template id="create-user-template">
             <horizontal-ruler></horizontal-ruler>
             <section>
-                <h2>Create User</h2>
-                <p>Create a new user account with a password.</p>
+                <h2>Create Ephemeral User</h2>
+                <p>Create a new ephemeral user account with a password.</p>
                 <div>
                     <label for="new-username">Username</label>
                     <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
@@ -174,7 +156,7 @@
                     <label for="new-password">Password</label>
                     <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
                 </div>
-                <button id="create-user-btn" type="button">Create User</button>
+                <button data-action="create-user" type="button">Create User</button>
             </section>
         </template>
     </div>

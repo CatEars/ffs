@@ -1,6 +1,6 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { createNewUser, storeUserAsCacheUser } from '../security/users.ts';
+import { createNewUser, storeUserAsEphemeralUser } from '../security/users.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
 import { logger } from '../logging/logger.ts';
 
@@ -21,7 +21,7 @@ export function registerAdminCreateUserRoutes(router: Router) {
         baseMiddlewares(),
         ...protectedMiddlewares(),
         async (ctx) => {
-            if (ctx.state.userPermissions && !ctx.state.userPermissions.canCreateUsers) {
+            if (!ctx.state.userPermissions?.canCreateUsers) {
                 ctx.response.status = HTTP_403_FORBIDDEN;
                 ctx.response.body = { error: 'You do not have permission to create users' };
                 return;
@@ -38,7 +38,7 @@ export function registerAdminCreateUserRoutes(router: Router) {
 
             try {
                 const newUser = createNewUser(username, password);
-                await storeUserAsCacheUser(newUser);
+                await storeUserAsEphemeralUser(newUser);
                 logger.info(`Created new user: ${username}`);
                 ctx.response.body = { success: true };
             } catch (err) {
