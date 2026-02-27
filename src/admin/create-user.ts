@@ -15,6 +15,7 @@ export function registerAdminCreateUserRoutes(router: Router) {
         (ctx) => {
             ctx.response.body = {
                 canCreateUsers: !!ctx.state.userPermissions?.canCreateUsers,
+                allowHousekeeping: !!ctx.state.userPermissions?.allowHousekeeping,
             };
         },
     );

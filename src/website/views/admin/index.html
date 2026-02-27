@@ -49,6 +49,7 @@
             messageType: initialSuccess ? 'success' : (initialError ? 'error' : null),
             isLoading: false,
             canCreateUsers: false,
+            allowHousekeeping: false,
             hasMessage: megaphone.view((state) => state.message !== null),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
@@ -72,12 +73,19 @@
             megaphone.template('#create-user-template', (clone) => clone)
         );
 
+        megaphone.renderIf(
+            state.allowHousekeeping,
+            '#housekeeping-section',
+            megaphone.template('#housekeeping-template', (clone) => clone)
+        );
+
         megaphone.init();
 
         fetch('/api/user/capabilities').then(async (res) => {
             if (res.ok) {
                 const caps = await res.json();
                 state.canCreateUsers = caps.canCreateUsers;
+                state.allowHousekeeping = caps.allowHousekeeping;
             }
         });
     </script>
@@ -90,19 +98,23 @@
 
     <horizontal-ruler></horizontal-ruler>
 
-    <section>
-        <h2>Thumbnails</h2>
-        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-        <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
-    </section>
+    <div id="housekeeping-section">
+        <template id="housekeeping-template">
+            <section>
+                <h2>Thumbnails</h2>
+                <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
+                <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
+            </section>
 
-    <horizontal-ruler></horizontal-ruler>
+            <horizontal-ruler></horizontal-ruler>
 
-    <section>
-        <h2>Share Link Manifests</h2>
-        <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
-        <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
-    </section>
+            <section>
+                <h2>Share Link Manifests</h2>
+                <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
+                <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
+            </section>
+        </template>
+    </div>
 
     <div id="create-user-section">
         <template id="create-user-template">

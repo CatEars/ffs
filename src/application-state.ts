@@ -5,6 +5,7 @@ import { AccessLevel, getRootAccessLevel } from './security/resources.ts';
 export type UserPermissions = {
     access: AccessLevel[];
     canCreateUsers?: boolean;
+    allowHousekeeping?: boolean;
 };
 
 export type FfsApplicationState = {
@@ -27,5 +28,6 @@ export function setPermissionsFromUserOrDefaultToRootAccess(
     if (permissions?.canCreateUsers) {
         userPermissions.canCreateUsers = permissions.canCreateUsers;
     }
+    userPermissions.allowHousekeeping = permissions?.allowHousekeeping !== false;
     ctx.state.userPermissions = userPermissions;
 }
