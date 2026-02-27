@@ -17,7 +17,9 @@ const fileResourceManger = new ResourceManager('file');
 
 export async function resolveUserFileTreeFromState(ctx: Context<FfsApplicationState>) {
     ctx.state.fileTree = getRootFileTree();
-    const fileAccess = fileResourceManger.getFirstMatchingAccessLevel(ctx.state.userConfig.access);
+    const fileAccess = fileResourceManger.getFirstMatchingAccessLevel(
+        ctx.state.userPermissions.access,
+    );
     if (fileAccess) {
         const resolvedFileAccess = fileResourceManger.stripResourceTypeName(fileAccess);
         if (resolvedFileAccess !== fileResourceManger.rootResourceName()) {

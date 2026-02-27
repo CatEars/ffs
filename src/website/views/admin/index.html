@@ -37,11 +37,18 @@
             await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
         }
 
+        const initialSuccess = getUrlParam('success', null);
+        const initialError = getUrlParam('error', null);
+        if (initialSuccess || initialError) {
+            history.replaceState({}, '', window.location.pathname);
+        }
+
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            message: null,
-            messageType: null,
+            message: initialSuccess || initialError || null,
+            messageType: initialSuccess ? 'success' : (initialError ? 'error' : null),
             isLoading: false,
+            canCreateUsers: false,
             hasMessage: megaphone.view((state) => state.message !== null),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
             clearManifests,
@@ -59,7 +66,20 @@
             })
         );
 
+        megaphone.renderIf(
+            state.canCreateUsers,
+            '#create-user-section',
+            megaphone.template('#create-user-template', (clone) => clone)
+        );
+
         megaphone.init();
+
+        fetch('/api/user/capabilities').then(async (res) => {
+            if (res.ok) {
+                const caps = await res.json();
+                state.canCreateUsers = caps.canCreateUsers;
+            }
+        });
     </script>
 
     <app-header>Admin</app-header>
@@ -83,6 +103,27 @@
         <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
         <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
     </section>
+
+    <div id="create-user-section">
+        <template id="create-user-template">
+            <horizontal-ruler></horizontal-ruler>
+            <section>
+                <h2>Create Ephemeral User</h2>
+                <p>Create a new ephemeral user account with a password.</p>
+                <form action="/api/admin/create-user" method="post">
+                    <div>
+                        <label for="new-username">Username</label>
+                        <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="new-password">Password</label>
+                        <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
+                    </div>
+                    <button type="submit">Create User</button>
+                </form>
+            </section>
+        </template>
+    </div>
 
     <horizontal-ruler></horizontal-ruler>
 

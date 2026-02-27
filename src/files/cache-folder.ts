@@ -10,6 +10,7 @@ const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';
 const THUMBNAIL_TEMP_SUBDIR = 'thumbnail-tmp';
 const MANIFESTS_SUBDIR = 'share-manifests';
+const EPHEMERAL_USERS_SUBDIR = 'ephemeral-users';
 const knownThumbnails = new Map<string, Deno.FileInfo>();
 let initialScanCompleted = false;
 
@@ -23,6 +24,10 @@ export function getThumbnailTempDir(): string {
 
 export function getManifestsDir(): string {
     return join(getCacheRoot(), MANIFESTS_SUBDIR);
+}
+
+export function getEphemeralUsersDir(): string {
+    return join(getCacheRoot(), EPHEMERAL_USERS_SUBDIR);
 }
 
 async function scanForThumbnails() {

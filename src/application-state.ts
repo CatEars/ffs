@@ -2,26 +2,30 @@ import { Context } from '@oak/oak/context';
 import { FileTree } from './files/file-tree.ts';
 import { AccessLevel, getRootAccessLevel } from './security/resources.ts';
 
-export type UserConfig = {
+export type UserPermissions = {
     access: AccessLevel[];
+    canCreateUsers?: boolean;
 };
 
 export type FfsApplicationState = {
     fileTree: FileTree;
-    userConfig: UserConfig;
+    userPermissions: UserPermissions;
 };
 
-export function setAccessFromUserConfigOrDefaultToRootAccess(
+export function setPermissionsFromUserOrDefaultToRootAccess(
     ctx: Context<FfsApplicationState>,
-    config?: Partial<UserConfig>,
+    permissions?: Partial<UserPermissions>,
 ) {
-    const userConfig: UserConfig = {
+    const userPermissions: UserPermissions = {
         access: [],
     };
-    if (config?.access) {
-        userConfig.access = config.access;
+    if (permissions?.access) {
+        userPermissions.access = permissions.access;
     } else {
-        userConfig.access = getRootAccessLevel();
+        userPermissions.access = getRootAccessLevel();
     }
-    ctx.state.userConfig = userConfig;
+    if (permissions?.canCreateUsers) {
+        userPermissions.canCreateUsers = permissions.canCreateUsers;
+    }
+    ctx.state.userPermissions = userPermissions;
 }

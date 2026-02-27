@@ -3,7 +3,10 @@
         "username": "admin",
         "password": "ffsadmin",
         "type": "insecure-basic_auth",
-        "key": "bab5b6be-2aad-11f0-a2ca-3b8bfdd0a613"
+        "key": "bab5b6be-2aad-11f0-a2ca-3b8bfdd0a613",
+        "permissions": {
+            "canCreateUsers": true
+        }
     },
     {
         "type": "pbkdf2",
@@ -18,7 +21,7 @@
         "b64Hash": "6380X20CCQXisntWf95ZUT3uQsn7vBNcFEOKnueoynM1km9nU8ip+IXCaNsxW4FLAUfBQ8hPBliv3K/SLP2SAg==",
         "salt": "890ecb11-41ad-4f48-ac3d-1760e04f153c",
         "key": "881ec4c1-7207-4532-9957-3b4254283515",
-        "config": {
+        "permissions": {
             "access": ["/file/./testbench"]
         }
     }
