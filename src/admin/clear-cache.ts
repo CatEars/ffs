@@ -38,7 +38,7 @@ export function registerAdminClearCacheRoutes(router: Router) {
         housekeepingMiddleware,
         async (ctx) => {
             await clearAndEnsureDirectoryExists(getManifestsDir());
-            logger.info('Cleared share links');
+            logger.info('Cleared share link manifests');
             ctx.response.body = { success: true };
         },
     );
