@@ -104,6 +104,12 @@ function loadEphemeralUsers() {
                 try {
                     const bytes = Deno.readFileSync(join(usersDir, entry.name));
                     const user = JSON.parse(new TextDecoder().decode(bytes));
+                    if (!user.permissions) {
+                        user.permissions = {};
+                    }
+                    if (user.permissions.allowHousekeeping === undefined) {
+                        user.permissions.allowHousekeeping = false;
+                    }
                     if (user.type === 'pbkdf2') {
                         knownUsers.push(user as Pbkdf2Auth);
                     } else if (user.type === 'insecure-basic_auth') {
@@ -139,6 +145,7 @@ export function createNewUser(username: string, password: string): UserAuth {
         b64Hash,
         salt,
         key,
+        permissions: { allowHousekeeping: false },
     };
 
     knownUsers.push(newUser);
