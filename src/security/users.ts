@@ -110,6 +110,9 @@ function loadEphemeralUsers() {
                     if (user.permissions.allowHousekeeping === undefined) {
                         user.permissions.allowHousekeeping = false;
                     }
+                    if (user.permissions.canCreateUsers === undefined) {
+                        user.permissions.canCreateUsers = false;
+                    }
                     if (user.type === 'pbkdf2') {
                         knownUsers.push(user as Pbkdf2Auth);
                     } else if (user.type === 'insecure-basic_auth') {
@@ -145,7 +148,7 @@ export function createNewUser(username: string, password: string): UserAuth {
         b64Hash,
         salt,
         key,
-        permissions: { allowHousekeeping: false },
+        permissions: { canCreateUsers: false, allowHousekeeping: false },
     };
 
     knownUsers.push(newUser);
