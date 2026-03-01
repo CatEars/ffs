@@ -29,12 +29,12 @@
             }
         }
 
-        async function clearManifests() {
-            await handleAction('/api/admin/clear-manifests', 'Clear Share Link Manifests');
-        }
-
         async function clearThumbnails() {
             await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
+        }
+
+        async function clearShareLinks() {
+            await handleAction('/api/admin/clear-share-links', 'Clear Share Links');
         }
 
         const initialSuccess = getUrlParam('success', null);
@@ -52,8 +52,8 @@
             allowHousekeeping: false,
             hasMessage: megaphone.view((state) => state.message !== null),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
-            clearManifests,
             clearThumbnails,
+            clearShareLinks,
         });
 
         megaphone.renderIf(
@@ -109,9 +109,9 @@
             <horizontal-ruler></horizontal-ruler>
 
             <section>
-                <h2>Share Link Manifests</h2>
-                <p>Remove all cached share link manifest files. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
-                <button $disabled="buttonsDisabled" @click="clearManifests" type="button">Clear Share Link Manifests</button>
+                <h2>Share Links</h2>
+                <p>Remove all share links. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
+                <button $disabled="buttonsDisabled" @click="clearShareLinks" type="button">Clear Share Links</button>
             </section>
         </template>
     </div>
