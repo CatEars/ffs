@@ -25,9 +25,7 @@ export function setPermissionsFromUserOrDefaultToRootAccess(
     } else {
         userPermissions.access = getRootAccessLevel();
     }
-    if (permissions?.canCreateUsers) {
-        userPermissions.canCreateUsers = permissions.canCreateUsers;
-    }
+    userPermissions.canCreateUsers = permissions?.canCreateUsers !== false;
     userPermissions.allowHousekeeping = permissions?.allowHousekeeping !== false;
     ctx.state.userPermissions = userPermissions;
 }
