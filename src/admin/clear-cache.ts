@@ -30,18 +30,6 @@ export function registerAdminClearCacheRoutes(router: Router) {
             ctx.response.body = { success: true };
         },
     );
-
-    router.post(
-        '/api/admin/clear-share-links',
-        baseMiddlewares(),
-        ...protectedMiddlewares(),
-        housekeepingMiddleware,
-        async (ctx) => {
-            await clearAndEnsureDirectoryExists(getManifestsDir());
-            logger.info('Cleared share link manifests');
-            ctx.response.body = { success: true };
-        },
-    );
 }
 
 const housekeepingMiddleware: Middleware<FfsApplicationState> = async (ctx, next) => {
