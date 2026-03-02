@@ -52,6 +52,8 @@
             allowHousekeeping: false,
             hasMessage: megaphone.view((state) => state.message !== null),
             buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
+            allowHousekeepingVisibility: megaphone.view((state) => state.allowHousekeeping ? 'show' : 'hidden'),
+            canCreateUsersVisibility: megaphone.view((state) => state.canCreateUsers ? 'show' : 'hidden'),
             clearThumbnails,
             clearShareLinks,
         });
@@ -65,18 +67,6 @@
                 messageEl.className = `message ${state.messageType.value}`;
                 return clone;
             })
-        );
-
-        megaphone.renderIf(
-            state.canCreateUsers,
-            '#create-user-section',
-            megaphone.template('#create-user-template', (clone) => clone)
-        );
-
-        megaphone.renderIf(
-            state.allowHousekeeping,
-            '#housekeeping-section',
-            megaphone.template('#housekeeping-template', (clone) => clone)
         );
 
         megaphone.init();
@@ -98,43 +88,39 @@
 
     <horizontal-ruler></horizontal-ruler>
 
-    <div id="housekeeping-section">
-        <template id="housekeeping-template">
-            <section>
-                <h2>Thumbnails</h2>
-                <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-                <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
-            </section>
+    <div $data-visibility="allowHousekeepingVisibility">
+        <section>
+            <h2>Thumbnails</h2>
+            <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
+            <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
+        </section>
 
-            <horizontal-ruler></horizontal-ruler>
+        <horizontal-ruler></horizontal-ruler>
 
-            <section>
-                <h2>Share Links</h2>
-                <p>Remove all share links. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
-                <button $disabled="buttonsDisabled" @click="clearShareLinks" type="button">Clear Share Links</button>
-            </section>
-        </template>
+        <section>
+            <h2>Share Links</h2>
+            <p>Remove all share links. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
+            <button $disabled="buttonsDisabled" @click="clearShareLinks" type="button">Clear Share Links</button>
+        </section>
     </div>
 
-    <div id="create-user-section">
-        <template id="create-user-template">
-            <horizontal-ruler></horizontal-ruler>
-            <section>
-                <h2>Create Ephemeral User</h2>
-                <p>Create a new ephemeral user account with a password.</p>
-                <form action="/api/admin/create-user" method="post">
-                    <div>
-                        <label for="new-username">Username</label>
-                        <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
-                    </div>
-                    <div>
-                        <label for="new-password">Password</label>
-                        <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
-                    </div>
-                    <button type="submit">Create User</button>
-                </form>
-            </section>
-        </template>
+    <div $data-visibility="canCreateUsersVisibility">
+        <horizontal-ruler></horizontal-ruler>
+        <section>
+            <h2>Create Ephemeral User</h2>
+            <p>Create a new ephemeral user account with a password.</p>
+            <form action="/api/admin/create-user" method="post">
+                <div>
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
+                </div>
+                <div>
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
+                </div>
+                <button type="submit">Create User</button>
+            </form>
+        </section>
     </div>
 
     <horizontal-ruler></horizontal-ruler>
