@@ -13,15 +13,23 @@
         flex-direction: column;
         justify-content: end;
         line-height: 16px;
+        min-height: var(--minimum-header-height);
     }
 
-    .header > .main-link {
+    .header > .main-link-holder > .main-link {
+        text-decoration: none;
         font-weight: 800;
         font-size: 26px;
         line-height: 26px;
-        padding-top: 1rem;
         padding-left: 0.5rem;
         padding-right: 1rem;
+    }
+
+    .header > .main-link-holder {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        min-height: var(--minimum-header-height);
     }
 
     .header > header-nav-select {

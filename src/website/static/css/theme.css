@@ -7,4 +7,6 @@
 
     --small-screen-breakpoint: 768px;
     --medium-screen-breakpoint: 1476px;
+
+    --minimum-header-height: 2.7rem;
 }
