@@ -5,6 +5,7 @@ import { logger } from '../logging/logger.ts';
 import { clearAndEnsureDirectoryExists } from '../utils/clear-and-ensure-dir.ts';
 import { HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
 import { FfsApplicationState } from '../application-state.ts';
+import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerAdminClearCacheRoutes(router: Router) {
     router.post(
@@ -15,7 +16,11 @@ export function registerAdminClearCacheRoutes(router: Router) {
         async (ctx) => {
             await clearAndEnsureDirectoryExists(getManifestsDir());
             logger.info('Cleared share link manifests directory');
-            ctx.response.body = { success: true };
+            returnToSender(ctx, {
+                search: {
+                    'message': 'Share link manifests cleared',
+                },
+            });
         },
     );
 
@@ -27,7 +32,11 @@ export function registerAdminClearCacheRoutes(router: Router) {
         async (ctx) => {
             await clearAndEnsureDirectoryExists(getThumbnailsDir());
             logger.info('Cleared thumbnails directory');
-            ctx.response.body = { success: true };
+            returnToSender(ctx, {
+                search: {
+                    'message': 'Thumbnails cleared',
+                },
+            });
         },
     );
 }

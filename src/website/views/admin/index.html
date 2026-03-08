@@ -1,61 +1,21 @@
 <!-- layout /templates/base.html -->
 <app-main>
     <script type="module">
-        async function handleAction(endpoint, actionName) {
-            state.isLoading = true;
-            state.message = null;
-
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (response.ok) {
-                    state.messageType = 'success';
-                    state.message = `${actionName} completed successfully`;
-                } else {
-                    const result = await response.json();
-                    state.messageType = 'error';
-                    state.message = result.error || result.message || `${actionName} failed`;
-                }
-            } catch (error) {
-                state.messageType = 'error';
-                state.message = `Error: ${error.message}`;
-            } finally {
-                state.isLoading = false;
-            }
-        }
-
-        async function clearThumbnails() {
-            await handleAction('/api/admin/clear-thumbnails', 'Clear Thumbnails');
-        }
-
-        async function clearShareLinks() {
-            await handleAction('/api/admin/clear-manifests', 'Clear Share Links');
-        }
-
-        const initialSuccess = getUrlParam('success', null);
-        const initialError = getUrlParam('error', null);
-        if (initialSuccess || initialError) {
-            history.replaceState({}, '', window.location.pathname);
-        }
-
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            message: initialSuccess || initialError || null,
-            messageType: initialSuccess ? 'success' : (initialError ? 'error' : null),
-            isLoading: false,
-            canCreateUsers: false,
-            allowHousekeeping: false,
+            message: megaphone.urlParam('message', null),
             hasMessage: megaphone.view((state) => state.message !== null),
-            buttonsDisabled: megaphone.view((state) => state.isLoading || undefined),
-            allowHousekeepingVisibility: megaphone.view((state) => state.allowHousekeeping ? 'show' : 'hidden'),
-            canCreateUsersVisibility: megaphone.view((state) => state.canCreateUsers ? 'show' : 'hidden'),
-            clearThumbnails,
-            clearShareLinks,
+            permissions: megaphone.jsonApi('/api/user/capabilities', {}),
+            canCreateUsers: megaphone.view((state) => state.permissions.canCreateUsers || false),
+            allowHousekeeping: megaphone.view(
+                (state) => state.permissions.allowHousekeeping || false
+            ),
+            allowHousekeepingVisibility: megaphone.view((state) =>
+                state.allowHousekeeping ? 'show' : 'hidden'
+            ),
+            canCreateUsersVisibility: megaphone.view((state) =>
+                state.canCreateUsers ? 'show' : 'hidden'
+            ),
         });
 
         megaphone.renderIf(
@@ -64,20 +24,15 @@
             megaphone.template('#message-template', (clone) => {
                 const messageEl = clone.querySelector('.message');
                 messageEl.textContent = state.message.value;
-                messageEl.className = `message ${state.messageType.value}`;
+                const clsName = state.message.value.toLocaleLowerCase().includes('error')
+                    ? 'error'
+                    : 'success';
+                messageEl.className = `message ${clsName}`;
                 return clone;
             })
         );
 
         megaphone.init();
-
-        fetch('/api/user/capabilities').then(async (res) => {
-            if (res.ok) {
-                const caps = await res.json();
-                state.canCreateUsers = caps.canCreateUsers;
-                state.allowHousekeeping = caps.allowHousekeeping;
-            }
-        });
     </script>
 
     <app-header>Admin</app-header>
@@ -88,40 +43,60 @@
 
     <horizontal-ruler></horizontal-ruler>
 
-    <div $data-visibility="allowHousekeepingVisibility">
-        <section>
+    <section $data-visibility="allowHousekeepingVisibility">
+        <form action="/api/admin/clear-thumbnails">
             <h2>Thumbnails</h2>
-            <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-            <button $disabled="buttonsDisabled" @click="clearThumbnails" type="button">Clear Thumbnails</button>
-        </section>
+            <p>
+                Remove all cached thumbnail images. These will be regenerated when files are viewed.
+            </p>
+            <button class="hero-button" type="submit">Clear Thumbnails</button>
+        </form>
 
         <horizontal-ruler></horizontal-ruler>
 
-        <section>
+        <form action="/api/admin/clear-manifests">
             <h2>Share Links</h2>
-            <p>Remove all share links. <strong>Warning: existing share links will no longer be accessible after clearing.</strong></p>
-            <button $disabled="buttonsDisabled" @click="clearShareLinks" type="button">Clear Share Links</button>
-        </section>
-    </div>
+            <p>
+                Remove all share links.
+                <strong
+                    >Warning: existing share links will no longer be accessible after
+                    clearing.</strong
+                >
+            </p>
+            <button class="hero-button" type="submit">Clear Share Links</button>
+        </form>
+    </section>
 
-    <div $data-visibility="canCreateUsersVisibility">
+    <section $data-visibility="canCreateUsersVisibility">
         <horizontal-ruler></horizontal-ruler>
         <section>
             <h2>Create Ephemeral User</h2>
             <p>Create a new ephemeral user account with a password.</p>
             <form action="/api/admin/create-user" method="post">
-                <div>
-                    <label for="new-username">Username</label>
-                    <input type="text" id="new-username" name="username" placeholder="Username" autocomplete="off" />
+                <div class="form-column">
+                    <label for="new-username"> Username </label>
+                    <input
+                        type="text"
+                        id="new-username"
+                        name="username"
+                        placeholder="Username"
+                        autocomplete="off"
+                    />
                 </div>
-                <div>
-                    <label for="new-password">Password</label>
-                    <input type="password" id="new-password" name="password" placeholder="Password" autocomplete="new-password" />
+                <div class="form-column">
+                    <label for="new-password"> Password </label>
+                    <input
+                        type="password"
+                        id="new-password"
+                        name="password"
+                        placeholder="Password"
+                        autocomplete="new-password"
+                    />
                 </div>
-                <button type="submit">Create User</button>
+                <button class="hero-button" type="submit">Create User</button>
             </form>
         </section>
-    </div>
+    </section>
 
     <horizontal-ruler></horizontal-ruler>
 
