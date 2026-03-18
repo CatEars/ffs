@@ -1,6 +1,6 @@
 import { join } from '@std/path/join';
 import { collectAsync } from '../utils/collect-async.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { collectMap } from '../utils/collect-map.ts';
 import { formatBytes } from '../utils/format-bytes.ts';
 

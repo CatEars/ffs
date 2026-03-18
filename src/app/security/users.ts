@@ -6,7 +6,7 @@ import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
 import { getEphemeralUsersDir } from '../files/cache-folder.ts';
 import { join } from '@std/path';
 import { ensureDir } from '@std/fs/ensure-dir';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 
 type BaseAuth = {
     username: string;

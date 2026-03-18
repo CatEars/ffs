@@ -4,7 +4,7 @@ import { registerAllFileListing } from './file-listing/index.ts';
 import { getEnableCacheAllDirectories, getStoreRoot, unsecure, validateConfig } from './config.ts';
 import { registerAllLogonRoutes } from './logon/index.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
-import { initializeLoggers, logger } from './logging/logger.ts';
+import { initializeLoggers, logger } from './logging/loggers.ts';
 import {
     areThumbnailsAvailable,
     registerAllThumbnailRoutes,

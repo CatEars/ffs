@@ -1,5 +1,5 @@
 import { ThumbnailRequest } from '../types.ts';
-import { logger } from '../../logging/logger.ts';
+import { logger } from '../../logging/loggers.ts';
 import { ensureDir } from '@std/fs/ensure-dir';
 import { dirname } from '@std/path/dirname';
 import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';

@@ -10,7 +10,7 @@ import { Context } from '@oak/oak/context';
 import { viewPath } from '../config.ts';
 import { Next } from '@oak/oak/middleware';
 import { HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { registerStaticRoutes } from './static-files.ts';
 import { resolve } from '@std/path/resolve';

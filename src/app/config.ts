@@ -1,4 +1,4 @@
-import { logger } from './logging/logger.ts';
+import { logger } from './logging/loggers.ts';
 
 let noSec: boolean = false;
 export const viewPath = Deno.cwd() + '/src/app/website/views/';

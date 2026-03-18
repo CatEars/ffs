@@ -1,7 +1,7 @@
 import { join, relative, resolve } from '@std/path';
 import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
 import { FileTreeWalker } from './file-tree-walker.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { existsSync } from 'node:fs';
 import { ensureDir } from '@std/fs/ensure-dir';
 import { clearAndEnsureDirectoryExists } from '../utils/clear-and-ensure-dir.ts';

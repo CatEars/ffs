@@ -1,6 +1,6 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerFileDeletionRoute(router: Router) {

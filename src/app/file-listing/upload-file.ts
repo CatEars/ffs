@@ -3,7 +3,7 @@ import { Router } from '@oak/oak/router';
 import { getStoreRoot } from '../config.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { returnToSender } from '../utils/return-to-sender.ts';
 
 export function registerUploadFileRoute(router: Router) {

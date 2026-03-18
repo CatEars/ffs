@@ -1,5 +1,5 @@
 import { Middleware } from '@oak/oak';
-import { requestLogger } from './logger.ts';
+import { requestLogger } from './loggers.ts';
 
 export const logAccessRequests: Middleware = (ctx, next) => {
     const origin = ctx.request.headers.get('X-Forwarded-For') || ctx.request.ip;

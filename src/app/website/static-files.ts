@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { FileTreeWalker } from '../files/file-tree-walker.ts';
 import { devModeEnabled } from '../config.ts';

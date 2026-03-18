@@ -1,5 +1,4 @@
 import { exists } from '@std/fs/exists';
-import { getRequestLogsFile } from '../config.ts';
 
 // deno-lint-ignore no-explicit-any
 type Loggable = any;
@@ -58,7 +57,7 @@ class FifoCache extends Array {
     }
 }
 
-class RecordingLogWrapper {
+export class RecordingLogWrapper {
     private readonly wrappedConsole: Logger;
     private readonly logCache: FifoCache = new FifoCache(1000);
     private noPrefix: boolean;
@@ -113,10 +112,7 @@ class RecordingLogWrapper {
     }
 }
 
-export const logger = new RecordingLogWrapper(console);
-export const backgroundProcessLogger = new RecordingLogWrapper(console);
-
-class FileLogger {
+export class FileLogger {
     private readonly pathGetter: () => string;
     private file: Deno.FsFile | undefined;
     private logCache: FifoCache = new FifoCache(1000);
@@ -151,10 +147,4 @@ class FileLogger {
     inspectRecentLogs(): string[][] {
         return this.logCache;
     }
-}
-
-export const requestLogger = new FileLogger(getRequestLogsFile);
-
-export async function initializeLoggers() {
-    await requestLogger.init();
 }

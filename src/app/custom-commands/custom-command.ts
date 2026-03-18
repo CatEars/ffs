@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { getCustomCommandsFile } from '../config.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 
 export type CustomCommand = {
     program: string;

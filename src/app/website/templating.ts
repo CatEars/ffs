@@ -2,7 +2,7 @@ import { dirname } from '@std/path/dirname';
 import { resolve } from '@std/path/resolve';
 import { devModeEnabled, viewPath } from '../config.ts';
 import { existsSync } from 'node:fs';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 
 const textDecoder = new TextDecoder();
 

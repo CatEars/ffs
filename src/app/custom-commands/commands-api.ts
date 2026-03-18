@@ -1,7 +1,7 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { HTTP_400_BAD_REQUEST } from '../utils/http-codes.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { getCustomCommands } from './custom-command.ts';
 import { returnToSender } from '../utils/return-to-sender.ts';
 

@@ -3,7 +3,7 @@ import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../utils/http-codes.ts
 import { getMatchingUser } from '../security/users.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { forgeBanhammer } from '../security/banhammer.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 
 const banhammer = forgeBanhammer({
     maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 10,

@@ -1,6 +1,6 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { backgroundProcessLogger, logger, requestLogger } from '../logging/logger.ts';
+import { backgroundProcessLogger, logger, requestLogger } from '../logging/loggers.ts';
 
 export function registerGetAppLogEndpoint(router: Router) {
     router.get('/api/logs', baseMiddlewares(), ...protectedMiddlewares(), (ctx) => {

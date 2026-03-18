@@ -4,7 +4,7 @@ import {
     thumbnailExists,
 } from '../../files/cache-folder.ts';
 import { ThumbnailRequest } from '../types.ts';
-import { logger } from '../../logging/logger.ts';
+import { logger } from '../../logging/loggers.ts';
 import { extname } from '@std/path/extname';
 import { collectAsync } from '../../utils/collect-async.ts';
 import { acceptedFileExtensions as acceptedImageExtensions } from './static-images.ts';

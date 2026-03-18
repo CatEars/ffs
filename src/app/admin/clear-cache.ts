@@ -1,7 +1,7 @@
 import { Middleware, Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { getManifestsDir, getThumbnailsDir } from '../files/cache-folder.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { clearAndEnsureDirectoryExists } from '../utils/clear-and-ensure-dir.ts';
 import { HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
 import { FfsApplicationState } from '../application-state.ts';

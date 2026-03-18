@@ -2,7 +2,7 @@ import { Router } from '@oak/oak';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { createNewUser, storeUserAsEphemeralUser } from '../security/users.ts';
 import { HTTP_403_FORBIDDEN } from '../utils/http-codes.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { returnToSender } from '../utils/return-to-sender.ts';
 
 const ADMIN_PAGE = '/admin/';

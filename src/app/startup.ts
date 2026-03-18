@@ -7,7 +7,7 @@ import {
     usersFileKey,
 } from './config.ts';
 import { resolveCacheFolder } from './files/cache-folder.ts';
-import { logger } from './logging/logger.ts';
+import { logger } from './logging/loggers.ts';
 
 function printBigWelcomeText() {
     logger.warn('');

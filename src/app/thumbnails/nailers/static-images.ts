@@ -2,7 +2,7 @@ import { ensureDir } from '@std/fs/ensure-dir';
 import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
 import { ThumbnailRequest } from '../types.ts';
 import { dirname } from '@std/path/dirname';
-import { logger } from '../../logging/logger.ts';
+import { logger } from '../../logging/loggers.ts';
 import { move } from '@std/fs/move';
 
 export const acceptedFileExtensions = [

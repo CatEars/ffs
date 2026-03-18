@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak/router';
-import { backgroundProcessLogger, logger } from '../logging/logger.ts';
+import { backgroundProcessLogger, logger } from '../logging/loggers.ts';
 import { ThumbnailRequest } from './types.ts';
 import { registerGetThumbnail } from './get-thumbnail.ts';
 import { extname } from '@std/path/extname';
