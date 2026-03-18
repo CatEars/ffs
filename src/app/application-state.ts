@@ -1,6 +1,6 @@
 import { Context } from '@oak/oak/context';
 import { FileTree } from './files/file-tree.ts';
-import { AccessLevel, getRootAccessLevel } from './security/resources.ts';
+import { AccessLevel, getRootAccessLevel } from '../lib/security/resources.ts';
 
 export type UserPermissions = {
     access: AccessLevel[];

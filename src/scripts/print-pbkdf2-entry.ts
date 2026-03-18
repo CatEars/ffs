@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { pbkdf2Hash } from '../app/security/password-hash.ts';
+import { pbkdf2Hash } from '../lib/security/password-hash.ts';
 
 const username = Deno.args[0];
 const password = Deno.args[1];

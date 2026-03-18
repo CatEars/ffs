@@ -5,8 +5,8 @@ import { getUsersFilePath } from '../config.ts';
 import { getEphemeralUsersDir } from '../files/cache-folder.ts';
 import { logger } from '../logging/loggers.ts';
 import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
-import { pbkdf2Hash } from './password-hash.ts';
-import { ResourceManager } from './resources.ts';
+import { pbkdf2Hash } from '../../lib/security/password-hash.ts';
+import { ResourceManager } from '../../lib/security/resources.ts';
 
 type BaseAuth = {
     username: string;
