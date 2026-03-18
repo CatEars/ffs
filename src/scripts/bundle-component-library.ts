@@ -11,10 +11,10 @@ function myLocation() {
 const esbuildLocation = join(myLocation(), 'vendor', 'bin', 'esbuild');
 
 async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
-    await Deno.mkdir('./src/website/static/js', { recursive: true });
+    await Deno.mkdir('./src/app/website/static/js', { recursive: true });
     const command = new Deno.Command(esbuildLocation, {
         args: ['--bundle', 'index.js', '--outfile=../static/js/index.bundle.js'],
-        cwd: './src/website/components',
+        cwd: './src/app/website/components',
     });
 
     const result = await command.output();
@@ -33,7 +33,7 @@ async function bundleJavascriptWebComponentsLibrary(opts?: BundleParams) {
 async function bundleCssStyles(opts?: BundleParams) {
     const command = new Deno.Command(esbuildLocation, {
         args: ['--bundle', 'index.css', '--loader:.svg=dataurl', '--outfile=index.bundle.css'],
-        cwd: './src/website/static/css',
+        cwd: './src/app/website/static/css',
     });
 
     const result = await command.output();

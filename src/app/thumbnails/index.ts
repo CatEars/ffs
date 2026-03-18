@@ -40,7 +40,7 @@ export function startThumbnailBackgroundProcess() {
     ];
 
     thumbnailProcess = new Deno.Command('deno', {
-        args: subProcessFlags.concat(['src/thumbnails/background-task.ts']),
+        args: subProcessFlags.concat(['src/app/thumbnails/background-task.ts']),
         stdout: 'piped',
         stdin: 'piped',
     }).spawn();

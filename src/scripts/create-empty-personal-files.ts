@@ -1,5 +1,5 @@
 const filesToCreate = [
-    './src/website/views/templates/base.personal.html',
+    './src/app/website/views/templates/base.personal.html',
 ];
 
 for (const file of filesToCreate) {

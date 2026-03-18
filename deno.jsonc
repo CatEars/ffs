@@ -16,20 +16,20 @@
         "@std/path": "jsr:@std/path@^1.1.1"
     },
     "tasks": {
-        "bundle-component-library": "deno run --allow-all scripts/bundle-component-library.ts",
+        "bundle-component-library": "deno run --allow-all src/scripts/bundle-component-library.ts",
         "ensure-dist": "mkdir -p dist",
-        "enable-eruda": "./scripts/set-eruda-as-personal-html-file.sh",
-        "create-personal-files": "deno run --allow-all scripts/create-empty-personal-files.ts",
-        "remove-personal-files": "deno run --allow-all scripts/remove-personal-files.ts",
-        "generate-default-test-bench": "deno run --allow-all scripts/generate-default-test-bench.ts",
-        "generate-svg-sprite-sheet": "deno run --allow-all scripts/generate-svg-sprite-sheet.ts",
+        "enable-eruda": "./src/scripts/set-eruda-as-personal-html-file.sh",
+        "create-personal-files": "deno run --allow-all src/scripts/create-empty-personal-files.ts",
+        "remove-personal-files": "deno run --allow-all src/scripts/remove-personal-files.ts",
+        "generate-default-test-bench": "deno run --allow-all src/scripts/generate-default-test-bench.ts",
+        "generate-svg-sprite-sheet": "deno run --allow-all src/scripts/generate-svg-sprite-sheet.ts",
         "run": {
-            "command": "deno run --allow-all scripts/dev-main.ts"
+            "command": "deno run --allow-all src/scripts/dev-main.ts"
         },
         "test": "deno test --allow-all",
-        "download-dependencies": "deno run --allow-all scripts/download-deps.ts",
-        "download-vendor-binaries": "./scripts/download-vendor-binaries.sh",
-        "unpack-favicon": "deno run --allow-all scripts/unpack-favicon.ts",
+        "download-dependencies": "deno run --allow-all src/scripts/download-deps.ts",
+        "download-vendor-binaries": "./src/scripts/download-vendor-binaries.sh",
+        "unpack-favicon": "deno run --allow-all src/scripts/unpack-favicon.ts",
         "setup": {
             "dependencies": [
                 "generate-default-test-bench",
@@ -40,19 +40,19 @@
             ]
         },
         "build-docker": {
-            "command": "./scripts/build-docker.sh",
+            "command": "./src/scripts/build-docker.sh",
             "dependencies": ["ensure-dist", "remove-personal-files", "bundle-component-library"]
         },
         "build-dist": {
-            "command": "./scripts/build-dist.sh",
+            "command": "./src/scripts/build-dist.sh",
             "dependencies": ["build-docker"]
         },
         "release": {
-            "command": "./scripts/create-github-release.sh",
+            "command": "./src/scripts/create-github-release.sh",
             "dependencies": [
                 "build-dist"
             ]
         },
-        "pack-plugins": "./scripts/pack-plugins.sh"
+        "pack-plugins": "./src/scripts/pack-plugins.sh"
     }
 }

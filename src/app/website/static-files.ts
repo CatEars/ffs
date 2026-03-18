@@ -8,13 +8,13 @@ const anHour = 1_000 * 60 * 60 * 1;
 const maxage = devModeEnabled ? 0 : anHour;
 
 export async function registerStaticRoutes(router: Router) {
-    await registerUnder(router, './src/website/static', '/static');
+    await registerUnder(router, './src/app/website/static', '/static');
 
     // Special case: favicon
     logger.info('Registering /favicon.ico');
     router.get('/favicon.ico', baseMiddlewares(), async (ctx) => {
         await ctx.send({
-            root: './src/website/static/',
+            root: './src/app/website/static/',
             path: 'favicon.ico',
             maxage,
         });

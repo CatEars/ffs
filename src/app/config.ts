@@ -1,7 +1,7 @@
 import { logger } from './logging/logger.ts';
 
 let noSec: boolean = false;
-export const viewPath = Deno.cwd() + '/src/website/views/';
+export const viewPath = Deno.cwd() + '/src/app/website/views/';
 export const devModeEnabled = Deno.env.get('FFS_ENV') === 'dev';
 export const storeRootKey = 'FFS_STORE_ROOT';
 export const cacheRootKey = 'FFS_CACHE_ROOT';
