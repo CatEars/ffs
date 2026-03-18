@@ -4,7 +4,7 @@ import { FileTreeWalker } from './file-tree-walker.ts';
 import { logger } from '../logging/loggers.ts';
 import { existsSync } from 'node:fs';
 import { ensureDir } from '@std/fs/ensure-dir';
-import { clearAndEnsureDirectoryExists } from '../utils/clear-and-ensure-dir.ts';
+import { clearAndEnsureDirectoryExists } from '../../lib/file-system/clear-and-ensure-dir.ts';
 
 const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';

@@ -1,5 +1,5 @@
 import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-scheme.ts';
-import { availableDiskBytes } from '../utils/disk-space.ts';
+import { availableDiskBytes } from '../../lib/file-system/disk-space.ts';
 import { getCacheRoot } from '../config.ts';
 import { getManifestsDir } from '../files/cache-folder.ts';
 import { join } from '@std/path';
