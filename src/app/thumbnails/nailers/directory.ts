@@ -6,7 +6,7 @@ import {
 import { ThumbnailRequest } from '../types.ts';
 import { logger } from '../../logging/loggers.ts';
 import { extname } from '@std/path/extname';
-import { collectAsync } from '../../utils/collect-async.ts';
+import { collectAsync } from '../../../lib/functional/collect-async.ts';
 import { acceptedFileExtensions as acceptedImageExtensions } from './static-images.ts';
 import { acceptedFileExtensions as acceptedVideoExtensions } from './mp4.ts';
 import { join } from '@std/path/join';
