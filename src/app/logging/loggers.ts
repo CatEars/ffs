@@ -1,5 +1,5 @@
-import { getRequestLogsFile } from '../config.ts';
 import { FileLogger, RecordingLogWrapper } from '../../lib/logger/logger.ts';
+import { getRequestLogsFile } from '../config.ts';
 
 export const requestLogger = new FileLogger(getRequestLogsFile);
 export const logger = new RecordingLogWrapper(console);

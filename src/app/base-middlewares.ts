@@ -1,6 +1,6 @@
 import { Middleware } from '@oak/oak';
-import { logAccessRequests } from './logging/access-logging.ts';
 import { FfsApplicationState } from './application-state.ts';
+import { logAccessRequests } from './logging/access-logging.ts';
 import { apiProtect } from './security/api-protect.ts';
 
 export function baseMiddlewares(): Middleware {

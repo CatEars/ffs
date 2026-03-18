@@ -1,12 +1,12 @@
-import { getUsersFilePath } from '../config.ts';
-import { pbkdf2Hash } from './password-hash.ts';
-import { UserPermissions } from '../application-state.ts';
-import { ResourceManager } from './resources.ts';
-import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
-import { getEphemeralUsersDir } from '../files/cache-folder.ts';
-import { join } from '@std/path';
 import { ensureDir } from '@std/fs/ensure-dir';
+import { join } from '@std/path';
+import { UserPermissions } from '../application-state.ts';
+import { getUsersFilePath } from '../config.ts';
+import { getEphemeralUsersDir } from '../files/cache-folder.ts';
 import { logger } from '../logging/loggers.ts';
+import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
+import { pbkdf2Hash } from './password-hash.ts';
+import { ResourceManager } from './resources.ts';
 
 type BaseAuth = {
     username: string;

@@ -1,9 +1,9 @@
-import { ThumbnailRequest } from '../types.ts';
-import { logger } from '../../logging/loggers.ts';
+import { move } from '@std/fs';
 import { ensureDir } from '@std/fs/ensure-dir';
 import { dirname } from '@std/path/dirname';
 import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
-import { move } from '@std/fs';
+import { logger } from '../../logging/loggers.ts';
+import { ThumbnailRequest } from '../types.ts';
 
 type Mp4Info = {
     duration: number;

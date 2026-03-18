@@ -1,7 +1,7 @@
 import { exists } from '@std/fs/exists';
+import { join } from '@std/path';
 import { resolve } from '@std/path/resolve';
 import { FileTreeCache, globalFileTreeCache } from './file-tree-cache.ts';
-import { join } from '@std/path';
 
 export type PathResult = { type: 'invalid' } | {
     type: 'valid';

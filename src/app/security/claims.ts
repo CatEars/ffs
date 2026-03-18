@@ -1,6 +1,6 @@
-import { getInstanceSecret } from '../config.ts';
-import { decodeBase64Url, encodeBase64Url } from '@std/encoding/base64url';
 import { decodeBase64, encodeBase64 } from '@std/encoding/base64';
+import { decodeBase64Url, encodeBase64Url } from '@std/encoding/base64url';
+import { getInstanceSecret } from '../config.ts';
 import { AccessLevel } from './resources.ts';
 
 const encoder = new TextEncoder();

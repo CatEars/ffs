@@ -1,7 +1,7 @@
 import { Context } from '@oak/oak/context';
+import { FfsApplicationState } from '../application-state.ts';
 import { getStoreRoot } from '../config.ts';
 import { FileTree } from '../files/file-tree.ts';
-import { FfsApplicationState } from '../application-state.ts';
 import { ResourceManager } from '../security/resources.ts';
 
 let _fileTree: FileTree | null = null;

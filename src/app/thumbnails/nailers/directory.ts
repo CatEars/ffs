@@ -1,18 +1,18 @@
+import { ensureDir } from '@std/fs/ensure-dir';
+import { move } from '@std/fs/move';
+import { dirname } from '@std/path/dirname';
+import { extname } from '@std/path/extname';
+import { join } from '@std/path/join';
+import { collectAsync } from '../../../lib/functional/index.ts';
 import {
     getThumbnailPath,
     getThumbnailTempDir,
     thumbnailExists,
 } from '../../files/cache-folder.ts';
-import { ThumbnailRequest } from '../types.ts';
 import { logger } from '../../logging/loggers.ts';
-import { extname } from '@std/path/extname';
-import { collectAsync } from '../../../lib/functional/collect-async.ts';
-import { acceptedFileExtensions as acceptedImageExtensions } from './static-images.ts';
+import { ThumbnailRequest } from '../types.ts';
 import { acceptedFileExtensions as acceptedVideoExtensions } from './mp4.ts';
-import { join } from '@std/path/join';
-import { ensureDir } from '@std/fs/ensure-dir';
-import { dirname } from '@std/path/dirname';
-import { move } from '@std/fs/move';
+import { acceptedFileExtensions as acceptedImageExtensions } from './static-images.ts';
 
 async function promoteThumbnail(request: ThumbnailRequest, fileToCopy: string) {
     const targetPath = getThumbnailPath(request.filePath);

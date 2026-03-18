@@ -1,9 +1,9 @@
 import { ensureDir } from '@std/fs/ensure-dir';
-import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
-import { ThumbnailRequest } from '../types.ts';
-import { dirname } from '@std/path/dirname';
-import { logger } from '../../logging/loggers.ts';
 import { move } from '@std/fs/move';
+import { dirname } from '@std/path/dirname';
+import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
+import { logger } from '../../logging/loggers.ts';
+import { ThumbnailRequest } from '../types.ts';
 
 export const acceptedFileExtensions = [
     '.png',

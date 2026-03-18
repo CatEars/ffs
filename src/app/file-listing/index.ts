@@ -1,11 +1,11 @@
 import { Router } from '@oak/oak/router';
-import { registerDirectoryRoutes } from './list-directory.ts';
+import { registerFileDeletionRoute } from './delete-file.ts';
 import { registerFileRoutes } from './get-file.ts';
-import { registerUploadFileRoute } from './upload-file.ts';
+import { registerDirectoryRoutes } from './list-directory.ts';
+import { registerMakeDirectoryRoute } from './make-directory.ts';
 import { registerMoveFileRoute } from './move-file.ts';
 import { registerRenameFileRoute } from './rename-file.ts';
-import { registerMakeDirectoryRoute } from './make-directory.ts';
-import { registerFileDeletionRoute } from './delete-file.ts';
+import { registerUploadFileRoute } from './upload-file.ts';
 
 export function registerAllFileListing(router: Router) {
     registerDirectoryRoutes(router);

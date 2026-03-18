@@ -1,17 +1,17 @@
 import { Router } from '@oak/oak';
-import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { getCacheRoot } from '../config.ts';
-import { canGenerateThumbnailFor } from './generate-thumbnail.ts';
-import { prioritizeThumbnail } from './index.ts';
-import { getThumbnailPath } from '../files/cache-folder.ts';
-import { sleep } from '../../lib/sleep/sleep.ts';
+import { relative } from '@std/path/relative';
 import {
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 } from '../../lib/http/http-codes.ts';
+import { sleep } from '../../lib/sleep/sleep.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
+import { getCacheRoot } from '../config.ts';
+import { getThumbnailPath } from '../files/cache-folder.ts';
 import { FileTree } from '../files/file-tree.ts';
-import { relative } from '@std/path/relative';
+import { canGenerateThumbnailFor } from './generate-thumbnail.ts';
+import { prioritizeThumbnail } from './index.ts';
 
 async function tryGetFile(fileTree: FileTree, filePath: string) {
     for (let cnt = 0; cnt < 20; ++cnt) {

@@ -1,8 +1,8 @@
 import { Router } from '@oak/oak/router';
-import { backgroundProcessLogger, logger } from '../logging/loggers.ts';
-import { ThumbnailRequest } from './types.ts';
-import { registerGetThumbnail } from './get-thumbnail.ts';
 import { extname } from '@std/path/extname';
+import { backgroundProcessLogger, logger } from '../logging/loggers.ts';
+import { registerGetThumbnail } from './get-thumbnail.ts';
+import { ThumbnailRequest } from './types.ts';
 
 function isFfmpegAvailable() {
     const proc = runFfmpegVersion();

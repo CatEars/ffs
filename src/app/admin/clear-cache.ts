@@ -1,11 +1,11 @@
 import { Middleware, Router } from '@oak/oak';
+import { clearAndEnsureDirectoryExists } from '../../lib/file-system/clear-and-ensure-dir.ts';
+import { HTTP_403_FORBIDDEN } from '../../lib/http/http-codes.ts';
+import { returnToSender } from '../../lib/http/return-to-sender.ts';
+import { FfsApplicationState } from '../application-state.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { getManifestsDir, getThumbnailsDir } from '../files/cache-folder.ts';
 import { logger } from '../logging/loggers.ts';
-import { clearAndEnsureDirectoryExists } from '../../lib/file-system/clear-and-ensure-dir.ts';
-import { HTTP_403_FORBIDDEN } from '../../lib/http/http-codes.ts';
-import { FfsApplicationState } from '../application-state.ts';
-import { returnToSender } from '../../lib/http/return-to-sender.ts';
 
 export function registerAdminClearCacheRoutes(router: Router) {
     router.post(

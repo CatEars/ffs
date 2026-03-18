@@ -1,8 +1,7 @@
 import { join } from '@std/path/join';
-import { collectAsync } from '../../lib/functional/collect-async.ts';
-import { logger } from '../logging/loggers.ts';
-import { collectMap } from '../../lib/functional/collect-map.ts';
 import { formatBytes } from '../../lib/file-system/format-bytes.ts';
+import { collectAsync, collectMap } from '../../lib/functional/index.ts';
+import { logger } from '../logging/loggers.ts';
 
 type BaseNode = {
     type: 'file' | 'directory';

@@ -1,5 +1,6 @@
-import { ThumbnailRequest } from './types.ts';
 import { extname } from '@std/path';
+import { thumbnailExists } from '../files/cache-folder.ts';
+import { copyMostFitingThumbnailFromDirectory } from './nailers/directory.ts';
 import {
     acceptedFileExtensions as acceptedVideoExtensions,
     createMp4Thumbnail,
@@ -8,8 +9,7 @@ import {
     acceptedFileExtensions as acceptedImageExtensions,
     createImageMagickThumbnail,
 } from './nailers/static-images.ts';
-import { thumbnailExists } from '../files/cache-folder.ts';
-import { copyMostFitingThumbnailFromDirectory } from './nailers/directory.ts';
+import { ThumbnailRequest } from './types.ts';
 
 type ThumbnailType = 'image' | 'video' | 'directory';
 

@@ -1,10 +1,10 @@
-import { join, relative, resolve } from '@std/path';
-import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
-import { FileTreeWalker } from './file-tree-walker.ts';
-import { logger } from '../logging/loggers.ts';
-import { existsSync } from 'node:fs';
 import { ensureDir } from '@std/fs/ensure-dir';
+import { join, relative, resolve } from '@std/path';
+import { existsSync } from 'node:fs';
 import { clearAndEnsureDirectoryExists } from '../../lib/file-system/clear-and-ensure-dir.ts';
+import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
+import { logger } from '../logging/loggers.ts';
+import { FileTreeWalker } from './file-tree-walker.ts';
 
 const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';

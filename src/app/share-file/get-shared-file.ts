@@ -1,9 +1,9 @@
 import { Router } from '@oak/oak/router';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { shareProtect } from './share-protect.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR } from '../../lib/http/http-codes.ts';
+import { baseMiddlewares } from '../base-middlewares.ts';
 import { getStoreRoot } from '../config.ts';
 import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
+import { shareProtect } from './share-protect.ts';
 
 export function registerGetSharedFilesRoutes(router: Router) {
     router.get('/api/share-file/list', baseMiddlewares(), shareProtect, async (ctx) => {

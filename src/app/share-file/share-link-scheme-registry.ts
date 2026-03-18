@@ -1,6 +1,6 @@
-import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-scheme.ts';
-import { rawPathsShareLinkScheme } from './raw-paths-share-link-scheme.ts';
 import { manifestShareLinkScheme } from './manifest-share-link-scheme.ts';
+import { rawPathsShareLinkScheme } from './raw-paths-share-link-scheme.ts';
+import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-scheme.ts';
 
 const SCHEME_SEPARATOR = ':';
 
@@ -23,7 +23,7 @@ export class ShareLinkSchemeRegistry {
         throw new Error('No available share link scheme for the given context');
     }
 
-    async decodeCode(fullCode: string): Promise<DecodedShare> {
+    decodeCode(fullCode: string): Promise<DecodedShare> {
         const separatorIndex = fullCode.indexOf(SCHEME_SEPARATOR);
         if (separatorIndex === -1) {
             throw new Error('Invalid share link code: missing scheme prefix');

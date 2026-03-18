@@ -1,6 +1,6 @@
 import { relative } from '@std/path';
-import { canGenerateThumbnailFor } from '../thumbnails/generate-thumbnail.ts';
 import { getStoreRoot } from '../config.ts';
+import { canGenerateThumbnailFor } from '../thumbnails/generate-thumbnail.ts';
 
 export type FileType = 'video' | 'image' | 'sound' | 'directory' | 'unidentified';
 

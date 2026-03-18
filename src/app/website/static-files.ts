@@ -1,8 +1,8 @@
 import { Router } from '@oak/oak';
-import { logger } from '../logging/loggers.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
-import { FileTreeWalker } from '../files/file-tree-walker.ts';
 import { devModeEnabled } from '../config.ts';
+import { FileTreeWalker } from '../files/file-tree-walker.ts';
+import { logger } from '../logging/loggers.ts';
 
 const anHour = 1_000 * 60 * 60 * 1;
 const maxage = devModeEnabled ? 0 : anHour;

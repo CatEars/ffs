@@ -1,4 +1,11 @@
+import { Context } from '@oak/oak/context';
+import { Next } from '@oak/oak/middleware';
 import { Router } from '@oak/oak/router';
+import { resolve } from '@std/path/resolve';
+import { HTTP_404_NOT_FOUND } from '../../lib/http/http-codes.ts';
+import { baseMiddlewares } from '../base-middlewares.ts';
+import { viewPath } from '../config.ts';
+import { logger } from '../logging/loggers.ts';
 import {
     collectAllPages,
     NavbarLink,
@@ -6,14 +13,7 @@ import {
     PluginPage,
     StaticJsPage,
 } from './collect-all-pages.ts';
-import { Context } from '@oak/oak/context';
-import { viewPath } from '../config.ts';
-import { Next } from '@oak/oak/middleware';
-import { HTTP_404_NOT_FOUND } from '../../lib/http/http-codes.ts';
-import { logger } from '../logging/loggers.ts';
-import { baseMiddlewares } from '../base-middlewares.ts';
 import { registerStaticRoutes } from './static-files.ts';
-import { resolve } from '@std/path/resolve';
 import { loadHtml } from './templating.ts';
 
 export async function registerAllWebsiteRoutes(router: Router) {

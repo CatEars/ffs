@@ -1,6 +1,6 @@
 import { walk, WalkEntry, WalkOptions } from '@std/fs/walk';
-import { relative } from '@std/path/relative';
 import { dirname } from '@std/path/dirname';
+import { relative } from '@std/path/relative';
 
 const keepAllWalkEntries = (_: WalkEntry) => true;
 
