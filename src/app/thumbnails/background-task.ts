@@ -8,7 +8,7 @@ import {
 import { logger } from '../logging/loggers.ts';
 import { ThumbnailRequest } from './types.ts';
 import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
-import { sleep } from '../utils/sleep.ts';
+import { sleep } from '../../lib/sleep/sleep.ts';
 import { Buffer } from 'node:buffer';
 import { MemoryCache } from '../../lib/cache/memory-cache.ts';
 import { thumbnailExists } from '../files/cache-folder.ts';

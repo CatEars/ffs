@@ -5,8 +5,8 @@ import {
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-} from '../utils/http-codes.ts';
-import { returnToSender } from '../utils/return-to-sender.ts';
+} from '../../lib/http/http-codes.ts';
+import { returnToSender } from '../../lib/http/return-to-sender.ts';
 
 export function registerMakeDirectoryRoute(router: Router<FfsApplicationState>) {
     router.post(

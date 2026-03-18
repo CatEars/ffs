@@ -1,7 +1,7 @@
 import { Middleware, Next } from '@oak/oak/middleware';
 import { Context } from '@oak/oak/context';
 import { shouldAbandonSecurity } from '../config.ts';
-import { HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
+import { HTTP_401_UNAUTHORIZED } from '../../lib/http/http-codes.ts';
 import { getUserMatchingApiKey, UserAuth } from './users.ts';
 import { FfsApplicationState } from '../application-state.ts';
 

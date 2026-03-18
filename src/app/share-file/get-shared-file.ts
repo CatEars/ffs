@@ -1,7 +1,7 @@
 import { Router } from '@oak/oak/router';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { shareProtect } from './share-protect.ts';
-import { HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR } from '../utils/http-codes.ts';
+import { HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR } from '../../lib/http/http-codes.ts';
 import { getStoreRoot } from '../config.ts';
 import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
 

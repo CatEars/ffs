@@ -1,5 +1,5 @@
 import { Middleware } from '@oak/oak';
-import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
+import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../../lib/http/http-codes.ts';
 import { Claims, signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from '../security/claims.ts';
 import { ResourceManager } from '../security/resources.ts';
 

@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak/router';
-import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
+import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../../lib/http/http-codes.ts';
 import { getMatchingUser } from '../security/users.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { forgeBanhammer } from '../security/banhammer.ts';

@@ -1,4 +1,4 @@
-import { isArrayPrefix } from '../utils/array-prefix.ts';
+import { isArrayPrefix } from '../../lib/functional/array-prefix.ts';
 
 export type ResourceType = string;
 

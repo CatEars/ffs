@@ -5,7 +5,7 @@ import {
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-} from '../utils/http-codes.ts';
+} from '../../lib/http/http-codes.ts';
 
 const maximumRequestBeforeTheBanhammerStrikesDefault = 250;
 

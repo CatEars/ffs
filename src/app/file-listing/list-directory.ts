@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak/router';
-import { HTTP_404_NOT_FOUND } from '../utils/http-codes.ts';
+import { HTTP_404_NOT_FOUND } from '../../lib/http/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
 import { FileIdentification, identifyFileFromDirEntry } from './file-type.ts';
 import { FfsApplicationState } from '../application-state.ts';

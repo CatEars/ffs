@@ -2,7 +2,7 @@ import { Router } from '@oak/oak';
 import { move } from '@std/fs';
 import { logger } from '../logging/loggers.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { returnToSender } from '../utils/return-to-sender.ts';
+import { returnToSender } from '../../lib/http/return-to-sender.ts';
 
 export function registerMoveFileRoute(router: Router) {
     router.post('/api/file/move', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {

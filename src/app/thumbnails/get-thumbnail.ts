@@ -4,12 +4,12 @@ import { getCacheRoot } from '../config.ts';
 import { canGenerateThumbnailFor } from './generate-thumbnail.ts';
 import { prioritizeThumbnail } from './index.ts';
 import { getThumbnailPath } from '../files/cache-folder.ts';
-import { sleep } from '../utils/sleep.ts';
+import { sleep } from '../../lib/sleep/sleep.ts';
 import {
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-} from '../utils/http-codes.ts';
+} from '../../lib/http/http-codes.ts';
 import { FileTree } from '../files/file-tree.ts';
 import { relative } from '@std/path/relative';
 
