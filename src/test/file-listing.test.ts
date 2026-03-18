@@ -6,7 +6,7 @@ import {
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-} from '../src/utils/http-codes.ts';
+} from '../utils/http-codes.ts';
 import { authenticatedFetch } from './authenticated-fetch.ts';
 
 type FileListing = {

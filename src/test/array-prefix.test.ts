@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertFalse } from '@std/assert/false';
-import { isArrayPrefix } from '../src/utils/array-prefix.ts';
+import { isArrayPrefix } from '../utils/array-prefix.ts';
 
 Deno.test('Empty array is prefix to all other arrays', () => {
     assert(isArrayPrefix([], []));
