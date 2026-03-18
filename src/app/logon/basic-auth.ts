@@ -1,8 +1,8 @@
 import { Router } from '@oak/oak/router';
+import { forgeBanhammer } from '../../lib/http/banhammer.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../../lib/http/http-codes.ts';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { logger } from '../logging/loggers.ts';
-import { forgeBanhammer } from '../security/banhammer.ts';
 import { getMatchingUser } from '../security/users.ts';
 
 const banhammer = forgeBanhammer({
