@@ -5,12 +5,12 @@ import {
     getStoreRoot,
     getThumbnailFinderSkipRegex,
 } from '../config.ts';
-import { logger } from '../logging/logger.ts';
+import { logger } from '../logging/loggers.ts';
 import { ThumbnailRequest } from './types.ts';
 import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
 import { sleep } from '../utils/sleep.ts';
 import { Buffer } from 'node:buffer';
-import { MemoryCache } from '../utils/memory-cache.ts';
+import { MemoryCache } from '../../lib/cache/memory-cache.ts';
 import { thumbnailExists } from '../files/cache-folder.ts';
 import { FileTreeWalker } from '../files/file-tree-walker.ts';
 import { resolve } from '@std/path/resolve';
