@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert/equals';
 import { baseUrl } from './constants.ts';
-import { HTTP_200_OK, HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
+import { HTTP_200_OK, HTTP_401_UNAUTHORIZED } from '../app/utils/http-codes.ts';
 import { assert } from '@std/assert/assert';
 import { authenticatedFetch } from './authenticated-fetch.ts';
 

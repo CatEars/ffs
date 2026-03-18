@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert/equals';
 import { resolve } from '@std/path/resolve';
 import { assert } from '@std/assert/assert';
 import { fail } from '@std/assert/fail';
-import { FileTree } from '../files/file-tree.ts';
+import { FileTree } from '../app/files/file-tree.ts';
 
 const sampleFileTree = new FileTree('.');
 

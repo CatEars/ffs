@@ -1,7 +1,7 @@
-import { ApiEndpointDefinition } from '../sitemap/index.ts';
+import { ApiEndpointDefinition } from '../app/sitemap/index.ts';
 import { baseUrl } from './constants.ts';
 import { assertEquals } from '@std/assert/equals';
-import { HTTP_401_UNAUTHORIZED } from '../utils/http-codes.ts';
+import { HTTP_401_UNAUTHORIZED } from '../app/utils/http-codes.ts';
 
 const publicApiEndpoints = ['/api/sitemap', '/api/logon', '/api/user-logon'];
 

@@ -1,4 +1,8 @@
-import { getThumbnailPath, getThumbnailTempDir, thumbnailExists } from '../../files/cache-folder.ts';
+import {
+    getThumbnailPath,
+    getThumbnailTempDir,
+    thumbnailExists,
+} from '../../files/cache-folder.ts';
 import { ThumbnailRequest } from '../types.ts';
 import { logger } from '../../logging/logger.ts';
 import { extname } from '@std/path/extname';

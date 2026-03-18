@@ -2,12 +2,12 @@ import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
 import { assertFalse } from '@std/assert/false';
 import { assertThrows } from '@std/assert/throws';
-import { ShareLinkSchemeRegistry } from '../share-file/share-link-scheme-registry.ts';
+import { ShareLinkSchemeRegistry } from '../app/share-file/share-link-scheme-registry.ts';
 import type {
     DecodedShare,
     ShareContext,
     ShareLinkScheme,
-} from '../share-file/share-link-scheme.ts';
+} from '../app/share-file/share-link-scheme.ts';
 
 class FakeScheme implements ShareLinkScheme {
     constructor(

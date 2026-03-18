@@ -1,4 +1,4 @@
-import { setConfig } from '../config.ts';
+import { setConfig } from '../app/config.ts';
 
 setConfig({
     storeRoot: '.',

@@ -54,7 +54,7 @@ function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
 
 function buildFileTreeOptions() {
     const fileTreeOptions = {
-        skip: ([] as RegExp[]),
+        skip: [] as RegExp[],
     };
     const thumbnailSkipPattern = getThumbnailFinderSkipRegex();
     if (thumbnailSkipPattern) {
