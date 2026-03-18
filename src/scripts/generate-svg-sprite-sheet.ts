@@ -1,8 +1,8 @@
 import { join } from '@std/path/join';
 import { basename } from '@std/path/basename';
 
-const INPUT_FOLDER = './src/website/static/svg';
-const OUTPUT_FILE = './src/website/static/svg/sprite_sheet.svg';
+const INPUT_FOLDER = './src/app/website/static/svg';
+const OUTPUT_FILE = './src/app/website/static/svg/sprite_sheet.svg';
 
 const SVG_SPRITE_HEADER = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">\n`;
 const SVG_SPRITE_FOOTER = `\n</svg>`;

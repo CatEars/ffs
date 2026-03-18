@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # Absolute or relative path to plugins directory
-PLUGIN_DIR="src/website/views/plugins"
+PLUGIN_DIR="src/app/website/views/plugins"
 DIST_DIR="dist"
 
 # Ensure the plugins directory exists

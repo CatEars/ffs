@@ -6,7 +6,7 @@ attempting to get other file servers to work.
 ## Run
 
 ```bash
-curl -sL https://raw.githubusercontent.com/catears/ffs/master/deploy/gh-deploy.sh | bash ;
+curl -sL https://raw.githubusercontent.com/catears/ffs/master/src/deploy/auto-install/gh-deploy.sh | bash ;
 docker run --rm --volume ./:/files --env 'FFS_STORE_ROOT=/files' --publish 8080:8080 catears/ffs
 ```
 
@@ -43,15 +43,15 @@ License.
 The goals of FFS is to be:
 
 - Crash-resistant
-  - A power outage should mean you "just restart" the server
+    - A power outage should mean you "just restart" the server
 - Zero config
-  - Runnable with no config and all config in-files and in-app
+    - Runnable with no config and all config in-files and in-app
 - Low Dependency
-  - Use standard API-s and slow moving technologies instead of v0.0.1 NPM packages
+    - Use standard API-s and slow moving technologies instead of v0.0.1 NPM packages
 - Mobile usable
-  - Halfway between mobile hostile to mobile first lies mobile usable.
+    - Halfway between mobile hostile to mobile first lies mobile usable.
 - Easy Extensible
-  - Writing a custom plugin and enabling it should be easy peasy
+    - Writing a custom plugin and enabling it should be easy peasy
 
 ## Honorable mentions - That simply did not fit me
 

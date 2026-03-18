@@ -16,4 +16,4 @@ setInterval(async () => {
         console.error('Failed to bundle', err);
     }
 }, 2000);
-await import('../src/main.ts');
+await import('../app/main.ts');

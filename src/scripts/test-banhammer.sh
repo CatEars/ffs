@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BOMBARDIER=./scripts/vendor/bin/bombardier
+BOMBARDIER=./src/scripts/vendor/bin/bombardier
 
 $BOMBARDIER \
   --method=POST \
