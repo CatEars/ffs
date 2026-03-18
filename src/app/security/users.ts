@@ -1,12 +1,12 @@
 import { ensureDir } from '@std/fs/ensure-dir';
 import { join } from '@std/path';
+import { pbkdf2Hash } from '../../lib/security/password-hash.ts';
+import { ResourceManager } from '../../lib/security/resources.ts';
 import { UserPermissions } from '../application-state.ts';
 import { getUsersFilePath } from '../config.ts';
 import { getEphemeralUsersDir } from '../files/cache-folder.ts';
 import { logger } from '../logging/loggers.ts';
-import { signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from './claims.ts';
-import { pbkdf2Hash } from '../../lib/security/password-hash.ts';
-import { ResourceManager } from '../../lib/security/resources.ts';
+import { claimsCodec } from './ffs-claims.ts';
 
 type BaseAuth = {
     username: string;
@@ -35,7 +35,7 @@ const knownUsers: UserAuth[] = [];
 
 async function deriveApiKey(user: UserAuth) {
     const userClaim = userResourceManager.nameForResource(user.username);
-    return await signAndUrlEncodeClaims([userClaim]);
+    return await claimsCodec.signAndUrlEncodeClaims([userClaim]);
 }
 
 export function getMatchingUser(
@@ -63,7 +63,7 @@ export function getMatchingUser(
 
 export async function getUserMatchingApiKey(apiKey: string) {
     ensureUsersFileRead();
-    const validatedKey = await verifyAndUrlDecodeClaims(apiKey);
+    const validatedKey = await claimsCodec.verifyAndUrlDecodeClaims(apiKey);
     if (!validatedKey) {
         return;
     }

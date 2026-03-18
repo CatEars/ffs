@@ -1,13 +1,14 @@
 import { Middleware } from '@oak/oak';
 import { HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED } from '../../lib/http/http-codes.ts';
-import { Claims, signAndUrlEncodeClaims, verifyAndUrlDecodeClaims } from '../security/claims.ts';
 import { ResourceManager } from '../../lib/security/resources.ts';
+import { Claims } from '../../lib/security/claims.ts';
+import { claimsCodec } from '../security/ffs-claims.ts';
 
 const fileShareResources = new ResourceManager('file-share');
 
 export async function generateSignedCode(pathCode: string) {
     const claim = fileShareResources.nameForResource(pathCode);
-    return await signAndUrlEncodeClaims([claim]);
+    return await claimsCodec.signAndUrlEncodeClaims([claim]);
 }
 
 function extractPathCode(verifiedClaims: Claims): string | undefined {
@@ -21,7 +22,7 @@ export const shareProtect: Middleware = async (ctx, next) => {
         ctx.response.status = HTTP_400_BAD_REQUEST;
         return;
     }
-    const verifiedClaims = await verifyAndUrlDecodeClaims(signedCode);
+    const verifiedClaims = await claimsCodec.verifyAndUrlDecodeClaims(signedCode);
     if (!verifiedClaims) {
         ctx.response.status = HTTP_401_UNAUTHORIZED;
         return;
