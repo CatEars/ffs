@@ -1,7 +1,7 @@
 import { Router } from '@oak/oak';
 import { baseMiddlewares } from '../base-middlewares.ts';
 import { devModeEnabled } from '../config.ts';
-import { FileTreeWalker } from '../files/file-tree-walker.ts';
+import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
 import { logger } from '../logging/loggers.ts';
 
 const anHour = 1_000 * 60 * 60 * 1;

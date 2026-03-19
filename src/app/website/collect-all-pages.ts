@@ -1,7 +1,7 @@
 import { Middleware } from '@oak/oak/middleware';
 import { Router } from '@oak/oak/router';
 import { viewPath } from '../config.ts';
-import { FileTreeWalker } from '../files/file-tree-walker.ts';
+import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
 
 export type PlainPage = {
     type: 'Plain';

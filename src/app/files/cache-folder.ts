@@ -2,9 +2,9 @@ import { ensureDir } from '@std/fs/ensure-dir';
 import { join, relative, resolve } from '@std/path';
 import { existsSync } from 'node:fs';
 import { clearAndEnsureDirectoryExists } from '../../lib/file-system/clear-and-ensure-dir.ts';
+import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
 import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
 import { logger } from '../logging/loggers.ts';
-import { FileTreeWalker } from './file-tree-walker.ts';
 
 const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';

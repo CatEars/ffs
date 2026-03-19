@@ -9,7 +9,7 @@ import {
     getThumbnailFinderSkipRegex,
 } from '../config.ts';
 import { thumbnailExists } from '../files/cache-folder.ts';
-import { FileTreeWalker } from '../files/file-tree-walker.ts';
+import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
 import { logger } from '../logging/loggers.ts';
 import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
 import { ThumbnailRequest } from './types.ts';
