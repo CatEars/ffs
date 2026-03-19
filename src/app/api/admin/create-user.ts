@@ -1,25 +1,13 @@
 import { Router } from '@oak/oak';
-import { HTTP_403_FORBIDDEN } from '../../lib/http/http-codes.ts';
-import { returnToSender } from '../../lib/http/return-to-sender.ts';
-import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { logger } from '../logging/loggers.ts';
-import { createNewUser, storeUserAsEphemeralUser } from '../security/users.ts';
+import { HTTP_403_FORBIDDEN } from '../../../lib/http/http-codes.ts';
+import { returnToSender } from '../../../lib/http/return-to-sender.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { logger } from '../../logging/loggers.ts';
+import { createNewUser, storeUserAsEphemeralUser } from '../../security/users.ts';
 
 const ADMIN_PAGE = '/admin/';
 
-export function registerAdminCreateUserRoutes(router: Router) {
-    router.get(
-        '/api/user/capabilities',
-        baseMiddlewares(),
-        ...protectedMiddlewares(),
-        (ctx) => {
-            ctx.response.body = {
-                canCreateUsers: !!ctx.state.userPermissions?.canCreateUsers,
-                allowHousekeeping: !!ctx.state.userPermissions?.allowHousekeeping,
-            };
-        },
-    );
-
+export function register(router: Router) {
     router.post(
         '/api/admin/create-user',
         baseMiddlewares(),

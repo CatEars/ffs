@@ -1,5 +1,5 @@
 import { baseMiddlewares, protectedMiddlewares } from '../../../../base-middlewares.ts';
-import { logger } from '../../../../logging/logger.ts';
+import { logger } from '../../../../logging/loggers.ts';
 import { ApplicationContext } from '../../../collect-all-pages.ts';
 
 export const enabled = false;

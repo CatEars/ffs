@@ -1,6 +1,9 @@
 import { Application } from '@oak/oak/application';
 import { Router } from '@oak/oak/router';
-import { registerAllAdminRoutes } from './admin/index.ts';
+import { dirname } from '@std/path/dirname';
+import { fromFileUrl } from '@std/path/from-file-url';
+import { join } from 'node:path';
+import { findRouteRegistrationsInFileTree } from '../lib/file-router/register-routes-by-file-tree.ts';
 import { registerAllAppLogsEndpoints } from './app-logs/index.ts';
 import {
     FfsApplicationState,
@@ -42,6 +45,13 @@ setOnUserAuthenticationHook(async (ctx, user) => {
     await resolveUserFileTreeFromState(ctx);
 });
 
+const routeRegistrations = await findRouteRegistrationsInFileTree(
+    join(dirname(fromFileUrl(import.meta.url)), 'api'),
+    logger,
+);
+for (const routeRegistrator of routeRegistrations) {
+    await routeRegistrator(router);
+}
 registerAllFileListing(router);
 registerAllFileShareRoutes(router);
 registerAllLogonRoutes(router);
@@ -50,7 +60,6 @@ registerAllThumbnailRoutes(router);
 registerSitemapRoute(router);
 registerAllCustomCommandApi(router);
 registerAllAppLogsEndpoints(router);
-registerAllAdminRoutes(router);
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();

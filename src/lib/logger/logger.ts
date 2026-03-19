@@ -3,7 +3,7 @@ import { exists } from '@std/fs/exists';
 // deno-lint-ignore no-explicit-any
 type Loggable = any;
 
-type Logger = {
+export type Logger = {
     debug(...msg: Loggable[]): void;
     log(...msg: Loggable[]): void;
     warn(...msg: Loggable[]): void;
@@ -57,7 +57,7 @@ class FifoCache extends Array {
     }
 }
 
-export class RecordingLogWrapper {
+export class RecordingLogWrapper implements Logger {
     private readonly wrappedConsole: Logger;
     private readonly logCache: FifoCache = new FifoCache(1000);
     private noPrefix: boolean;
@@ -83,6 +83,10 @@ export class RecordingLogWrapper {
         const log = this.generate('color: red', msg);
         this.wrappedConsole.warn(...log);
         this.addToCache(msg);
+    }
+
+    log(...msg: Loggable[]): void {
+        return this.info(...msg);
     }
 
     addToCache(msg: Loggable[]) {
