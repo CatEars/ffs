@@ -44,26 +44,27 @@
     <horizontal-ruler></horizontal-ruler>
 
     <section $data-visibility="allowHousekeepingVisibility">
+        <h2>Thumbnails</h2>
+        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
         <form action="/api/admin/clear-thumbnails">
-            <h2>Thumbnails</h2>
-            <p>
-                Remove all cached thumbnail images. These will be regenerated when files are viewed.
-            </p>
-            <button class="hero-button" type="submit">Clear Thumbnails</button>
+            <div class="form-column">
+                <button type="submit">Clear Thumbnails</button>
+            </div>
         </form>
 
         <horizontal-ruler></horizontal-ruler>
 
+        <h2>Share Links</h2>
+        <p>
+            Remove all share links.
+            <strong
+                >Warning: existing share links will no longer be accessible after clearing.</strong
+            >
+        </p>
         <form action="/api/admin/clear-manifests">
-            <h2>Share Links</h2>
-            <p>
-                Remove all share links.
-                <strong
-                    >Warning: existing share links will no longer be accessible after
-                    clearing.</strong
-                >
-            </p>
-            <button class="hero-button" type="submit">Clear Share Links</button>
+            <div class="form-column">
+                <button type="submit">Clear Share Links</button>
+            </div>
         </form>
     </section>
 
@@ -93,7 +94,9 @@
                         autocomplete="new-password"
                     />
                 </div>
-                <button class="hero-button" type="submit">Create User</button>
+                <div class="form-column">
+                    <button type="submit">Create User</button>
+                </div>
             </form>
         </section>
     </section>
