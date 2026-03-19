@@ -8,7 +8,7 @@ import { getStoreRoot } from '../../config.ts';
 import { shareLinkSchemeRegistry } from '../../share-file/share-link-scheme-registry.ts';
 import { shareProtect } from '../../share-file/share-protect.ts';
 
-export function registerGetSharedFilesRoutes(router: Router) {
+export function register(router: Router) {
     router.get('/api/share-file/download', baseMiddlewares(), shareProtect, async (ctx) => {
         if (!ctx.state.pathCode) {
             ctx.response.status = HTTP_500_INTERNAL_SERVER_ERROR;

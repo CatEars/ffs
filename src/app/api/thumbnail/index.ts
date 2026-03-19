@@ -36,7 +36,7 @@ async function waitUntilFilepathExistsOrBail(
     }
 }
 
-export function registerGetThumbnail(router: Router) {
+export function register(router: Router) {
     const cacheRoot = getCacheRoot();
     const cacheFileTree = new FileTree(cacheRoot);
 

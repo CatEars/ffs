@@ -1,14 +1,12 @@
 import { HTTPMethods, Router } from '@oak/oak';
 import { baseMiddlewares } from '../../base-middlewares.ts';
-import { logger } from '../../logging/loggers.ts';
 
 export type ApiEndpointDefinition = {
     methods: HTTPMethods[];
     path: string;
 };
 
-export function registerSitemapRoute(router: Router) {
-    logger.info('Registering /api/sitemap');
+export function register(router: Router) {
     router.get('/api/sitemap', baseMiddlewares(), (ctx) => {
         const values = router.values();
         const result: ApiEndpointDefinition[] = [];

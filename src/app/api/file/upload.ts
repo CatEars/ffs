@@ -6,7 +6,7 @@ import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts
 import { getStoreRoot } from '../../config.ts';
 import { logger } from '../../logging/loggers.ts';
 
-export function registerUploadFileRoute(router: Router) {
+export function register(router: Router) {
     router.post(
         '/api/file/upload',
         baseMiddlewares(),

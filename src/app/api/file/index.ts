@@ -2,7 +2,7 @@ import { Router } from '@oak/oak/router';
 import { FfsApplicationState } from '../../application-state.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 
-export function registerFileRoutes(router: Router<FfsApplicationState>) {
+export function register(router: Router<FfsApplicationState>) {
     router.get('/api/file', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const fileTree = ctx.state.fileTree;
         const path = ctx.request.url.searchParams.get('path');

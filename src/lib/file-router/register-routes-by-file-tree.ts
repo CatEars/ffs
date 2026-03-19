@@ -24,8 +24,8 @@ export async function findRouteRegistrationsInFileTree(rootPath: string, logger:
                 if (memberName.startsWith('register') && typeof exportedMember === 'function') {
                     results.push(async (router: Router) => {
                         logger.log(
-                            'Registering endpoints',
-                            `${rootRelativePath}::${memberName}`,
+                            'Registering',
+                            `${rootRelativePath.padEnd(27)} --> ${memberName}()`,
                         );
                         const res = exportedMember(router);
                         if (res instanceof Promise) {

@@ -10,7 +10,7 @@ import {
 import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 
-export function registerRenameFileRoute(router: Router) {
+export function register(router: Router) {
     router.post('/api/file/rename', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const fileTree = ctx.state.fileTree;
         const form = await ctx.request.body.formData();

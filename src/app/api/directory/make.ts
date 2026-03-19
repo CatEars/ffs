@@ -8,7 +8,7 @@ import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { FfsApplicationState } from '../../application-state.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 
-export function registerMakeDirectoryRoute(router: Router<FfsApplicationState>) {
+export function register(router: Router<FfsApplicationState>) {
     router.post(
         '/api/directory/make',
         baseMiddlewares(),

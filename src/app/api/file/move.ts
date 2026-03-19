@@ -4,7 +4,7 @@ import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { logger } from '../../logging/loggers.ts';
 
-export function registerMoveFileRoute(router: Router) {
+export function register(router: Router) {
     router.post('/api/file/move', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const fileTree = ctx.state.fileTree;
         const formData = await ctx.request.body.formData();

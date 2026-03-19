@@ -8,7 +8,7 @@ type ApiFile = Deno.DirEntry & FileIdentification & {
     date: Date;
 };
 
-export function registerDirectoryRoutes(router: Router<FfsApplicationState>) {
+export function register(router: Router<FfsApplicationState>) {
     router.get('/api/directory', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const fileTree = ctx.state.fileTree;
         const pathToCheck = ctx.request.url.searchParams.get('path');
