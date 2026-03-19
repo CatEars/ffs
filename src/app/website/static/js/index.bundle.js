@@ -942,6 +942,13 @@
       const header = this.getAttribute("header");
       const text = this.getAttribute("text");
       return html2`<drop-down>
+            <style>
+                pre {
+                    display: flex;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+            </style>
             <h2 slot="header">${header}</h2>
             <pre>${text}</pre>
         </drop-down>`;
