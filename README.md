@@ -12,8 +12,6 @@ docker run --rm --volume ./:/files --env 'FFS_STORE_ROOT=/files' --publish 8080:
 
 This will download the latest release and run a docker image on port 8080 for you to try it out.
 
-More advanced setups can be found in the [deploy](./deploy/) folder.
-
 ## Licenses
 
 ### Material Design Icons License
