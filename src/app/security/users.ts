@@ -38,31 +38,30 @@ async function deriveApiKey(user: UserAuth) {
     return await claimsCodec.signAndUrlEncodeClaims([userClaim]);
 }
 
-export function getMatchingUser(
+export async function getMatchingUser(
     username: string,
     password: string,
 ): Promise<string | undefined> {
-    ensureUsersFileRead();
+    await ensureUsersFileRead();
     for (const user of knownUsers) {
         if (
             user.type === 'insecure-basic_auth' &&
             user.username === username &&
             user.password === password
         ) {
-            return deriveApiKey(user);
+            return await deriveApiKey(user);
         } else if (
             user.type === 'pbkdf2' &&
             user.username === username &&
             pbkdf2Compare(user, password)
         ) {
-            return deriveApiKey(user);
+            return await deriveApiKey(user);
         }
     }
-    return Promise.resolve(undefined);
 }
 
 export async function getUserMatchingApiKey(apiKey: string) {
-    ensureUsersFileRead();
+    await ensureUsersFileRead();
     const validatedKey = await claimsCodec.verifyAndUrlDecodeClaims(apiKey);
     if (!validatedKey) {
         return;
@@ -75,7 +74,7 @@ export async function getUserMatchingApiKey(apiKey: string) {
     }
 }
 
-function ensureUsersFileRead() {
+async function ensureUsersFileRead() {
     if (hasReadUsersFile) {
         return;
     }
@@ -91,18 +90,19 @@ function ensureUsersFileRead() {
         }
     }
 
-    loadEphemeralUsers();
+    await loadEphemeralUsers();
 
     hasReadUsersFile = true;
 }
 
-function loadEphemeralUsers() {
+async function loadEphemeralUsers() {
     try {
         const usersDir = getEphemeralUsersDir();
-        for (const entry of Deno.readDirSync(usersDir)) {
+        await ensureDir(usersDir);
+        for await (const entry of Deno.readDir(usersDir)) {
             if (entry.isFile && entry.name.endsWith('.json')) {
                 try {
-                    const bytes = Deno.readFileSync(join(usersDir, entry.name));
+                    const bytes = await Deno.readFile(join(usersDir, entry.name));
                     const user = JSON.parse(new TextDecoder().decode(bytes));
                     if (!user.permissions) {
                         user.permissions = {};
@@ -131,8 +131,8 @@ function loadEphemeralUsers() {
     }
 }
 
-export function createNewUser(username: string, password: string): UserAuth {
-    ensureUsersFileRead();
+export async function createNewUser(username: string, password: string): Promise<UserAuth> {
+    await ensureUsersFileRead();
 
     if (knownUsers.some((u) => u.username === username)) {
         throw new Error(`User '${username}' already exists`);

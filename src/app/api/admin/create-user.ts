@@ -32,7 +32,7 @@ export function register(router: Router) {
             }
 
             try {
-                const newUser = createNewUser(username, password);
+                const newUser = await createNewUser(username, password);
                 await storeUserAsEphemeralUser(newUser);
                 logger.info(`Created new user: ${username}`);
                 returnToSender(ctx, {

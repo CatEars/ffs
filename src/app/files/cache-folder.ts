@@ -107,3 +107,10 @@ export async function startThumbnailScanning() {
     setTimeout(scanForThumbnails, devModeEnabled ? 1 : 2_500);
     setInterval(scanForThumbnails, devModeEnabled ? 10_000 : 60_000);
 }
+
+export async function ensureCacheDirs() {
+    await ensureDir(getThumbnailsDir());
+    await ensureDir(getThumbnailTempDir());
+    await ensureDir(getManifestsDir());
+    await ensureDir(getEphemeralUsersDir());
+}
