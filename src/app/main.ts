@@ -46,6 +46,7 @@ await registerAllWebsiteRoutes(router);
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();
+    await startThumbnailScanning();
 } else {
     logger.warn(
         'ffmpeg is not available, so will not generate thumbnails in the background',
@@ -54,7 +55,6 @@ if (areThumbnailsAvailable()) {
 if (getEnableCacheAllDirectories()) {
     startFileTreeCacheBackgroundProcess(getStoreRoot());
 }
-await startThumbnailScanning();
 
 app.use(router.routes());
 app.use(router.allowedMethods());
