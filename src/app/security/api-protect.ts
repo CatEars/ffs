@@ -1,7 +1,7 @@
 import { Context } from '@oak/oak/context';
 import { Middleware, Next } from '@oak/oak/middleware';
-import { HTTP_401_UNAUTHORIZED } from '../../lib/http/http-codes.ts';
-import { FfsApplicationState } from '../application-state.ts';
+import { HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN } from '../../lib/http/http-codes.ts';
+import { FfsApplicationState, UserPermissions } from '../application-state.ts';
 import { shouldAbandonSecurity } from '../config.ts';
 import { getUserMatchingApiKey, UserAuth } from './users.ts';
 
@@ -47,3 +47,28 @@ export const apiProtect: Middleware<FfsApplicationState> = async (ctx, next) => 
 
     ctx.response.status = HTTP_401_UNAUTHORIZED;
 };
+
+export type PermissionSelector = (
+    permissions: UserPermissions,
+) => (boolean | undefined)[] | (boolean | undefined);
+
+export type PermissionEnsuringOptions = {
+    message: string;
+};
+
+export const ensurePermissions: (
+    selector: PermissionSelector,
+    options?: Partial<PermissionEnsuringOptions>,
+) => Middleware<FfsApplicationState> =
+    (selector: PermissionSelector, options?: Partial<PermissionEnsuringOptions>) =>
+    async (ctx, next) => {
+        const opts = options ?? {};
+        const selection = selector(ctx.state.userPermissions || {});
+        const selectedPermissions = Array.isArray(selection) ? selection : [selection];
+        if (selectedPermissions.every((x) => x === true)) {
+            ctx.response.status = HTTP_403_FORBIDDEN;
+            ctx.response.body = { error: opts.message ?? 'Forbidden' };
+            return;
+        }
+        await next();
+    };
