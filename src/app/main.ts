@@ -8,9 +8,8 @@ import {
     FfsApplicationState,
     setPermissionsFromUserOrDefaultToRootAccess,
 } from './application-state.ts';
-import { getEnableCacheAllDirectories, getStoreRoot, unsecure, validateConfig } from './config.ts';
+import { unsecure, validateConfig } from './config.ts';
 import { startThumbnailScanning } from './files/cache-folder.ts';
-import { startFileTreeCacheBackgroundProcess } from './files/file-tree-cache.ts';
 import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
@@ -51,9 +50,6 @@ if (areThumbnailsAvailable()) {
     logger.warn(
         'ffmpeg is not available, so will not generate thumbnails in the background',
     );
-}
-if (getEnableCacheAllDirectories()) {
-    startFileTreeCacheBackgroundProcess(getStoreRoot());
 }
 
 app.use(router.routes());

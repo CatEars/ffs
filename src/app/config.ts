@@ -10,7 +10,6 @@ export const requestLogsKey = 'FFS_REQUEST_LOGS_FILE';
 export const customCommandsFileKey = 'FFS_CUSTOM_COMMANDS_FILE';
 export const instanceSecretKey = 'FFS_INSTANCE_SECRET';
 export const thumbnailFinderSkipRegexKey = 'FFS_THUMBNAIL_FINDER_SKIP_REGEX';
-export const enableCacheAllDirectoriesKey = 'FFS_CACHE_ALL_DIRECTORIES';
 
 type Config = {
     storeRoot: string;
@@ -20,7 +19,6 @@ type Config = {
     customCommandsFile: string;
     instanceSecret?: string;
     thumbnailFinderSkipRegex?: string;
-    enableCacheAllDirectories?: string;
 };
 
 function getEnvValueOrThrow(key: string) {
@@ -53,10 +51,6 @@ export function getCustomCommandsFile() {
 
 export function getThumbnailFinderSkipRegex() {
     return Deno.env.get(thumbnailFinderSkipRegexKey);
-}
-
-export function getEnableCacheAllDirectories() {
-    return Deno.env.get(enableCacheAllDirectoriesKey) || '';
 }
 
 const featuresThatDependOnInstanceSecret: string[] = [];
@@ -96,9 +90,6 @@ export function setConfig(config: Config) {
     }
     if (config.thumbnailFinderSkipRegex) {
         Deno.env.set(thumbnailFinderSkipRegexKey, config.thumbnailFinderSkipRegex);
-    }
-    if (config.enableCacheAllDirectories) {
-        Deno.env.set(enableCacheAllDirectoriesKey, config.enableCacheAllDirectories);
     }
 }
 

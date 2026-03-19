@@ -136,21 +136,3 @@ export class FileTreeCache {
 }
 
 export const globalFileTreeCache = new FileTreeCache();
-
-async function runSingleGlobalFileTreeCacheUpdate(rootPath: string) {
-    logger.debug(
-        'Updating file tree cache for quick file access. Pre size:',
-        globalFileTreeCache.estimateSize(),
-    );
-    await globalFileTreeCache.cacheTree(rootPath);
-    logger.debug('Done updating file tree cache. Post size:', globalFileTreeCache.estimateSize());
-}
-
-export function startFileTreeCacheBackgroundProcess(rootPath: string) {
-    setTimeout(async () => {
-        await runSingleGlobalFileTreeCacheUpdate(rootPath);
-    }, 1000 * 2.5);
-    setInterval(async () => {
-        await runSingleGlobalFileTreeCacheUpdate(rootPath);
-    }, 1000 * 60 * 2.5);
-}
