@@ -24,7 +24,7 @@ export async function findRouteRegistrationsInFileTree(rootPath: string, logger:
                 if (memberName.startsWith('register') && typeof exportedMember === 'function') {
                     results.push(async (router: Router) => {
                         logger.log(
-                            'Registering @oak/Router endpoints from',
+                            'Registering endpoints',
                             `${rootRelativePath}::${memberName}`,
                         );
                         const res = exportedMember(router);

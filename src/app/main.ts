@@ -4,13 +4,11 @@ import { dirname } from '@std/path/dirname';
 import { fromFileUrl } from '@std/path/from-file-url';
 import { join } from 'node:path';
 import { findRouteRegistrationsInFileTree } from '../lib/file-router/register-routes-by-file-tree.ts';
-import { registerAllAppLogsEndpoints } from './app-logs/index.ts';
 import {
     FfsApplicationState,
     setPermissionsFromUserOrDefaultToRootAccess,
 } from './application-state.ts';
 import { getEnableCacheAllDirectories, getStoreRoot, unsecure, validateConfig } from './config.ts';
-import { registerAllCustomCommandApi } from './custom-commands/index.ts';
 import { registerAllFileListing } from './file-listing/index.ts';
 import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { startThumbnailScanning } from './files/cache-folder.ts';
@@ -58,8 +56,6 @@ registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
 registerAllThumbnailRoutes(router);
 registerSitemapRoute(router);
-registerAllCustomCommandApi(router);
-registerAllAppLogsEndpoints(router);
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();

@@ -1,20 +1,14 @@
 import { Router } from '@oak/oak';
-import { HTTP_400_BAD_REQUEST } from '../../lib/http/http-codes.ts';
-import { returnToSender } from '../../lib/http/return-to-sender.ts';
-import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { logger } from '../logging/loggers.ts';
-import { getCustomCommands } from './custom-command.ts';
+import { HTTP_400_BAD_REQUEST } from '../../../lib/http/http-codes.ts';
+import { returnToSender } from '../../../lib/http/return-to-sender.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { getCustomCommands } from '../../custom-commands/custom-command.ts';
+import { logger } from '../../logging/loggers.ts';
 
 const decoder = new TextDecoder();
 
-export function registerCommandsApi(router: Router) {
-    logger.info('Registering /api/custom-commands/*');
-
+export function register(router: Router) {
     const commands = getCustomCommands();
-
-    router.get('/api/custom-commands', baseMiddlewares(), ...protectedMiddlewares(), (ctx) => {
-        ctx.response.body = commands;
-    });
 
     if (commands.length === 0) {
         logger.info("No custom commands registered. Won't register POST route");
