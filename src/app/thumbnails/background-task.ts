@@ -1,7 +1,6 @@
 import { resolve } from '@std/path/resolve';
-import { Buffer } from 'node:buffer';
-import { stdin } from 'node:process';
 import { MemoryCache } from '../../lib/cache/memory-cache.ts';
+import { IpcPipe } from '../../lib/ipc-pipe/pipe.ts';
 import { sleep } from '../../lib/sleep/sleep.ts';
 import {
     devModeEnabled,
@@ -26,31 +25,6 @@ logger.info(
 const filesToPrioritize: ThumbnailRequest[] = [];
 const fiveMinutes = 1000 * 60 * 5;
 const recentlyParsedThumbnails = new MemoryCache<ThumbnailRequest>(fiveMinutes);
-
-function parseIncomingThumbnailRequest(data: Buffer<ArrayBufferLike>) {
-    const request = new TextDecoder().decode(data);
-    const lines = request.split('\n');
-    for (const line of lines) {
-        if (!line.trim()) {
-            continue;
-        }
-
-        try {
-            const res = JSON.parse(line) as ThumbnailRequest;
-            if (!res.filePath || !res.filePath.trim()) {
-                continue;
-            }
-
-            // Always push STDIN requests to top. Let those found on own be at end
-            filesToPrioritize.splice(0, 0, res);
-        } catch (err) {
-            logger.warn(
-                'Received thumbnail prio request, but unable to parse it. Error:',
-                err,
-            );
-        }
-    }
-}
 
 function buildFileTreeOptions() {
     const fileTreeOptions = {
@@ -105,7 +79,12 @@ async function findDirectoriesToThumbnail() {
     }
 }
 
-stdin.addListener('data', parseIncomingThumbnailRequest);
+const thumbnailIpcPipe = new IpcPipe('thumbnail', logger);
+thumbnailIpcPipe.listenToStdin();
+thumbnailIpcPipe.on('thumbnail-prioritize', (request: ThumbnailRequest) => {
+    // Always push STDIN requests to top. Let those found on own be at end
+    filesToPrioritize.splice(0, 0, request);
+});
 
 await findFilesToThumbnail();
 await findDirectoriesToThumbnail();

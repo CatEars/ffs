@@ -1,6 +1,7 @@
 import { extname } from '@std/path/extname';
+import { IpcPipe } from '../../lib/ipc-pipe/pipe.ts';
 import { backgroundProcessLogger, logger } from '../logging/loggers.ts';
-import { ThumbnailRequest } from './types.ts';
+import { prioritizeThumbnailEvent, ThumbnailRequest } from './types.ts';
 
 function isFfmpegAvailable() {
     const proc = runFfmpegVersion();
@@ -24,10 +25,9 @@ export function areThumbnailsAvailable() {
     return isFfmpegAvailable() && isImageMagickAvailable();
 }
 
+export const thumbnailIpcPipe = new IpcPipe('thumbnail', logger);
+
 let thumbnailProcess: Deno.ChildProcess | undefined;
-let thumbnailProcessStdin:
-    | WritableStreamDefaultWriter<Uint8Array<ArrayBufferLike>>
-    | undefined;
 
 export function startThumbnailBackgroundProcess() {
     const subProcessFlags = [
@@ -43,7 +43,7 @@ export function startThumbnailBackgroundProcess() {
         stdin: 'piped',
     }).spawn();
 
-    thumbnailProcessStdin = thumbnailProcess.stdin.getWriter();
+    thumbnailIpcPipe.setIpcWriter(thumbnailProcess.stdin.getWriter());
 
     const prefix = `<pid=${thumbnailProcess.pid}|thumbnail>`;
     function writeBackgroundTaskOutput(message: string) {
@@ -81,9 +81,7 @@ export async function prioritizeThumbnail(filePath: string) {
                 isFile,
                 isDirectory,
             };
-            const bytes = new TextEncoder().encode(JSON.stringify(data) + '\n');
-
-            await thumbnailProcessStdin?.write(bytes);
+            await thumbnailIpcPipe.post(prioritizeThumbnailEvent, data);
         } catch (err) {
             logger.warn(
                 'Tried to prioritize thumbnail',
