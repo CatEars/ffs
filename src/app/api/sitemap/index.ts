@@ -1,6 +1,6 @@
 import { HTTPMethods, Router } from '@oak/oak';
-import { baseMiddlewares } from '../base-middlewares.ts';
-import { logger } from '../logging/loggers.ts';
+import { baseMiddlewares } from '../../base-middlewares.ts';
+import { logger } from '../../logging/loggers.ts';
 
 export type ApiEndpointDefinition = {
     methods: HTTPMethods[];

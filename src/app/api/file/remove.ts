@@ -1,9 +1,9 @@
 import { Router } from '@oak/oak';
-import { returnToSender } from '../../lib/http/return-to-sender.ts';
-import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { logger } from '../logging/loggers.ts';
+import { returnToSender } from '../../../lib/http/return-to-sender.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { logger } from '../../logging/loggers.ts';
 
-export function registerFileDeletionRoute(router: Router) {
+export function register(router: Router) {
     router.post('/api/file/remove', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const fileTree = ctx.state.fileTree;
         const formData = await ctx.request.body.formData();

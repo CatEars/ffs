@@ -1,7 +1,5 @@
-import { Router } from '@oak/oak/router';
 import { extname } from '@std/path/extname';
 import { backgroundProcessLogger, logger } from '../logging/loggers.ts';
-import { registerGetThumbnail } from './get-thumbnail.ts';
 import { ThumbnailRequest } from './types.ts';
 
 function isFfmpegAvailable() {
@@ -119,8 +117,4 @@ function isFfmpegVersionString(programOutput: string) {
 
 function isImageMagickVersion(programOutput: string) {
     return /^Version: ImageMagick \d\.\d\.\d/.test(programOutput);
-}
-
-export function registerAllThumbnailRoutes(router: Router) {
-    registerGetThumbnail(router);
 }

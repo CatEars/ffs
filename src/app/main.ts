@@ -9,21 +9,13 @@ import {
     setPermissionsFromUserOrDefaultToRootAccess,
 } from './application-state.ts';
 import { getEnableCacheAllDirectories, getStoreRoot, unsecure, validateConfig } from './config.ts';
-import { registerAllFileListing } from './file-listing/index.ts';
-import { resolveUserFileTreeFromState } from './file-listing/resolve-file-tree.ts';
 import { startThumbnailScanning } from './files/cache-folder.ts';
 import { startFileTreeCacheBackgroundProcess } from './files/file-tree-cache.ts';
+import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
-import { registerAllLogonRoutes } from './logon/index.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
-import { registerAllFileShareRoutes } from './share-file/index.ts';
-import { registerSitemapRoute } from './sitemap/index.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import {
-    areThumbnailsAvailable,
-    registerAllThumbnailRoutes,
-    startThumbnailBackgroundProcess,
-} from './thumbnails/index.ts';
+import { areThumbnailsAvailable, startThumbnailBackgroundProcess } from './thumbnails/index.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
@@ -50,12 +42,7 @@ const routeRegistrations = await findRouteRegistrationsInFileTree(
 for (const routeRegistrator of routeRegistrations) {
     await routeRegistrator(router);
 }
-registerAllFileListing(router);
-registerAllFileShareRoutes(router);
-registerAllLogonRoutes(router);
 await registerAllWebsiteRoutes(router);
-registerAllThumbnailRoutes(router);
-registerSitemapRoute(router);
 
 if (areThumbnailsAvailable()) {
     startThumbnailBackgroundProcess();

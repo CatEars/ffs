@@ -1,10 +1,10 @@
 import { Router } from '@oak/oak/router';
 import * as path from '@std/path';
-import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../../lib/http/http-codes.ts';
-import { returnToSender } from '../../lib/http/return-to-sender.ts';
-import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { getStoreRoot } from '../config.ts';
-import { logger } from '../logging/loggers.ts';
+import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../../../lib/http/http-codes.ts';
+import { returnToSender } from '../../../lib/http/return-to-sender.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { getStoreRoot } from '../../config.ts';
+import { logger } from '../../logging/loggers.ts';
 
 export function registerUploadFileRoute(router: Router) {
     router.post(

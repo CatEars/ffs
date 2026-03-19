@@ -1,10 +1,10 @@
 import { Router } from '@oak/oak/router';
-import { HTTP_400_BAD_REQUEST } from '../../lib/http/http-codes.ts';
-import { baseMiddlewares, protectedMiddlewares } from '../base-middlewares.ts';
-import { shareLinkSchemeRegistry } from './share-link-scheme-registry.ts';
-import { generateSignedCode } from './share-protect.ts';
+import { HTTP_400_BAD_REQUEST } from '../../../lib/http/http-codes.ts';
+import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { shareLinkSchemeRegistry } from '../../share-file/share-link-scheme-registry.ts';
+import { generateSignedCode } from '../../share-file/share-protect.ts';
 
-export function registerCreateFileShareLink(router: Router) {
+export function register(router: Router) {
     router.post('/api/link', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
         const form = await ctx.request.body.formData();
         const paths = JSON.parse(form.get('paths')?.toString() || '');

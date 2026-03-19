@@ -1,4 +1,4 @@
-import { ApiEndpointDefinition } from '../app/sitemap/index.ts';
+import { ApiEndpointDefinition } from '../app/api/sitemap/index.ts';
 import { baseUrl } from './constants.ts';
 import { assertEquals } from '@std/assert/equals';
 import { HTTP_401_UNAUTHORIZED } from '../lib/http/http-codes.ts';
