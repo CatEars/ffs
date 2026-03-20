@@ -47,9 +47,9 @@
         <h2>Thumbnails</h2>
         <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
         <form action="/api/admin/clear-thumbnails">
-            <div class="form-column">
+            <fieldset>
                 <button type="submit">Clear Thumbnails</button>
-            </div>
+            </fieldset>
         </form>
 
         <horizontal-ruler></horizontal-ruler>
@@ -62,9 +62,9 @@
             >
         </p>
         <form action="/api/admin/clear-manifests">
-            <div class="form-column">
+            <fieldset>
                 <button type="submit">Clear Share Links</button>
-            </div>
+            </fieldset>
         </form>
     </section>
 
@@ -74,8 +74,8 @@
             <h2>Create Ephemeral User</h2>
             <p>Create a new ephemeral user account with a password.</p>
             <form action="/api/admin/create-user" method="post">
-                <div class="form-column">
-                    <label for="new-username"> Username </label>
+                <fieldset>
+                    <legend>Username</legend>
                     <input
                         type="text"
                         id="new-username"
@@ -83,9 +83,9 @@
                         placeholder="Username"
                         autocomplete="off"
                     />
-                </div>
-                <div class="form-column">
-                    <label for="new-password"> Password </label>
+                </fieldset>
+                <fieldset>
+                    <legend>Password</legend>
                     <input
                         type="password"
                         id="new-password"
@@ -93,10 +93,10 @@
                         placeholder="Password"
                         autocomplete="new-password"
                     />
-                </div>
-                <div class="form-column">
+                </fieldset>
+                <fieldset>
                     <button type="submit">Create User</button>
-                </div>
+                </fieldset>
             </form>
         </section>
     </section>
