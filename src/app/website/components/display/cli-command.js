@@ -50,23 +50,21 @@ class CliCommand extends BaseWebComponent {
             </style>
             <form action="${action}" method="${method}">
                 <input type="hidden" name="index" value="${command.index}" />
-                <div class="form-row">
-                    <span
-                        >Example: <span id="command-display">${formatCommand(command)}</span></span
-                    >
-                </div>
-                <div>
-                    <ol>
-                        ${range(command.nargs).map(
-                            (x) =>
-                                html`<label>
-                                    <span>$${x + 1}</span>
-                                    <input onchange="${onInputChange}" name="arg" type="text" />
-                                </label>`
-                        )}
-                    </ol>
-                </div>
-                <button type="submit">Run</button>
+                <fieldset>
+                    <legend>
+                        Example: <span id="command-display">${formatCommand(command)}</span>
+                    </legend>
+                </fieldset>
+                ${range(command.nargs).map(
+                    (x) =>
+                        html`<fieldset>
+                            <legend>$${x + 1}</legend>
+                            <input onchange="${onInputChange}" name="arg" type="text" />
+                        </fieldset>`
+                )}
+                <fieldset>
+                    <button type="submit">Run</button>
+                </fieldset>
             </form>
         `;
     }

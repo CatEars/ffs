@@ -506,22 +506,20 @@
             </style>
             <form action="${action}" method="${method}">
                 <input type="hidden" name="index" value="${command.index}" />
-                <div class="form-row">
-                    <span
-                        >Example: <span id="command-display">${formatCommand(command)}</span></span
-                    >
-                </div>
-                <div>
-                    <ol>
-                        ${range(command.nargs).map(
-        (x2) => html2`<label>
-                                    <span>$${x2 + 1}</span>
-                                    <input onchange="${onInputChange}" name="arg" type="text" />
-                                </label>`
+                <fieldset>
+                    <legend>
+                        Example: <span id="command-display">${formatCommand(command)}</span>
+                    </legend>
+                </fieldset>
+                ${range(command.nargs).map(
+        (x2) => html2`<fieldset>
+                            <legend>$${x2 + 1}</legend>
+                            <input onchange="${onInputChange}" name="arg" type="text" />
+                        </fieldset>`
       )}
-                    </ol>
-                </div>
-                <button type="submit">Run</button>
+                <fieldset>
+                    <button type="submit">Run</button>
+                </fieldset>
             </form>
         `;
     }
