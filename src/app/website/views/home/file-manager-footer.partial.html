@@ -11,10 +11,25 @@
         <form id="delete-form" action="/api/file/remove" method="POST" style="display: none">
             <input id="files-to-remove" name="files-to-remove" type="hidden" />
         </form>
+        <form
+            id="download-form"
+            action="/api/download/manifest"
+            method="POST"
+            style="display: none"
+        >
+            <template id="download-input-template">
+                <input type="text" name="file" />
+            </template>
+        </form>
         <div class="action-buttons">
             <button @click="createFileShare" type="button">
                 <svg class="medium-icon">
                     <use href="/static/svg/sprite_sheet.svg#share"></use>
+                </svg>
+            </button>
+            <button @click="downloadFiles" type="button">
+                <svg class="medium-icon">
+                    <use href="/static/svg/sprite_sheet.svg#download"></use>
                 </svg>
             </button>
         </div>

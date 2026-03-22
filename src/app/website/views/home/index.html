@@ -35,12 +35,12 @@
                 sorting === 'oldest'
                     ? (a, b) => a.date - b.date
                     : sorting === 'newest'
-                    ? (a, b) => b.date - a.date
-                    : sorting === 'a-z'
-                    ? (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
-                    : sorting === 'z-a'
-                    ? (a, b) => -a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
-                    : () => {};
+                      ? (a, b) => b.date - a.date
+                      : sorting === 'a-z'
+                        ? (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
+                        : sorting === 'z-a'
+                          ? (a, b) => -a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
+                          : () => {};
 
             let copy = files.toSorted(sortingFunction);
             if (directoriesFirst) {
@@ -227,6 +227,27 @@
             document.getElementById('make-directory-path').value = myPath;
             document.getElementById('make-directory-form').submit();
         }
+
+        function downloadFiles() {
+            const myPath = getCurrentPath();
+            const checkedFiles = getCheckedFiles();
+            if (checkedFiles.length === 0) {
+                return;
+            }
+            const downloadForm = document.getElementById('download-form');
+            const inputTemplate = document.getElementById('download-input-template');
+            const prependedPath = !!myPath ? '' : `${myPath}/`;
+            console.log(prependedPath, myPath, checkedFiles);
+            for (const file of checkedFiles) {
+                const fullPath = prependedPath + file;
+                const clone = inputTemplate.content.cloneNode(true);
+                clone.querySelector('input').value = fullPath;
+
+                downloadForm.appendChild(clone);
+            }
+
+            downloadForm.submit();
+        }
     </script>
     <script type="module">
         function onCrumbClick(evt) {
@@ -328,6 +349,7 @@
             renameFile,
             makeDirectory,
             deleteFiles,
+            downloadFiles,
         });
 
         megaphone.renderEach(
@@ -373,10 +395,7 @@
 
         megaphone.init();
     </script>
-    <breadcrumb-nav
-        $trail="currentPath"
-        @crumb-click="onCrumbClick"
-    ></breadcrumb-nav>
+    <breadcrumb-nav $trail="currentPath" @crumb-click="onCrumbClick"></breadcrumb-nav>
     <horizontal-ruler></horizontal-ruler>
     <paginate-control
         $page="currentPage"

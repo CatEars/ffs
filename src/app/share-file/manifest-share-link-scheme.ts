@@ -2,7 +2,7 @@ import { ensureDir } from '@std/fs/ensure-dir';
 import { join } from '@std/path';
 import { availableDiskBytes } from '../../lib/file-system/disk-space.ts';
 import { getCacheRoot } from '../config.ts';
-import { getManifestsDir } from '../files/cache-folder.ts';
+import { getShareManifestsDir } from '../files/cache-folder.ts';
 import type { DecodedShare, ShareContext, ShareLinkScheme } from './share-link-scheme.ts';
 
 const MIN_AVAILABLE_BYTES = 50 * 1024 * 1024;
@@ -16,7 +16,7 @@ async function sha256Hex(data: string): Promise<string> {
 }
 
 function manifestPath(hash: string): string {
-    return join(getManifestsDir(), `${hash}.json`);
+    return join(getShareManifestsDir(), `${hash}.json`);
 }
 
 const SHA256_HEX_REGEX = /^[0-9a-f]{64}$/;
@@ -38,7 +38,7 @@ export class ManifestShareLinkScheme implements ShareLinkScheme {
     async createCode(ctx: ShareContext): Promise<string> {
         const json = JSON.stringify(ctx.paths);
         const hash = await sha256Hex(json);
-        await ensureDir(getManifestsDir());
+        await ensureDir(getShareManifestsDir());
         await Deno.writeTextFile(manifestPath(hash), JSON.stringify({ paths: ctx.paths }));
         return hash;
     }

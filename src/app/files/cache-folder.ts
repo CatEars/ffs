@@ -9,7 +9,8 @@ import { logger } from '../logging/loggers.ts';
 const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';
 const THUMBNAIL_TEMP_SUBDIR = 'thumbnail-tmp';
-const MANIFESTS_SUBDIR = 'share-manifests';
+const SHARE_MANIFESTS_SUBDIR = 'share-manifests';
+const DOWNLOAD_MANIFESTS_SUBDIR = 'download-manifests';
 const EPHEMERAL_USERS_SUBDIR = 'ephemeral-users';
 const knownThumbnails = new Map<string, Deno.FileInfo>();
 let initialScanCompleted = false;
@@ -22,12 +23,16 @@ export function getThumbnailTempDir(): string {
     return join(getCacheRoot(), THUMBNAIL_TEMP_SUBDIR);
 }
 
-export function getManifestsDir(): string {
-    return join(getCacheRoot(), MANIFESTS_SUBDIR);
+export function getShareManifestsDir(): string {
+    return join(getCacheRoot(), SHARE_MANIFESTS_SUBDIR);
 }
 
 export function getEphemeralUsersDir(): string {
     return join(getCacheRoot(), EPHEMERAL_USERS_SUBDIR);
+}
+
+export function getDownloadManifestsDir(): string {
+    return join(getCacheRoot(), DOWNLOAD_MANIFESTS_SUBDIR);
 }
 
 async function scanForThumbnails() {
@@ -111,6 +116,7 @@ export async function startThumbnailScanning() {
 export async function ensureCacheDirs() {
     await ensureDir(getThumbnailsDir());
     await ensureDir(getThumbnailTempDir());
-    await ensureDir(getManifestsDir());
+    await ensureDir(getShareManifestsDir());
     await ensureDir(getEphemeralUsersDir());
+    await ensureDir(getDownloadManifestsDir());
 }

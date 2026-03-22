@@ -5,9 +5,8 @@
 
         const megaphone = new Megaphone();
         const state = megaphone.declareState({
-            //downloadManifest: megaphone.jsonApi(`/api/download/manifest?id=${manifestId}`, {}),
-            //filesToDownload: megaphone.view((state) => state.downloadManifest.files || []),
-            filesToDownload: [{ name: 'hello.txt' }],
+            downloadManifest: megaphone.jsonApi(`/api/download/manifest?id=${manifestId}`, {}),
+            filesToDownload: megaphone.view((state) => state.downloadManifest.files || []),
         });
 
         megaphone.renderEach(
@@ -16,7 +15,7 @@
             megaphone.template('#file-download-row', (clone, file) => {
                 clone.querySelector('span').innerHTML = file.name;
                 clone.querySelector('button').addEventListener('click', () => {
-                    console.log(`DOWNLOADING ${file.name}`);
+                    console.log(`DOWNLOADING ${file.directoryPath}/${file.name}`);
                 });
                 return clone;
             })
