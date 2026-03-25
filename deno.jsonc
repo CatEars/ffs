@@ -13,7 +13,9 @@
         "@std/assert": "jsr:@std/assert@1",
         "@std/encoding": "jsr:@std/encoding@^1.0.10",
         "@std/fs": "jsr:@std/fs@^1.0.19",
-        "@std/path": "jsr:@std/path@^1.1.1"
+        "@std/io": "jsr:@std/io@^0.225.3",
+        "@std/path": "jsr:@std/path@^1.1.1",
+        "@std/tar": "jsr:@std/tar@^0.1.10"
     },
     "tasks": {
         "bundle-component-library": "deno run --allow-all src/scripts/bundle-component-library.ts",

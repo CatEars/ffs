@@ -64,4 +64,19 @@ export class CacheFolderManifestRegistry implements DownloadManifestRegistry {
     }
 }
 
-export const manifestRegistry = new InMemoryManifestRegistry();
+export class LoggingManifestRegistry implements DownloadManifestRegistry {
+    private readonly wrappedRegistry: DownloadManifestRegistry;
+    constructor(wrappedRegistry: DownloadManifestRegistry) {
+        this.wrappedRegistry = wrappedRegistry;
+    }
+    async generateManifest(files: FileDescriptorForManifest[]): Promise<DownloadManifest> {
+        const manifest = await this.wrappedRegistry.generateManifest(files);
+        logger.info('Generated manifest', manifest.id, 'for', manifest.files.length, 'files');
+        return manifest;
+    }
+    getManifest(manifestId: string): Promise<DownloadManifest | undefined> {
+        return this.wrappedRegistry.getManifest(manifestId);
+    }
+}
+
+export const manifestRegistry = new LoggingManifestRegistry(new InMemoryManifestRegistry());

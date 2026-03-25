@@ -12,8 +12,16 @@
         megaphone.renderEach(
             state.filesToDownload,
             '#download-list',
-            megaphone.template('#file-download-row', (clone, file) => {
+            megaphone.template('#file-download-row', (clone, file, idx) => {
                 clone.querySelector('span').innerHTML = file.name;
+                if (file.isFile) {
+                    clone.querySelector('a').href =
+                        `/api/download/file?manifestId=${manifestId}&fileIndex=${idx}`;
+                } else if (file.isDirectory) {
+                    clone.querySelector('a').href =
+                        `/api/download/directory?manifestId=${manifestId}&fileIndex=${idx}`;
+                }
+
                 clone.querySelector('button').addEventListener('click', () => {
                     console.log(`DOWNLOADING ${file.directoryPath}/${file.name}`);
                 });
@@ -28,7 +36,7 @@
     <template id="file-download-row">
         <li>
             <span></span>
-            <button>Download</button>
+            <a target="_black"><button>Download</button></a>
         </li>
     </template>
     <section id="downloader"></section>
