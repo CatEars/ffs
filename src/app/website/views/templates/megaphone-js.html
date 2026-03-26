@@ -231,7 +231,8 @@
                     `Megaphone(${this.number})`,
                     'UPDATE',
                     element,
-                    'attribute -->',
+                    attribute,
+                    '-->',
                     value
                 );
             }
@@ -363,7 +364,11 @@
                     if (value === undefined || value === null) {
                         element.removeAttribute(name);
                     } else {
-                        element.setAttribute(name, `${value}`);
+                        if (name === 'textContent') {
+                            element.textContent = `${value}`;
+                        } else {
+                            element.setAttribute(name, `${value}`);
+                        }
                     }
                 }
             }
@@ -374,6 +379,17 @@
                     callable(value);
                 }
             }
+        }
+
+        #resolveAttributeName(nameSetByUser, element) {
+            for (const key in element) {
+                const lower = key.toLocaleLowerCase();
+                if (nameSetByUser === key || nameSetByUser === lower) {
+                    console.log('KEY', key, 'LOWER', lower, 'NAME', nameSetByUser);
+                    return key;
+                }
+            }
+            return nameSetByUser;
         }
 
         #bindValuesAndEventListeners() {
@@ -391,9 +407,13 @@
                             boundValues.set(attribute.value, []);
                         }
 
+                        const resolvedAttributeName = this.#resolveAttributeName(
+                            attribute.name.substring(1),
+                            element
+                        );
                         boundValues.get(attribute.value).push({
                             element,
-                            name: attribute.name.substring(1),
+                            name: resolvedAttributeName,
                         });
                     } else if (this.#isEventListenerMarker(attribute.name)) {
                         if (!knownStateKeys.has(attribute.value)) {

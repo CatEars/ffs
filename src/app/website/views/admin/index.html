@@ -6,6 +6,12 @@
             message: megaphone.urlParam('message', null),
             hasMessage: megaphone.view((state) => state.message !== null),
             permissions: megaphone.jsonApi('/api/user/capabilities', {}),
+            diskUsage: megaphone.jsonApi('/api/admin/disk-usage', {
+                path: '???',
+                available: '???',
+            }),
+            diskMountpoint: megaphone.view((state) => state.diskUsage.path || '???'),
+            availableBytesInDisk: megaphone.view((state) => state.diskUsage.available || '???'),
             canCreateUsers: megaphone.view((state) => state.permissions.canCreateUsers || false),
             allowHousekeeping: megaphone.view(
                 (state) => state.permissions.allowHousekeeping || false
@@ -32,6 +38,7 @@
             })
         );
 
+        megaphone.debug();
         megaphone.init();
     </script>
 
@@ -39,6 +46,10 @@
 
     <section>
         <p>Administrative actions for managing the FFS file server.</p>
+        <p>
+            Mounted to <span $textContent="diskMountpoint"></span> and
+            <span $textContent="availableBytesInDisk"></span> are available.
+        </p>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
