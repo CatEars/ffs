@@ -235,6 +235,7 @@
                 return;
             }
             const downloadForm = document.getElementById('download-form');
+            document.getElementById('download-input-root').value = myPath;
             const inputTemplate = document.getElementById('download-input-template');
             const prependedPath = !!myPath ? '' : `${myPath}/`;
             console.log(prependedPath, myPath, checkedFiles);

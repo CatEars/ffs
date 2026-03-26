@@ -4,6 +4,7 @@ import { TarStream, TarStreamInput } from '@std/tar/tar-stream';
 
 export async function* exploreAndCollectFullDirectoryInfo(
     directoryPath: string,
+    pathPrefix: string = '',
 ): AsyncIterable<TarStreamInput> {
     for await (
         const entry of walk(directoryPath, {
@@ -16,14 +17,14 @@ export async function* exploreAndCollectFullDirectoryInfo(
         if (entry.isFile) {
             yield {
                 type: 'file',
-                path: relative(directoryPath, entry.path),
+                path: pathPrefix + relative(directoryPath, entry.path),
                 size: (await Deno.stat(entry.path)).size,
                 readable: (await Deno.open(entry.path)).readable,
             };
         } else if (entry.isDirectory) {
             yield {
                 type: 'directory',
-                path: relative(directoryPath, entry.path),
+                path: pathPrefix + relative(directoryPath, entry.path),
             };
         }
     }

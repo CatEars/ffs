@@ -11,14 +11,10 @@
         <form id="delete-form" action="/api/file/remove" method="POST" style="display: none">
             <input id="files-to-remove" name="files-to-remove" type="hidden" />
         </form>
-        <form
-            id="download-form"
-            action="/api/download/manifest"
-            method="POST"
-            style="display: none"
-        >
+        <form id="download-form" action="/api/download" method="POST" style="display: none">
+            <input id="download-input-root" name="root" type="hidden" />
             <template id="download-input-template">
-                <input type="text" name="file" />
+                <input type="text" name="file" type="hidden" />
             </template>
         </form>
         <div class="action-buttons">
