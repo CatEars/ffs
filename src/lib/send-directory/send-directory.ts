@@ -4,6 +4,7 @@ import { resolve } from '@std/path/resolve';
 import { basename } from 'node:path';
 import { logger } from '../../app/logging/loggers.ts';
 import { HTTP_400_BAD_REQUEST } from '../http/http-codes.ts';
+import { setDownloadedFilename } from '../http/set-filename.ts';
 import { streamDirectoryAsTarGzip } from './directory-stream.ts';
 
 export type SendDirectoryOptions = {
@@ -18,10 +19,7 @@ export function sendDirectory(ctx: Context, path: string, options: SendDirectory
     }
 
     logger.info('sending directory', resolvedPath);
-    ctx.response.headers.set(
-        'Content-Disposition',
-        `attachment; filename="${basename(path)}.tar.gz"`,
-    );
+    setDownloadedFilename(ctx, basename(path) + '.tar.gz');
     ctx.response.type = 'application/gzip';
     ctx.response.body = streamDirectoryAsTarGzip(resolvedPath);
 }
