@@ -1,7 +1,7 @@
 import { Router } from '@oak/oak';
 import { resolveUnder } from '../../../lib/ensure-under/ensure-under.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../../../lib/http/http-codes.ts';
-import { sendAsArchive } from '../../../lib/send-as-archive/send-as-archive.ts';
+import { sendFilesSmartly } from '../../../lib/send-smartly/send-smartly.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { getStoreRoot } from '../../config.ts';
 import { logger } from '../../logging/loggers.ts';
@@ -22,7 +22,7 @@ export function register(router: Router) {
             return;
         }
 
-        sendAsArchive(ctx, filePaths.map((x) => x.toString() || ''), {
+        await sendFilesSmartly(ctx, filePaths.map((x) => x.toString() || ''), {
             root: resolvedRoot,
             logger: logger,
         });

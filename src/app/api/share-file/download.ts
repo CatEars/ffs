@@ -1,15 +1,12 @@
 import { Router } from '@oak/oak/router';
-import { basename } from '@std/path/basename';
-import { join } from '@std/path/join';
 import {
     HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
     HTTP_500_INTERNAL_SERVER_ERROR,
 } from '../../../lib/http/http-codes.ts';
-import { setDownloadedFilename } from '../../../lib/http/set-filename.ts';
-import { sendDirectory } from '../../../lib/send-directory/send-directory.ts';
+import { sendFilesSmartly } from '../../../lib/send-smartly/send-smartly.ts';
 import { baseMiddlewares } from '../../base-middlewares.ts';
 import { getStoreRoot } from '../../config.ts';
+import { logger } from '../../logging/loggers.ts';
 import { shareLinkSchemeRegistry } from '../../share-file/share-link-scheme-registry.ts';
 import { shareProtect } from '../../share-file/share-protect.ts';
 
@@ -27,18 +24,9 @@ export function register(router: Router) {
         }
 
         const path = paths[index];
-        const fullPath = join(getStoreRoot(), path);
-        const stat = await Deno.stat(fullPath);
-        if (stat.isDirectory) {
-            sendDirectory(ctx, path, { root: getStoreRoot() });
-        } else if (stat.isFile) {
-            setDownloadedFilename(ctx, basename(path));
-            await ctx.send({
-                root: getStoreRoot(),
-                path,
-            });
-        } else {
-            ctx.response.status = HTTP_403_FORBIDDEN;
-        }
+        await sendFilesSmartly(ctx, [path], {
+            root: getStoreRoot(),
+            logger: logger,
+        });
     });
 }

@@ -236,9 +236,12 @@
             }
             const downloadForm = document.getElementById('download-form');
             document.getElementById('download-input-root').value = myPath;
+            // clear all previously selected files
+            const priorFileInputs = downloadForm.querySelectorAll('[name="file"]');
+            priorFileInputs.forEach((elem) => elem.remove());
+
             const inputTemplate = document.getElementById('download-input-template');
             const prependedPath = !!myPath ? '' : `${myPath}/`;
-            console.log(prependedPath, myPath, checkedFiles);
             for (const file of checkedFiles) {
                 const fullPath = prependedPath + file;
                 const clone = inputTemplate.content.cloneNode(true);
