@@ -364,6 +364,7 @@
                     if (value === undefined || value === null) {
                         element.removeAttribute(name);
                     } else {
+                        // LINK-PROP-ATTR-BUG
                         if (name === 'textContent') {
                             element.textContent = `${value}`;
                         } else {
