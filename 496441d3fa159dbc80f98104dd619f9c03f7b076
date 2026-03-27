@@ -1,14 +1,8 @@
+[ ] Use websocket and custom streaming protocol for uploading (or non-websocket?)
+
+[ ] Create manual test with full disk
+
 [ ] Rotate logs
-
-[ ] Built-in `docs` page
-
-[ ] Automate changelog of features and fixes
-
-[ ] Add `Config`/`Admin` tab that can auto-generate config for a new installation
-
-[ ] Make Command use SSE (or similar) for running commands
-
-[ ] Side view of files when in media mode ("playlist")
 
 [ ] Fix thumbnail generation for files with '%' in name
 
@@ -16,10 +10,16 @@
 
 [ ] Figure out good timing of calling thumbnails outdated (and cache times for files)
 
-[ ] Use websocket and custom streaming protocol for uploading
+[ ] Side view of files when in media mode ("playlist")
 
 [ ] Util around file operations to handle issue with eg bad partionioned data
 
+[ ] Add `Config`/`Admin` tab that can auto-generate config for a new installation
+
+[ ] Make Command use SSE (or similar) for running commands
+
+[ ] Built-in `docs` page
+
 [ ] Look at error: Uncaught "Missing promise in ring @ 2065589943" issue
 
-[ ] Create manual test with full disk
+[ ] Automate changelog of features and fixes
