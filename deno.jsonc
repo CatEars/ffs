@@ -55,6 +55,7 @@
                 "build-dist"
             ]
         },
-        "pack-plugins": "./src/scripts/pack-plugins.sh"
+        "pack-plugins": "./src/scripts/pack-plugins.sh",
+        "generate-html-property-mapping": "deno run --allow-all src/scripts/generate-html-property-mapping.ts"
     }
 }

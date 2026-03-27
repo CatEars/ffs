@@ -1,5 +1,7 @@
 <!-- Megaphone is a homebrewn reactivity framework -->
 <script>
+    // <!-- include ./html-property-mapper.js -->
+
     class ComputedView {
         constructor(stateSelector, megaphone) {
             this.stateSelector = stateSelector;
@@ -222,7 +224,15 @@
         }
 
         warn(...msgs) {
-            console.warn(`Megaphone(${this.number})`, ...msgs);
+            if (this.debugEnabled) {
+                console.warn(`Megaphone(${this.number})`, ...msgs);
+            }
+        }
+
+        info(...msgs) {
+            if (this.debugEnabled) {
+                console.info(`Megaphone(${this.number})`, ...msgs);
+            }
         }
 
         updateValue(element, attribute, value) {
@@ -359,14 +369,14 @@
         #onUpdate(target, property, value) {
             const boundElementValue = this.boundValues.get(property);
             if (boundElementValue) {
-                for (const { element, name } of boundElementValue) {
+                for (const { element, name, lowercaseName } of boundElementValue) {
                     this.debugger.updateValue(element, name, value);
                     if (value === undefined || value === null) {
                         element.removeAttribute(name);
                     } else {
-                        // LINK-PROP-ATTR-BUG
-                        if (name === 'textContent') {
-                            element.textContent = `${value}`;
+                        const mapper = _mappedProperties[lowercaseName];
+                        if (mapper) {
+                            mapper(element, `${value}`);
                         } else {
                             element.setAttribute(name, `${value}`);
                         }
@@ -380,17 +390,6 @@
                     callable(value);
                 }
             }
-        }
-
-        #resolveAttributeName(nameSetByUser, element) {
-            for (const key in element) {
-                const lower = key.toLocaleLowerCase();
-                if (nameSetByUser === key || nameSetByUser === lower) {
-                    console.log('KEY', key, 'LOWER', lower, 'NAME', nameSetByUser);
-                    return key;
-                }
-            }
-            return nameSetByUser;
         }
 
         #bindValuesAndEventListeners() {
@@ -408,13 +407,11 @@
                             boundValues.set(attribute.value, []);
                         }
 
-                        const resolvedAttributeName = this.#resolveAttributeName(
-                            attribute.name.substring(1),
-                            element
-                        );
+                        const userGivenName = attribute.name.substring(1);
                         boundValues.get(attribute.value).push({
                             element,
-                            name: resolvedAttributeName,
+                            name: userGivenName,
+                            lowercaseName: userGivenName.toLocaleLowerCase(),
                         });
                     } else if (this.#isEventListenerMarker(attribute.name)) {
                         if (!knownStateKeys.has(attribute.value)) {
@@ -454,6 +451,7 @@
             if (this.state !== null) {
                 throw new Error('You may only declare state once!');
             }
+            this.debugger.info('declaring state', state);
             this.state = state;
 
             const asyncTasks = [];
