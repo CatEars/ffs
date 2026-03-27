@@ -1,5 +1,3 @@
-[ ] Handle properties and attribute difference in megaphone. Properties like textContent or innerHTML are not set, only valid attributes (like class and id) are. LINK-PROP-ATTR-BUG
-
 [ ] Rotate logs
 
 [ ] Built-in `docs` page
