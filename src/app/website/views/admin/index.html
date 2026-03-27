@@ -22,6 +22,8 @@
             canCreateUsersVisibility: megaphone.view((state) =>
                 state.canCreateUsers ? 'show' : 'hidden'
             ),
+            properties: Object.keys(HTMLElement.prototype),
+            niceProps: megaphone.view((state) => state.properties.map((x) => `'${x}'\n`)),
         });
 
         megaphone.renderIf(
@@ -42,6 +44,7 @@
     </script>
 
     <app-header>Admin</app-header>
+    <pre $textContent="niceProps"></pre>
 
     <section>
         <p>Administrative actions for managing the FFS file server.</p>

@@ -1,0 +1,146 @@
+<!-- layout /templates/base.html -->
+<app-header>Print HTML Element Properties</app-header>
+<app-main>
+    <pre id="renderArea"></pre>
+    <script>
+        function getCommonElementProperties() {
+            const commonTags = [
+                'a',
+                'abbr',
+                'address',
+                'area',
+                'article',
+                'aside',
+                'audio',
+                'b',
+                'base',
+                'blockquote',
+                'body',
+                'br',
+                'button',
+                'canvas',
+                'caption',
+                'cite',
+                'code',
+                'col',
+                'data',
+                'datalist',
+                'dd',
+                'del',
+                'details',
+                'dfn',
+                'dialog',
+                'div',
+                'dl',
+                'dt',
+                'em',
+                'embed',
+                'fieldset',
+                'figcaption',
+                'figure',
+                'footer',
+                'form',
+                'h1',
+                'head',
+                'header',
+                'hr',
+                'html',
+                'i',
+                'iframe',
+                'img',
+                'input',
+                'ins',
+                'kbd',
+                'label',
+                'legend',
+                'li',
+                'link',
+                'main',
+                'map',
+                'mark',
+                'meta',
+                'meter',
+                'nav',
+                'noscript',
+                'object',
+                'ol',
+                'optgroup',
+                'option',
+                'output',
+                'p',
+                'picture',
+                'pre',
+                'progress',
+                'q',
+                'rp',
+                'rt',
+                'ruby',
+                's',
+                'samp',
+                'script',
+                'section',
+                'select',
+                'small',
+                'source',
+                'span',
+                'strong',
+                'style',
+                'sub',
+                'summary',
+                'sup',
+                'table',
+                'tbody',
+                'td',
+                'template',
+                'textarea',
+                'tfoot',
+                'th',
+                'thead',
+                'time',
+                'title',
+                'tr',
+                'track',
+                'u',
+                'ul',
+                'var',
+                'video',
+                'wbr',
+            ];
+
+            let allUniqueProps = new Set();
+
+            commonTags.forEach((tag) => {
+                try {
+                    let el = document.createElement(tag);
+                    let currentObj = el;
+                    while (currentObj) {
+                        Object.getOwnPropertyNames(currentObj).forEach((prop) => {
+                            try {
+                                if (typeof el[prop] !== 'function') {
+                                    allUniqueProps.add(prop);
+                                }
+                            } catch (e) {
+                                // Some properties throw errors when accessed directly;
+                                // we usually want these in our list as they are data-holders.
+                                allUniqueProps.add(prop);
+                            }
+                        });
+                        currentObj = Object.getPrototypeOf(currentObj);
+                    }
+                } catch (e) {
+                    console.warn(tag, 'is not supported:', e);
+                }
+            });
+
+            return Array.from(allUniqueProps).sort();
+        }
+
+        const masterList = getCommonElementProperties();
+        const filteredList = masterList.filter(
+            (x) => !(x.startsWith('__') || x.startsWith('on') || x.toUpperCase() === x)
+        );
+        document.querySelector('#renderArea').innerText = filteredList
+            .map((x) => `'${x}',`)
+            .join('\n');
+    </script>
+</app-main>
