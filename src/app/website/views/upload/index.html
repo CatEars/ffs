@@ -23,7 +23,9 @@
                 } else if (data.type === 'progress') {
                     const authToken = data.authToken;
                     const element = document.querySelector(`*[data-authToken="${authToken}"]`);
-                    element.querySelector('.bytes-uploaded').textContent = data.totalBytesSent;
+                    element.querySelector('.bytes-uploaded').textContent = formatBytes(
+                        data.totalBytesSent
+                    );
                 }
             }
         };
@@ -31,6 +33,7 @@
         async function upload() {
             const fileInput = document.querySelector('#file');
             const files = fileInput.files;
+            console.log('INITIATING UPLOAD OF', files);
             fileInput.value = '';
             state.names = [];
             for (const file of files) {
@@ -45,13 +48,14 @@
                     },
                 });
                 const booking = await bookingResponse.json();
+                console.log('GOT booking', booking);
                 const liClone = document
                     .querySelector('#uploading-item-template')
                     .content.cloneNode(true);
                 liClone.querySelector('li').setAttribute('data-authToken', booking.authToken);
                 liClone.querySelector('.upload-name').textContent = file.name;
-                liClone.querySelector('.bytes-uploaded').textContent = '0';
-                liClone.querySelector('.bytes-total').textContent = file.size;
+                liClone.querySelector('.bytes-uploaded').textContent = '0 Bytes';
+                liClone.querySelector('.bytes-total').textContent = formatBytes(file.size);
                 document.querySelector('#uploading-items').appendChild(liClone);
                 worker.postMessage(
                     JSON.stringify({
