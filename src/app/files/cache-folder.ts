@@ -12,6 +12,7 @@ const THUMBNAIL_TEMP_SUBDIR = 'thumbnail-tmp';
 const SHARE_MANIFESTS_SUBDIR = 'share-manifests';
 const DOWNLOAD_MANIFESTS_SUBDIR = 'download-manifests';
 const EPHEMERAL_USERS_SUBDIR = 'ephemeral-users';
+const UPLOAD_SUBDIR = 'upload';
 const knownThumbnails = new Map<string, Deno.FileInfo>();
 let initialScanCompleted = false;
 
@@ -33,6 +34,10 @@ export function getEphemeralUsersDir(): string {
 
 export function getDownloadManifestsDir(): string {
     return join(getCacheRoot(), DOWNLOAD_MANIFESTS_SUBDIR);
+}
+
+export function getUploadDir(): string {
+    return join(getCacheRoot(), UPLOAD_SUBDIR);
 }
 
 async function scanForThumbnails() {
@@ -119,4 +124,5 @@ export async function ensureCacheDirs() {
     await ensureDir(getShareManifestsDir());
     await ensureDir(getEphemeralUsersDir());
     await ensureDir(getDownloadManifestsDir());
+    await ensureDir(getUploadDir());
 }

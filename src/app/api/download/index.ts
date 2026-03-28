@@ -1,6 +1,6 @@
 import { Router } from '@oak/oak';
-import { resolveUnder } from '../../../lib/ensure-under/ensure-under.ts';
 import { HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND } from '../../../lib/http/http-codes.ts';
+import { resolveUnder } from '../../../lib/resolve-under/resolve-under.ts';
 import { sendFilesSmartly } from '../../../lib/send-smartly/send-smartly.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { getStoreRoot } from '../../config.ts';
