@@ -32,8 +32,13 @@
 
         async function upload() {
             const fileInput = document.querySelector('#file');
-            const files = fileInput.files;
-            console.log('INITIATING UPLOAD OF', files);
+            const filesFromInput = fileInput.files;
+            // Ensure files are displayed in same order by reversing them, as they will be prepended
+            const files = [];
+            for (const file of filesFromInput) {
+                files.push(file);
+            }
+            files.reverse();
             fileInput.value = '';
             state.names = [];
             for (const file of files) {
@@ -48,7 +53,6 @@
                     },
                 });
                 const booking = await bookingResponse.json();
-                console.log('GOT booking', booking);
                 const liClone = document
                     .querySelector('#uploading-item-template')
                     .content.cloneNode(true);
@@ -56,7 +60,7 @@
                 liClone.querySelector('.upload-name').textContent = file.name;
                 liClone.querySelector('.bytes-uploaded').textContent = '0 Bytes';
                 liClone.querySelector('.bytes-total').textContent = formatBytes(file.size);
-                document.querySelector('#uploading-items').appendChild(liClone);
+                document.querySelector('#uploading-items').prepend(liClone);
                 worker.postMessage(
                     JSON.stringify({
                         type: 'auth-token',
