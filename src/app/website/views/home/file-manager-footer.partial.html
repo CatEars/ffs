@@ -53,7 +53,13 @@
             </button>
         </div>
         <horizontal-ruler></horizontal-ruler>
-        <!-- include ./upload-form.partial.html -->
+        <div class="action-buttons">
+            <button @click="gotoUpload" type="button">
+                <svg class="medium-icon">
+                    <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
+                </svg>
+            </button>
+        </div>
     </drop-down>
     <drop-down>
         <p slot="header">Rename</p>

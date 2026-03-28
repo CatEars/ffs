@@ -1,5 +1,17 @@
-<form id="upload-form" action="/api/file/upload" method="POST" enctype="multipart/form-data">
+<!-- layout /templates/base.html -->
+<app-header>Upload</app-header>
+<app-main>
     <script type="module">
+        const worker = new Worker('uploader.js');
+
+        function upload() {
+            console.log(document.querySelector('#file').files);
+        }
+
+        function clickHiddenFileBrowseButton(evt) {
+            document.getElementById('file').click();
+        }
+
         function getFilenamesFromEvent(evt) {
             const result = [];
             for (const file of evt.target.files) {
@@ -8,62 +20,56 @@
             state.names = result;
         }
 
-        function clickHiddenFileBrowseButton(evt) {
-            evt.preventDefault();
-            document.getElementById('file').click();
-        }
-
         const megaphone = new Megaphone();
-        megaphone.confine(document.getElementById('upload-form'));
-
         const state = megaphone.declareState({
+            uploadDirectory: megaphone.urlParam('path'),
             names: [],
             getFilenamesFromEvent,
             clickHiddenFileBrowseButton,
             uploadDisabled: megaphone.view((state) =>
                 state.names.length === 0 ? true : undefined
             ),
+
+            upload,
         });
 
         megaphone.renderEach(
             state.names,
             '#upload-name-display',
             megaphone.template('#upload-name-template', (clone, name) => {
-                clone.querySelector('div').innerText = name;
+                clone.querySelector('span').innerText = name;
                 return clone;
             })
         );
 
         megaphone.init();
     </script>
+    <p>
+        Any uploaded file will be put in the directory: <span $textContent="uploadDirectory"></span>
+    </p>
+    <input
+        style="display: none"
+        @change="getFilenamesFromEvent"
+        type="file"
+        id="file"
+        name="file"
+        multiple
+    />
     <div class="action-buttons">
-        <input
-            style="display: none"
-            @change="getFilenamesFromEvent"
-            type="file"
-            id="file"
-            name="file"
-        />
-        <button @click="clickHiddenFileBrowseButton" id="browseButton">
+        <button @click="clickHiddenFileBrowseButton" id="browseButton" type="button">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#attach"></use>
             </svg>
         </button>
-        <button $disabled="uploadDisabled" type="submit">
+        <button @click="upload" $disabled="uploadDisabled" type="button">
             <svg class="medium-icon">
                 <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
             </svg>
         </button>
     </div>
-    <div>
-        <div id="upload-name-display">
-            <template id="upload-name-template">
-                <div></div>
-            </template>
-        </div>
-    </div>
-    <input type="hidden" id="directory" name="directory" />
-    <script>
-        document.getElementById('directory').value = decodeURIComponent(getCurrentPath());
-    </script>
-</form>
+    <ul id="upload-name-display">
+        <template id="upload-name-template">
+            <li><span></span></li>
+        </template>
+    </ul>
+</app-main>
