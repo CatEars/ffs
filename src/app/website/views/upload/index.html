@@ -4,8 +4,48 @@
     <script type="module">
         const worker = new Worker('uploader.js');
 
-        function upload() {
-            console.log(document.querySelector('#file').files);
+        worker.onmessage = async (e) => {
+            if (e.type === 'message') {
+                const data = JSON.parse(e.data);
+                if (data.type === 'uploaded') {
+                    const authToken = data.authToken;
+                    await fetch('/api/upload/commit', {
+                        method: 'POST',
+                        body: JSON.stringify({ token: authToken }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                }
+            }
+        };
+
+        async function upload() {
+            const files = document.querySelector('#file').files;
+            for (const file of files) {
+                console.log('BOOK', state.uploadDirectory.value, file.name);
+                const bookingResponse = await fetch('/api/upload/book', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        directory: state.uploadDirectory.value,
+                        fileName: file.name,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const booking = await bookingResponse.json();
+                worker.postMessage(
+                    JSON.stringify({
+                        type: 'auth-token',
+                        authToken: booking.authToken,
+                    })
+                );
+                const stream = file.stream();
+                worker.postMessage(stream, {
+                    transfer: [stream],
+                });
+            }
         }
 
         function clickHiddenFileBrowseButton(evt) {

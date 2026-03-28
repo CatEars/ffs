@@ -6,7 +6,7 @@ import {
     storeRootKey,
     usersFileKey,
 } from './config.ts';
-import { resolveCacheFolder } from './files/cache-folder.ts';
+import { ensureCacheDirs, resolveCacheFolder } from './files/cache-folder.ts';
 import { logger } from './logging/loggers.ts';
 
 function printBigWelcomeText() {
@@ -29,6 +29,7 @@ function printBigWelcomeText() {
 export async function startup() {
     printBigWelcomeText();
     await setFirstTimeUserValuesIfLikely();
+    await ensureCacheDirs();
 }
 
 function isLikelyFirstTimeUser() {

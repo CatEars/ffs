@@ -49,7 +49,7 @@ export function register(router: Router) {
         const cacheDir = join(getUploadDir(), authToken);
         const tempFile = join(cacheDir, fileName);
         await Deno.mkdir(cacheDir);
-        const f = await Deno.open(tempFile, { createNew: true });
+        const f = await Deno.open(tempFile, { createNew: true, write: true });
         f.close();
 
         apiTokens.set(authToken, {
@@ -72,7 +72,6 @@ export function register(router: Router) {
         }
 
         const tempFile = booking.tempFile;
-        ctx.request.body.stream;
         const appendData = await ctx.request.body.blob();
         await Deno.writeFile(tempFile, appendData.stream(), {
             append: true,
