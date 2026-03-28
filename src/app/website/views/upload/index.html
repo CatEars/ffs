@@ -16,14 +16,24 @@
                             'Content-Type': 'application/json',
                         },
                     });
+                    const element = document.querySelector(`*[data-authToken="${authToken}"]`);
+                    element.querySelector('.upload-checkmark').textContent = '✅';
+                    element.querySelector('.bytes-uploaded').textContent =
+                        element.querySelector('.bytes-total').textContent;
+                } else if (data.type === 'progress') {
+                    const authToken = data.authToken;
+                    const element = document.querySelector(`*[data-authToken="${authToken}"]`);
+                    element.querySelector('.bytes-uploaded').textContent = data.totalBytesSent;
                 }
             }
         };
 
         async function upload() {
-            const files = document.querySelector('#file').files;
+            const fileInput = document.querySelector('#file');
+            const files = fileInput.files;
+            fileInput.value = '';
+            state.names = [];
             for (const file of files) {
-                console.log('BOOK', state.uploadDirectory.value, file.name);
                 const bookingResponse = await fetch('/api/upload/book', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -35,6 +45,14 @@
                     },
                 });
                 const booking = await bookingResponse.json();
+                const liClone = document
+                    .querySelector('#uploading-item-template')
+                    .content.cloneNode(true);
+                liClone.querySelector('li').setAttribute('data-authToken', booking.authToken);
+                liClone.querySelector('.upload-name').textContent = file.name;
+                liClone.querySelector('.bytes-uploaded').textContent = '0';
+                liClone.querySelector('.bytes-total').textContent = file.size;
+                document.querySelector('#uploading-items').appendChild(liClone);
                 worker.postMessage(
                     JSON.stringify({
                         type: 'auth-token',
@@ -69,7 +87,6 @@
             uploadDisabled: megaphone.view((state) =>
                 state.names.length === 0 ? true : undefined
             ),
-
             upload,
         });
 
@@ -84,9 +101,8 @@
 
         megaphone.init();
     </script>
-    <p>
-        Any uploaded file will be put in the directory: <span $textContent="uploadDirectory"></span>
-    </p>
+    <p>Uploaded files will be put in the directory: <span $textContent="uploadDirectory"></span></p>
+    <p>Do not close this tab! Any ongoing upload will fail if this tab is closed.</p>
     <input
         style="display: none"
         @change="getFilenamesFromEvent"
@@ -110,6 +126,17 @@
     <ul id="upload-name-display">
         <template id="upload-name-template">
             <li><span></span></li>
+        </template>
+    </ul>
+    <ul id="uploading-items">
+        <template id="uploading-item-template">
+            <li>
+                <span class="upload-checkmark"></span>
+                <span class="upload-name"></span> |
+                <span class="bytes-uploaded"></span>
+                /
+                <span class="bytes-total"></span>
+            </li>
         </template>
     </ul>
 </app-main>

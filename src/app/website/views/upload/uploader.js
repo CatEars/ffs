@@ -12,6 +12,8 @@ self.onmessage = (evt) => {
             }
             setTimeout(async () => {
                 let cnt = 0;
+                const progressUpdatePeriod = 50;
+
                 for await (const chunk of evt.data) {
                     cnt += chunk.length;
                     const blob = new Blob([chunk], { type: 'application/octet-stream' });
@@ -19,7 +21,15 @@ self.onmessage = (evt) => {
                         method: 'POST',
                         body: blob,
                     });
-                    console.log('Upload(' + authToken + ')', 'at', cnt, 'bytes');
+                    if (cnt % progressUpdatePeriod === 0) {
+                        self.postMessage(
+                            JSON.stringify({
+                                type: 'progress',
+                                authToken,
+                                totalBytesSent: cnt,
+                            })
+                        );
+                    }
                 }
                 self.postMessage(
                     JSON.stringify({
