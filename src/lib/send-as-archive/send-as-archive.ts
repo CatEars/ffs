@@ -1,9 +1,9 @@
 import { Context } from '@oak/oak';
 import { basename } from '@std/path/basename';
 import { TarStream, TarStreamInput } from '@std/tar/tar-stream';
-import { resolveUnder } from '../ensure-under/ensure-under.ts';
 import { setDownloadedFilename } from '../http/set-filename.ts';
 import { Logger } from '../logger/logger.ts';
+import { resolveUnder } from '../resolve-under/resolve-under.ts';
 import { exploreAndCollectFullDirectoryInfo } from '../send-directory/directory-stream.ts';
 
 export type SendAsArchiveOptions = {

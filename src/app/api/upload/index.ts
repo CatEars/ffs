@@ -72,6 +72,7 @@ export function register(router: Router) {
         }
 
         const tempFile = booking.tempFile;
+        ctx.request.body.stream;
         const appendData = await ctx.request.body.blob();
         await Deno.writeFile(tempFile, appendData.stream(), {
             append: true,
@@ -80,6 +81,24 @@ export function register(router: Router) {
         ctx.response.status = HTTP_200_OK;
     });
 
-    router.post('/api/upload/commit', baseMiddlewares(), ...protectedMiddlewares(), (ctx) => {
+    router.post('/api/upload/commit', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
+        const { token } = await ctx.request.body.json();
+        const booking = apiTokens.get(token);
+        if (!booking) {
+            ctx.response.status = HTTP_404_NOT_FOUND;
+            return;
+        }
+
+        const targetPath = await ctx.state.fileTree.resolvePath(
+            join(booking.directory, booking.fileName),
+        );
+        if (targetPath.type === 'invalid') {
+            ctx.response.status = HTTP_404_NOT_FOUND;
+            return;
+        }
+
+        await Deno.rename(booking.tempFile, targetPath.fullPath);
+        apiTokens.delete(token);
+        ctx.response.status = HTTP_200_OK;
     });
 }
