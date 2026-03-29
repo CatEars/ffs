@@ -1,5 +1,16 @@
-import { zip } from '@deno-library/compress';
+const source = './data/favicon_io.tar.xz';
+const dest = './src/app/website/static/';
 
-console.log('Unpacking ./data/favicon_io.zip to static website assets folder');
-await zip.uncompress('./data/favicon_io.zip', './src/app/website/static/');
-Deno.removeSync('./src/app/website/static/about.txt');
+const command = new Deno.Command('tar', {
+    args: ['-xJf', source, '-C', dest],
+});
+
+const { success } = await command.output();
+
+if (success) {
+    try {
+        Deno.removeSync(`${dest}about.txt`);
+    } catch (e) {
+        if (!(e instanceof Deno.errors.NotFound)) throw e;
+    }
+}
