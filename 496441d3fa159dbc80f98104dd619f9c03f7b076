@@ -8,6 +8,8 @@
 
 [ ] Delete uploaded chunks and auth tokens in background
 
+[ ] Support folder upload
+
 [ ] Create manual test with full disk
 
 [ ] Rotate logs
