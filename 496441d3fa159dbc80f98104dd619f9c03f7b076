@@ -2,7 +2,7 @@
 
 [ ] Fix background upload for mobile applications
 
-[ ] Refactor upload pages
+[ ] Ensure upload tokens stay between restarts
 
 [ ] Use pre-calculated chunking for uploaded files and parallelize upload streaming
 
