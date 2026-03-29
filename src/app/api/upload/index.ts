@@ -62,7 +62,9 @@ export function register(router: Router) {
         };
     });
 
-    router.post('/api/upload/chunk', baseMiddlewares(), async (ctx) => {
+    // No logging as big files will call this endpoint MANY times
+    // Auth extended by token created earlier
+    router.post('/api/upload/chunk', async (ctx) => {
         const token = ctx.request.url.searchParams.get('token') || '';
         const booking = apiTokens.get(token);
 
