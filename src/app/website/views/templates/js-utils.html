@@ -75,4 +75,13 @@
 
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
+
+    function reverseIterable(iterable) {
+        const result = [];
+        for (const elem of iterable) {
+            result.push(elem);
+        }
+        result.reverse();
+        return result;
+    }
 </script>

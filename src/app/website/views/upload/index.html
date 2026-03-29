@@ -4,63 +4,71 @@
     <script type="module">
         const worker = new Worker('uploader.js');
 
+        function createUploadProgress(options) {
+            const { name, token, size } = options;
+            const liClone = document
+                .querySelector('#uploading-item-template')
+                .content.cloneNode(true);
+            liClone.querySelector('li').setAttribute('data-authToken', token);
+            liClone.querySelector('.upload-name').textContent = name;
+            liClone.querySelector('.bytes-uploaded').textContent = '0 Bytes';
+            liClone.querySelector('.bytes-total').textContent = formatBytes(size);
+            document.querySelector('#uploading-items').prepend(liClone);
+        }
+
+        function updateUploadProgress(token, bytesSent) {
+            const element = document.querySelector(`*[data-authToken="${token}"]`);
+            element.querySelector('.bytes-uploaded').textContent = formatBytes(bytesSent);
+        }
+
+        function markUploadFinished(token) {
+            const element = document.querySelector(`*[data-authToken="${token}"]`);
+            element.querySelector('.upload-checkmark').textContent = '✅';
+            element.querySelector('.bytes-uploaded').textContent =
+                element.querySelector('.bytes-total').textContent;
+        }
+
+        function postJson(path, body) {
+            return fetch(path, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
+
         worker.onmessage = async (e) => {
             if (e.type === 'message') {
                 const data = JSON.parse(e.data);
                 if (data.type === 'uploaded') {
                     const authToken = data.authToken;
-                    await fetch('/api/upload/commit', {
-                        method: 'POST',
-                        body: JSON.stringify({ token: authToken }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    const element = document.querySelector(`*[data-authToken="${authToken}"]`);
-                    element.querySelector('.upload-checkmark').textContent = '✅';
-                    element.querySelector('.bytes-uploaded').textContent =
-                        element.querySelector('.bytes-total').textContent;
+                    await postJson('/api/upload/commit', { token: authToken });
+                    markUploadFinished(authToken);
                 } else if (data.type === 'progress') {
-                    const authToken = data.authToken;
-                    const element = document.querySelector(`*[data-authToken="${authToken}"]`);
-                    element.querySelector('.bytes-uploaded').textContent = formatBytes(
-                        data.totalBytesSent
-                    );
+                    updateUploadProgress(data.authToken);
                 }
             }
         };
 
         async function upload() {
             const fileInput = document.querySelector('#file');
-            const filesFromInput = fileInput.files;
-            // Ensure files are displayed in same order by reversing them, as they will be prepended
-            const files = [];
-            for (const file of filesFromInput) {
-                files.push(file);
-            }
-            files.reverse();
+            // Display files in same order when switching lists by reversing them
+            // They will be prepended to new list
+            const files = reverseIterable(fileInput.files);
             fileInput.value = '';
             state.names = [];
             for (const file of files) {
-                const bookingResponse = await fetch('/api/upload/book', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        directory: state.uploadDirectory.value,
-                        fileName: file.name,
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                const bookingResponse = await postJson('/api/upload/book', {
+                    directory: state.uploadDirectory.value,
+                    fileName: file.name,
                 });
                 const booking = await bookingResponse.json();
-                const liClone = document
-                    .querySelector('#uploading-item-template')
-                    .content.cloneNode(true);
-                liClone.querySelector('li').setAttribute('data-authToken', booking.authToken);
-                liClone.querySelector('.upload-name').textContent = file.name;
-                liClone.querySelector('.bytes-uploaded').textContent = '0 Bytes';
-                liClone.querySelector('.bytes-total').textContent = formatBytes(file.size);
-                document.querySelector('#uploading-items').prepend(liClone);
+                createUploadProgress({
+                    name: file.name,
+                    token: booking.authToken,
+                    size: file.size,
+                });
                 worker.postMessage(
                     JSON.stringify({
                         type: 'auth-token',
