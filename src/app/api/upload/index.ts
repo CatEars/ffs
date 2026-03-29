@@ -11,6 +11,7 @@ import {
 import { resolveUnder } from '../../../lib/resolve-under/resolve-under.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { getUploadDir } from '../../files/cache-folder.ts';
+import { logger } from '../../logging/loggers.ts';
 
 type UploadBooking = {
     directory: string;
@@ -58,6 +59,7 @@ export function register(router: Router) {
             fileName,
             tempFile,
         });
+        logger.info('Created upload booking for', fileName, 'to', directory);
         ctx.response.body = {
             authToken,
         };
@@ -101,6 +103,7 @@ export function register(router: Router) {
 
         try {
             await Deno.rename(booking.tempFile, targetPath.fullPath);
+            logger.info('Uploaded', booking.fileName, 'to', booking.directory);
         } catch (err) {
             const error = err as Error;
             if (

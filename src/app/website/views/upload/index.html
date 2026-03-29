@@ -46,7 +46,7 @@
                     await postJson('/api/upload/commit', { token: authToken });
                     markUploadFinished(authToken);
                 } else if (data.type === 'progress') {
-                    updateUploadProgress(data.authToken);
+                    updateUploadProgress(data.authToken, data.totalBytesSent);
                 }
             }
         };
