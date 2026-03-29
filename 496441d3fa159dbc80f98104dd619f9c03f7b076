@@ -4,6 +4,8 @@
 
 [ ] Refactor upload pages
 
+[ ] Use pre-calculated chunking for uploaded files and parallelize upload streaming
+
 [ ] Create manual test with full disk
 
 [ ] Rotate logs
