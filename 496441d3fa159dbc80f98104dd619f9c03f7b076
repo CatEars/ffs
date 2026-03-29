@@ -6,6 +6,8 @@
 
 [ ] Use pre-calculated chunking for uploaded files and parallelize upload streaming
 
+[ ] Delete uploaded chunks and auth tokens in background
+
 [ ] Create manual test with full disk
 
 [ ] Rotate logs
