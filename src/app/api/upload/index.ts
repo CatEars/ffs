@@ -6,6 +6,7 @@ import {
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
     HTTP_404_NOT_FOUND,
+    HTTP_500_INTERNAL_SERVER_ERROR,
 } from '../../../lib/http/http-codes.ts';
 import { resolveUnder } from '../../../lib/resolve-under/resolve-under.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
@@ -98,7 +99,24 @@ export function register(router: Router) {
             return;
         }
 
-        await Deno.rename(booking.tempFile, targetPath.fullPath);
+        try {
+            await Deno.rename(booking.tempFile, targetPath.fullPath);
+        } catch (err) {
+            const error = err as Error;
+            if (
+                error && error.message &&
+                error.message.includes('Invalid cross-device link (os error 18): rename')
+            ) {
+                // Deno.rename fails to move files between different file system devices
+                // revert to copy+remove
+                await Deno.copyFile(booking.tempFile, targetPath.fullPath);
+                await Deno.remove(booking.tempFile);
+            } else {
+                ctx.response.status = HTTP_500_INTERNAL_SERVER_ERROR;
+                return;
+            }
+        }
+
         apiTokens.delete(token);
         ctx.response.status = HTTP_200_OK;
     });
