@@ -54,3 +54,18 @@ Deno.test('You can load alpine.js as static file', async () => {
         result.headers.get('Content-Type'),
     );
 });
+
+Deno.test('GET /logout redirects to the landing page', async () => {
+    const result = await fetch(baseUrl + '/logout', { redirect: 'manual' });
+    await result.body?.cancel();
+    assert(result.status >= 300 && result.status < 400);
+    assertEquals('/', new URL(result.headers.get('location')!).pathname);
+});
+
+Deno.test('GET /logout clears the FFS-Authorization cookie', async () => {
+    const result = await fetch(baseUrl + '/logout', { redirect: 'manual' });
+    await result.body?.cancel();
+    const setCookie = result.headers.get('set-cookie') ?? '';
+    assert(setCookie.includes('FFS-Authorization='));
+    assert(setCookie.includes('Expires=') || setCookie.includes('Max-Age=0'));
+});
