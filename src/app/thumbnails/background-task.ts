@@ -1,6 +1,5 @@
 import { resolve } from '@std/path/resolve';
 import { MemoryCache } from '../../lib/cache/memory-cache.ts';
-import { IpcPipe } from '../../lib/ipc-pipe/pipe.ts';
 import { sleep } from '../../lib/sleep/sleep.ts';
 import {
     devModeEnabled,
@@ -79,12 +78,10 @@ async function findDirectoriesToThumbnail() {
     }
 }
 
-const thumbnailIpcPipe = new IpcPipe('thumbnail', logger);
-thumbnailIpcPipe.listenToStdin();
-thumbnailIpcPipe.on('thumbnail-prioritize', (request: ThumbnailRequest) => {
-    // Always push STDIN requests to top. Let those found on own be at end
-    filesToPrioritize.splice(0, 0, request);
-});
+self.onmessage = (event: MessageEvent<ThumbnailRequest>) => {
+    // Always push prioritized requests to top. Let those found on own be at end
+    filesToPrioritize.splice(0, 0, event.data);
+};
 
 await findFilesToThumbnail();
 await findDirectoriesToThumbnail();
