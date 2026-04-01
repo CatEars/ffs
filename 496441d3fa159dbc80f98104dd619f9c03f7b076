@@ -1,3 +1,7 @@
+[ ] Make thumbnail generation a "Module" and make it easy to disable all modules
+
+[ ] Make plugins a "Module" and make it easy to disable
+
 [ ] Make it easy to run and configure ffs via command-line
 
 [ ] Fix poor testing situation
