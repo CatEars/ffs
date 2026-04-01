@@ -10,7 +10,7 @@
 
 [ ] Fix background upload for mobile applications
 
-[ ] Ensure upload tokens stay between restarts
+[ ] Ensure upload tokens stay between restarts on server
 
 [ ] Use pre-calculated chunking for uploaded files and parallelize upload streaming
 
