@@ -6,7 +6,6 @@
 
         function onCrumbClick(evt) {
             const { detail } = evt;
-            console.log('EVT', detail);
             const { trail, index } = detail;
             const elements = trail.split('/');
             const selectedLocation = elements.slice(0, index + 1).join('/');
