@@ -63,7 +63,7 @@ async function writeNavbarExtensions(navbarLinks: NavbarLink[]) {
         `<header-tab href="${link.webPath}">${link.displayText}</header-tab>`
     );
     await Deno.writeTextFile(
-        resolve(viewPath, 'templates/header/links-added-by-plugins.html'),
+        resolve(viewPath, '../templates/header/links-added-by-plugins.html'),
         '<!-- Below is auto-generated, do not touch! -->\n' +
             links.join('\n'),
     );

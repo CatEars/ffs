@@ -31,9 +31,18 @@ function resolveRelativePath(
     context: DirectiveContext,
     relativeLocation: string,
 ) {
+    if (relativeLocation.startsWith('$templates/')) {
+        return resolve(
+            import.meta.dirname || '',
+            'templates',
+            relativeLocation.slice('$templates/'.length),
+        );
+    }
+
     if (relativeLocation.startsWith('/')) {
         return resolve(viewPath, relativeLocation.slice(1));
     }
+
     const sourceDirectory = dirname(context.filePath);
     return resolve(sourceDirectory, relativeLocation);
 }
@@ -58,7 +67,7 @@ function findFirstLayout(
     sourceHtml: string,
     sourceFile: string,
 ): LayoutDirective | null {
-    const regex = /<!--\s+layout\s+([\w\/\.-]+)\s+-->/gm;
+    const regex = /<!--\s+layout\s+([\w\/\.$-]+)\s+-->/gm;
     const result = regex.exec(sourceHtml);
     if (result === null || result.length === 0) {
         return null;

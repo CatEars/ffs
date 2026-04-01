@@ -1,7 +1,7 @@
 import { Middleware } from '@oak/oak/middleware';
 import { Router } from '@oak/oak/router';
-import { viewPath } from '../config.ts';
 import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
+import { viewPath } from '../config.ts';
 
 export type PlainPage = {
     type: 'Plain';
@@ -35,25 +35,13 @@ export type StaticJsPage = {
 
 export type Page = PlainPage | PluginPage | StaticJsPage;
 
-function isUnderTemplateDirectory(path: string) {
-    return path.includes('/templates/');
-}
-
 function isPartialHtmlFile(path: string) {
     return path.endsWith('.partial.html');
 }
 
-function isVendoredComponentLibraries(path: string) {
-    return path.includes('/components/vendor/');
-}
-
 async function collectDirectoryTree() {
     const walker = new FileTreeWalker(viewPath);
-    walker.filter((entry) => {
-        return !isUnderTemplateDirectory(entry.path) &&
-            !isPartialHtmlFile(entry.name) &&
-            !isVendoredComponentLibraries(entry.path);
-    });
+    walker.filter((entry) => !isPartialHtmlFile(entry.name));
     return await walker.collectAll();
 }
 
