@@ -1,0 +1,360 @@
+<!-- layout $templates/base.html -->
+<app-header>Component Showcase</app-header>
+<app-main>
+    <style>
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin: 0;
+            padding: 0.25rem 0.5rem;
+            border-left: 3px solid currentColor;
+        }
+        .component-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .component-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            border: 1px dashed rgba(128, 128, 128, 0.4);
+            border-radius: 4px;
+            min-width: 12rem;
+        }
+        .component-label {
+            font-size: 0.7rem;
+            font-family: monospace;
+            opacity: 0.5;
+            margin: 0;
+        }
+        .event-log {
+            font-family: monospace;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            white-space: pre-wrap;
+            min-height: 1.2rem;
+        }
+    </style>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- LAYOUT COMPONENTS                                           -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section">
+        <p class="section-label">Layout Components</p>
+
+        <div class="component-box">
+            <p class="component-label">&lt;row-layout&gt;</p>
+            <row-layout style="gap:1rem">
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Item A</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Item B</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Item C</span>
+            </row-layout>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;column-layout&gt;</p>
+            <column-layout style="gap:0.5rem">
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Row 1</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Row 2</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Row 3</span>
+            </column-layout>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;gapped-row&gt;</p>
+            <gapped-row>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Alpha</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Beta</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Gamma</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Delta</span>
+                <span style="padding:0.4rem 0.8rem;border:1px solid gray;border-radius:3px">Epsilon</span>
+            </gapped-row>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;horizontal-ruler&gt;</p>
+            <horizontal-ruler></horizontal-ruler>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TEXT COMPONENTS                                             -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section">
+        <p class="section-label">Text Components</p>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;app-header&gt; (default slot)</p>
+            <app-header>Page Title Here</app-header>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;app-header&gt; (starter + ender slots)</p>
+            <app-header>
+                <span slot="starter">★</span>
+                Header with Slots
+                <span slot="ender">★</span>
+            </app-header>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;app-subheader&gt;</p>
+            <app-subheader>Subheader Text</app-subheader>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- NAVIGATION COMPONENTS                                       -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section">
+        <p class="section-label">Navigation Components</p>
+
+        <div class="component-box">
+            <p class="component-label">&lt;header-tab&gt;</p>
+            <div style="display:flex;flex-direction:row;gap:0.5rem">
+                <header-tab href="/debug/">Debug</header-tab>
+                <header-tab href="/home/">Files</header-tab>
+                <header-tab href="/logs/">Logs</header-tab>
+            </div>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;breadcrumb-nav trail="..."&gt;</p>
+            <breadcrumb-nav trail="root/folder/subfolder/file.txt" id="crumb-demo"></breadcrumb-nav>
+            <p class="event-log" id="crumb-log">click a crumb to see event</p>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;header-nav-select&gt;</p>
+            <header-nav-select>
+                <option value="/home/">Files</option>
+                <option value="/custom-commands/">Commands</option>
+                <option value="/logs/">Logs</option>
+                <option value="/admin/">Admin</option>
+            </header-nav-select>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- DISPLAY COMPONENTS                                          -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section">
+        <p class="section-label">Display Components</p>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;drop-down&gt;</p>
+            <drop-down>
+                <p slot="header">Click to expand</p>
+                <p>This is the hidden content inside the dropdown. It can contain any HTML.</p>
+                <p>A second paragraph to demonstrate multi-line content.</p>
+            </drop-down>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;log-drop-down header="..." text="..."&gt;</p>
+            <log-drop-down
+                header="Application Log"
+                text="[INFO]  2024-01-01 10:00:00 Server started on :8080
+[INFO]  2024-01-01 10:00:05 Accepting connections
+[WARN]  2024-01-01 10:01:12 Slow query detected (450ms)
+[ERROR] 2024-01-01 10:02:30 Connection refused: host unreachable"
+            ></log-drop-down>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;icon-hover url="..."&gt; (hover to preview)</p>
+            <icon-hover url="/static/svg/sprite_sheet.svg">
+                <svg class="icon" style="width:2rem;height:2rem">
+                    <use href="/static/svg/sprite_sheet.svg#image"></use>
+                </svg>
+            </icon-hover>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;icon-hover disabled="true"&gt;</p>
+            <icon-hover disabled="true">
+                <svg class="icon" style="width:2rem;height:2rem">
+                    <use href="/static/svg/sprite_sheet.svg#folder"></use>
+                </svg>
+            </icon-hover>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;cli-command command="..."&gt;</p>
+            <cli-command
+                command='{"program":"ffmpeg","args":["-i","$1","-vf","scale=$2:-1","output.mp4"],"index":0,"nargs":2}'
+                method="post"
+                action="#"
+            ></cli-command>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- FILE COMPONENTS                                             -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section">
+        <p class="section-label">File Components</p>
+
+        <div class="component-box">
+            <p class="component-label">&lt;file-card file-type="directory"&gt;</p>
+            <div style="width:8rem;height:10rem;display:flex">
+                <file-card
+                    filename="my-folder"
+                    root="."
+                    image-src="folder"
+                    file-type="directory"
+                ></file-card>
+            </div>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;file-card file-type="image"&gt;</p>
+            <div style="width:8rem;height:10rem;display:flex">
+                <file-card
+                    filename="photo.jpg"
+                    root="."
+                    image-src="photo_camera"
+                    file-type="image"
+                ></file-card>
+            </div>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;file-card file-type="video"&gt;</p>
+            <div style="width:8rem;height:10rem;display:flex">
+                <file-card
+                    filename="clip.mp4"
+                    root="."
+                    image-src="videocam"
+                    file-type="video"
+                ></file-card>
+            </div>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;file-card file-type="sound"&gt;</p>
+            <div style="width:8rem;height:10rem;display:flex">
+                <file-card
+                    filename="song.mp3"
+                    root="."
+                    image-src="music_note"
+                    file-type="sound"
+                ></file-card>
+            </div>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;file-card file-type="other"&gt;</p>
+            <div style="width:8rem;height:10rem;display:flex">
+                <file-card
+                    filename="readme.txt"
+                    root="."
+                    image-src="description"
+                    file-type="other"
+                ></file-card>
+            </div>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;file-link&gt; (all types)</p>
+            <div style="display:flex;flex-direction:column;gap:0.5rem">
+                <file-link filename="documents" root="." file-type="directory"></file-link>
+                <file-link filename="image.png" root="." file-type="image"></file-link>
+                <file-link filename="movie.mp4" root="." file-type="video"></file-link>
+                <file-link filename="track.mp3" root="." file-type="sound"></file-link>
+                <file-link filename="notes.txt" root="." file-type="other"></file-link>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- CONTROL COMPONENTS                                          -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section">
+        <p class="section-label">Control Components</p>
+
+        <div class="component-box">
+            <p class="component-label">&lt;switch-control&gt; (unchecked)</p>
+            <switch-control id="switch-off">Enable feature</switch-control>
+            <p class="event-log" id="switch-off-log">—</p>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;switch-control checked="true"&gt;</p>
+            <switch-control checked="true" id="switch-on">Enable feature</switch-control>
+            <p class="event-log" id="switch-on-log">—</p>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;radio-control text="..."&gt;</p>
+            <div style="display:flex;flex-direction:row;gap:0.5rem">
+                <radio-control text="Option A" checked="true" id="radio-a"></radio-control>
+                <radio-control text="Option B" id="radio-b"></radio-control>
+                <radio-control text="Option C" id="radio-c"></radio-control>
+            </div>
+        </div>
+
+        <div class="component-box">
+            <p class="component-label">&lt;radio-control imgsrc="..."&gt;</p>
+            <div style="display:flex;flex-direction:row;gap:0.5rem">
+                <radio-control imgsrc="folder" checked="true"></radio-control>
+                <radio-control imgsrc="photo_camera"></radio-control>
+                <radio-control imgsrc="videocam"></radio-control>
+                <radio-control imgsrc="music_note"></radio-control>
+            </div>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;paginate-control page="3" max-pages="5"&gt;</p>
+            <paginate-control page="3" max-pages="5" id="paginate-small"></paginate-control>
+            <p class="event-log" id="paginate-small-log">click a page number to see event</p>
+        </div>
+
+        <div class="component-box" style="width:100%">
+            <p class="component-label">&lt;paginate-control page="5" max-pages="20"&gt; (with ellipsis)</p>
+            <paginate-control page="5" max-pages="20" id="paginate-large"></paginate-control>
+            <p class="event-log" id="paginate-large-log">click a page number to see event</p>
+        </div>
+    </div>
+
+    <script>
+        // BreadcrumbNav event demo
+        document.getElementById('crumb-demo').addEventListener('crumb-click', (evt) => {
+            const log = document.getElementById('crumb-log');
+            log.textContent = `crumb-click → trail="${evt.detail.trail}", index=${evt.detail.index}`;
+        });
+
+        // SwitchControl event demos
+        document.getElementById('switch-off').addEventListener('change', (evt) => {
+            document.getElementById('switch-off-log').textContent =
+                `change → checked=${evt.detail.checked}`;
+        });
+        document.getElementById('switch-on').addEventListener('change', (evt) => {
+            document.getElementById('switch-on-log').textContent =
+                `change → checked=${evt.detail.checked}`;
+        });
+
+        // PaginateControl event demos
+        document.getElementById('paginate-small').addEventListener('page-shift', (evt) => {
+            document.getElementById('paginate-small-log').textContent =
+                `page-shift → page=${evt.detail.page}`;
+        });
+        document.getElementById('paginate-large').addEventListener('page-shift', (evt) => {
+            document.getElementById('paginate-large-log').textContent =
+                `page-shift → page=${evt.detail.page}`;
+        });
+    </script>
+</app-main>
