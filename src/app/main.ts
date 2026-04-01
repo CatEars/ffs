@@ -11,6 +11,7 @@ import {
 import { unsecure, validateConfig } from './config.ts';
 import { startThumbnailScanning } from './files/cache-folder.ts';
 import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
+import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';

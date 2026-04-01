@@ -44,3 +44,29 @@ curl -L \
   -H "Content-Type: application/octet-stream" \
   "https://uploads.github.com/repos/catears/ffs/releases/$release_id/assets?name=$TINY_ARCHIVE_NAME" \
   --data-binary "@dist/$TINY_ARCHIVE_NAME"
+
+echo "Uploading remaining platform binaries..."
+
+for FILEPATH in dist/*; do
+  FILENAME=$(basename "$FILEPATH")
+
+  case "$FILENAME" in
+    *.tar.gz)
+      echo "Skipping $FILENAME (already uploaded)"
+      continue
+      ;;
+  esac
+
+  echo "Uploading $FILENAME..."
+  curl -L \
+    -sS \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $FFS_RELEASE_TOKEN" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    -H "Content-Type: application/octet-stream" \
+    "https://uploads.github.com/repos/catears/ffs/releases/$release_id/assets?name=$FILENAME" \
+    --data-binary "@$FILEPATH"
+done
+
+echo "All assets uploaded successfully."

@@ -13,13 +13,6 @@ import { logger } from '../logging/loggers.ts';
 import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
 import { ThumbnailRequest } from './types.ts';
 
-const cacheRoot = getCacheRoot();
-const storeRoot = getStoreRoot();
-logger.debug(
-    'Background task for thumbnail generation started. Storing thumbnails in cache at',
-    cacheRoot,
-);
-
 const filesToPrioritize: ThumbnailRequest[] = [];
 const fiveMinutes = 1000 * 60 * 5;
 const recentlyParsedThumbnails = new MemoryCache<ThumbnailRequest>(fiveMinutes);
@@ -36,6 +29,7 @@ function buildFileTreeOptions() {
 }
 
 async function findFilesToThumbnail() {
+    const storeRoot = getStoreRoot();
     const fileTreeOptions = buildFileTreeOptions();
     const fileTreeWalker = new FileTreeWalker(storeRoot, {
         ...fileTreeOptions,
@@ -58,6 +52,7 @@ async function findFilesToThumbnail() {
 }
 
 async function findDirectoriesToThumbnail() {
+    const storeRoot = getStoreRoot();
     const fileTreeOptions = buildFileTreeOptions();
     const fileTreeWalker = new FileTreeWalker(storeRoot, {
         ...fileTreeOptions,
@@ -78,6 +73,11 @@ async function findDirectoriesToThumbnail() {
 }
 
 async function main() {
+    logger.debug(
+        'Background task for thumbnail generation started. Storing thumbnails in cache at',
+        getCacheRoot(),
+    );
+
     const me: Worker = self as unknown as Worker;
     if (me.onmessage) {
         me.onmessage = (event: MessageEvent<ThumbnailRequest>) => {

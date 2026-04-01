@@ -1,3 +1,4 @@
+import { resolve } from '@std/path/resolve';
 import {
     cacheRootKey,
     customCommandsFileKey,
@@ -47,9 +48,21 @@ async function setFirstTimeUserValuesIfLikely() {
         setConfig({
             cacheRoot: await resolveCacheFolder(),
             storeRoot: '.',
-            usersFilePath: 'data/users-file.json',
+            usersFilePath: resolve(
+                import.meta.dirname || '',
+                '..',
+                '..',
+                'data',
+                'users-file.json',
+            ),
             requestLogsFile: 'access.log',
-            customCommandsFile: './data/sample-custom-commands.json',
+            customCommandsFile: resolve(
+                import.meta.dirname || '',
+                '..',
+                '..',
+                'data',
+                'sample-custom-commands.json',
+            ),
         });
     } else {
         if (!Deno.env.get(cacheRootKey)) {

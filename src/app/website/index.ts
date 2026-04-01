@@ -22,7 +22,12 @@ export async function registerAllWebsiteRoutes(router: Router) {
     const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
     const jsPages = allPages.filter((x) => x.type === 'Js') as StaticJsPage[];
     registerPlainPages(plainPages, router);
-    await registerPluginPages(pluginPages, router);
+    try {
+        await registerPluginPages(pluginPages, router);
+    } catch {
+        logger.debug('Unable to register plugin pages');
+    }
+
     await registerStaticRoutes(router);
     registerStaticJsRoutes(jsPages, router);
 }
