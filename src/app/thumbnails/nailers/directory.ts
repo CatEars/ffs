@@ -30,7 +30,7 @@ async function promoteThumbnail(request: ThumbnailRequest, fileToCopy: string) {
     }
     await ensureDir(dirname(targetPath));
     await move(tempFile, targetPath, { overwrite: true });
-    logger.info('Promoting thumbnail for', sourcePath, 'to directory', targetPath);
+    logger.debug('Promoting thumbnail for', sourcePath, 'to directory', targetPath);
 }
 
 function findFileType(filePath: string) {

@@ -309,26 +309,24 @@
         }
 
         #registerFormSubmitCsrfAppender() {
-            const csrfToken = this.csrfToken;
-            console.log('addEventListener!', csrfToken);
+            const self = this;
             this.rootNode.addEventListener(
                 'submit',
                 (event) => {
-                    console.log('hallelujah', csrfToken);
-                    if (!csrfToken) {
+                    if (!self.csrfToken) {
                         return;
                     }
                     const form = event.target;
-                    let csrfInput = form.querySelector('input[name="ffs_csrf_token"]');
+                    let csrfInput = form.querySelector('input[name="ffs_csrf_protection"]');
 
                     if (!csrfInput) {
                         csrfInput = document.createElement('input');
                         csrfInput.type = 'hidden';
-                        csrfInput.name = 'ffs_csrf_token';
+                        csrfInput.name = 'ffs_csrf_protection';
                         form.appendChild(csrfInput);
                     }
 
-                    csrfInput.value = token;
+                    csrfInput.value = self.csrfToken.value;
                 },
                 true
             );
