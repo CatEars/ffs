@@ -1,3 +1,5 @@
+[ ] Figure out how we can create a `stable` and `nightly` release branches
+
 [ ] Make thumbnail generation a "Module" and make it easy to disable all modules
 
 [ ] Make plugins a "Module" and make it easy to disable
