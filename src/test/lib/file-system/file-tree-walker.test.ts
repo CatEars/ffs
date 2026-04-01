@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { FileTreeWalker } from './file-tree-walker.ts';
+import { FileTreeWalker } from '../../../lib/file-system/file-tree-walker.ts';
 
 Deno.test('FileTreeWalker lists files in a directory', async () => {
     const tempDir = await Deno.makeTempDir();

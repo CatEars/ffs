@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert/equals';
-import { setDownloadedFilename } from './set-filename.ts';
+import { setDownloadedFilename } from '../../../lib/http/set-filename.ts';
 import type { Context } from '@oak/oak';
 
 function makeCtx(): { ctx: Context; headers: Headers } {

@@ -1,7 +1,7 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { ClaimCodec } from './claims.ts';
-import type { Claims } from './claims.ts';
+import { ClaimCodec } from '../../../lib/security/claims.ts';
+import type { Claims } from '../../../lib/security/claims.ts';
 
 Deno.test('ClaimCodec round-trips claims through sign and verify', async () => {
     const codec = new ClaimCodec('test-secret');

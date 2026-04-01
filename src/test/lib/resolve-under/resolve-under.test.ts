@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { resolveUnder } from './resolve-under.ts';
+import { resolveUnder } from '../../../lib/resolve-under/resolve-under.ts';
 
 Deno.test('resolveUnder returns the resolved path for a valid sub-path', () => {
     const result = resolveUnder('file.txt', '/root');

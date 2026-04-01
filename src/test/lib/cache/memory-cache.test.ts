@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert/equals';
-import { MemoryCache } from './memory-cache.ts';
+import { MemoryCache } from '../../../lib/cache/memory-cache.ts';
 
 Deno.test('MemoryCache returns undefined for missing keys', () => {
     const cache = new MemoryCache<string>(1000);

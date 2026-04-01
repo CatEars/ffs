@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { clearAndEnsureDirectoryExists } from './clear-and-ensure-dir.ts';
+import { clearAndEnsureDirectoryExists } from '../../../lib/file-system/clear-and-ensure-dir.ts';
 
 Deno.test('clearAndEnsureDirectoryExists creates a new directory when it does not exist', async () => {
     const tempDir = await Deno.makeTempDir();

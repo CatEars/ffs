@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { RecordingLogWrapper, FileLogger } from './logger.ts';
+import { RecordingLogWrapper, FileLogger } from '../../../lib/logger/logger.ts';
 
 // --- RecordingLogWrapper ---
 

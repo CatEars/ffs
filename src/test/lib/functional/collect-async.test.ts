@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert/equals';
-import { collectAsync } from './collect-async.ts';
+import { collectAsync } from '../../../lib/functional/collect-async.ts';
 
 Deno.test('collectAsync collects all elements from an async iterable', async () => {
     async function* gen() {

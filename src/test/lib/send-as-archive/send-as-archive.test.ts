@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
-import { sendAsArchive } from './send-as-archive.ts';
+import { sendAsArchive } from '../../../lib/send-as-archive/send-as-archive.ts';
 import type { Context } from '@oak/oak';
 
 function makeCtx() {

@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
-import { forgeBanhammer } from './banhammer.ts';
+import { forgeBanhammer } from '../../../lib/http/banhammer.ts';
 import type { Context, Next } from '@oak/oak';
 
 function makeCtx(ip: string): { ctx: Context; getStatus: () => number | undefined } {

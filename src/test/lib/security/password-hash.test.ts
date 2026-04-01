@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { pbkdf2Hash } from './password-hash.ts';
+import { pbkdf2Hash } from '../../../lib/security/password-hash.ts';
 
 Deno.test('pbkdf2Hash returns a non-empty base64 string', () => {
     const hash = pbkdf2Hash('password', 'salt');

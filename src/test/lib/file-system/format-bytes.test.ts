@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert/equals';
-import { formatBytes } from './format-bytes.ts';
+import { formatBytes } from '../../../lib/file-system/format-bytes.ts';
 
 Deno.test('formatBytes returns "0 Bytes" for 0', () => {
     assertEquals(formatBytes(0), '0 Bytes');

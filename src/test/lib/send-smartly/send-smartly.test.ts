@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
-import { HTTP_400_BAD_REQUEST } from '../http/http-codes.ts';
-import { sendFilesSmartly } from './send-smartly.ts';
+import { HTTP_400_BAD_REQUEST } from '../../../lib/http/http-codes.ts';
+import { sendFilesSmartly } from '../../../lib/send-smartly/send-smartly.ts';
 import type { Context } from '@oak/oak';
 
 function makeCtx() {

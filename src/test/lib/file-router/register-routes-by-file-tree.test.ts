@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
-import { findRouteRegistrationsInFileTree } from './register-routes-by-file-tree.ts';
-import type { Logger } from '../logger/logger.ts';
+import { findRouteRegistrationsInFileTree } from '../../../lib/file-router/register-routes-by-file-tree.ts';
+import type { Logger } from '../../../lib/logger/logger.ts';
 
 const silentLogger: Logger = {
     debug: () => {},

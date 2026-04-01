@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert/equals';
-import { returnToSender } from './return-to-sender.ts';
+import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import type { Context } from '@oak/oak';
 
 function makeCtx(referer: string | null): { ctx: Context; getRedirect: () => string } {

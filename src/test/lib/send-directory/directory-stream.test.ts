@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { exploreAndCollectFullDirectoryInfo, streamDirectoryAsTarGzip } from './directory-stream.ts';
+import { exploreAndCollectFullDirectoryInfo, streamDirectoryAsTarGzip } from '../../../lib/send-directory/directory-stream.ts';
 
 Deno.test('exploreAndCollectFullDirectoryInfo yields file entries for files in a directory', async () => {
     const tempDir = await Deno.makeTempDir();

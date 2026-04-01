@@ -6,7 +6,7 @@ import {
     getRootAccessLevel,
     isRootAccessLevel,
     getKnownResourceTypes,
-} from './resources.ts';
+} from '../../../lib/security/resources.ts';
 
 Deno.test('ResourceManager.mayAccess returns true when access level is a prefix of the resource', () => {
     const rm = new ResourceManager('files');

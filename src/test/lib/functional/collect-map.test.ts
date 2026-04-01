@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert/equals';
-import { collectMap } from './collect-map.ts';
+import { collectMap } from '../../../lib/functional/collect-map.ts';
 
 Deno.test('collectMap collects values from a map values iterator', () => {
     const map = new Map([

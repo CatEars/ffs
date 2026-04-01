@@ -1,5 +1,5 @@
 import { assert } from '@std/assert/assert';
-import { sleep } from './sleep.ts';
+import { sleep } from '../../../lib/sleep/sleep.ts';
 
 Deno.test('sleep resolves after approximately the given number of milliseconds', async () => {
     const start = Date.now();

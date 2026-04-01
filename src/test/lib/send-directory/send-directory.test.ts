@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert/equals';
-import { HTTP_400_BAD_REQUEST } from '../http/http-codes.ts';
-import { sendDirectory } from './send-directory.ts';
+import { HTTP_400_BAD_REQUEST } from '../../../lib/http/http-codes.ts';
+import { sendDirectory } from '../../../lib/send-directory/send-directory.ts';
 import type { Context } from '@oak/oak';
 
 function makeCtx() {

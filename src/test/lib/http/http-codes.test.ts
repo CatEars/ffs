@@ -6,7 +6,7 @@ import {
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_500_INTERNAL_SERVER_ERROR,
-} from './http-codes.ts';
+} from '../../../lib/http/http-codes.ts';
 
 Deno.test('HTTP status codes have the correct numeric values', () => {
     assertEquals(HTTP_200_OK, 200);
