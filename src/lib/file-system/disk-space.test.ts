@@ -1,5 +1,5 @@
 import { assert, assertRejects } from '@std/assert';
-import { availableDiskBytes } from '../lib/file-system/disk-space.ts';
+import { availableDiskBytes } from './disk-space.ts';
 
 Deno.test('availableDiskBytes returns a positive number for a valid path', async () => {
     const bytes = await availableDiskBytes('.');
