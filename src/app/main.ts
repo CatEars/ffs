@@ -9,13 +9,13 @@ import {
     setPermissionsFromUserOrDefaultToRootAccess,
 } from './application-state.ts';
 import { unsecure, validateConfig } from './config.ts';
-import { startThumbnailScanning } from './files/cache-folder.ts';
+import { thumbnailProviderChain } from './api/thumbnail/index.ts';
 import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import { areThumbnailsAvailable, startThumbnailBackgroundProcess } from './thumbnails/index.ts';
+import * as thumbnailModule from './thumbnails/module.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
@@ -44,9 +44,9 @@ for (const routeRegistrator of routeRegistrations) {
 }
 await registerAllWebsiteRoutes(router);
 
-if (areThumbnailsAvailable()) {
-    startThumbnailBackgroundProcess();
-    await startThumbnailScanning();
+if (thumbnailModule.isAvailable()) {
+    thumbnailModule.activate(thumbnailProviderChain);
+    await thumbnailModule.startBackgroundTasks();
 } else {
     logger.warn(
         'ffmpeg is not available, so will not generate thumbnails in the background',

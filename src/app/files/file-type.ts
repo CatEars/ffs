@@ -1,6 +1,5 @@
 import { relative } from '@std/path';
 import { getStoreRoot } from '../config.ts';
-import { canGenerateThumbnailFor } from '../thumbnails/generate-thumbnail.ts';
 
 export type FileType = 'video' | 'image' | 'sound' | 'directory' | 'unidentified';
 
@@ -29,32 +28,32 @@ export function identifyFileFromDirEntry(
 ): FileIdentification {
     const lowercaseName = entry.name.toLocaleLowerCase();
     const relativePath = relative(getStoreRoot(), fullPath);
+    const imageSrc = `/api/thumbnail?path=${encodeURIComponent(relativePath)}`;
 
-    const imageSrc = canGenerateThumbnailFor(fullPath) ? `/api/thumbnail?path=${relativePath}` : '';
     if (entry.isDirectory) {
         return {
             fileType: 'directory',
-            imageSrc: imageSrc || 'folder',
+            imageSrc,
         };
     } else if (isVideoFile(lowercaseName)) {
         return {
             fileType: 'video',
-            imageSrc: imageSrc || 'videocam',
+            imageSrc,
         };
     } else if (isSoundFile(lowercaseName)) {
         return {
             fileType: 'sound',
-            imageSrc: imageSrc || 'music_note',
+            imageSrc,
         };
     } else if (isImageFile(lowercaseName)) {
         return {
             fileType: 'image',
-            imageSrc: imageSrc || 'photo_camera',
+            imageSrc,
         };
     } else {
         return {
             fileType: 'unidentified',
-            imageSrc: imageSrc || 'description',
+            imageSrc,
         };
     }
 }

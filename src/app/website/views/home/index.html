@@ -122,10 +122,7 @@
         }
 
         function getFileImageSource(root, file) {
-            if (isMovieFile(file.name) || (isImageFile(file.name) && !file.name.endsWith('.gif'))) {
-                return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
-            }
-            return '';
+            return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
         }
 
         function storeToCuttingBoard(files) {
