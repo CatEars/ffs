@@ -64,7 +64,7 @@ export function register(router: Router) {
         const thumbnailExists = await cacheFileTree.exists(thumbnailPath);
         if (!thumbnailExists) {
             const actualPath = pathExistResult.fullPath;
-            await prioritizeThumbnail(actualPath);
+            prioritizeThumbnail(actualPath);
             const generatedThumbnail = await waitUntilFilepathExistsOrBail(
                 cacheFileTree,
                 thumbnailPath,

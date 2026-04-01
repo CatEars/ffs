@@ -33,7 +33,7 @@ export function startThumbnailBackgroundProcess() {
     );
 }
 
-export async function prioritizeThumbnail(filePath: string) {
+export function prioritizeThumbnail(filePath: string) {
     if (thumbnailWorker !== undefined) {
         try {
             // This isn't necessarily true, but for prioritizing thumbnails

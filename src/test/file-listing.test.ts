@@ -1,13 +1,13 @@
-import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert';
-import { baseUrl } from './constants.ts';
+import { assert } from '@std/assert/assert';
 import {
     HTTP_200_OK,
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-} from '../utils/http-codes.ts';
+} from '../lib/http/http-codes.ts';
 import { authenticatedFetch } from './authenticated-fetch.ts';
+import { baseUrl } from './constants.ts';
 
 type FileListing = {
     name: string;
