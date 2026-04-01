@@ -262,6 +262,7 @@
             this.initialized = false;
             this.initTasks = [];
             this.rootNode = document;
+            this.csrfToken = null;
             this.debugger = new MegaphoneDebugger();
         }
 
@@ -305,6 +306,32 @@
 
                 child = nextSibling;
             }
+        }
+
+        #registerFormSubmitCsrfAppender() {
+            const csrfToken = this.csrfToken;
+            console.log('addEventListener!', csrfToken);
+            this.rootNode.addEventListener(
+                'submit',
+                (event) => {
+                    console.log('hallelujah', csrfToken);
+                    if (!csrfToken) {
+                        return;
+                    }
+                    const form = event.target;
+                    let csrfInput = form.querySelector('input[name="ffs_csrf_token"]');
+
+                    if (!csrfInput) {
+                        csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = 'ffs_csrf_token';
+                        form.appendChild(csrfInput);
+                    }
+
+                    csrfInput.value = token;
+                },
+                true
+            );
         }
 
         #getDependents(value) {
@@ -483,6 +510,20 @@
             return this.stateProxy;
         }
 
+        async declareCsrfCookie(cookieName) {
+            this.csrfToken = await getCookie(cookieName);
+        }
+
+        authorizedFetch(path, options = {}) {
+            if (this.csrfToken) {
+                if (!options.headers) {
+                    options.headers = {};
+                }
+                options.headers['FFS-Csrf-Protection'] = this.csrfToken;
+            }
+            return fetch(path, options);
+        }
+
         confine(element) {
             if (!element || !element.querySelectorAll) {
                 throw new Error(
@@ -504,6 +545,7 @@
             this.boundValues = this.#bindValuesAndEventListeners();
             this.#updateAllStateValues();
             this.#startAllInitTasks();
+            this.#registerFormSubmitCsrfAppender();
         }
 
         view(stateSelector) {

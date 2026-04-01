@@ -10,22 +10,27 @@ const banhammer = forgeBanhammer({
 
 export function register(router: Router) {
     router.post('/api/user-logon', banhammer, baseMiddlewares(), async (ctx) => {
-        const data = await ctx.request.body.form();
+        const data = await ctx.request.body.formData();
         const username = data.get('username');
         const password = data.get('password');
-        if (!username || !password) {
+        if (!username?.toString() || !password?.toString()) {
             ctx.response.status = HTTP_400_BAD_REQUEST;
             return;
         }
 
-        const matchingUser = await getMatchingUser(username, password);
+        const matchingUser = await getMatchingUser(username.toString(), password.toString());
 
         if (!matchingUser) {
             ctx.response.redirect('/logon/fail');
             return;
         }
 
-        ctx.cookies.set('FFS-Authorization', matchingUser);
+        ctx.cookies.set('FFS-Authorization', matchingUser, {
+            httpOnly: true,
+        });
+        ctx.cookies.set('FFS-Csrf-Protection', crypto.randomUUID(), {
+            httpOnly: false,
+        });
         ctx.response.redirect('/home/');
     });
 }

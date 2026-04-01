@@ -4,6 +4,7 @@ import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { getCustomCommands } from '../../custom-commands/custom-command.ts';
 import { logger } from '../../logging/loggers.ts';
+import { csrfProtect } from '../../security/csrf-protect.ts';
 
 const decoder = new TextDecoder();
 
@@ -19,6 +20,7 @@ export function register(router: Router) {
         '/api/custom-commands/run',
         baseMiddlewares(),
         ...protectedMiddlewares(),
+        csrfProtect,
         async (ctx) => {
             const body = await ctx.request.body.formData();
             const idFromBody = body.get('index');

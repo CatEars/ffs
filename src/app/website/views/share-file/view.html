@@ -1,6 +1,8 @@
 <!-- layout /templates/base.html -->
 <script type="module">
     const megaphone = new Megaphone();
+    megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
     const code = getUrlParam('code');
     const state = megaphone.declareState({
         fileData: megaphone.jsonApi(`/api/share-file/list?code=${code}`, []),

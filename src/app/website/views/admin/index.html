@@ -2,6 +2,8 @@
 <app-main>
     <script type="module">
         const megaphone = new Megaphone();
+        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
         const state = megaphone.declareState({
             message: megaphone.urlParam('message', null),
             hasMessage: megaphone.view((state) => state.message !== null),

@@ -5,12 +5,14 @@ import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { getStoreRoot } from '../../config.ts';
 import { logger } from '../../logging/loggers.ts';
+import { csrfProtect } from '../../security/csrf-protect.ts';
 
 export function register(router: Router) {
     router.post(
         '/api/file/upload',
         baseMiddlewares(),
         ...protectedMiddlewares(),
+        csrfProtect,
         async (ctx) => {
             const fileTree = ctx.state.fileTree;
             const data = await ctx.request.body.formData();

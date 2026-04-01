@@ -7,12 +7,14 @@ import {
 import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { FfsApplicationState } from '../../application-state.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { csrfProtect } from '../../security/csrf-protect.ts';
 
 export function register(router: Router<FfsApplicationState>) {
     router.post(
         '/api/directory/make',
         baseMiddlewares(),
         ...protectedMiddlewares(),
+        csrfProtect,
         async (ctx) => {
             const fileTree = ctx.state.fileTree;
             const formData = await ctx.request.body.formData();

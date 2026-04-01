@@ -24,6 +24,8 @@
         }
 
         const megaphone = new Megaphone();
+        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
         const state = megaphone.declareState({
             displayText: '',
             onSubmitEcho,

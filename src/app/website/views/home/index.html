@@ -293,6 +293,8 @@
         }
 
         const megaphone = new Megaphone();
+        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
         const currentPath = getCurrentPath();
         const state = megaphone.declareState({
             pageSize: megaphone.localStorage('default-page-size', 100),

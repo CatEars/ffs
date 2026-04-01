@@ -3,6 +3,7 @@ import { HTTP_403_FORBIDDEN } from '../../../lib/http/http-codes.ts';
 import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { logger } from '../../logging/loggers.ts';
+import { csrfProtect } from '../../security/csrf-protect.ts';
 import { createNewUser, storeUserAsEphemeralUser } from '../../security/users.ts';
 
 const ADMIN_PAGE = '/admin/';
@@ -12,6 +13,7 @@ export function register(router: Router) {
         '/api/admin/create-user',
         baseMiddlewares(),
         ...protectedMiddlewares(),
+        csrfProtect,
         async (ctx) => {
             if (!ctx.state.userPermissions?.canCreateUsers) {
                 ctx.response.status = HTTP_403_FORBIDDEN;

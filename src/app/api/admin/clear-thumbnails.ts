@@ -5,12 +5,14 @@ import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts
 import { getThumbnailsDir } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/loggers.ts';
 import { ensurePermissions } from '../../security/api-protect.ts';
+import { csrfProtect } from '../../security/csrf-protect.ts';
 
 export function register(router: Router) {
     router.post(
         '/api/admin/clear-thumbnails',
         baseMiddlewares(),
         ...protectedMiddlewares(),
+        csrfProtect,
         ensurePermissions((p) => p.allowHousekeeping),
         async (ctx) => {
             await clearAndEnsureDirectoryExists(getThumbnailsDir());
