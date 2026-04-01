@@ -18,7 +18,7 @@
     },
     "tasks": {
         "bundle-component-library": "deno run --allow-all src/scripts/bundle-component-library.ts",
-        "ensure-dist": "mkdir -p dist",
+        "ensure-dist": "mkdir -p dist && touch dist/rmme && rm dist/*",
         "enable-eruda": "./src/scripts/set-eruda-as-personal-html-file.sh",
         "create-personal-files": "deno run --allow-all src/scripts/create-empty-personal-files.ts",
         "remove-personal-files": "deno run --allow-all src/scripts/remove-personal-files.ts",
@@ -40,25 +40,32 @@
                 "unpack-favicon"
             ]
         },
+        "prebuild": {
+            "dependencies": [
+                "ensure-dist",
+                "remove-personal-files",
+                "bundle-component-library"
+            ]
+        },
         "build-win-x86_64": {
             "command": "deno compile --include ./src/app/website/components/ --include ./src/app/website/static --include ./src/app/website/templates --include ./src/app/website/views --include ./data --include ./src/app/api/ --target x86_64-pc-windows-msvc -o ./dist/ffs-win-x86_64.exe --allow-all ./src/app/main.ts",
-            "dependencies": ["ensure-dist"]
+            "dependencies": ["prebuild"]
         },
         "build-mac-x86_64": {
             "command": "deno compile --include ./src/app/website/components/ --include ./src/app/website/static --include ./src/app/website/templates --include ./src/app/website/views --include ./data --include ./src/app/api/ --target x86_64-apple-darwin -o ./dist/ffs-darwin-x86_64 --allow-all ./src/app/main.ts",
-            "dependencies": ["ensure-dist"]
+            "dependencies": ["prebuild"]
         },
         "build-mac-arm64": {
             "command": "deno compile --include ./src/app/website/components/ --include ./src/app/website/static --include ./src/app/website/templates --include ./src/app/website/views --include ./data --include ./src/app/api/ --target aarch64-apple-darwin -o ./dist/ffs-darwin-arm64 --allow-all ./src/app/main.ts",
-            "dependencies": ["ensure-dist"]
+            "dependencies": ["prebuild"]
         },
         "build-linux-x86_64": {
             "command": "deno compile --include ./src/app/website/components/ --include ./src/app/website/static --include ./src/app/website/templates --include ./src/app/website/views --include ./data --include ./src/app/api/ --target x86_64-unknown-linux-gnu -o ./dist/ffs-linux-x86_64 --allow-all ./src/app/main.ts",
-            "dependencies": ["ensure-dist"]
+            "dependencies": ["prebuild"]
         },
         "build-linux-arm64": {
             "command": "deno compile --include ./src/app/website/components/ --include ./src/app/website/static --include ./src/app/website/templates --include ./src/app/website/views --include ./data --include ./src/app/api/ --target aarch64-unknown-linux-gnu -o ./dist/ffs-linux-arm64 --allow-all ./src/app/main.ts",
-            "dependencies": ["ensure-dist"]
+            "dependencies": ["prebuild"]
         },
         "build-all-native": {
             "dependencies": [
@@ -71,7 +78,7 @@
         },
         "build-docker": {
             "command": "./src/scripts/build-docker.sh",
-            "dependencies": ["ensure-dist", "remove-personal-files", "bundle-component-library"]
+            "dependencies": ["prebuild"]
         },
         "build-dist": {
             "command": "./src/scripts/build-dist.sh",
