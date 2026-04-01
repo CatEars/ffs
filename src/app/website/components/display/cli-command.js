@@ -1,10 +1,10 @@
-import { BaseWebComponent } from '../base.js';
+import { BaseFormComponent } from '../base-form.js';
 
 function formatCommand(cmd) {
     return `${cmd['program']} ${cmd.args.join(' ')}`;
 }
 
-class CliCommand extends BaseWebComponent {
+class CliCommand extends BaseFormComponent {
     static observedAttributes = ['command'];
 
     render(html) {

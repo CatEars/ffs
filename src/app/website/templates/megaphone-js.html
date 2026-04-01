@@ -313,6 +313,7 @@
             this.rootNode.addEventListener(
                 'submit',
                 (event) => {
+                    console.log('CSRF', self.csrfToken);
                     if (!self.csrfToken) {
                         return;
                     }
