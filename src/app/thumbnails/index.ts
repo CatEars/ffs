@@ -1,7 +1,6 @@
 import { extname } from '@std/path/extname';
-import { IpcPipe } from '../../lib/ipc-pipe/pipe.ts';
-import { backgroundProcessLogger, logger } from '../logging/loggers.ts';
-import { prioritizeThumbnailEvent, ThumbnailRequest } from './types.ts';
+import { logger } from '../logging/loggers.ts';
+import { ThumbnailRequest } from './types.ts';
 
 function isFfmpegAvailable() {
     const proc = runFfmpegVersion();
@@ -25,52 +24,17 @@ export function areThumbnailsAvailable() {
     return isFfmpegAvailable() && isImageMagickAvailable();
 }
 
-export const thumbnailIpcPipe = new IpcPipe('thumbnail', logger);
-
-let thumbnailProcess: Deno.ChildProcess | undefined;
+let thumbnailWorker: Worker | undefined;
 
 export function startThumbnailBackgroundProcess() {
-    const subProcessFlags = [
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '--allow-run',
-    ];
-
-    thumbnailProcess = new Deno.Command('deno', {
-        args: subProcessFlags.concat(['src/app/thumbnails/background-task.ts']),
-        stdout: 'piped',
-        stdin: 'piped',
-    }).spawn();
-
-    thumbnailIpcPipe.setIpcWriter(thumbnailProcess.stdin.getWriter());
-
-    const prefix = `<pid=${thumbnailProcess.pid}|thumbnail>`;
-    function writeBackgroundTaskOutput(message: string) {
-        backgroundProcessLogger.debug(prefix, message.trimEnd());
-    }
-
-    const decoder = new TextDecoder();
-    thumbnailProcess.stdout.pipeTo(
-        new WritableStream({
-            write: (chunk: Uint8Array) => {
-                const decodedString = decoder.decode(chunk, { stream: true });
-                if (decodedString) {
-                    writeBackgroundTaskOutput(decodedString);
-                }
-            },
-            close: () => {
-                const finalString = decoder.decode();
-                if (finalString) {
-                    writeBackgroundTaskOutput(finalString);
-                }
-            },
-        }),
+    thumbnailWorker = new Worker(
+        new URL('./background-task.ts', import.meta.url).href,
+        { type: 'module' },
     );
 }
 
 export async function prioritizeThumbnail(filePath: string) {
-    if (thumbnailProcess !== null) {
+    if (thumbnailWorker !== undefined) {
         try {
             // This isn't necessarily true, but for prioritizing thumbnails
             // it is okay enough. E.g. ".d" directories are an exception to this.
@@ -81,7 +45,7 @@ export async function prioritizeThumbnail(filePath: string) {
                 isFile,
                 isDirectory,
             };
-            await thumbnailIpcPipe.post(prioritizeThumbnailEvent, data);
+            thumbnailWorker.postMessage(data);
         } catch (err) {
             logger.warn(
                 'Tried to prioritize thumbnail',

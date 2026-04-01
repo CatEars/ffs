@@ -189,7 +189,7 @@
             resetCuttingBoard();
             document.getElementById('files-to-move').value = JSON.stringify(board);
             document.getElementById('destination').value = path;
-            document.getElementById('paste-form').submit();
+            document.getElementById('paste-form').requestSubmit();
         }
 
         function deleteFiles() {
@@ -200,14 +200,14 @@
                 fileName: elem,
             }));
             document.getElementById('files-to-remove').value = JSON.stringify(filesToRemove);
-            document.getElementById('delete-form').submit();
+            document.getElementById('delete-form').requestSubmit();
         }
 
         function createFileShare() {
             const myPath = getCurrentPath();
             const paths = getCheckedFiles().map((x) => `${myPath}/${x}`);
             document.getElementById('link-paths').value = JSON.stringify(paths);
-            document.getElementById('link-form').submit();
+            document.getElementById('link-form').requestSubmit();
         }
 
         function renameFile() {
@@ -219,13 +219,13 @@
             const elementToRename = checkedFiles[0];
             const renameForm = document.getElementById('rename-form');
             document.getElementById('source').value = `${myPath}/${elementToRename}`;
-            renameForm.submit();
+            renameForm.requestSubmit();
         }
 
         function makeDirectory() {
             const myPath = getCurrentPath();
             document.getElementById('make-directory-path').value = myPath;
-            document.getElementById('make-directory-form').submit();
+            document.getElementById('make-directory-form').requestSubmit();
         }
 
         function downloadFiles() {
@@ -250,7 +250,7 @@
                 downloadForm.appendChild(clone);
             }
 
-            downloadForm.submit();
+            downloadForm.requestSubmit();
         }
     </script>
     <script type="module">
