@@ -6,7 +6,6 @@ import type { Context } from '@oak/oak';
 function makeCtx() {
     let responseType = '';
     let responseBody: unknown = undefined;
-    let filename = '';
 
     const ctx = {
         response: {
