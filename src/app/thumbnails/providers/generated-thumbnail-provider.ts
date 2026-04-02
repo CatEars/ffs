@@ -1,6 +1,3 @@
-import { relative } from '@std/path/relative';
-import { Context } from '@oak/oak/context';
-import { FfsApplicationState } from '../../application-state.ts';
 import { getCacheRoot } from '../../config.ts';
 import { getThumbnailPath } from '../../files/cache-folder.ts';
 import { FileTree } from '../../files/file-tree.ts';
@@ -8,6 +5,7 @@ import { sleep } from '../../../lib/sleep/sleep.ts';
 import { canGenerateThumbnailFor } from '../generate-thumbnail.ts';
 import { prioritizeThumbnail } from '../index.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
+import { ThumbnailResult } from '../types.ts';
 
 async function tryGetFile(fileTree: FileTree, filePath: string) {
     for (let cnt = 0; cnt < 20; ++cnt) {
@@ -40,12 +38,11 @@ export class GeneratedThumbnailProvider implements ThumbnailProvider {
     }
 
     async handle(
-        ctx: Context<FfsApplicationState>,
         resolvedFullPath: string,
         isDirectory: boolean,
-    ): Promise<boolean> {
+    ): Promise<ThumbnailResult> {
         if (!isDirectory && !canGenerateThumbnailFor(resolvedFullPath)) {
-            return false;
+            return { type: 'ThumbnailNotFound' };
         }
 
         const thumbnailPath = getThumbnailPath(resolvedFullPath);
@@ -57,14 +54,11 @@ export class GeneratedThumbnailProvider implements ThumbnailProvider {
                 thumbnailPath,
             );
             if (!generated) {
-                return false;
+                return { type: 'ThumbnailNotFound' };
             }
         }
 
-        await ctx.send({
-            path: relative(getCacheRoot(), thumbnailPath),
-            root: getCacheRoot(),
-        });
-        return true;
+        const body = await Deno.readFile(thumbnailPath);
+        return { type: 'ThumbnailFound', contentType: 'image/webp', body };
     }
 }

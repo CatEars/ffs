@@ -1,10 +1,8 @@
 import { extname } from '@std/path/extname';
 import { join } from '@std/path/join';
-import { Context } from '@oak/oak/context';
-import { HTTP_500_INTERNAL_SERVER_ERROR } from '../../../lib/http/http-codes.ts';
-import { FfsApplicationState } from '../../application-state.ts';
 import { logger } from '../../logging/loggers.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
+import { ThumbnailResult } from '../types.ts';
 
 type SvgIconName = 'folder' | 'videocam' | 'music_note' | 'photo_camera' | 'description';
 
@@ -33,20 +31,17 @@ const svgDir = join(import.meta.dirname!, '../../website/static/svg');
 
 export class SvgIconProvider implements ThumbnailProvider {
     async handle(
-        ctx: Context<FfsApplicationState>,
         resolvedFullPath: string,
         isDirectory: boolean,
-    ): Promise<boolean> {
+    ): Promise<ThumbnailResult> {
         const iconName = resolveIconName(resolvedFullPath, isDirectory);
         const svgPath = join(svgDir, `${iconName}.svg`);
         try {
-            const svgContent = await Deno.readTextFile(svgPath);
-            ctx.response.headers.set('Content-Type', 'image/svg+xml');
-            ctx.response.body = svgContent;
+            const body = await Deno.readTextFile(svgPath);
+            return { type: 'ThumbnailFound', contentType: 'image/svg+xml', body };
         } catch (err) {
             logger.error(`Failed to read SVG icon file '${svgPath}':`, err);
-            ctx.response.status = HTTP_500_INTERNAL_SERVER_ERROR;
+            return { type: 'ThumbnailNotFound' };
         }
-        return true;
     }
 }

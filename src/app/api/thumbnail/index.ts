@@ -1,5 +1,5 @@
 import { Router } from '@oak/oak';
-import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN } from '../../../lib/http/http-codes.ts';
+import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND } from '../../../lib/http/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { thumbnailProviderChain } from '../../thumbnails/module.ts';
 
@@ -29,6 +29,13 @@ export function register(router: Router) {
             }
         }
 
-        await thumbnailProviderChain.resolve(ctx, pathExistResult.fullPath, isDirectory);
+        const result = await thumbnailProviderChain.resolve(pathExistResult.fullPath, isDirectory);
+        if (result.type === 'ThumbnailNotFound') {
+            ctx.response.status = HTTP_404_NOT_FOUND;
+            return;
+        }
+
+        ctx.response.headers.set('Content-Type', result.contentType);
+        ctx.response.body = result.body;
     });
 }

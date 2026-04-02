@@ -1,6 +1,5 @@
-import { Context } from '@oak/oak/context';
-import { FfsApplicationState } from '../application-state.ts';
 import { ThumbnailProvider } from './thumbnail-provider.ts';
+import { ThumbnailResult } from './types.ts';
 
 export class ThumbnailProviderChain {
     private providers: ThumbnailProvider[] = [];
@@ -14,15 +13,15 @@ export class ThumbnailProviderChain {
     }
 
     async resolve(
-        ctx: Context<FfsApplicationState>,
         resolvedFullPath: string,
         isDirectory: boolean,
-    ): Promise<void> {
+    ): Promise<ThumbnailResult> {
         for (const provider of this.providers) {
-            const handled = await provider.handle(ctx, resolvedFullPath, isDirectory);
-            if (handled) {
-                return;
+            const result = await provider.handle(resolvedFullPath, isDirectory);
+            if (result.type === 'ThumbnailFound') {
+                return result;
             }
         }
+        return { type: 'ThumbnailNotFound' };
     }
 }
