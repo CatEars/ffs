@@ -1,7 +1,7 @@
+import type { Context } from '@oak/oak';
 import { assertEquals } from '@std/assert/equals';
 import { HTTP_400_BAD_REQUEST } from '../../../lib/http/http-codes.ts';
 import { sendDirectory } from '../../../lib/send-directory/send-directory.ts';
-import type { Context } from '@oak/oak';
 
 function makeCtx() {
     let status: number | undefined = undefined;
@@ -11,7 +11,7 @@ function makeCtx() {
     const ctx = {
         response: {
             get status() {
-                return status;
+                return status || 60000;
             },
             set status(value: number) {
                 status = value;

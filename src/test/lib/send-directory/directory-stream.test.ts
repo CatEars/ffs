@@ -1,6 +1,17 @@
 import { assert } from '@std/assert/assert';
-import { assertEquals } from '@std/assert/equals';
-import { exploreAndCollectFullDirectoryInfo, streamDirectoryAsTarGzip } from '../../../lib/send-directory/directory-stream.ts';
+import { TarStreamInput } from '@std/tar/tar-stream';
+import {
+    exploreAndCollectFullDirectoryInfo,
+    streamDirectoryAsTarGzip,
+} from '../../../lib/send-directory/directory-stream.ts';
+
+function closeFiles(entries: TarStreamInput[]) {
+    for (const entry of entries) {
+        if (entry.type == 'file') {
+            entry.readable.cancel();
+        }
+    }
+}
 
 Deno.test('exploreAndCollectFullDirectoryInfo yields file entries for files in a directory', async () => {
     const tempDir = await Deno.makeTempDir();
@@ -12,6 +23,7 @@ Deno.test('exploreAndCollectFullDirectoryInfo yields file entries for files in a
     }
 
     assert(entries.some((e) => e.type === 'file' && e.path.endsWith('hello.txt')));
+    closeFiles(entries);
     await Deno.remove(tempDir, { recursive: true });
 });
 
@@ -26,6 +38,7 @@ Deno.test('exploreAndCollectFullDirectoryInfo yields directory entries', async (
     }
 
     assert(entries.some((e) => e.type === 'directory'));
+    closeFiles(entries);
     await Deno.remove(tempDir, { recursive: true });
 });
 
@@ -39,6 +52,7 @@ Deno.test('exploreAndCollectFullDirectoryInfo applies pathPrefix to entry paths'
     }
 
     assert(entries.some((e) => e.path.startsWith('prefix/')));
+    closeFiles(entries);
     await Deno.remove(tempDir, { recursive: true });
 });
 

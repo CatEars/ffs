@@ -1,7 +1,7 @@
-import { assertEquals } from '@std/assert/equals';
-import { assert } from '@std/assert/assert';
-import { forgeBanhammer } from '../../../lib/http/banhammer.ts';
 import type { Context, Next } from '@oak/oak';
+import { assert } from '@std/assert/assert';
+import { assertEquals } from '@std/assert/equals';
+import { forgeBanhammer } from '../../../lib/http/banhammer.ts';
 
 function makeCtx(ip: string): { ctx: Context; getStatus: () => number | undefined } {
     let status: number | undefined = undefined;
@@ -9,7 +9,7 @@ function makeCtx(ip: string): { ctx: Context; getStatus: () => number | undefine
         request: { ip },
         response: {
             get status() {
-                return status;
+                return status || 60000;
             },
             set status(value: number) {
                 status = value;
@@ -25,7 +25,9 @@ Deno.test(
     'forgeBanhammer allows requests below the threshold',
     { sanitizeOps: false, sanitizeResources: false },
     async () => {
-        const banhammer = forgeBanhammer({ maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 5 });
+        const banhammer = forgeBanhammer({
+            maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 5,
+        });
         const { ctx, getStatus } = makeCtx('1.2.3.4');
 
         for (let i = 0; i < 5; i++) {
@@ -40,7 +42,9 @@ Deno.test(
     'forgeBanhammer blocks requests at or above the threshold',
     { sanitizeOps: false, sanitizeResources: false },
     async () => {
-        const banhammer = forgeBanhammer({ maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 3 });
+        const banhammer = forgeBanhammer({
+            maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 3,
+        });
         const { ctx, getStatus } = makeCtx('10.0.0.1');
 
         for (let i = 0; i < 3; i++) {
@@ -56,7 +60,9 @@ Deno.test(
     'forgeBanhammer tracks different IPs independently',
     { sanitizeOps: false, sanitizeResources: false },
     async () => {
-        const banhammer = forgeBanhammer({ maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 3 });
+        const banhammer = forgeBanhammer({
+            maximumRequestsBeforeTheBanhammerStrikesPerFiveSeconds: 3,
+        });
         const ip1 = makeCtx('192.168.1.1');
         const ip2 = makeCtx('192.168.1.2');
 

@@ -1,6 +1,6 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { RecordingLogWrapper, FileLogger } from '../../../lib/logger/logger.ts';
+import { FileLogger, RecordingLogWrapper } from '../../../lib/logger/logger.ts';
 
 // --- RecordingLogWrapper ---
 
@@ -63,6 +63,7 @@ Deno.test('FileLogger writes log entries to a file', async () => {
     logger.info('hello from file logger');
     const content = await Deno.readTextFile(tempFile);
     assert(content.includes('hello from file logger'));
+    logger.close();
     await Deno.remove(tempFile);
 });
 
@@ -74,5 +75,6 @@ Deno.test('FileLogger records recent logs for inspection', async () => {
     logger.info('entry two');
     const recent = logger.inspectRecentLogs();
     assertEquals(recent.length, 2);
+    logger.close();
     await Deno.remove(tempFile);
 });

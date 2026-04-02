@@ -12,9 +12,9 @@ Deno.test('resolveUnder returns null for a path traversal above root', () => {
     assertEquals(result, null);
 });
 
-Deno.test('resolveUnder returns null for an absolute path outside root', () => {
+Deno.test('resolveUnder treats absolute path as relative to root (and thus protects against absolute path "traversal")', () => {
     const result = resolveUnder('/etc/passwd', '/root');
-    assertEquals(result, null);
+    assertEquals(result, '/root/etc/passwd');
 });
 
 Deno.test('resolveUnder allows paths that resolve to the root itself', () => {

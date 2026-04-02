@@ -1,7 +1,8 @@
 import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
-import { ClaimCodec } from '../../../lib/security/claims.ts';
+import { decodeBase64Url, encodeBase64Url } from '@std/encoding/base64url';
 import type { Claims } from '../../../lib/security/claims.ts';
+import { ClaimCodec } from '../../../lib/security/claims.ts';
 
 Deno.test('ClaimCodec round-trips claims through sign and verify', async () => {
     const codec = new ClaimCodec('test-secret');
@@ -15,7 +16,12 @@ Deno.test('ClaimCodec returns null for a tampered claim string', async () => {
     const codec = new ClaimCodec('test-secret');
     const claims: Claims = [['files']];
     const encoded = await codec.signAndUrlEncodeClaims(claims);
-    const tampered = encoded.slice(0, -4) + 'XXXX';
+    const decoded = new TextDecoder().decode(decodeBase64Url(encoded));
+    const decodedObj = JSON.parse(decoded);
+    const claimsArray = JSON.parse(decodedObj.claims);
+    claimsArray.push(['tampered']);
+    decodedObj.claims = JSON.stringify(claimsArray);
+    const tampered = encodeBase64Url(JSON.stringify(decodedObj));
     const result = await codec.verifyAndUrlDecodeClaims(tampered);
     assertEquals(result, null);
 });

@@ -151,4 +151,8 @@ export class FileLogger {
     inspectRecentLogs(): string[][] {
         return this.logCache;
     }
+
+    close() {
+        return this.file?.close();
+    }
 }

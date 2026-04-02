@@ -1,8 +1,8 @@
-import { assertEquals } from '@std/assert/equals';
+import type { Context } from '@oak/oak';
 import { assert } from '@std/assert/assert';
+import { assertEquals } from '@std/assert/equals';
 import { HTTP_400_BAD_REQUEST } from '../../../lib/http/http-codes.ts';
 import { sendFilesSmartly } from '../../../lib/send-smartly/send-smartly.ts';
-import type { Context } from '@oak/oak';
 
 function makeCtx() {
     let status: number | undefined = undefined;
@@ -14,7 +14,7 @@ function makeCtx() {
         response: {
             headers: new Headers(),
             get status() {
-                return status;
+                return status || 60000;
             },
             set status(value: number) {
                 status = value;

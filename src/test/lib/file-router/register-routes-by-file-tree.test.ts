@@ -1,5 +1,5 @@
-import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
+import { assertEquals } from '@std/assert/equals';
 import { findRouteRegistrationsInFileTree } from '../../../lib/file-router/register-routes-by-file-tree.ts';
 import type { Logger } from '../../../lib/logger/logger.ts';
 
@@ -46,3 +46,17 @@ Deno.test(
         await Deno.remove(tempDir, { recursive: true });
     },
 );
+
+Deno.test('findRouteRegistrationsInFileTree returns each registration function found in an imported file', async () => {
+    const tempDir = await Deno.makeTempDir();
+    await Deno.writeTextFile(
+        tempDir + '/multi-register.ts',
+        `
+export function registerFirst() {}
+export function registerSecond() {}
+`,
+    );
+    const results = await findRouteRegistrationsInFileTree(tempDir, silentLogger);
+    assertEquals(results.length, 2);
+    await Deno.remove(tempDir, { recursive: true });
+});
