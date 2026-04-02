@@ -1,32 +1,18 @@
 import { relative } from '@std/path';
 import { getStoreRoot } from '../config.ts';
+import { FileType, isImageFile, isSoundFile, isVideoFile } from '../../lib/file-type/file-type.ts';
 
-export type FileType = 'video' | 'image' | 'sound' | 'directory' | 'unidentified';
+export type { FileType };
 
 export type FileIdentification = {
     fileType: FileType;
     imageSrc: string;
 };
 
-function isVideoFile(filename: string): boolean {
-    return ['mp4', 'mv4', 'm4v'].some((x) => filename.endsWith(x));
-}
-
-function isSoundFile(filename: string): boolean {
-    return ['mp3'].some((x) => filename.endsWith(x));
-}
-
-function isImageFile(filename: string): boolean {
-    return ['png', 'jpg', 'jpeg', 'gif', 'tiff', 'webp', 'avif', 'bmp', 'ico'].some((x) =>
-        filename.endsWith(x)
-    );
-}
-
 export function identifyFileFromDirEntry(
     fullPath: string,
     entry: Deno.DirEntry,
 ): FileIdentification {
-    const lowercaseName = entry.name.toLocaleLowerCase();
     const relativePath = relative(getStoreRoot(), fullPath);
     const imageSrc = `/api/thumbnail?path=${encodeURIComponent(relativePath)}`;
 
@@ -35,17 +21,17 @@ export function identifyFileFromDirEntry(
             fileType: 'directory',
             imageSrc,
         };
-    } else if (isVideoFile(lowercaseName)) {
+    } else if (isVideoFile(fullPath)) {
         return {
             fileType: 'video',
             imageSrc,
         };
-    } else if (isSoundFile(lowercaseName)) {
+    } else if (isSoundFile(fullPath)) {
         return {
             fileType: 'sound',
             imageSrc,
         };
-    } else if (isImageFile(lowercaseName)) {
+    } else if (isImageFile(fullPath)) {
         return {
             fileType: 'image',
             imageSrc,

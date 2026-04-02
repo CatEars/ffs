@@ -1,26 +1,21 @@
-import { extname } from '@std/path/extname';
 import { join } from '@std/path/join';
+import { isImageFile, isSoundFile, isVideoFile } from '../../../lib/file-type/file-type.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
 import { ThumbnailContext, ThumbnailResult } from '../types.ts';
 
 type SvgIconName = 'folder' | 'videocam' | 'music_note' | 'photo_camera' | 'description';
 
-const videoExtensions = ['.mp4', '.mv4', '.m4v'];
-const soundExtensions = ['.mp3'];
-const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.tiff', '.webp', '.avif', '.bmp', '.ico'];
-
 function resolveIconName(resolvedFullPath: string, isDirectory: boolean): SvgIconName {
     if (isDirectory) {
         return 'folder';
     }
-    const ext = extname(resolvedFullPath).toLowerCase();
-    if (videoExtensions.includes(ext)) {
+    if (isVideoFile(resolvedFullPath)) {
         return 'videocam';
     }
-    if (soundExtensions.includes(ext)) {
+    if (isSoundFile(resolvedFullPath)) {
         return 'music_note';
     }
-    if (imageExtensions.includes(ext)) {
+    if (isImageFile(resolvedFullPath)) {
         return 'photo_camera';
     }
     return 'description';
