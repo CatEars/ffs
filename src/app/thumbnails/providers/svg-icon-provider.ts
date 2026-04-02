@@ -2,7 +2,7 @@ import { extname } from '@std/path/extname';
 import { join } from '@std/path/join';
 import { logger } from '../../logging/loggers.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
-import { ThumbnailResult } from '../types.ts';
+import { ThumbnailContext, ThumbnailResult } from '../types.ts';
 
 type SvgIconName = 'folder' | 'videocam' | 'music_note' | 'photo_camera' | 'description';
 
@@ -30,10 +30,7 @@ function resolveIconName(resolvedFullPath: string, isDirectory: boolean): SvgIco
 const svgDir = join(import.meta.dirname!, '../../website/static/svg');
 
 export class SvgIconProvider implements ThumbnailProvider {
-    async handle(
-        resolvedFullPath: string,
-        isDirectory: boolean,
-    ): Promise<ThumbnailResult> {
+    async handle({ resolvedFullPath, isDirectory }: ThumbnailContext): Promise<ThumbnailResult> {
         const iconName = resolveIconName(resolvedFullPath, isDirectory);
         const svgPath = join(svgDir, `${iconName}.svg`);
         try {

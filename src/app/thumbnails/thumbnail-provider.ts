@@ -1,8 +1,5 @@
-import { ThumbnailResult } from './types.ts';
+import { ThumbnailContext, ThumbnailResult } from './types.ts';
 
 export interface ThumbnailProvider {
-    handle(
-        resolvedFullPath: string,
-        isDirectory: boolean,
-    ): Promise<ThumbnailResult>;
+    handle(ctx: ThumbnailContext): Promise<ThumbnailResult>;
 }

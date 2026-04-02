@@ -1,5 +1,5 @@
 import { ThumbnailProvider } from './thumbnail-provider.ts';
-import { ThumbnailResult } from './types.ts';
+import { ThumbnailContext, ThumbnailResult } from './types.ts';
 
 export class ThumbnailProviderChain {
     private providers: ThumbnailProvider[] = [];
@@ -12,12 +12,9 @@ export class ThumbnailProviderChain {
         this.providers.push(provider);
     }
 
-    async resolve(
-        resolvedFullPath: string,
-        isDirectory: boolean,
-    ): Promise<ThumbnailResult> {
+    async resolve(ctx: ThumbnailContext): Promise<ThumbnailResult> {
         for (const provider of this.providers) {
-            const result = await provider.handle(resolvedFullPath, isDirectory);
+            const result = await provider.handle(ctx);
             if (result.type === 'ThumbnailFound') {
                 return result;
             }

@@ -4,6 +4,11 @@ export type ThumbnailRequest = {
     isDirectory: boolean;
 };
 
+export type ThumbnailContext = {
+    resolvedFullPath: string;
+    isDirectory: boolean;
+};
+
 export type ThumbnailResult =
     | { type: 'ThumbnailNotFound' }
     | { type: 'ThumbnailFound'; contentType: string; body: string | Uint8Array };

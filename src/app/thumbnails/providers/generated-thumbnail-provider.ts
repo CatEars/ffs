@@ -5,7 +5,7 @@ import { sleep } from '../../../lib/sleep/sleep.ts';
 import { canGenerateThumbnailFor } from '../generate-thumbnail.ts';
 import { prioritizeThumbnail } from '../index.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
-import { ThumbnailResult } from '../types.ts';
+import { ThumbnailContext, ThumbnailResult } from '../types.ts';
 
 async function tryGetFile(fileTree: FileTree, filePath: string) {
     for (let cnt = 0; cnt < 20; ++cnt) {
@@ -37,10 +37,7 @@ export class GeneratedThumbnailProvider implements ThumbnailProvider {
         this.cacheFileTree = new FileTree(getCacheRoot());
     }
 
-    async handle(
-        resolvedFullPath: string,
-        isDirectory: boolean,
-    ): Promise<ThumbnailResult> {
+    async handle({ resolvedFullPath, isDirectory }: ThumbnailContext): Promise<ThumbnailResult> {
         if (!isDirectory && !canGenerateThumbnailFor(resolvedFullPath)) {
             return { type: 'ThumbnailNotFound' };
         }
