@@ -1,9 +1,9 @@
 import { extname } from '@std/path/extname';
 import { join } from '@std/path/join';
 import { Context } from '@oak/oak/context';
-import { HTTP_500_INTERNAL_SERVER_ERROR } from '../../../../lib/http/http-codes.ts';
-import { FfsApplicationState } from '../../../application-state.ts';
-import { logger } from '../../../logging/loggers.ts';
+import { HTTP_500_INTERNAL_SERVER_ERROR } from '../../../lib/http/http-codes.ts';
+import { FfsApplicationState } from '../../application-state.ts';
+import { logger } from '../../logging/loggers.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
 
 type SvgIconName = 'folder' | 'videocam' | 'music_note' | 'photo_camera' | 'description';
@@ -29,7 +29,7 @@ function resolveIconName(resolvedFullPath: string, isDirectory: boolean): SvgIco
     return 'description';
 }
 
-const svgDir = join(import.meta.dirname!, '../../../website/static/svg');
+const svgDir = join(import.meta.dirname!, '../../website/static/svg');
 
 export class SvgIconProvider implements ThumbnailProvider {
     async handle(

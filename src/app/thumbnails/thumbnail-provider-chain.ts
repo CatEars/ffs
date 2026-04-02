@@ -1,5 +1,5 @@
 import { Context } from '@oak/oak/context';
-import { FfsApplicationState } from '../../application-state.ts';
+import { FfsApplicationState } from '../application-state.ts';
 import { ThumbnailProvider } from './thumbnail-provider.ts';
 
 export class ThumbnailProviderChain {

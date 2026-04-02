@@ -1,11 +1,7 @@
 import { Router } from '@oak/oak';
 import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN } from '../../../lib/http/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
-import { SvgIconProvider } from './providers/svg-icon-provider.ts';
-import { ThumbnailProviderChain } from './thumbnail-provider-chain.ts';
-
-export const thumbnailProviderChain = new ThumbnailProviderChain();
-thumbnailProviderChain.append(new SvgIconProvider());
+import { thumbnailProviderChain } from '../../thumbnails/module.ts';
 
 export function register(router: Router) {
     router.get('/api/thumbnail', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {

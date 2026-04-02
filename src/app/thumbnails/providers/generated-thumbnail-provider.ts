@@ -1,12 +1,12 @@
 import { relative } from '@std/path/relative';
 import { Context } from '@oak/oak/context';
-import { FfsApplicationState } from '../../../application-state.ts';
-import { getCacheRoot } from '../../../config.ts';
-import { getThumbnailPath } from '../../../files/cache-folder.ts';
-import { FileTree } from '../../../files/file-tree.ts';
-import { sleep } from '../../../../lib/sleep/sleep.ts';
-import { canGenerateThumbnailFor } from '../../../thumbnails/generate-thumbnail.ts';
-import { prioritizeThumbnail } from '../../../thumbnails/index.ts';
+import { FfsApplicationState } from '../../application-state.ts';
+import { getCacheRoot } from '../../config.ts';
+import { getThumbnailPath } from '../../files/cache-folder.ts';
+import { FileTree } from '../../files/file-tree.ts';
+import { sleep } from '../../../lib/sleep/sleep.ts';
+import { canGenerateThumbnailFor } from '../generate-thumbnail.ts';
+import { prioritizeThumbnail } from '../index.ts';
 import { ThumbnailProvider } from '../thumbnail-provider.ts';
 
 async function tryGetFile(fileTree: FileTree, filePath: string) {

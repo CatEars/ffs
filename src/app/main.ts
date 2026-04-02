@@ -9,7 +9,6 @@ import {
     setPermissionsFromUserOrDefaultToRootAccess,
 } from './application-state.ts';
 import { unsecure, validateConfig } from './config.ts';
-import { thumbnailProviderChain } from './api/thumbnail/index.ts';
 import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
@@ -45,7 +44,7 @@ for (const routeRegistrator of routeRegistrations) {
 await registerAllWebsiteRoutes(router);
 
 if (thumbnailModule.isAvailable()) {
-    thumbnailModule.activate(thumbnailProviderChain);
+    thumbnailModule.activate();
     await thumbnailModule.startBackgroundTasks();
 } else {
     logger.warn(
