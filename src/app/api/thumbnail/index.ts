@@ -35,7 +35,6 @@ export function register(router: Router) {
             return;
         }
 
-        ctx.response.headers.set('Content-Type', result.contentType);
-        ctx.response.body = result.body;
+        await ctx.send({ root: result.root, path: result.path });
     });
 }

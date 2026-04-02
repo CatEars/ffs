@@ -1,5 +1,6 @@
+import { relative } from '@std/path/relative';
 import { getCacheRoot } from '../../config.ts';
-import { getThumbnailPath } from '../../files/cache-folder.ts';
+import { getThumbnailPath, getThumbnailsDir } from '../../files/cache-folder.ts';
 import { FileTree } from '../../files/file-tree.ts';
 import { sleep } from '../../../lib/sleep/sleep.ts';
 import { canGenerateThumbnailFor } from '../generate-thumbnail.ts';
@@ -55,7 +56,7 @@ export class GeneratedThumbnailProvider implements ThumbnailProvider {
             }
         }
 
-        const body = await Deno.readFile(thumbnailPath);
-        return { type: 'ThumbnailFound', contentType: 'image/webp', body };
+        const thumbnailsDir = getThumbnailsDir();
+        return { type: 'ThumbnailFound', root: thumbnailsDir, path: relative(thumbnailsDir, thumbnailPath) };
     }
 }

@@ -11,4 +11,4 @@ export type ThumbnailContext = {
 
 export type ThumbnailResult =
     | { type: 'ThumbnailNotFound' }
-    | { type: 'ThumbnailFound'; contentType: string; body: string | Uint8Array };
+    | { type: 'ThumbnailFound'; root: string; path: string };
