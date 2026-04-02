@@ -16,9 +16,9 @@ export function isAvailable(): boolean {
 
 export function activate(): void {
     thumbnailProviderChain.prepend(new GeneratedThumbnailProvider());
+    startThumbnailBackgroundProcess();
 }
 
 export async function startBackgroundTasks(): Promise<void> {
-    startThumbnailBackgroundProcess();
     await startThumbnailScanning();
 }
