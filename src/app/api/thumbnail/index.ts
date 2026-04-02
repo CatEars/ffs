@@ -30,7 +30,7 @@ export function register(router: Router) {
         }
 
         const result = await thumbnailProviderChain.resolve({ resolvedFullPath: pathExistResult.fullPath, isDirectory });
-        if (result.type === 'ThumbnailNotFound') {
+        if (result.type === 'thumbnail-not-found') {
             ctx.response.status = HTTP_404_NOT_FOUND;
             return;
         }

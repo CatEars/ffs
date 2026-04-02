@@ -40,7 +40,7 @@ export class GeneratedThumbnailProvider implements ThumbnailProvider {
 
     async handle({ resolvedFullPath, isDirectory }: ThumbnailContext): Promise<ThumbnailResult> {
         if (!isDirectory && !canGenerateThumbnailFor(resolvedFullPath)) {
-            return { type: 'ThumbnailNotFound' };
+            return { type: 'thumbnail-not-found' };
         }
 
         const thumbnailPath = getThumbnailPath(resolvedFullPath);
@@ -52,11 +52,11 @@ export class GeneratedThumbnailProvider implements ThumbnailProvider {
                 thumbnailPath,
             );
             if (!generated) {
-                return { type: 'ThumbnailNotFound' };
+                return { type: 'thumbnail-not-found' };
             }
         }
 
         const thumbnailsDir = getThumbnailsDir();
-        return { type: 'ThumbnailFound', root: thumbnailsDir, path: relative(thumbnailsDir, thumbnailPath) };
+        return { type: 'thumbnail-found', root: thumbnailsDir, path: relative(thumbnailsDir, thumbnailPath) };
     }
 }

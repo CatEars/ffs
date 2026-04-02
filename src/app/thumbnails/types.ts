@@ -10,5 +10,5 @@ export type ThumbnailContext = {
 };
 
 export type ThumbnailResult =
-    | { type: 'ThumbnailNotFound' }
-    | { type: 'ThumbnailFound'; root: string; path: string };
+    | { type: 'thumbnail-not-found' }
+    | { type: 'thumbnail-found'; root: string; path: string };

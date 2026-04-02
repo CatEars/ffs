@@ -31,6 +31,6 @@ const svgDir = join(import.meta.dirname!, '../../website/static/svg');
 export class SvgIconProvider implements ThumbnailProvider {
     handle({ resolvedFullPath, isDirectory }: ThumbnailContext): Promise<ThumbnailResult> {
         const iconName = resolveIconName(resolvedFullPath, isDirectory);
-        return Promise.resolve({ type: 'ThumbnailFound', root: svgDir, path: `${iconName}.svg` });
+        return Promise.resolve({ type: 'thumbnail-found', root: svgDir, path: `${iconName}.svg` });
     }
 }

@@ -15,10 +15,10 @@ export class ThumbnailProviderChain {
     async resolve(ctx: ThumbnailContext): Promise<ThumbnailResult> {
         for (const provider of this.providers) {
             const result = await provider.handle(ctx);
-            if (result.type === 'ThumbnailFound') {
+            if (result.type === 'thumbnail-found') {
                 return result;
             }
         }
-        return { type: 'ThumbnailNotFound' };
+        return { type: 'thumbnail-not-found' };
     }
 }
