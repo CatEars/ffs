@@ -5,7 +5,7 @@ export type ThumbnailRequest = {
 };
 
 export type ThumbnailContext = {
-    resolvedFullPath: string;
+    searchObjectFullPath: string;
     isDirectory: boolean;
 };
 

@@ -1,7 +1,11 @@
 import { Router } from '@oak/oak';
-import { HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND } from '../../../lib/http/http-codes.ts';
+import {
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+} from '../../../lib/http/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
-import { thumbnailProviderChain } from '../../thumbnails/module.ts';
+import { thumbnailLocator } from '../../thumbnails/thumbnail-locator.ts';
 
 export function register(router: Router) {
     router.get('/api/thumbnail', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
@@ -19,22 +23,13 @@ export function register(router: Router) {
             return;
         }
 
-        let isDirectory = false;
-        if (pathExistResult.exists) {
-            try {
-                const stat = await Deno.stat(pathExistResult.fullPath);
-                isDirectory = stat.isDirectory;
-            } catch {
-                // File disappeared between resolvePath and stat; treat as file
-            }
-        }
+        const result = await thumbnailLocator.getThumbnail(pathExistResult.fullPath);
 
-        const result = await thumbnailProviderChain.resolve({ resolvedFullPath: pathExistResult.fullPath, isDirectory });
         if (result.type === 'thumbnail-not-found') {
             ctx.response.status = HTTP_404_NOT_FOUND;
             return;
+        } else {
+            await ctx.send({ root: result.root, path: result.path });
         }
-
-        await ctx.send({ root: result.root, path: result.path });
     });
 }

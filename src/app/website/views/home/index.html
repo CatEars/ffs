@@ -15,7 +15,7 @@
                     name: '..',
                     isDirectory: true,
                     fileType: 'directory',
-                    imageSrc: 'folder',
+                    svgIconName: 'folder',
                 },
             ].concat(files);
         }
@@ -368,6 +368,7 @@
                 filename: file.name,
                 'file-type': file.fileType,
                 'image-src': file.imageSrc,
+                'svg-icon-name': file.svgIconName,
                 root: currentPath,
             }))
         );
@@ -379,11 +380,8 @@
                 clone.querySelector('input').value = file.name;
                 clone
                     .querySelector('use')
-                    .setAttribute(
-                        'href',
-                        `/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`
-                    );
-                const imageSource = getFileImageSource(currentPath, file);
+                    .setAttribute('href', `/static/svg/sprite_sheet.svg#${file.svgIconName}`);
+                const imageSource = file.imageSrc;
                 const iconHover = clone.querySelector('icon-hover');
                 if (file.isFile) {
                     iconHover.setAttribute('url', imageSource);

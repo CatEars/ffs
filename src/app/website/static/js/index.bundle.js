@@ -314,9 +314,12 @@
     render(_html) {
       throw new Error("Sub-components must implement the render(...) method.");
     }
+    postRender(_html) {
+    }
     _renderComponent() {
       const content = this.render(html);
       ye(content, this.shadowRoot);
+      this.postRender(html);
     }
     attributeChangedCallback(_name, _oldValue, _newValue) {
       this._renderComponent();
@@ -696,20 +699,16 @@
   }
 
   // display/file/file-card.js
-  function urlEncodeThumbnailComponent(url) {
-    const x2 = url.split("path=")[1];
-    return `/api/thumbnail?path=${encodeURIComponent(x2)}`;
-  }
   var FileCard = class extends BaseWebComponent {
-    static observedAttributes = ["filename", "root", "image-src", "file-type"];
+    static observedAttributes = ["filename", "root", "image-src", "file-type", "svg-icon-name"];
     render(html2) {
       const filename = this.getAttribute("filename") || "";
       const root = this.getAttribute("root") || "";
-      const imageSrc = this.getAttribute("image-src") || "";
       const fileType = this.getAttribute("file-type") || "";
-      const image = imageSrc.includes("/thumbnail") ? html2`<img src="${urlEncodeThumbnailComponent(imageSrc)}" />` : html2`<svg class="large-icon">
-                  <use href="/static/svg/sprite_sheet.svg#${imageSrc}"></use>
-              </svg>`;
+      const iconName = this.getAttribute("svg-icon-name") || "";
+      const image = html2`<svg class="large-icon">
+            <use href="/static/svg/sprite_sheet.svg#${iconName}"></use>
+        </svg>`;
       const href = getNavigationLink(root, filename, fileType);
       const displayText = embellishFilename(filename, fileType);
       return html2`
@@ -758,10 +757,23 @@
                 }
             </style>
             <a href="${href}">
-                <div>${image}</div>
+                <div class="image-container">${image}</div>
                 <span>${displayText}</span>
             </a>
         `;
+    }
+    postRender(_html) {
+      const imageSrc = this.getAttribute("image-src") || "";
+      const container = this.shadowRoot.querySelector(".image-container");
+      if (imageSrc) {
+        const img = new Image();
+        img.src = imageSrc;
+        img.fetchPriority = "low";
+        img.onload = () => {
+          container.innerHTML = "";
+          container.appendChild(img);
+        };
+      }
     }
   };
   var file_card_default = FileCard;
