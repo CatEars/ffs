@@ -40,9 +40,14 @@ export class BaseWebComponent extends HTMLElement {
         throw new Error('Sub-components must implement the render(...) method.');
     }
 
+    postRender(_html) {
+        // Sub-components may override postRender to initiate calls that may affect the shadow DOM
+    }
+
     _renderComponent() {
         const content = this.render(html);
         render(content, this.shadowRoot);
+        this.postRender(html);
     }
 
     attributeChangedCallback(_name, _oldValue, _newValue) {
