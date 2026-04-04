@@ -1,5 +1,6 @@
 import { extname } from '@std/path';
-import { thumbnailExists } from '../files/cache-folder.ts';
+import { thumbnailExists } from '../../files/cache-folder.ts';
+import { ThumbnailRequest } from '../types.ts';
 import { copyMostFitingThumbnailFromDirectory } from './nailers/directory.ts';
 import {
     acceptedFileExtensions as acceptedVideoExtensions,
@@ -9,14 +10,13 @@ import {
     acceptedFileExtensions as acceptedImageExtensions,
     createImageMagickThumbnail,
 } from './nailers/static-images.ts';
-import { ThumbnailRequest } from './types.ts';
 
 type ThumbnailType = 'image' | 'video' | 'directory';
 
 type Thumbnailer = {
     extNames: string[];
     thumbnailType: ThumbnailType;
-    handler: (thumbnail: ThumbnailRequest) => Promise<void>;
+    handler: (thumbnail: ThumbnailRequest) => Promise<string | null>;
 };
 
 // LINK-FILE-EXTENSIONS
@@ -40,20 +40,19 @@ const nailers: Thumbnailer[] = [
 
 const extNames = nailers.flatMap((x) => x.extNames);
 
-export async function generateThumbnail(thumbnail: ThumbnailRequest) {
+export async function generateThumbnail(thumbnail: ThumbnailRequest): Promise<string | null> {
     const ext = extname(thumbnail.filePath);
     for (const nailer of nailers) {
         if (
             thumbnail.isFile && nailer.thumbnailType !== 'directory' &&
             nailer.extNames.includes(ext)
         ) {
-            await nailer.handler(thumbnail);
-            return;
+            return await nailer.handler(thumbnail);
         } else if (thumbnail.isDirectory && nailer.thumbnailType === 'directory') {
-            await nailer.handler(thumbnail);
-            return;
+            return await nailer.handler(thumbnail);
         }
     }
+    return null;
 }
 
 export function canGenerateThumbnailFor(filePath: string) {

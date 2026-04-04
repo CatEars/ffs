@@ -1,9 +1,9 @@
 import { move } from '@std/fs';
 import { ensureDir } from '@std/fs/ensure-dir';
 import { dirname } from '@std/path/dirname';
-import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
-import { logger } from '../../logging/loggers.ts';
-import { ThumbnailRequest } from '../types.ts';
+import { getThumbnailPath, getThumbnailTempDir } from '../../../files/cache-folder.ts';
+import { logger } from '../../../logging/loggers.ts';
+import { ThumbnailRequest } from '../../types.ts';
 
 type Mp4Info = {
     duration: number;
@@ -45,7 +45,7 @@ async function getMp4Duration(thumbnail: ThumbnailRequest): Promise<Mp4Info> {
     };
 }
 
-export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
+export async function createMp4Thumbnail(thumbnail: ThumbnailRequest): Promise<string | null> {
     const mp4Info = await getMp4Duration(thumbnail);
     const position = (mp4Info.duration * 0.45) || 30;
     const outputPath = getThumbnailPath(thumbnail.filePath);
@@ -81,7 +81,7 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
     if (!result.success) {
         logger.debug('ffmpeg problems', new TextDecoder().decode(result.stderr));
         await Deno.remove(tempFile);
-        return;
+        return null;
     }
     await ensureDir(dirname(outputPath));
     await move(tempFile, outputPath, { overwrite: true });
@@ -89,4 +89,5 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest) {
         'Generated thumbnail',
         outputPath,
     );
+    return outputPath;
 }

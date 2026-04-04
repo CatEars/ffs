@@ -1,6 +1,11 @@
 import { Logger } from '../../lib/logger/logger.ts';
 import { OptionalModule } from '../../lib/optional-module/optional-module.ts';
-import { areThumbnailsAvailable, startThumbnailBackgroundProcess } from './index.ts';
+import {
+    activateThumbnailWorker,
+    areThumbnailsAvailable,
+    deactivateThumbnailWorker,
+    startThumbnailBackgroundProcess,
+} from './worker/index.ts';
 
 class ThumbnailsModule implements OptionalModule {
     private activated: boolean = false;
@@ -10,11 +15,10 @@ class ThumbnailsModule implements OptionalModule {
         return Promise.resolve(areThumbnailsAvailable());
     }
 
-    init(): Promise<void> {
+    async init(): Promise<void> {
         // Always start the background process,
         // By deactivating we simply stop producing and returning thumbnails
-        startThumbnailBackgroundProcess();
-        return Promise.resolve();
+        await startThumbnailBackgroundProcess();
     }
 
     isActivated(): boolean {
@@ -22,11 +26,13 @@ class ThumbnailsModule implements OptionalModule {
     }
 
     activate(): Promise<void> {
+        activateThumbnailWorker();
         this.activated = true;
         return Promise.resolve();
     }
 
     deactivate(): Promise<void> {
+        deactivateThumbnailWorker();
         this.activated = false;
         return Promise.resolve();
     }

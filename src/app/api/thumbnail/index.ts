@@ -5,7 +5,7 @@ import {
     HTTP_404_NOT_FOUND,
 } from '../../../lib/http/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
-import { thumbnailLocator } from '../../thumbnails/thumbnail-locator.ts';
+import { getThumbnailLocationQuicklyOrSkip } from '../../thumbnails/worker/index.ts';
 
 export function register(router: Router) {
     router.get('/api/thumbnail', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
@@ -23,7 +23,7 @@ export function register(router: Router) {
             return;
         }
 
-        const result = await thumbnailLocator.getThumbnail(pathExistResult.fullPath);
+        const result = await getThumbnailLocationQuicklyOrSkip(pathExistResult.fullPath);
 
         if (result.type === 'thumbnail-not-found') {
             ctx.response.status = HTTP_404_NOT_FOUND;

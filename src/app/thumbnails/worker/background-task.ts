@@ -8,14 +8,18 @@ import {
     getStoreRoot,
     getThumbnailFinderSkipRegex,
 } from '../../config.ts';
-import { thumbnailExists } from '../../files/cache-folder.ts';
+import { getThumbnailPath, thumbnailExists } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/loggers.ts';
-import { canGenerateThumbnailFor, generateThumbnail } from '../generate-thumbnail.ts';
-import { ThumbnailRequest } from '../types.ts';
+import { ThumbnailRequest, ThumbnailWorkerRequest, ThumbnailWorkerResponse } from '../types.ts';
+import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
+import { areThumbnailsAvailable } from './index.ts';
 
+let activated = false;
 const filesToPrioritize: ThumbnailRequest[] = [];
 const fiveMinutes = 1000 * 60 * 5;
-const recentlyParsedThumbnails = new MemoryCache<ThumbnailRequest>(fiveMinutes);
+const recentlyParsedThumbnails = new MemoryCache<[ThumbnailRequest, string | null]>(
+    fiveMinutes,
+);
 
 function buildFileTreeOptions() {
     const fileTreeOptions = {
@@ -29,6 +33,9 @@ function buildFileTreeOptions() {
 }
 
 async function findFilesToThumbnail() {
+    if (!activated) {
+        return;
+    }
     const storeRoot = getStoreRoot();
     const fileTreeOptions = buildFileTreeOptions();
     const fileTreeWalker = new FileTreeWalker(storeRoot, {
@@ -52,6 +59,9 @@ async function findFilesToThumbnail() {
 }
 
 async function findDirectoriesToThumbnail() {
+    if (!activated) {
+        return;
+    }
     const storeRoot = getStoreRoot();
     const fileTreeOptions = buildFileTreeOptions();
     const fileTreeWalker = new FileTreeWalker(storeRoot, {
@@ -72,18 +82,45 @@ async function findDirectoriesToThumbnail() {
     }
 }
 
+const me: Worker = self as unknown as Worker;
+
+function doPost(message: ThumbnailWorkerResponse) {
+    if (me) {
+        me.postMessage(message);
+    }
+}
+
 async function main() {
     logger.debug(
         'Background task for thumbnail generation started. Storing thumbnails in cache at',
         getCacheRoot(),
     );
 
-    const me: Worker = self as unknown as Worker;
-    if (me.onmessage) {
-        me.onmessage = (event: MessageEvent<ThumbnailRequest>) => {
-            // Always push prioritized requests to top. Let those found on own be at end
-            filesToPrioritize.splice(0, 0, event.data);
+    if (me) {
+        me.onmessage = (event: MessageEvent<ThumbnailWorkerRequest>) => {
+            if (event.data.type === 'create-thumbnail') {
+                // Always push prioritized requests to top. Let those found on own be at end
+                filesToPrioritize.splice(0, 0, event.data);
+            } else if (event.data.type === 'activate') {
+                activated = true;
+                logger.info('Background task for generating thumbnails activated');
+            } else if (event.data.type === 'deactivate') {
+                activated = false;
+                logger.info('Background task for generating thumbnails deactivated');
+            } else if (event.data.type === 'echo') {
+                doPost({
+                    type: 'echo',
+                });
+            }
         };
+    }
+
+    const isSelfAvailable = areThumbnailsAvailable();
+    if (!isSelfAvailable) {
+        logger.debug(
+            'Background task for thumbnails turning itself off since ffmpeg and image magick are not available',
+        );
+        return;
     }
 
     await findFilesToThumbnail();
@@ -91,17 +128,68 @@ async function main() {
     setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);
     setInterval(findDirectoriesToThumbnail, devModeEnabled ? 10_000 : 60_000);
 
+    let consecutiveNothings = 0;
     while (true) {
         while (filesToPrioritize.length > 0) {
+            consecutiveNothings = 0;
             const next = filesToPrioritize.splice(0, 1)[0];
-            if (
-                recentlyParsedThumbnails.get(next.filePath) ||
-                thumbnailExists(next.filePath)
-            ) {
+            if (!activated) {
+                if (next.id) {
+                    doPost({
+                        type: 'thumbnail-not-found',
+                        id: next.id,
+                    });
+                }
                 continue;
             }
+
+            const recentlyParsed = recentlyParsedThumbnails.get(next.filePath);
+            if (recentlyParsed) {
+                if (next.id) {
+                    const [, loc] = recentlyParsed;
+                    if (loc !== null) {
+                        doPost({
+                            type: 'thumbnail-found',
+                            id: next.id,
+                            path: loc,
+                        });
+                    } else {
+                        doPost({
+                            type: 'thumbnail-not-found',
+                            id: next.id,
+                        });
+                    }
+                }
+                continue;
+            }
+
+            if (thumbnailExists(next.filePath)) {
+                if (next.id) {
+                    const filePath = getThumbnailPath(next.filePath);
+                    doPost({
+                        type: 'thumbnail-found',
+                        id: next.id,
+                        path: filePath,
+                    });
+                }
+                continue;
+            }
+
             try {
-                await generateThumbnail(next);
+                const thumbnailPath = await generateThumbnail(next);
+                if (next.id && thumbnailPath) {
+                    doPost({
+                        type: 'thumbnail-found',
+                        id: next.id,
+                        path: thumbnailPath,
+                    });
+                } else if (next.id && !thumbnailPath) {
+                    doPost({
+                        type: 'thumbnail-not-found',
+                        id: next.id,
+                    });
+                }
+                recentlyParsedThumbnails.set(next.filePath, [next, thumbnailPath]);
             } catch (err) {
                 logger.debug(
                     'Failed to generate thumbnail for',
@@ -110,10 +198,14 @@ async function main() {
                     err,
                 );
             }
-
-            recentlyParsedThumbnails.set(next.filePath, next);
         }
-        await sleep(500);
+
+        if (consecutiveNothings > 50) {
+            await sleep(200);
+        } else {
+            consecutiveNothings++;
+        }
+        await sleep(1);
     }
 }
 

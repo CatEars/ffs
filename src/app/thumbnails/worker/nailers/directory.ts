@@ -3,14 +3,14 @@ import { move } from '@std/fs/move';
 import { dirname } from '@std/path/dirname';
 import { extname } from '@std/path/extname';
 import { join } from '@std/path/join';
-import { collectAsync } from '../../../lib/functional/index.ts';
+import { collectAsync } from '../../../../lib/functional/index.ts';
 import {
     getThumbnailPath,
     getThumbnailTempDir,
     thumbnailExists,
-} from '../../files/cache-folder.ts';
-import { logger } from '../../logging/loggers.ts';
-import { ThumbnailRequest } from '../types.ts';
+} from '../../../files/cache-folder.ts';
+import { logger } from '../../../logging/loggers.ts';
+import { ThumbnailRequest } from '../../types.ts';
 import { acceptedFileExtensions as acceptedVideoExtensions } from './mp4.ts';
 import { acceptedFileExtensions as acceptedImageExtensions } from './static-images.ts';
 
@@ -48,7 +48,7 @@ function findFileType(filePath: string) {
 
 export async function copyMostFitingThumbnailFromDirectory(
     request: ThumbnailRequest,
-): Promise<void> {
+): Promise<string | null> {
     // If we created a video thumbnail and there are no other videos -> copy thumbnail to parent
     // Else if we created an image thumbnail and this is the only image -> copy thumbnail to parent
 
@@ -64,4 +64,5 @@ export async function copyMostFitingThumbnailFromDirectory(
     } else if (images.length === 1) {
         await promoteThumbnail(request, images[0].name);
     }
+    return null;
 }
