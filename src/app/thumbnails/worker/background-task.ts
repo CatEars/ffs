@@ -1,7 +1,7 @@
 import { resolve } from '@std/path/resolve';
 import { MemoryCache } from '../../../lib/cache/memory-cache.ts';
+import { Channel } from '../../../lib/channel/channel.ts';
 import { FileTreeWalker } from '../../../lib/file-system/file-tree-walker.ts';
-import { sleep } from '../../../lib/sleep/sleep.ts';
 import {
     devModeEnabled,
     getCacheRoot,
@@ -15,11 +15,11 @@ import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail
 import { areThumbnailsAvailable } from './index.ts';
 
 let activated = false;
-const filesToPrioritize: ThumbnailRequest[] = [];
 const fiveMinutes = 1000 * 60 * 5;
-const recentlyParsedThumbnails = new MemoryCache<[ThumbnailRequest, string | null]>(
+const recentlyParsedThumbnails = new MemoryCache<[string | null]>(
     fiveMinutes,
 );
+const filesToPrioritizeChannel: Channel<ThumbnailRequest> = new Channel();
 
 function buildFileTreeOptions() {
     const fileTreeOptions = {
@@ -50,7 +50,7 @@ async function findFilesToThumbnail() {
     );
 
     for await (const file of fileTreeWalker.walk()) {
-        filesToPrioritize.push({
+        filesToPrioritizeChannel.push({
             filePath: resolve(storeRoot, '.' + file.parent, file.name),
             isFile: true,
             isDirectory: false,
@@ -74,7 +74,7 @@ async function findDirectoriesToThumbnail() {
     fileTreeWalker.filter((file) => !thumbnailExists(file.path));
 
     for await (const directory of fileTreeWalker.walk()) {
-        filesToPrioritize.push({
+        filesToPrioritizeChannel.push({
             filePath: resolve(storeRoot, '.' + directory.parent, directory.name),
             isFile: false,
             isDirectory: true,
@@ -100,7 +100,7 @@ async function main() {
         me.onmessage = (event: MessageEvent<ThumbnailWorkerRequest>) => {
             if (event.data.type === 'create-thumbnail') {
                 // Always push prioritized requests to top. Let those found on own be at end
-                filesToPrioritize.splice(0, 0, event.data);
+                filesToPrioritizeChannel.pushFirst(event.data);
             } else if (event.data.type === 'activate') {
                 activated = true;
                 logger.info('Background task for generating thumbnails activated');
@@ -128,84 +128,76 @@ async function main() {
     setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);
     setInterval(findDirectoriesToThumbnail, devModeEnabled ? 10_000 : 60_000);
 
-    let consecutiveNothings = 0;
     while (true) {
-        while (filesToPrioritize.length > 0) {
-            consecutiveNothings = 0;
-            const next = filesToPrioritize.splice(0, 1)[0];
-            if (!activated) {
-                if (next.id) {
+        const next = await filesToPrioritizeChannel.consume();
+        if (next === null) {
+            continue;
+        }
+        if (!activated) {
+            if (next.id) {
+                doPost({
+                    type: 'thumbnail-not-found',
+                    id: next.id,
+                });
+            }
+            continue;
+        }
+
+        const recentlyParsed = recentlyParsedThumbnails.get(next.filePath);
+        if (recentlyParsed) {
+            if (next.id) {
+                const [loc] = recentlyParsed;
+                if (loc !== null) {
+                    doPost({
+                        type: 'thumbnail-found',
+                        id: next.id,
+                        path: loc,
+                    });
+                } else {
                     doPost({
                         type: 'thumbnail-not-found',
                         id: next.id,
                     });
                 }
-                continue;
             }
-
-            const recentlyParsed = recentlyParsedThumbnails.get(next.filePath);
-            if (recentlyParsed) {
-                if (next.id) {
-                    const [, loc] = recentlyParsed;
-                    if (loc !== null) {
-                        doPost({
-                            type: 'thumbnail-found',
-                            id: next.id,
-                            path: loc,
-                        });
-                    } else {
-                        doPost({
-                            type: 'thumbnail-not-found',
-                            id: next.id,
-                        });
-                    }
-                }
-                continue;
-            }
-
-            if (thumbnailExists(next.filePath)) {
-                if (next.id) {
-                    const filePath = getThumbnailPath(next.filePath);
-                    doPost({
-                        type: 'thumbnail-found',
-                        id: next.id,
-                        path: filePath,
-                    });
-                }
-                continue;
-            }
-
-            try {
-                const thumbnailPath = await generateThumbnail(next);
-                if (next.id && thumbnailPath) {
-                    doPost({
-                        type: 'thumbnail-found',
-                        id: next.id,
-                        path: thumbnailPath,
-                    });
-                } else if (next.id && !thumbnailPath) {
-                    doPost({
-                        type: 'thumbnail-not-found',
-                        id: next.id,
-                    });
-                }
-                recentlyParsedThumbnails.set(next.filePath, [next, thumbnailPath]);
-            } catch (err) {
-                logger.debug(
-                    'Failed to generate thumbnail for',
-                    next,
-                    'Skipping. error:',
-                    err,
-                );
-            }
+            continue;
         }
 
-        if (consecutiveNothings > 50) {
-            await sleep(200);
-        } else {
-            consecutiveNothings++;
+        if (thumbnailExists(next.filePath)) {
+            if (next.id) {
+                const filePath = getThumbnailPath(next.filePath);
+                doPost({
+                    type: 'thumbnail-found',
+                    id: next.id,
+                    path: filePath,
+                });
+            }
+            continue;
         }
-        await sleep(1);
+
+        try {
+            const thumbnailPath = await generateThumbnail(next);
+            if (next.id && thumbnailPath) {
+                doPost({
+                    type: 'thumbnail-found',
+                    id: next.id,
+                    path: thumbnailPath,
+                });
+            } else if (next.id && !thumbnailPath) {
+                doPost({
+                    type: 'thumbnail-not-found',
+                    id: next.id,
+                });
+            }
+            recentlyParsedThumbnails.set(next.filePath, [thumbnailPath]);
+        } catch (err) {
+            logger.debug(
+                'Failed to generate thumbnail for',
+                next,
+                'Skipping. error:',
+                err,
+            );
+        }
     }
 }
 
