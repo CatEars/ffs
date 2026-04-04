@@ -4,6 +4,11 @@ import { embellishFilename, getNavigationLink } from './linking.js';
 class FileCard extends BaseWebComponent {
     static observedAttributes = ['filename', 'root', 'image-src', 'file-type', 'svg-icon-name'];
 
+    constructor() {
+        super();
+        this.imageRenderingStarted = false;
+    }
+
     render(html) {
         const filename = this.getAttribute('filename') || '';
         const root = this.getAttribute('root') || '';
@@ -60,6 +65,9 @@ class FileCard extends BaseWebComponent {
                     padding-right: 0.2rem;
                     flex-grow: 0;
                 }
+                div.loaded > svg {
+                    display: none;
+                }
             </style>
             <a href="${href}">
                 <div class="image-container">${image}</div>
@@ -71,13 +79,15 @@ class FileCard extends BaseWebComponent {
     postRender(_html) {
         const imageSrc = this.getAttribute('image-src') || '';
         const container = this.shadowRoot.querySelector('.image-container');
-        if (imageSrc) {
+        const hasImage = this.imageRenderingStarted;
+        if (imageSrc && !hasImage) {
+            this.imageRenderingStarted = true;
             const img = new Image();
             img.src = imageSrc;
             img.fetchPriority = 'low';
             img.onload = () => {
-                container.innerHTML = '';
                 container.appendChild(img);
+                container.classList.add('loaded');
             };
         }
     }

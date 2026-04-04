@@ -2,9 +2,7 @@ import { ensureDir } from '@std/fs/ensure-dir';
 import { join, relative, resolve } from '@std/path';
 import { existsSync } from 'node:fs';
 import { clearAndEnsureDirectoryExists } from '../../lib/file-system/clear-and-ensure-dir.ts';
-import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
-import { devModeEnabled, getCacheRoot, getStoreRoot } from '../config.ts';
-import { logger } from '../logging/loggers.ts';
+import { getCacheRoot, getStoreRoot } from '../config.ts';
 
 const cachePrefix = 'ffs-cachedir-';
 const THUMBNAILS_SUBDIR = 'thumbnails';
@@ -13,8 +11,6 @@ const SHARE_MANIFESTS_SUBDIR = 'share-manifests';
 const DOWNLOAD_MANIFESTS_SUBDIR = 'download-manifests';
 const EPHEMERAL_USERS_SUBDIR = 'ephemeral-users';
 const UPLOAD_SUBDIR = 'upload';
-const knownThumbnails = new Map<string, Deno.FileInfo>();
-let initialScanCompleted = false;
 
 export function getThumbnailsDir(): string {
     return join(getCacheRoot(), THUMBNAILS_SUBDIR);
@@ -38,27 +34,6 @@ export function getDownloadManifestsDir(): string {
 
 export function getUploadDir(): string {
     return join(getCacheRoot(), UPLOAD_SUBDIR);
-}
-
-async function scanForThumbnails() {
-    const root = getThumbnailsDir();
-    const fileTreeWalker = new FileTreeWalker(root, {
-        includeFiles: true,
-        includeSymlinks: false,
-        includeDirs: false,
-        match: [new RegExp('\.webp$', 'gi')],
-    });
-
-    for await (const entry of fileTreeWalker.walk()) {
-        const fullPath = join(root, entry.parent, entry.name);
-        try {
-            knownThumbnails.set(fullPath, await Deno.stat(fullPath));
-        } catch (err) {
-            logger.debug('got', err, 'when trying to scan for thumbnails');
-        }
-    }
-
-    initialScanCompleted = true;
 }
 
 async function priorTempDirectory() {
@@ -100,10 +75,7 @@ function isOutdated(thumbnailFileInfo: Deno.FileInfo) {
 
 export function thumbnailExists(filePath: string): boolean {
     const thumbnailPath = getThumbnailPath(filePath);
-    if (initialScanCompleted) {
-        const entry = knownThumbnails.get(thumbnailPath);
-        return !!entry && !isOutdated(entry);
-    } else if (existsSync(thumbnailPath)) {
+    if (existsSync(thumbnailPath)) {
         const entry = Deno.statSync(thumbnailPath);
         return entry && !isOutdated(entry);
     } else {
@@ -111,16 +83,9 @@ export function thumbnailExists(filePath: string): boolean {
     }
 }
 
-export async function startThumbnailScanning() {
-    await ensureDir(getThumbnailsDir());
-    await clearAndEnsureDirectoryExists(getThumbnailTempDir());
-    setTimeout(scanForThumbnails, devModeEnabled ? 1 : 2_500);
-    setInterval(scanForThumbnails, devModeEnabled ? 10_000 : 60_000);
-}
-
 export async function ensureCacheDirs() {
     await ensureDir(getThumbnailsDir());
-    await ensureDir(getThumbnailTempDir());
+    await clearAndEnsureDirectoryExists(getThumbnailTempDir());
     await ensureDir(getShareManifestsDir());
     await ensureDir(getEphemeralUsersDir());
     await ensureDir(getDownloadManifestsDir());

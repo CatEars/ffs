@@ -28,7 +28,7 @@ let thumbnailWorker: Worker | undefined;
 
 export function startThumbnailBackgroundProcess() {
     thumbnailWorker = new Worker(
-        new URL('./background-task.ts', import.meta.url).href,
+        new URL('./worker/background-task.ts', import.meta.url).href,
         { type: 'module' },
     );
 }

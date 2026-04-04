@@ -1,17 +1,17 @@
 import { resolve } from '@std/path/resolve';
-import { MemoryCache } from '../../lib/cache/memory-cache.ts';
-import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
-import { sleep } from '../../lib/sleep/sleep.ts';
+import { MemoryCache } from '../../../lib/cache/memory-cache.ts';
+import { FileTreeWalker } from '../../../lib/file-system/file-tree-walker.ts';
+import { sleep } from '../../../lib/sleep/sleep.ts';
 import {
     devModeEnabled,
     getCacheRoot,
     getStoreRoot,
     getThumbnailFinderSkipRegex,
-} from '../config.ts';
-import { thumbnailExists } from '../files/cache-folder.ts';
-import { logger } from '../logging/loggers.ts';
-import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
-import { ThumbnailRequest } from './types.ts';
+} from '../../config.ts';
+import { thumbnailExists } from '../../files/cache-folder.ts';
+import { logger } from '../../logging/loggers.ts';
+import { canGenerateThumbnailFor, generateThumbnail } from '../generate-thumbnail.ts';
+import { ThumbnailRequest } from '../types.ts';
 
 const filesToPrioritize: ThumbnailRequest[] = [];
 const fiveMinutes = 1000 * 60 * 5;

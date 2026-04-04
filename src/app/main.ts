@@ -14,7 +14,7 @@ import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import * as thumbnailModule from './thumbnails/module.ts';
+import { thumbnailsModule } from './thumbnails/module.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
@@ -28,6 +28,7 @@ await initializeLoggers();
 
 const app = new Application<FfsApplicationState>();
 const router = new Router();
+const optionalModules = [thumbnailsModule];
 
 setOnUserAuthenticationHook(async (ctx, user) => {
     setPermissionsFromUserOrDefaultToRootAccess(ctx, user.permissions);
@@ -43,17 +44,19 @@ for (const routeRegistrator of routeRegistrations) {
 }
 await registerAllWebsiteRoutes(router);
 
-if (thumbnailModule.isAvailable()) {
-    thumbnailModule.activate();
-    await thumbnailModule.startBackgroundTasks();
-} else {
-    logger.warn(
-        'ffmpeg is not available, so will not generate thumbnails in the background',
-    );
-}
-
 app.use(router.routes());
 app.use(router.allowedMethods());
+
+for (const optionalModule of optionalModules) {
+    await optionalModule.init();
+    const isAvailable = await optionalModule.isAvailable();
+    if (isAvailable) {
+        logger.info(`Activating module "${optionalModule.name}"`);
+        await optionalModule.activate();
+    } else {
+        optionalModule.warnUnavailableOnStartup(logger);
+    }
+}
 
 if (likelyFirstTimeUser) {
     printWelcomeHelper();
