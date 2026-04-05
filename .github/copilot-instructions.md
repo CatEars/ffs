@@ -39,6 +39,20 @@ Reusable UI components are implemented as native Web Components under `src/app/w
 - When building new UI, reuse existing components from this library before creating new ones.
 - New components must extend `BaseWebComponent` and follow the same `render(html)` pattern.
 
+## Frontend Reactivity: Megaphone
+
+The frontend uses a **homebrew reactivity framework called Megaphone**, defined in `src/app/website/templates/megaphone-js.html`. It is included into every HTML page via the `base.html` template (`src/app/website/templates/base.html`).
+
+**Whenever making changes to the frontend** (HTML views under `src/app/website/views/`, or any inline JavaScript), consult `megaphone-js.html` first to understand:
+
+- How application state is declared (`megaphone.declareState(...)`)
+- How computed/derived values work (`megaphone.view(...)`)
+- How API data is fetched reactively (`megaphone.jsonApi(...)`)
+- How local/session storage is bound to state (`megaphone.localStorage(...)`, `megaphone.sessionStorage(...)`)
+- How CSRF tokens are managed (`megaphone.declareCsrfCookie(...)`)
+
+Do not bypass Megaphone by adding a second reactivity library or ad-hoc DOM mutation; keep all state management inside the existing Megaphone instance on each page.
+
 ## Dependencies
 
 **Do not introduce new libraries or dependencies.** The project intentionally keeps its dependency surface small. All required packages are already declared in `deno.jsonc`. Use only what is already imported there.
