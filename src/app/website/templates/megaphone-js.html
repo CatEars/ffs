@@ -285,13 +285,63 @@
             return new PlainValue(value);
         }
 
+        #bindNewElements(root) {
+            // Only bind when fully initialized; before init() the boundValues map will be
+            // rebuilt by #bindValuesAndEventListeners(), so registering here would be
+            // premature and could result in duplicate entries.
+            if (!this.state || !this.initialized) {
+                return new Set();
+            }
+            const knownStateKeys = new Set(Object.keys(this.state));
+            const newlyBound = new Set();
+            // Include root itself when it is a regular Element (not a DocumentFragment),
+            // since querySelectorAll('*') only returns descendants.
+            const elements = [
+                ...(root.nodeType === Node.ELEMENT_NODE ? [root] : []),
+                ...root.querySelectorAll('*'),
+            ];
+            for (const el of elements) {
+                for (const attribute of el.attributes) {
+                    if (this.#isBoundValueMarker(attribute.name)) {
+                        if (!knownStateKeys.has(attribute.value)) {
+                            continue;
+                        }
+                        if (!this.boundValues.has(attribute.value)) {
+                            this.boundValues.set(attribute.value, []);
+                        }
+                        const userGivenName = attribute.name.substring(1);
+                        this.boundValues.get(attribute.value).push({
+                            element: el,
+                            name: userGivenName,
+                            lowercaseName: userGivenName.toLocaleLowerCase(),
+                        });
+                        newlyBound.add(attribute.value);
+                    } else if (this.#isEventListenerMarker(attribute.name)) {
+                        if (!knownStateKeys.has(attribute.value)) {
+                            continue;
+                        }
+                        const eventName = attribute.name.substring(1);
+                        const func = this.state[attribute.value];
+                        if (func) {
+                            el.addEventListener(eventName, func.get());
+                        }
+                    }
+                }
+            }
+            return newlyBound;
+        }
+
         #renderAndAppend(element, valueToRender, renderFunction, index = null) {
             const rendered =
                 index === null
                     ? renderFunction(valueToRender)
                     : renderFunction(valueToRender, index);
             if (rendered) {
+                const newlyBoundKeys = this.#bindNewElements(rendered);
                 element.appendChild(rendered);
+                for (const key of newlyBoundKeys) {
+                    this.#onUpdate(this.state, key, this.state[key].get());
+                }
             }
         }
 
