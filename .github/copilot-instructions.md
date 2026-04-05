@@ -71,10 +71,6 @@ Prefer keeping all state management inside the existing Megaphone instance on ea
 
 **Do not introduce new libraries or dependencies.** The project intentionally keeps its dependency surface small. All required packages are already declared in `deno.jsonc`. Use only what is already imported there.
 
-## Comments
-
-Follow the minimal-commenting philosophy described in `.github/CODING_GUIDELINES.md`. Write self-documenting code through clear names and types. Do not add comments that restate what the code does. Only comment when explaining a non-obvious algorithmic choice, a deliberate performance trade-off, an intentionally empty block, or a suppressed linter warning.
-
 ## Code Style
 
 - Deno runtime; TypeScript for server-side code, JavaScript for client-side components.
