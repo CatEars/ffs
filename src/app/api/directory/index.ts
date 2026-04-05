@@ -6,6 +6,7 @@ import { FileIdentification, identifyFileFromDirEntry } from '../../files/file-t
 
 type ApiFile = Deno.DirEntry & FileIdentification & {
     date: Date;
+    size?: number;
 };
 
 export function register(router: Router<FfsApplicationState>) {
@@ -32,6 +33,7 @@ export function register(router: Router<FfsApplicationState>) {
                     ...listingResult,
                     ...identifyFileFromDirEntry(statResult.fullPath, listingResult),
                     date,
+                    size: listingResult.isFile ? (statResult.info.size ?? 0) : undefined,
                 };
                 resultingFiles.push(resultingFile);
             }

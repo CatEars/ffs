@@ -53,7 +53,12 @@ Reusable UI components are implemented as native Web Components under `src/app/w
 
 The frontend uses a **homebrew reactivity framework called Megaphone**, defined in `src/app/website/templates/megaphone-js.html`. It is included into every HTML page via the `base.html` template (`src/app/website/templates/base.html`).
 
-**Whenever making changes to the frontend** (HTML views under `src/app/website/views/`, or any inline JavaScript), consult `megaphone-js.html` first to understand:
+**Whenever making changes to the frontend** (HTML views under `src/app/website/views/`, or any inline JavaScript), first check what is already available globally by consulting:
+
+- `src/app/website/templates/base.html` — the base layout included on every page; it pulls in all shared scripts and styles.
+- `src/app/website/templates/js-utils.html` — utility functions available on every page (e.g. `formatBytes`, `range`, `getUrlParam`, `setUrlParam`, `getCookie`). **Do not redefine these in individual page scripts.**
+
+Then consult `megaphone-js.html` to understand:
 
 - How application state is declared (`megaphone.declareState(...)`)
 - How computed/derived values work (`megaphone.view(...)`)

@@ -399,7 +399,13 @@
                 fl.setAttribute('filename', file.name);
                 fl.setAttribute('file-type', file.fileType);
                 fl.setAttribute('root', decodeURIComponent(getCurrentPath()));
-                clone.querySelector('div.file-row-text').appendChild(fl);
+                const rowText = clone.querySelector('div.file-row-text');
+                rowText.insertBefore(fl, clone.querySelector('.file-size'));
+
+                const fileSizeEl = clone.querySelector('.file-size');
+                if (file.isFile && file.size != null) {
+                    fileSizeEl.textContent = formatBytes(file.size, 1);
+                }
 
                 return clone;
             })
