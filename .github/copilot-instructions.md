@@ -60,8 +60,12 @@ The frontend uses a **homebrew reactivity framework called Megaphone**, defined 
 - How API data is fetched reactively (`megaphone.jsonApi(...)`)
 - How local/session storage is bound to state (`megaphone.localStorage(...)`, `megaphone.sessionStorage(...)`)
 - How CSRF tokens are managed (`megaphone.declareCsrfCookie(...)`)
+- How a state value is rendered into a DOM element (`megaphone.render(state, selector, renderFunc)`) — watches `state` and replaces the children of the element matched by `selector` with the result of `renderFunc(value)` on every change.
+- How a list of state values is rendered (`megaphone.renderEach(state, selector, renderFunc)`) — like `render`, but iterates over an array, calling `renderFunc(item, idx)` for each element.
+- How a reusable `<template>` element is cloned and populated (`megaphone.template(templateSelector, renderFunc)`) — returns a render function that deep-clones the `<template>` matched by `templateSelector` and passes the clone to `renderFunc` for population; use as the `renderFunc` argument of `render`/`renderEach`.
+- How a Web Component element is created from state (`megaphone.webComponent(tagName, attributeGenerator)`) — returns a render function that creates a `<tagName>` element and sets attributes from the object returned by `attributeGenerator(value)`; use as the `renderFunc` argument of `render`/`renderEach`.
 
-Do not bypass Megaphone by adding a second reactivity library or ad-hoc DOM mutation; keep all state management inside the existing Megaphone instance on each page.
+Prefer keeping all state management inside the existing Megaphone instance on each page. Avoid introducing a second reactivity library; direct DOM mutations outside of Megaphone render functions are discouraged.
 
 ## Dependencies
 
