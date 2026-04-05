@@ -94,7 +94,7 @@
             Click <em>Few items</em> and <em>Many items</em> repeatedly. The
             <strong>Listener Counts</strong> table must show counts that match the current
             number of rendered rows — never growing beyond that — proving that stale entries
-            are pruned on each re-render. <code>megaphone.listenerCount()</code> is called
+            are pruned on each re-render. <code>megaphone.debugger.listenerCount()</code> is called
             after each render to refresh the display.
         </p>
     </div>
@@ -115,7 +115,7 @@
     <!-- LISTENER COUNTS                                              -->
     <!-- ═══════════════════════════════════════════════════════════ -->
     <div class="section">
-        <p class="section-label">Listener Counts (via <code>megaphone.listenerCount()</code>)</p>
+        <p class="section-label">Listener Counts (via <code>megaphone.debugger.listenerCount()</code>)</p>
         <div id="listener-counts">
             <table class="counter-table">
                 <thead>
@@ -161,7 +161,7 @@
         let renderCount = 0;
 
         function refreshCountDisplay() {
-            const { counts, total } = megaphone.listenerCount();
+            const { counts, total } = megaphone.debugger.listenerCount();
             const tbody = document.getElementById('counts-body');
             tbody.innerHTML = '';
             for (const [key, n] of Object.entries(counts)) {

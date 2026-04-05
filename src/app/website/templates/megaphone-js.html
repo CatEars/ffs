@@ -198,9 +198,20 @@
     class MegaphoneDebugger {
         static _claimedStateNames = new Map();
 
-        constructor() {
+        constructor(megaphone) {
+            this.megaphone = megaphone;
             this.number = this.#generateRandomNumber();
             this.debugEnabled = false;
+        }
+
+        listenerCount() {
+            const counts = {};
+            let total = 0;
+            for (const [key, entries] of this.megaphone.boundValues) {
+                counts[key] = entries.length;
+                total += entries.length;
+            }
+            return { counts, total };
         }
 
         #generateRandomNumber() {
@@ -263,7 +274,7 @@
             this.initTasks = [];
             this.rootNode = document;
             this.csrfToken = null;
-            this.debugger = new MegaphoneDebugger();
+            this.debugger = new MegaphoneDebugger(this);
         }
 
         #isBoundValueMarker(name) {
@@ -596,16 +607,6 @@
 
         debug() {
             this.debugger.debugEnabled = true;
-        }
-
-        listenerCount() {
-            const counts = {};
-            let total = 0;
-            for (const [key, entries] of this.boundValues) {
-                counts[key] = entries.length;
-                total += entries.length;
-            }
-            return { counts, total };
         }
 
         init() {
