@@ -356,6 +356,18 @@
 
                 child = nextSibling;
             }
+            this.#pruneDetachedElements();
+        }
+
+        #pruneDetachedElements() {
+            for (const [key, entries] of this.boundValues) {
+                const live = entries.filter((e) => this.rootNode.contains(e.element));
+                if (live.length === 0) {
+                    this.boundValues.delete(key);
+                } else {
+                    this.boundValues.set(key, live);
+                }
+            }
         }
 
         #registerFormSubmitCsrfAppender() {
@@ -584,6 +596,16 @@
 
         debug() {
             this.debugger.debugEnabled = true;
+        }
+
+        listenerCount() {
+            const counts = {};
+            let total = 0;
+            for (const [key, entries] of this.boundValues) {
+                counts[key] = entries.length;
+                total += entries.length;
+            }
+            return { counts, total };
         }
 
         init() {
