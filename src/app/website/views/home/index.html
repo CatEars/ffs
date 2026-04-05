@@ -81,6 +81,14 @@
             return file.endsWith('.mp3');
         }
 
+        function formatBytes(bytes) {
+            if (bytes == null) return '';
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+            return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+        }
+
         function isImageFile(file) {
             // LINK-FILE-EXTENSIONS
             return [
@@ -399,7 +407,13 @@
                 fl.setAttribute('filename', file.name);
                 fl.setAttribute('file-type', file.fileType);
                 fl.setAttribute('root', decodeURIComponent(getCurrentPath()));
-                clone.querySelector('div.file-row-text').appendChild(fl);
+                const rowText = clone.querySelector('div.file-row-text');
+                rowText.insertBefore(fl, clone.querySelector('.file-size'));
+
+                const fileSizeEl = clone.querySelector('.file-size');
+                if (file.isFile && file.size != null) {
+                    fileSizeEl.textContent = formatBytes(file.size);
+                }
 
                 return clone;
             })

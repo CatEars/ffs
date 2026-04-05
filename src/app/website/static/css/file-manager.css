@@ -18,6 +18,21 @@
         color: var(--font-color);
     }
 
+    .file-row-text {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+    }
+
+    .file-size {
+        margin-left: auto;
+        padding-left: 1rem;
+        white-space: nowrap;
+        font-size: 0.85em;
+        color: var(--font-color-muted, var(--font-color));
+        opacity: 0.7;
+    }
+
     drop-down {
         margin-top: 1rem;
     }
