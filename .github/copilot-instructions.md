@@ -4,6 +4,16 @@
 
 FFS (Friendly File Server) is a Deno-based file server application. The source code lives under `src/` and is organized into four top-level folders.
 
+### Design goals
+
+These goals should guide every technical decision:
+
+- **Crash-resistant** — a power outage means "just restart"; avoid state that can't survive an unclean shutdown.
+- **Zero config** — runnable with no configuration; all config lives in-files and in-app.
+- **Low dependency** — prefer stable, standard APIs over fast-moving packages; keep the dependency surface small and slow-moving.
+- **Mobile usable** — UI must be comfortable on mobile devices, not merely tolerable.
+- **Easy to extend** — writing and enabling a custom plugin should be straightforward.
+
 ## Folder Structure
 
 ### `src/app/`
