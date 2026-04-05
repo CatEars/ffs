@@ -1,0 +1,52 @@
+<!-- layout $templates/base.html -->
+<app-header>Debug</app-header>
+<app-main>
+    <style>
+        .page-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 40rem;
+        }
+        .page-link {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            border-radius: 4px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .page-link:hover {
+            background: rgba(128, 128, 128, 0.08);
+        }
+        .page-link-title {
+            font-weight: bold;
+        }
+        .page-link-path {
+            font-family: monospace;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+    </style>
+
+    <div class="page-list">
+        <a class="page-link" href="/debug/components">
+            <span class="page-link-title">Component Showcase</span>
+            <span class="page-link-path">/debug/components</span>
+        </a>
+        <a class="page-link" href="/debug/megaphone-template-binds">
+            <span class="page-link-title">Megaphone Template Binds (Issue #35)</span>
+            <span class="page-link-path">/debug/megaphone-template-binds</span>
+        </a>
+        <a class="page-link" href="/debug/megaphone-listener-count">
+            <span class="page-link-title">Megaphone Listener Count</span>
+            <span class="page-link-path">/debug/megaphone-listener-count</span>
+        </a>
+        <a class="page-link" href="/debug/print-html-element-properties">
+            <span class="page-link-title">Print HTML Element Properties</span>
+            <span class="page-link-path">/debug/print-html-element-properties</span>
+        </a>
+    </div>
+</app-main>
