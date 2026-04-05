@@ -2,150 +2,66 @@
 <app-header>Debug: Megaphone Template Binds (Issue #35)</app-header>
 <app-main>
     <style>
-        .section {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
-        }
-        .section-label {
-            font-size: 0.75rem;
-            font-weight: bold;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            opacity: 0.6;
-            margin: 0;
-            padding: 0.25rem 0.5rem;
-            border-left: 3px solid currentColor;
-        }
-        .controls {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            min-height: 2rem;
-        }
-        .item-row {
-            display: flex;
-            flex-direction: row;
-            gap: 0.75rem;
-            align-items: center;
-            padding: 0.4rem 0.75rem;
-            border: 1px solid rgba(128, 128, 128, 0.3);
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.85rem;
-        }
-        .item-row.highlighted {
-            background: rgba(100, 180, 255, 0.15);
-            border-color: rgba(100, 180, 255, 0.5);
-        }
-        .badge {
-            font-size: 0.7rem;
-            padding: 0.1rem 0.4rem;
-            border-radius: 3px;
-            background: rgba(128, 128, 128, 0.2);
-        }
-        .status-dot {
-            width: 0.6rem;
-            height: 0.6rem;
-            border-radius: 50%;
-            background: gray;
-            display: inline-block;
-            flex-shrink: 0;
-        }
-        .status-dot.online {
-            background: limegreen;
-        }
-        .description {
-            font-size: 0.875rem;
-            opacity: 0.8;
-            line-height: 1.5;
-            max-width: 50rem;
-        }
+        .item-row { border: 1px solid rgba(128, 128, 128, 0.3); padding: 0.4rem 0.75rem; font-family: monospace; }
+        .item-row.highlighted { background: rgba(100, 180, 255, 0.15); border-color: rgba(100, 180, 255, 0.5); }
+        .status-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: gray; display: inline-block; }
+        .status-dot.online { background: limegreen; }
         .pass { color: green; font-weight: bold; }
         .fail { color: red; font-weight: bold; }
     </style>
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- DESCRIPTION                                                  -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <div class="section">
-        <p class="section-label">Issue #35</p>
-        <p class="description">
-            Bind markers (<code>$attr="stateKey"</code>) inside <code>&lt;template&gt;</code>
-            elements were not registered when the template was cloned and rendered via
-            <code>megaphone.template()</code> + <code>megaphone.renderEach()</code>, because
-            <code>#bindValuesAndEventListeners()</code> only ran once at <code>init()</code>
-            time, before the cloned elements existed in the DOM.
-        </p>
-        <p class="description">
-            Each test below renders rows from a template that contains bind markers.
-            Clicking the toggle button changes the relevant state; if the fix is working the
-            rendered rows update immediately.
-        </p>
+    <h2>Issue #35</h2>
+    <p>
+        Bind markers (<code>$attr="stateKey"</code>) inside <code>&lt;template&gt;</code>
+        elements were not registered when the template was cloned and rendered via
+        <code>megaphone.template()</code> + <code>megaphone.renderEach()</code>, because
+        <code>#bindValuesAndEventListeners()</code> only ran once at <code>init()</code>
+        time, before the cloned elements existed in the DOM.
+    </p>
+    <p>
+        Each test below renders rows from a template that contains bind markers.
+        Clicking the toggle button changes the relevant state; if the fix is working the
+        rendered rows update immediately.
+    </p>
+
+    <h2>Test 1 — <code>$class</code> bind in rendered template rows</h2>
+    <p>
+        Each row is cloned from a <code>&lt;template&gt;</code> whose root
+        <code>&lt;div&gt;</code> carries <code>$class="rowClass"</code>. Clicking
+        <em>Toggle highlight</em> alternates the class between
+        <code>item-row</code> and <code>item-row highlighted</code>. All rows should
+        visually change at once.
+    </p>
+    <div>
+        <button id="toggle-highlight-btn">Toggle highlight</button>
+        <span id="highlight-status">highlight: off</span>
     </div>
+    <div id="rows-container"></div>
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TEST 1: $class bind inside a rendered template              -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <div class="section">
-        <p class="section-label">Test 1 — <code>$class</code> bind in rendered template rows</p>
-        <p class="description">
-            Each row is cloned from a <code>&lt;template&gt;</code> whose root
-            <code>&lt;div&gt;</code> carries <code>$class="rowClass"</code>. Clicking
-            <em>Toggle highlight</em> alternates the class between
-            <code>item-row</code> and <code>item-row highlighted</code>. All rows should
-            visually change at once.
-        </p>
-        <div class="controls">
-            <button id="toggle-highlight-btn">Toggle highlight</button>
-            <span id="highlight-status">highlight: off</span>
-        </div>
-        <div class="item-list" id="rows-container"></div>
+    <h2>Test 2 — multiple bind markers in one template</h2>
+    <p>
+        Each row is cloned from a template containing both
+        <code>$class="dotClass"</code> (status dot) and
+        <code>$textcontent="statusText"</code> (label text). Clicking
+        <em>Toggle online/offline</em> should simultaneously update both the dot
+        colour and the label on every row.
+    </p>
+    <div>
+        <button id="toggle-online-btn">Toggle online/offline</button>
     </div>
+    <div id="status-container"></div>
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TEST 2: multiple bind markers per template clone            -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <div class="section">
-        <p class="section-label">Test 2 — multiple bind markers in one template</p>
-        <p class="description">
-            Each row is cloned from a template containing both
-            <code>$class="dotClass"</code> (status dot) and
-            <code>$textcontent="statusText"</code> (label text). Clicking
-            <em>Toggle online/offline</em> should simultaneously update both the dot
-            colour and the label on every row.
-        </p>
-        <div class="controls">
-            <button id="toggle-online-btn">Toggle online/offline</button>
-        </div>
-        <div class="item-list" id="status-container"></div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TEMPLATES (hidden, not rendered by the browser directly)    -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-
-    <!-- Test 1 template: $class bind controls the entire class string for the row div -->
     <template id="row-template">
         <div $class="rowClass">
             <span class="item-name"></span>
         </div>
     </template>
 
-    <!-- Test 2 template: $class on dot, $textcontent on badge -->
     <template id="status-row-template">
         <div class="item-row">
             <span $class="dotClass" class="status-dot"></span>
             <span class="item-name"></span>
-            <span $textcontent="statusText" class="badge">offline</span>
+            <span $textcontent="statusText">offline</span>
         </div>
     </template>
 

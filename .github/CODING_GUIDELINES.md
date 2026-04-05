@@ -124,6 +124,16 @@ If you find yourself needing to write a comment to explain what code does:
 2. Consider extracting complex logic into a well-named function
 3. Only if the code still requires explanation, add a minimal comment
 
+## Debug Pages
+
+Debug pages under `src/app/website/views/debug/` must be kept **mostly style-free**:
+
+- Do not add `<style>` blocks for cosmetic layout (sections, cards, labels, descriptions).
+- Use semantic HTML elements (`<h2>`, `<p>`, `<ul>`, `<button>`, etc.) for structure.
+- Web components (e.g. `<app-header>`, `<app-main>`) may be used freely.
+- A minimal `<style>` block is acceptable only when the CSS is directly required by the test
+  being demonstrated (e.g. `.highlighted { background: ... }` to visually confirm a class-bind works).
+
 ## Summary
 
 The FFS project values clean, readable code that speaks for itself. Before adding a comment, ask
