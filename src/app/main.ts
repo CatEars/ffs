@@ -17,6 +17,7 @@ import { pluginsModule } from './plugins/module.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
+import { startHotSwap } from './website/hot-swap.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -62,6 +63,8 @@ for (const optionalModule of optionalModules) {
 if (likelyFirstTimeUser) {
     printWelcomeHelper();
 }
+
+startHotSwap(router);
 
 const port = 8080;
 logger.info(`Starting server on port ${port}`);

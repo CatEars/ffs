@@ -207,3 +207,9 @@ export class HtmlTemplate {
 export function loadHtml(filePath: string): HtmlTemplate {
     return new HtmlTemplate(filePath);
 }
+
+export function clearAllRenderCache(): void {
+    for (const key of Object.keys(renderCache)) {
+        delete renderCache[key];
+    }
+}
