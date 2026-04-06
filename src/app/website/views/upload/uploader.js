@@ -12,7 +12,8 @@ self.onmessage = (evt) => {
             }
             setTimeout(async () => {
                 let cnt = 0;
-                const progressUpdatePeriod = 50;
+                let lastProgressAt = 0;
+                const progressIntervalMs = 100;
 
                 for await (const chunk of evt.data) {
                     cnt += chunk.length;
@@ -21,7 +22,9 @@ self.onmessage = (evt) => {
                         method: 'POST',
                         body: blob,
                     });
-                    if (cnt % progressUpdatePeriod === 0) {
+                    const now = Date.now();
+                    if (now - lastProgressAt >= progressIntervalMs) {
+                        lastProgressAt = now;
                         self.postMessage(
                             JSON.stringify({
                                 type: 'progress',
