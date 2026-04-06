@@ -3,15 +3,19 @@ import { WorkerRpc } from '../../../lib/worker-rpc/worker-rpc.ts';
 import { logger } from '../../logging/loggers.ts';
 import { ThumbnailRequest, ThumbnailWorkerRequest, ThumbnailWorkerResponse } from '../types.ts';
 
-const ffmpegTester = new ExecutableTester('ffmpeg', ['-version'], /^ffmpeg version \d\.\d\.\d/);
-const imageMagickTester = new ExecutableTester(
+export const ffmpegTester = new ExecutableTester(
+    'ffmpeg',
+    ['-version'],
+    /^ffmpeg version \d\.\d\.\d/,
+);
+export const imageMagickTester = new ExecutableTester(
     'convert',
     ['-version'],
     /^Version: ImageMagick \d\.\d\.\d/,
 );
 
 export async function areThumbnailsAvailable() {
-    return (await ffmpegTester.isAvailable()) && (await imageMagickTester.isAvailable());
+    return (await ffmpegTester.isAvailable()) || (await imageMagickTester.isAvailable());
 }
 
 let thumbnailRpc: WorkerRpc<ThumbnailWorkerRequest, ThumbnailWorkerResponse> | undefined;

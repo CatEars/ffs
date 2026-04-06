@@ -1,6 +1,7 @@
 import { extname } from '@std/path';
 import { thumbnailExists } from '../../files/cache-folder.ts';
 import { ThumbnailRequest } from '../types.ts';
+import { ffmpegTester, imageMagickTester } from './index.ts';
 import { copyMostFitingThumbnailFromDirectory } from './nailers/directory.ts';
 import {
     acceptedFileExtensions as acceptedVideoExtensions,
@@ -19,18 +20,20 @@ type Thumbnailer = {
     handler: (thumbnail: ThumbnailRequest) => Promise<string | null>;
 };
 
+const ffmpegNailer: Thumbnailer = {
+    extNames: acceptedVideoExtensions,
+    thumbnailType: 'video',
+    handler: createMp4Thumbnail,
+};
+
+const imageMagickNailer: Thumbnailer = {
+    extNames: acceptedImageExtensions,
+    thumbnailType: 'image',
+    handler: createImageMagickThumbnail,
+};
+
 // LINK-FILE-EXTENSIONS
-const nailers: Thumbnailer[] = [
-    {
-        extNames: acceptedVideoExtensions,
-        thumbnailType: 'video',
-        handler: createMp4Thumbnail,
-    },
-    {
-        extNames: acceptedImageExtensions,
-        thumbnailType: 'image',
-        handler: createImageMagickThumbnail,
-    },
+let nailers: Thumbnailer[] = [
     {
         extNames: [],
         thumbnailType: 'directory',
@@ -38,7 +41,10 @@ const nailers: Thumbnailer[] = [
     },
 ];
 
-const extNames = nailers.flatMap((x) => x.extNames);
+let extNames: string[] = [];
+function rebuildExtNames() {
+    extNames = nailers.flatMap((x) => x.extNames);
+}
 
 export async function generateThumbnail(thumbnail: ThumbnailRequest): Promise<string | null> {
     const ext = extname(thumbnail.filePath);
@@ -61,4 +67,32 @@ export function canGenerateThumbnailFor(filePath: string) {
         return true;
     }
     return thumbnailExists(filePath);
+}
+
+export async function ensureNailersUpToDate() {
+    let changed = false;
+    const containsFfmpeg = nailers.some((elem) => elem.thumbnailType === 'video');
+    const containsImageMagick = nailers.some((elem) => elem.thumbnailType === 'image');
+    const ffmpegAvailable = await ffmpegTester.isAvailable();
+    const imageMagickAvailable = await imageMagickTester.isAvailable();
+
+    if (ffmpegAvailable && !containsFfmpeg) {
+        nailers.push(ffmpegNailer);
+        changed = true;
+    } else if (!ffmpegAvailable && containsFfmpeg) {
+        nailers = nailers.filter((x) => x.thumbnailType === 'video');
+        changed = true;
+    }
+
+    if (imageMagickAvailable && !containsImageMagick) {
+        nailers.push(imageMagickNailer);
+        changed = true;
+    } else if (!imageMagickAvailable && containsImageMagick) {
+        nailers = nailers.filter((x) => x.thumbnailType === 'image');
+        changed = true;
+    }
+
+    if (changed) {
+        rebuildExtNames();
+    }
 }

@@ -12,7 +12,11 @@ import {
 import { getThumbnailPath, thumbnailExists } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/loggers.ts';
 import { ThumbnailRequest, ThumbnailWorkerRequest, ThumbnailWorkerResponse } from '../types.ts';
-import { canGenerateThumbnailFor, generateThumbnail } from './generate-thumbnail.ts';
+import {
+    canGenerateThumbnailFor,
+    ensureNailersUpToDate,
+    generateThumbnail,
+} from './generate-thumbnail.ts';
 import { areThumbnailsAvailable } from './index.ts';
 
 let activated = false;
@@ -142,6 +146,11 @@ async function main() {
         activated = false;
         logger.info('Background task for generating thumbnails deactivated');
     });
+
+    await ensureNailersUpToDate();
+    setInterval(async () => {
+        await ensureNailersUpToDate();
+    }, 60_000);
 
     if (await areThumbnailsAvailable()) {
         await findFilesToThumbnail();
