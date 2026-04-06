@@ -97,11 +97,6 @@ async function main() {
         getCacheRoot(),
     );
 
-    if (!me) {
-        logger.debug('Disk usage worker does not hold reference to self, unable to set up communication');
-        return;
-    }
-
     await loadCacheFromDisk();
 
     const rpc = WorkerRpc.buildFromWorker<DiskUsageWorkerRequest, DiskUsageWorkerResponse>(me);

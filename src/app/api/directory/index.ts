@@ -33,7 +33,7 @@ export function register(router: Router<FfsApplicationState>) {
             const statResult = await fileTree.stat(listing, listingResult.name);
             if (statResult.type === 'valid') {
                 const date = statResult.info.mtime || statResult.info.ctime || new Date(0);
-                const resultingFile: ApiFile = {
+                const resultingFile = {
                     ...listingResult,
                     ...identifyFileFromDirEntry(statResult.fullPath, listingResult),
                     date,
