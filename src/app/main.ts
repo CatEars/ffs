@@ -13,6 +13,7 @@ import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
 import { optionalModules } from './optional-modules.ts';
+import { pluginsModule } from './plugins/module.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
@@ -46,6 +47,7 @@ await registerAllWebsiteRoutes(router);
 app.use(router.routes());
 app.use(router.allowedMethods());
 
+pluginsModule.setRouter(router);
 for (const optionalModule of optionalModules) {
     await optionalModule.init();
     const isAvailable = await optionalModule.isAvailable();

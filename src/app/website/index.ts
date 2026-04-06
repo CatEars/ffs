@@ -19,17 +19,22 @@ import { loadHtml } from './templating.ts';
 export async function registerAllWebsiteRoutes(router: Router) {
     const allPages = await collectAllPages();
     const plainPages = allPages.filter((x) => x.type === 'Plain') as PlainPage[];
-    const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
     const jsPages = allPages.filter((x) => x.type === 'Js') as StaticJsPage[];
     registerPlainPages(plainPages, router);
+    await writeNavbarExtensions([]);
+
+    await registerStaticRoutes(router);
+    registerStaticJsRoutes(jsPages, router);
+}
+
+export async function registerPluginPagesOnRouter(router: Router): Promise<void> {
+    const allPages = await collectAllPages();
+    const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
     try {
         await registerPluginPages(pluginPages, router);
     } catch {
         logger.debug('Unable to register plugin pages');
     }
-
-    await registerStaticRoutes(router);
-    registerStaticJsRoutes(jsPages, router);
 }
 
 function registerStaticJsRoutes(pages: StaticJsPage[], router: Router) {
