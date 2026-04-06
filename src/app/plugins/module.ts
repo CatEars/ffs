@@ -29,6 +29,9 @@ class PluginsModule implements OptionalModule {
     }
 
     async activate(): Promise<void> {
+        // Routes cannot be removed from Oak's router once registered, so we
+        // only register them on the first activation. Subsequent activate()
+        // calls (e.g. after a deactivate/activate cycle) only update the flag.
         if (!this.routesRegistered && this.router !== null) {
             await registerPluginPagesOnRouter(this.router);
             this.routesRegistered = true;

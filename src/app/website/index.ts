@@ -9,6 +9,7 @@ import { logger } from '../logging/loggers.ts';
 import {
     collectAllPages,
     NavbarLink,
+    Page,
     PlainPage,
     PluginPage,
     StaticJsPage,
@@ -16,8 +17,17 @@ import {
 import { registerStaticRoutes } from './static-files.ts';
 import { loadHtml } from './templating.ts';
 
+let cachedPages: Page[] | null = null;
+
+async function getPages(): Promise<Page[]> {
+    if (cachedPages === null) {
+        cachedPages = await collectAllPages();
+    }
+    return cachedPages;
+}
+
 export async function registerAllWebsiteRoutes(router: Router) {
-    const allPages = await collectAllPages();
+    const allPages = await getPages();
     const plainPages = allPages.filter((x) => x.type === 'Plain') as PlainPage[];
     const jsPages = allPages.filter((x) => x.type === 'Js') as StaticJsPage[];
     registerPlainPages(plainPages, router);
@@ -28,7 +38,7 @@ export async function registerAllWebsiteRoutes(router: Router) {
 }
 
 export async function registerPluginPagesOnRouter(router: Router): Promise<void> {
-    const allPages = await collectAllPages();
+    const allPages = await getPages();
     const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
     try {
         await registerPluginPages(pluginPages, router);
