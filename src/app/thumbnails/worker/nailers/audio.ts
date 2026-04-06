@@ -1,7 +1,11 @@
 import { ensureDir } from '@std/fs/ensure-dir';
 import { move } from '@std/fs/move';
 import { dirname } from '@std/path/dirname';
-import { getThumbnailPath, getThumbnailTempDir } from '../../../files/cache-folder.ts';
+import {
+    getThumbnailPath,
+    getThumbnailTempDir,
+    thumbnailExists,
+} from '../../../files/cache-folder.ts';
 import { logger } from '../../../logging/loggers.ts';
 import { ThumbnailRequest } from '../../types.ts';
 
@@ -91,5 +95,27 @@ export async function createAudioThumbnail(
     await ensureDir(dirname(outputPath));
     await move(tempThumbFile, outputPath, { overwrite: true });
     logger.debug('Generated thumbnail', outputPath);
+
+    // Promote album art to the parent directory if it doesn't already have a thumbnail.
+    const parentDir = dirname(thumbnail.filePath);
+    if (!thumbnailExists(parentDir)) {
+        const parentThumbnailPath = getThumbnailPath(parentDir);
+        const tempPromotedFile = await Deno.makeTempFile({
+            prefix: 'ffs_audiodir',
+            dir: getThumbnailTempDir(),
+            suffix: '.webp',
+        });
+        try {
+            await Deno.copyFile(outputPath, tempPromotedFile);
+        } catch (err) {
+            await Deno.remove(tempPromotedFile);
+            logger.debug('Failed to promote album art thumbnail to directory', parentDir, err);
+            return outputPath;
+        }
+        await ensureDir(dirname(parentThumbnailPath));
+        await move(tempPromotedFile, parentThumbnailPath, { overwrite: true });
+        logger.debug('Promoted album art thumbnail to directory', parentThumbnailPath);
+    }
+
     return outputPath;
 }
