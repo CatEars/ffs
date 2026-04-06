@@ -211,6 +211,7 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 '03 - Galactic Spit (Extended Mix).mp3',
                 '04 - Event Horizon Boogie.mp3',
             ],
+            readme: 'Tests: MP3 album with two art files (front.jpg + back.jpg).',
         },
         {
             name: 'Professor Bongo & The Time Weasels - Live at the Cheese Factory',
@@ -221,6 +222,8 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 '03 - The Professors Lament.mp3',
                 '04 - Encore Encore (Reprise).mp3',
             ],
+            readme:
+                'Tests: MP3 album with a single art file named AlbumArt.jpg (Windows Media Player convention).',
         },
         {
             name: 'The Spectacular Turnip Orchestra - Greatest Ringtones',
@@ -230,6 +233,8 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 '02 - Hold Music Fantasia.mp3',
                 '03 - Elevator Jazz Supreme.mp3',
             ],
+            readme:
+                'Tests: MP3 album with a single art file named cover.jpg (common open-source player convention).',
         },
         {
             name: 'DJ Sprocket & MC Spatula - Breakfast Bangers Vol. 2',
@@ -240,6 +245,8 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 '03 - Scrambled Eggs Remix.mp3',
                 '04 - Omelette du Jour (Radio Edit).mp3',
             ],
+            readme:
+                'Tests: MP3 album with a single art file named folder.jpg (Windows Explorer thumbnail convention).',
         },
         {
             name: 'The Invisible Ukulele Ensemble - Self-Titled',
@@ -249,6 +256,7 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 '02 - You Cant See Me But You Can Hear Me.mp3',
                 '03 - The Soundless Sound.mp3',
             ],
+            readme: 'Tests: MP3 album with no album art at all.',
         },
         {
             name: 'Sir Reginald Fluffington III - Opus for Cats and Thunderstorms',
@@ -260,6 +268,8 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 'Track04.wav',
                 'Track05.wav',
             ],
+            readme:
+                'Tests: WAV album (typical CD-rip layout) with two art files (front.jpg + back.jpg) and generic track names.',
         },
     ];
 
@@ -278,6 +288,10 @@ async function createAudioAlbums(basePath: string): Promise<void> {
             await Deno.writeFile(trackPath, new Uint8Array(0));
             console.log(`Created track: ${trackPath}`);
         }
+
+        const readmePath = join(albumDir, 'readme.txt');
+        await Deno.writeTextFile(readmePath, album.readme + '\n');
+        console.log(`Created readme: ${readmePath}`);
     }
 }
 
