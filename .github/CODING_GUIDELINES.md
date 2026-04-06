@@ -124,6 +124,20 @@ If you find yourself needing to write a comment to explain what code does:
 2. Consider extracting complex logic into a well-named function
 3. Only if the code still requires explanation, add a minimal comment
 
+## Debug Pages
+
+Debug pages live under `src/app/website/views/debug/`. They are unlisted — not linked from the
+main navigation — and intended for development and testing purposes only.
+
+### Rules for debug pages
+
+- **Style-free**: no cosmetic `<style>` blocks. Use semantic HTML and web components for layout.
+  A minimal `<style>` is only allowed when the CSS itself is what is being tested (e.g. visual
+  states).
+- **Index page**: `src/app/website/views/debug/index.html` is the linking page that lists all
+  debug pages. **Whenever a new debug page is added, add a link to it in this index.** This keeps
+  all debug tools discoverable from a single entry point at `/debug/`.
+
 ## Summary
 
 The FFS project values clean, readable code that speaks for itself. Before adding a comment, ask
