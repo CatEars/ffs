@@ -2,6 +2,7 @@ import { Logger } from '../logger/logger.ts';
 
 export interface OptionalModule {
     name: string;
+    description: string;
     isAvailable(): Promise<boolean>;
     init(): Promise<void>;
     isActivated(): boolean;

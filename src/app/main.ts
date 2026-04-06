@@ -12,9 +12,9 @@ import { unsecure, validateConfig } from './config.ts';
 import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
+import { optionalModules } from './optional-modules.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import { thumbnailsModule } from './thumbnails/module.ts';
 import { registerAllWebsiteRoutes } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
@@ -28,7 +28,6 @@ await initializeLoggers();
 
 const app = new Application<FfsApplicationState>();
 const router = new Router();
-const optionalModules = [thumbnailsModule];
 
 setOnUserAuthenticationHook(async (ctx, user) => {
     setPermissionsFromUserOrDefaultToRootAccess(ctx, user.permissions);
