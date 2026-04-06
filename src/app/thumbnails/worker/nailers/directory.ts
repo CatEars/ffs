@@ -9,7 +9,6 @@ import {
     getThumbnailTempDir,
     thumbnailExists,
 } from '../../../files/cache-folder.ts';
-import { logger } from '../../../logging/loggers.ts';
 import { ThumbnailRequest } from '../../types.ts';
 import { acceptedFileExtensions as acceptedAudioExtensions } from './audio.ts';
 import { acceptedFileExtensions as acceptedVideoExtensions } from './mp4.ts';
@@ -31,7 +30,6 @@ async function promoteThumbnail(request: ThumbnailRequest, fileToCopy: string) {
     }
     await ensureDir(dirname(targetPath));
     await move(tempFile, targetPath, { overwrite: true });
-    logger.debug('Promoting thumbnail for', sourcePath, 'to directory', targetPath);
 }
 
 function findFileType(filePath: string) {

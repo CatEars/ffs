@@ -43,10 +43,6 @@ export async function createImageMagickThumbnail(
     });
     const result = await command.output();
     if (!result.success) {
-        logger.debug(
-            'image magick problems',
-            new TextDecoder().decode(result.stderr),
-        );
         await Deno.remove(tempFile);
         return null;
     }
