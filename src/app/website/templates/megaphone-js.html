@@ -518,7 +518,8 @@
                 if (!options.headers) {
                     options.headers = {};
                 }
-                options.headers['FFS-Csrf-Protection'] = this.csrfToken;
+                console.log(this.csrfToken);
+                options.headers['FFS-Csrf-Protection'] = this.csrfToken.value;
             }
             return fetch(path, options);
         }
