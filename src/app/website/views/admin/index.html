@@ -89,7 +89,7 @@
     <section $data-visibility="allowHousekeepingVisibility">
         <h2>Thumbnails</h2>
         <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
-        <form action="/api/admin/clear-thumbnails">
+        <form action="/api/admin/clear-thumbnails" method="post">
             <fieldset>
                 <button type="submit">Clear Thumbnails</button>
             </fieldset>
@@ -104,7 +104,7 @@
                 >Warning: existing share links will no longer be accessible after clearing.</strong
             >
         </p>
-        <form action="/api/admin/clear-manifests">
+        <form action="/api/admin/clear-manifests" method="post">
             <fieldset>
                 <button type="submit">Clear Share Links</button>
             </fieldset>

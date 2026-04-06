@@ -66,9 +66,10 @@ export const ensurePermissions: (
         const selection = selector(ctx.state.userPermissions || {});
         const selectedPermissions = Array.isArray(selection) ? selection : [selection];
         if (selectedPermissions.every((x) => x === true)) {
+            await next();
+        } else {
             ctx.response.status = HTTP_403_FORBIDDEN;
             ctx.response.body = { error: opts.message ?? 'Forbidden' };
             return;
         }
-        await next();
     };
