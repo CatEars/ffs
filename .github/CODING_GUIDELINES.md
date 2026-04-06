@@ -129,3 +129,37 @@ If you find yourself needing to write a comment to explain what code does:
 The FFS project values clean, readable code that speaks for itself. Before adding a comment, ask
 yourself: "Can I make the code clearer instead?" If the answer is yes, refactor the code. If the
 answer is no, and the comment provides genuine value, then add it sparingly.
+
+## Frontend: Making Authenticated Fetch Requests
+
+When making `fetch` requests from frontend page scripts, **always use `megaphone.authorizedFetch`**
+instead of the global `fetch`. This method automatically attaches the CSRF token declared via
+`megaphone.declareCsrfCookie(...)`, so you never need to read the cookie manually or set the
+`FFS-Csrf-Protection` header yourself.
+
+**Bad (manual CSRF handling):**
+
+```javascript
+const csrfToken = getCookie('FFS-Csrf-Protection');
+const res = await fetch('/api/admin/some-action', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'FFS-Csrf-Protection': csrfToken,
+    },
+    body: JSON.stringify(payload),
+});
+```
+
+**Good (megaphone handles CSRF):**
+
+```javascript
+const res = await megaphone.authorizedFetch('/api/admin/some-action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+});
+```
+
+`megaphone.authorizedFetch` forwards all options to `fetch` unchanged, only injecting the CSRF
+header when a token has been declared. Use it for every authenticated POST/PUT/DELETE call.

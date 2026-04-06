@@ -42,14 +42,10 @@
                     const endpoint = toggle.checked
                         ? '/api/admin/modules/activate'
                         : '/api/admin/modules/deactivate';
-                    const csrfToken = getCookie('FFS-Csrf-Protection');
                     errorMsg.textContent = '';
-                    const res = await fetch(endpoint, {
+                    const res = await megaphone.authorizedFetch(endpoint, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'FFS-Csrf-Protection': csrfToken,
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: mod.name }),
                     });
                     if (!res.ok) {
