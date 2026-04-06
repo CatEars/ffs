@@ -65,7 +65,6 @@ export async function loadAndCleanBookings(): Promise<void> {
                     bookings.set(token, booking);
                 }
             } catch {
-                // Malformed or missing booking.json — log a warning and skip
                 logger.warn('Could not load upload booking for token', token, '— skipping');
             }
         }
