@@ -1,11 +1,13 @@
 import { Router } from '@oak/oak';
+import { relative } from '@std/path/relative';
 import {
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 } from '../../../lib/http/http-codes.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
-import { getThumbnailLocationQuicklyOrSkip } from '../../thumbnails/worker/index.ts';
+import { getThumbnailsDir } from '../../files/cache-folder.ts';
+import { getThumbnailLocationQuicklyOrNull } from '../../thumbnails/worker/index.ts';
 
 export function register(router: Router) {
     router.get('/api/thumbnail', baseMiddlewares(), ...protectedMiddlewares(), async (ctx) => {
@@ -23,13 +25,15 @@ export function register(router: Router) {
             return;
         }
 
-        const result = await getThumbnailLocationQuicklyOrSkip(pathExistResult.fullPath);
+        const result = await getThumbnailLocationQuicklyOrNull(pathExistResult.fullPath);
 
-        if (result.type === 'thumbnail-not-found') {
+        if (!result || result.type !== 'thumbnail-found') {
             ctx.response.status = HTTP_404_NOT_FOUND;
             return;
         } else {
-            await ctx.send({ root: result.root, path: result.path });
+            const root = getThumbnailsDir();
+            const path = relative(root, result.path);
+            await ctx.send({ root, path });
         }
     });
 }

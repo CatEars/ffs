@@ -42,13 +42,14 @@ const extNames = nailers.flatMap((x) => x.extNames);
 
 export async function generateThumbnail(thumbnail: ThumbnailRequest): Promise<string | null> {
     const ext = extname(thumbnail.filePath);
+    const stat = await Deno.stat(thumbnail.filePath);
     for (const nailer of nailers) {
         if (
-            thumbnail.isFile && nailer.thumbnailType !== 'directory' &&
+            stat.isFile && nailer.thumbnailType !== 'directory' &&
             nailer.extNames.includes(ext)
         ) {
             return await nailer.handler(thumbnail);
-        } else if (thumbnail.isDirectory && nailer.thumbnailType === 'directory') {
+        } else if (stat.isDirectory && nailer.thumbnailType === 'directory') {
             return await nailer.handler(thumbnail);
         }
     }

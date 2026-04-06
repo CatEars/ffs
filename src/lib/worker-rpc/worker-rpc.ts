@@ -1,4 +1,4 @@
-import { EventEmitter } from 'node:stream';
+import { EventEmitter } from 'node:events';
 import { sleep } from '../sleep/sleep.ts';
 
 export type WorkerRpcRequestOptions = {
@@ -11,23 +11,20 @@ export type IdCarrierOrTypeCarrier = {
     type: string;
 };
 
-// deno-lint-ignore no-explicit-any
-type PostMessageFunction = (message: any) => void;
-
 export class WorkerRpc<
     TSendMessage extends IdCarrierOrTypeCarrier,
     TReceiveMessage extends IdCarrierOrTypeCarrier,
 > {
-    private readonly postMessage: PostMessageFunction;
+    private readonly wrappedWorker: Worker;
     private readonly messageEmitter: EventEmitter;
 
-    constructor(postMessage: PostMessageFunction, messageEmitter: EventEmitter) {
-        this.postMessage = postMessage;
+    constructor(wrappedWorker: Worker, messageEmitter: EventEmitter) {
+        this.wrappedWorker = wrappedWorker;
         this.messageEmitter = messageEmitter;
     }
 
     post(message: TSendMessage) {
-        this.postMessage(message);
+        this.wrappedWorker.postMessage(message);
     }
 
     on($type: string, handler: (msg: TReceiveMessage) => void) {
@@ -78,7 +75,7 @@ export class WorkerRpc<
         TReceiveMessage extends IdCarrierOrTypeCarrier,
     >(worker: Worker) {
         return new WorkerRpc<TReceiveMessage, TSendMessage>(
-            worker.postMessage,
+            worker,
             this.#buildEventEmitter(worker),
         );
     }
@@ -88,7 +85,7 @@ export class WorkerRpc<
         TReceiveMessage extends IdCarrierOrTypeCarrier,
     >(worker: Worker) {
         return new WorkerRpc<TSendMessage, TReceiveMessage>(
-            worker.postMessage,
+            worker,
             this.#buildEventEmitter(worker),
         );
     }

@@ -1,14 +1,6 @@
-import { extname } from '@std/path/extname';
-import { relative } from '@std/path/relative';
 import { WorkerRpc } from '../../../lib/worker-rpc/worker-rpc.ts';
-import { getThumbnailsDir } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/loggers.ts';
-import {
-    ThumbnailRequest,
-    ThumbnailResult,
-    ThumbnailWorkerRequest,
-    ThumbnailWorkerResponse,
-} from '../types.ts';
+import { ThumbnailRequest, ThumbnailWorkerRequest, ThumbnailWorkerResponse } from '../types.ts';
 
 function runFfmpegVersion() {
     try {
@@ -92,19 +84,13 @@ export function deactivateThumbnailWorker() {
     thumbnailRpc?.post({ type: 'deactivate' });
 }
 
-export async function getThumbnailLocationQuicklyOrSkip(
+export async function getThumbnailLocationQuicklyOrNull(
     filePath: string,
-): Promise<ThumbnailResult> {
+): Promise<ThumbnailWorkerResponse> {
     if (thumbnailRpc !== undefined) {
         try {
-            // This isn't necessarily true, but for prioritizing thumbnails
-            // it is okay enough. E.g. ".d" directories are an exception to this.
-            const isFile = extname(filePath).length > 0;
-            const isDirectory = !isFile;
             const data: ThumbnailRequest = {
                 filePath,
-                isFile,
-                isDirectory,
             };
             const id: string = crypto.randomUUID();
             const request: ThumbnailWorkerRequest = {
@@ -113,13 +99,8 @@ export async function getThumbnailLocationQuicklyOrSkip(
                 ...data,
             };
             const result = await thumbnailRpc.request(request);
-            if (result !== null && result.type === 'thumbnail-found') {
-                const thumbnailsDir = getThumbnailsDir();
-                return {
-                    type: 'thumbnail-found',
-                    root: thumbnailsDir,
-                    path: relative(thumbnailsDir, result.path),
-                };
+            if (result !== null) {
+                return result;
             }
         } catch (err) {
             logger.warn(
@@ -133,5 +114,6 @@ export async function getThumbnailLocationQuicklyOrSkip(
 
     return {
         type: 'thumbnail-not-found',
+        id: '',
     };
 }

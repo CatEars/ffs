@@ -1,7 +1,5 @@
 export type ThumbnailRequest = {
     filePath: string;
-    isFile: boolean;
-    isDirectory: boolean;
     id?: string;
 };
 
@@ -36,9 +34,10 @@ export type ThumbnailWorkerResponse =
         type: 'echo';
     };
 
-export type ThumbnailContext = {
-    searchObjectFullPath: string;
+export type ThumbnailWorkItem = {
+    filePath: string;
     isDirectory: boolean;
+    isFile: boolean;
 };
 
 export type ThumbnailLocation = {
