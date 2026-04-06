@@ -2,6 +2,10 @@ import { extname } from '@std/path';
 import { thumbnailExists } from '../../files/cache-folder.ts';
 import { ThumbnailRequest } from '../types.ts';
 import { ffmpegTester, imageMagickTester } from './index.ts';
+import {
+    acceptedFileExtensions as acceptedAudioExtensions,
+    createAudioThumbnail,
+} from './nailers/audio.ts';
 import { copyMostFitingThumbnailFromDirectory } from './nailers/directory.ts';
 import {
     acceptedFileExtensions as acceptedVideoExtensions,
@@ -12,7 +16,7 @@ import {
     createImageMagickThumbnail,
 } from './nailers/static-images.ts';
 
-type ThumbnailType = 'image' | 'video' | 'directory';
+type ThumbnailType = 'image' | 'video' | 'audio' | 'directory';
 
 type Thumbnailer = {
     extNames: string[];
@@ -30,6 +34,12 @@ const imageMagickNailer: Thumbnailer = {
     extNames: acceptedImageExtensions,
     thumbnailType: 'image',
     handler: createImageMagickThumbnail,
+};
+
+const audioNailer: Thumbnailer = {
+    extNames: acceptedAudioExtensions,
+    thumbnailType: 'audio',
+    handler: createAudioThumbnail,
 };
 
 // LINK-FILE-EXTENSIONS
@@ -73,6 +83,7 @@ export async function ensureNailersUpToDate() {
     let changed = false;
     const containsFfmpeg = nailers.some((elem) => elem.thumbnailType === 'video');
     const containsImageMagick = nailers.some((elem) => elem.thumbnailType === 'image');
+    const containsAudio = nailers.some((elem) => elem.thumbnailType === 'audio');
     const ffmpegAvailable = await ffmpegTester.isAvailable();
     const imageMagickAvailable = await imageMagickTester.isAvailable();
 
@@ -89,6 +100,15 @@ export async function ensureNailersUpToDate() {
         changed = true;
     } else if (!imageMagickAvailable && containsImageMagick) {
         nailers = nailers.filter((x) => x.thumbnailType === 'image');
+        changed = true;
+    }
+
+    const audioAvailable = ffmpegAvailable && imageMagickAvailable;
+    if (audioAvailable && !containsAudio) {
+        nailers.push(audioNailer);
+        changed = true;
+    } else if (!audioAvailable && containsAudio) {
+        nailers = nailers.filter((x) => x.thumbnailType !== 'audio');
         changed = true;
     }
 
