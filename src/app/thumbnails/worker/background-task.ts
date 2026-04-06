@@ -143,7 +143,7 @@ async function main() {
         logger.info('Background task for generating thumbnails deactivated');
     });
 
-    if (areThumbnailsAvailable()) {
+    if (await areThumbnailsAvailable()) {
         await findFilesToThumbnail();
         await findDirectoriesToThumbnail();
         setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);

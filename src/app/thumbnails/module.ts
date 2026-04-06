@@ -12,7 +12,7 @@ class ThumbnailsModule implements OptionalModule {
     public readonly name: string = 'Automatic Thumbnail Generation';
 
     isAvailable(): Promise<boolean> {
-        return Promise.resolve(areThumbnailsAvailable());
+        return areThumbnailsAvailable();
     }
 
     async init(): Promise<void> {

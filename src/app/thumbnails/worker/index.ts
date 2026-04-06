@@ -1,51 +1,17 @@
+import { ExecutableTester } from '../../../lib/exe-tester/exe-tester.ts';
 import { WorkerRpc } from '../../../lib/worker-rpc/worker-rpc.ts';
 import { logger } from '../../logging/loggers.ts';
 import { ThumbnailRequest, ThumbnailWorkerRequest, ThumbnailWorkerResponse } from '../types.ts';
 
-function runFfmpegVersion() {
-    try {
-        return new Deno.Command('ffmpeg', { args: ['-version'] }).outputSync();
-    } catch {
-        return false;
-    }
-}
+const ffmpegTester = new ExecutableTester('ffmpeg', ['-version'], /^ffmpeg version \d\.\d\.\d/);
+const imageMagickTester = new ExecutableTester(
+    'convert',
+    ['-version'],
+    /^Version: ImageMagick \d\.\d\.\d/,
+);
 
-function runImageMagickVersion() {
-    try {
-        return new Deno.Command('convert', { args: ['-version'] }).outputSync();
-    } catch {
-        return false;
-    }
-}
-
-function isFfmpegVersionString(programOutput: string) {
-    return /^ffmpeg version \d\.\d\.\d/.test(programOutput);
-}
-
-function isImageMagickVersion(programOutput: string) {
-    return /^Version: ImageMagick \d\.\d\.\d/.test(programOutput);
-}
-
-function isFfmpegAvailable() {
-    const proc = runFfmpegVersion();
-    if (proc === false) {
-        return false;
-    }
-    const stdout = new TextDecoder().decode(proc.stdout);
-    return proc.success && isFfmpegVersionString(stdout);
-}
-
-function isImageMagickAvailable() {
-    const proc = runImageMagickVersion();
-    if (proc === false) {
-        return false;
-    }
-    const stdout = new TextDecoder().decode(proc.stdout);
-    return proc.success && isImageMagickVersion(stdout);
-}
-
-export function areThumbnailsAvailable() {
-    return isFfmpegAvailable() && isImageMagickAvailable();
+export async function areThumbnailsAvailable() {
+    return (await ffmpegTester.isAvailable()) && (await imageMagickTester.isAvailable());
 }
 
 let thumbnailRpc: WorkerRpc<ThumbnailWorkerRequest, ThumbnailWorkerResponse> | undefined;
