@@ -9,7 +9,7 @@
             const { trail, index } = detail;
             const elements = trail.split('/');
             const selectedLocation = elements.slice(0, index + 1).join('/');
-            const webPath = `/home/?path=${selectedLocation}`;
+            const webPath = `/home/?path=${encodeURIComponent(selectedLocation)}`;
             window.location.href = webPath;
         }
 
