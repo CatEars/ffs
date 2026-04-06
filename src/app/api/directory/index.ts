@@ -2,6 +2,7 @@ import { Router } from '@oak/oak/router';
 import { HTTP_404_NOT_FOUND } from '../../../lib/http/http-codes.ts';
 import { FfsApplicationState } from '../../application-state.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
+import { getDiskUsageQuicklyOrNull } from '../../disk-usage/worker/index.ts';
 import { FileIdentification, identifyFileFromDirEntry } from '../../files/file-type.ts';
 
 type ApiFile = Deno.DirEntry & FileIdentification & {
@@ -25,6 +26,9 @@ export function register(router: Router<FfsApplicationState>) {
         }
 
         const resultingFiles: ApiFile[] = [];
+        const diskUsageRequests: Promise<number | null>[] = [];
+        const dirIndices: number[] = [];
+
         for (const listingResult of listing.files) {
             const statResult = await fileTree.stat(listing, listingResult.name);
             if (statResult.type === 'valid') {
@@ -36,6 +40,20 @@ export function register(router: Router<FfsApplicationState>) {
                     size: listingResult.isFile ? (statResult.info.size ?? 0) : undefined,
                 };
                 resultingFiles.push(resultingFile);
+                if (listingResult.isDirectory) {
+                    dirIndices.push(resultingFiles.length - 1);
+                    diskUsageRequests.push(getDiskUsageQuicklyOrNull(statResult.fullPath));
+                }
+            }
+        }
+
+        // Resolve all disk-usage requests in parallel; each has an ultra-short
+        // internal timeout so this does not materially delay the response.
+        const diskUsageResults = await Promise.all(diskUsageRequests);
+        for (let i = 0; i < dirIndices.length; i++) {
+            const sizeBytes = diskUsageResults[i];
+            if (sizeBytes !== null) {
+                resultingFiles[dirIndices[i]].size = sizeBytes;
             }
         }
 

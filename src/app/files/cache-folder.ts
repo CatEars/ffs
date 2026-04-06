@@ -11,6 +11,7 @@ const SHARE_MANIFESTS_SUBDIR = 'share-manifests';
 const DOWNLOAD_MANIFESTS_SUBDIR = 'download-manifests';
 const EPHEMERAL_USERS_SUBDIR = 'ephemeral-users';
 const UPLOAD_SUBDIR = 'upload';
+const DISK_USAGE_SUBDIR = 'disk-usage';
 
 export function getThumbnailsDir(): string {
     return join(getCacheRoot(), THUMBNAILS_SUBDIR);
@@ -34,6 +35,10 @@ export function getDownloadManifestsDir(): string {
 
 export function getUploadDir(): string {
     return join(getCacheRoot(), UPLOAD_SUBDIR);
+}
+
+export function getDiskUsageCacheDir(): string {
+    return join(getCacheRoot(), DISK_USAGE_SUBDIR);
 }
 
 async function priorTempDirectory() {
