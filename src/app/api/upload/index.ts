@@ -10,18 +10,11 @@ import {
 } from '../../../lib/http/http-codes.ts';
 import { resolveUnder } from '../../../lib/resolve-under/resolve-under.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
-import { getUploadDir } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/loggers.ts';
 import { csrfProtect } from '../../security/csrf-protect.ts';
-
-type UploadBooking = {
-    directory: string;
-    fileName: string;
-    tempFile: string;
-};
+import { createBooking, deleteBooking, getBooking } from '../../upload/booking-store.ts';
 
 export function register(router: Router) {
-    const apiTokens = new Map<string, UploadBooking>();
     router.post(
         '/api/upload/book',
         baseMiddlewares(),
@@ -53,22 +46,9 @@ export function register(router: Router) {
                 return;
             }
 
-            const authToken = crypto.randomUUID();
-            const cacheDir = join(getUploadDir(), authToken);
-            const tempFile = join(cacheDir, fileName);
-            await Deno.mkdir(cacheDir);
-            const f = await Deno.open(tempFile, { createNew: true, write: true });
-            f.close();
-
-            apiTokens.set(authToken, {
-                directory,
-                fileName,
-                tempFile,
-            });
+            const authToken = await createBooking(directory, fileName);
             logger.info('Created upload booking for', fileName, 'to', directory);
-            ctx.response.body = {
-                authToken,
-            };
+            ctx.response.body = { authToken };
         },
     );
 
@@ -76,18 +56,15 @@ export function register(router: Router) {
     // Auth extended by token created earlier
     router.post('/api/upload/chunk', async (ctx) => {
         const token = ctx.request.url.searchParams.get('token') || '';
-        const booking = apiTokens.get(token);
+        const booking = getBooking(token);
 
         if (!booking) {
             ctx.response.status = HTTP_401_UNAUTHORIZED;
             return;
         }
 
-        const tempFile = booking.tempFile;
         const appendData = await ctx.request.body.blob();
-        await Deno.writeFile(tempFile, appendData.stream(), {
-            append: true,
-        });
+        await Deno.writeFile(booking.tempFile, appendData.stream(), { append: true });
 
         ctx.response.status = HTTP_200_OK;
     });
@@ -99,7 +76,7 @@ export function register(router: Router) {
         csrfProtect,
         async (ctx) => {
             const { token } = await ctx.request.body.json();
-            const booking = apiTokens.get(token);
+            const booking = getBooking(token);
             if (!booking) {
                 ctx.response.status = HTTP_404_NOT_FOUND;
                 return;
@@ -132,7 +109,7 @@ export function register(router: Router) {
                 }
             }
 
-            apiTokens.delete(token);
+            await deleteBooking(token);
             ctx.response.status = HTTP_200_OK;
         },
     );

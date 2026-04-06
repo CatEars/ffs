@@ -9,6 +9,7 @@ import {
 } from './config.ts';
 import { ensureCacheDirs, resolveCacheFolder } from './files/cache-folder.ts';
 import { logger } from './logging/loggers.ts';
+import { loadAndCleanBookings } from './upload/booking-store.ts';
 
 function printBigWelcomeText() {
     logger.warn('');
@@ -31,6 +32,7 @@ export async function startup() {
     printBigWelcomeText();
     await setFirstTimeUserValuesIfLikely();
     await ensureCacheDirs();
+    await loadAndCleanBookings();
 }
 
 function isLikelyFirstTimeUser() {
