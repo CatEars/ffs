@@ -1,5 +1,10 @@
 import { join } from '@std/path/join';
 
+const albumArtSourcePath = new URL(
+    '../app/website/static/android-chrome-192x192.png',
+    import.meta.url,
+).pathname;
+
 type TestGenerator = {
     name: string;
     generator: (path: string) => Promise<void>;
@@ -195,6 +200,76 @@ async function createDeeplyNestedFiles(
     }
 }
 
+async function createAudioAlbums(basePath: string): Promise<void> {
+    const albums = [
+        {
+            name: 'Cosmic Llama - Songs From the Void',
+            artFiles: ['front.jpg', 'back.jpg'],
+            tracks: [
+                '01 - Into the Void.mp3',
+                '02 - Space Llama Shuffle.mp3',
+                '03 - Galactic Spit (Extended Mix).mp3',
+                '04 - Event Horizon Boogie.mp3',
+            ],
+        },
+        {
+            name: 'Professor Bongo & The Time Weasels - Live at the Cheese Factory',
+            artFiles: ['AlbumArt.jpg'],
+            tracks: [
+                '01 - Cheese Waltz in Eb Major.mp3',
+                '02 - Weasel Stampede.mp3',
+                '03 - The Professors Lament.mp3',
+                '04 - Encore Encore (Reprise).mp3',
+            ],
+        },
+        {
+            name: 'The Spectacular Turnip Orchestra - Greatest Ringtones',
+            artFiles: ['cover.jpg'],
+            tracks: [
+                '01 - Ringtone No. 1 in D Minor.mp3',
+                '02 - Hold Music Fantasia.mp3',
+                '03 - Elevator Jazz Supreme.mp3',
+            ],
+        },
+        {
+            name: 'DJ Sprocket & MC Spatula - Breakfast Bangers Vol. 2',
+            artFiles: ['folder.jpg'],
+            tracks: [
+                '01 - Waffle Drop.mp3',
+                '02 - Pancake Flip (feat. The Syrup Collective).mp3',
+                '03 - Scrambled Eggs Remix.mp3',
+                '04 - Omelette du Jour (Radio Edit).mp3',
+            ],
+        },
+        {
+            name: 'The Invisible Ukulele Ensemble - Self-Titled',
+            artFiles: [],
+            tracks: [
+                '01 - Transparent Chords.mp3',
+                '02 - You Cant See Me But You Can Hear Me.mp3',
+                '03 - The Soundless Sound.mp3',
+            ],
+        },
+    ];
+
+    for (const album of albums) {
+        const albumDir = join(basePath, album.name);
+        await Deno.mkdir(albumDir, { recursive: true });
+
+        for (const artFile of album.artFiles) {
+            const artPath = join(albumDir, artFile);
+            await Deno.copyFile(albumArtSourcePath, artPath);
+            console.log(`Created album art: ${artPath}`);
+        }
+
+        for (const track of album.tracks) {
+            const trackPath = join(albumDir, track);
+            await Deno.writeFile(trackPath, new Uint8Array(0));
+            console.log(`Created track: ${trackPath}`);
+        }
+    }
+}
+
 const generators: TestGenerator[] = [
     {
         name: 'long-filenames',
@@ -211,6 +286,10 @@ const generators: TestGenerator[] = [
     {
         name: 'deep-nesting',
         generator: createDeeplyNestedFiles,
+    },
+    {
+        name: 'music-library',
+        generator: createAudioAlbums,
     },
 ];
 
