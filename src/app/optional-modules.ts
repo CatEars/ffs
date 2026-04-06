@@ -1,4 +1,5 @@
 import { OptionalModule } from '../lib/optional-module/optional-module.ts';
+import { diskUsageModule } from './disk-usage/module.ts';
 import { thumbnailsModule } from './thumbnails/module.ts';
 
-export const optionalModules: OptionalModule[] = [thumbnailsModule];
+export const optionalModules: OptionalModule[] = [thumbnailsModule, diskUsageModule];
