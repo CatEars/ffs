@@ -39,11 +39,6 @@ async function saveCacheToDisk(): Promise<void> {
     await Deno.writeTextFile(cacheFile, JSON.stringify(entries));
 }
 
-/**
- * Recursively sums the sizes of all files under `dirPath` and caches every
- * intermediate directory it visits along the way.  Returns the total byte
- * count for `dirPath`.
- */
 async function scanDirectory(dirPath: string): Promise<number> {
     let total = 0;
     try {
@@ -80,10 +75,6 @@ async function runFullScan(): Promise<void> {
     logger.debug('Disk usage worker: full scan complete, cache has', usageCache.size, 'entries');
 }
 
-/**
- * Scans a single directory (and all its descendants) when it was not yet
- * cached or has become stale.  Used for priority requests.
- */
 async function runPriorityScan(dirPath: string): Promise<void> {
     const size = await scanDirectory(dirPath);
     usageCache.set(dirPath, { sizeBytes: size, scannedAt: Date.now() });
