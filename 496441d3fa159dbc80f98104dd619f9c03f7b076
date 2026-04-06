@@ -8,8 +8,6 @@
 
 [ ] Fix poor testing situation
 
-[ ] Style upload page with nicer progress display
-
 [ ] Fix background upload for mobile applications
 
 [ ] Use pre-calculated chunking for uploaded files and parallelize upload streaming
