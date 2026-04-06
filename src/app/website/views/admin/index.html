@@ -33,27 +33,28 @@
             megaphone.template('#module-item-template', (clone, mod) => {
                 clone.querySelector('.module-name').textContent = mod.name;
                 clone.querySelector('.module-description').textContent = mod.description;
-                const toggle = clone.querySelector('.module-toggle');
-                const errorMsg = clone.querySelector('.module-error');
-                toggle.checked = mod.isActivated;
-                toggle.disabled = !mod.isAvailable;
-                toggle.title = mod.isAvailable ? '' : 'Module is unavailable';
-                toggle.addEventListener('change', async () => {
-                    const endpoint = toggle.checked
-                        ? '/api/admin/modules/activate'
-                        : '/api/admin/modules/deactivate';
-                    errorMsg.textContent = '';
-                    const res = await megaphone.authorizedFetch(endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: mod.name }),
-                    });
-                    if (!res.ok) {
-                        toggle.checked = !toggle.checked;
-                        const data = await res.json().catch(() => ({}));
-                        errorMsg.textContent = data.error || 'Operation failed';
-                    }
-                });
+                const form = clone.querySelector('form');
+                const btn = clone.querySelector('.module-action-btn');
+                clone.querySelector('.module-name-input').value = mod.name;
+                let statusText, statusCircle;
+                if (!mod.isAvailable) {
+                    statusText = 'Unavailable';
+                    statusCircle = '⚫';
+                    btn.textContent = 'Activate';
+                    btn.disabled = true;
+                } else if (mod.isActivated) {
+                    statusText = 'Activated';
+                    statusCircle = '🟢';
+                    btn.textContent = 'Deactivate';
+                    form.action = '/api/admin/modules/deactivate';
+                } else {
+                    statusText = 'Deactivated';
+                    statusCircle = '🔴';
+                    btn.textContent = 'Activate';
+                    form.action = '/api/admin/modules/activate';
+                }
+                clone.querySelector('.module-status').textContent =
+                    `Status: ${statusText} ${statusCircle}`;
                 return clone;
             })
         );
@@ -152,12 +153,15 @@
         <ul id="modules-list">
             <template id="module-item-template">
                 <li>
-                    <label>
-                        <input type="checkbox" class="module-toggle" />
-                        <strong class="module-name"></strong>
-                    </label>
+                    <strong class="module-name"></strong>
                     <p class="module-description"></p>
-                    <p class="module-error"></p>
+                    <p class="module-status"></p>
+                    <form method="post">
+                        <input type="hidden" name="name" class="module-name-input" />
+                        <fieldset>
+                            <button type="submit" class="module-action-btn">Activate</button>
+                        </fieldset>
+                    </form>
                 </li>
             </template>
         </ul>

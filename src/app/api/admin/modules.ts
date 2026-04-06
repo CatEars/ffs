@@ -1,8 +1,11 @@
 import { Router } from '@oak/oak';
+import { returnToSender } from '../../../lib/http/return-to-sender.ts';
 import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts';
 import { optionalModules } from '../../optional-modules.ts';
 import { ensurePermissions } from '../../security/api-protect.ts';
 import { csrfProtect } from '../../security/csrf-protect.ts';
+
+const ADMIN_PAGE = '/admin/';
 
 export function register(router: Router) {
     router.get(
@@ -30,21 +33,36 @@ export function register(router: Router) {
         csrfProtect,
         ensurePermissions((p) => p.allowHousekeeping),
         async (ctx) => {
-            const body = await ctx.request.body.json();
-            const mod = optionalModules.find((m) => m.name === body.name);
+            const formData = await ctx.request.body.formData();
+            const name = formData.get('name')?.toString() ?? '';
+            if (!name) {
+                returnToSender(ctx, {
+                    search: { message: 'Error: module name is required' },
+                    defaultPath: ADMIN_PAGE,
+                });
+                return;
+            }
+            const mod = optionalModules.find((m) => m.name === name);
             if (!mod) {
-                ctx.response.status = 404;
-                ctx.response.body = { error: 'Module not found' };
+                returnToSender(ctx, {
+                    search: { message: `Error: module '${name}' not found` },
+                    defaultPath: ADMIN_PAGE,
+                });
                 return;
             }
             const isAvailable = await mod.isAvailable();
             if (!isAvailable) {
-                ctx.response.status = 400;
-                ctx.response.body = { error: 'Module is not available' };
+                returnToSender(ctx, {
+                    search: { message: `Error: module '${name}' is not available` },
+                    defaultPath: ADMIN_PAGE,
+                });
                 return;
             }
             await mod.activate();
-            ctx.response.body = { name: mod.name, isActivated: mod.isActivated() };
+            returnToSender(ctx, {
+                search: { message: `Module '${name}' activated` },
+                defaultPath: ADMIN_PAGE,
+            });
         },
     );
 
@@ -55,15 +73,28 @@ export function register(router: Router) {
         csrfProtect,
         ensurePermissions((p) => p.allowHousekeeping),
         async (ctx) => {
-            const body = await ctx.request.body.json();
-            const mod = optionalModules.find((m) => m.name === body.name);
+            const formData = await ctx.request.body.formData();
+            const name = formData.get('name')?.toString() ?? '';
+            if (!name) {
+                returnToSender(ctx, {
+                    search: { message: 'Error: module name is required' },
+                    defaultPath: ADMIN_PAGE,
+                });
+                return;
+            }
+            const mod = optionalModules.find((m) => m.name === name);
             if (!mod) {
-                ctx.response.status = 404;
-                ctx.response.body = { error: 'Module not found' };
+                returnToSender(ctx, {
+                    search: { message: `Error: module '${name}' not found` },
+                    defaultPath: ADMIN_PAGE,
+                });
                 return;
             }
             await mod.deactivate();
-            ctx.response.body = { name: mod.name, isActivated: mod.isActivated() };
+            returnToSender(ctx, {
+                search: { message: `Module '${name}' deactivated` },
+                defaultPath: ADMIN_PAGE,
+            });
         },
     );
 }
