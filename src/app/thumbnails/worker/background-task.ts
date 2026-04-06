@@ -90,6 +90,22 @@ function doPost(message: ThumbnailWorkerResponse) {
     }
 }
 
+function getThumbnail(next: ThumbnailRequest) {
+    if (!activated) {
+        return false;
+    }
+
+    const recentlyParsed = recentlyParsedThumbnails.get(next.filePath);
+    if (recentlyParsed) {
+        const [loc] = recentlyParsed;
+        if (loc) {
+            return loc;
+        } else {
+            return false;
+        }
+    }
+}
+
 async function main() {
     logger.debug(
         'Background task for thumbnail generation started. Storing thumbnails in cache at',
@@ -133,6 +149,7 @@ async function main() {
         if (next === null) {
             continue;
         }
+        const thumby = getThumbnail(next);
         if (!activated) {
             if (next.id) {
                 doPost({
