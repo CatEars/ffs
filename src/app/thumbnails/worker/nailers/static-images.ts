@@ -1,9 +1,9 @@
 import { ensureDir } from '@std/fs/ensure-dir';
 import { move } from '@std/fs/move';
 import { dirname } from '@std/path/dirname';
-import { getThumbnailPath, getThumbnailTempDir } from '../../files/cache-folder.ts';
-import { logger } from '../../logging/loggers.ts';
-import { ThumbnailRequest } from '../types.ts';
+import { getThumbnailPath, getThumbnailTempDir } from '../../../files/cache-folder.ts';
+import { logger } from '../../../logging/loggers.ts';
+import { ThumbnailRequest } from '../../types.ts';
 
 export const acceptedFileExtensions = [
     '.png',
@@ -18,7 +18,9 @@ export const acceptedFileExtensions = [
     '.psd',
 ];
 
-export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
+export async function createImageMagickThumbnail(
+    thumbnail: ThumbnailRequest,
+): Promise<string | null> {
     const outputPath = getThumbnailPath(thumbnail.filePath);
     const tempFile = await Deno.makeTempFile({
         prefix: 'ffs_imggen',
@@ -46,7 +48,7 @@ export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
             new TextDecoder().decode(result.stderr),
         );
         await Deno.remove(tempFile);
-        return;
+        return null;
     }
     await ensureDir(dirname(outputPath));
     await move(tempFile, outputPath, { overwrite: true });
@@ -54,4 +56,5 @@ export async function createImageMagickThumbnail(thumbnail: ThumbnailRequest) {
         'Generated thumbnail',
         outputPath,
     );
+    return outputPath;
 }

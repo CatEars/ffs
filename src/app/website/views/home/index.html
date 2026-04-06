@@ -15,7 +15,7 @@
                     name: '..',
                     isDirectory: true,
                     fileType: 'directory',
-                    imageSrc: 'folder',
+                    svgIconName: 'folder',
                 },
             ].concat(files);
         }
@@ -122,10 +122,7 @@
         }
 
         function getFileImageSource(root, file) {
-            if (isMovieFile(file.name) || (isImageFile(file.name) && !file.name.endsWith('.gif'))) {
-                return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
-            }
-            return '';
+            return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
         }
 
         function storeToCuttingBoard(files) {
@@ -371,6 +368,7 @@
                 filename: file.name,
                 'file-type': file.fileType,
                 'image-src': file.imageSrc,
+                'svg-icon-name': file.svgIconName,
                 root: currentPath,
             }))
         );
@@ -382,11 +380,8 @@
                 clone.querySelector('input').value = file.name;
                 clone
                     .querySelector('use')
-                    .setAttribute(
-                        'href',
-                        `/static/svg/sprite_sheet.svg#${resolveSvgLocationForFile(file)}`
-                    );
-                const imageSource = getFileImageSource(currentPath, file);
+                    .setAttribute('href', `/static/svg/sprite_sheet.svg#${file.svgIconName}`);
+                const imageSource = file.imageSrc;
                 const iconHover = clone.querySelector('icon-hover');
                 if (file.isFile) {
                     iconHover.setAttribute('url', imageSource);
