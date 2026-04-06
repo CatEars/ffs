@@ -50,30 +50,14 @@ export function areThumbnailsAvailable() {
 
 let thumbnailRpc: WorkerRpc<ThumbnailWorkerRequest, ThumbnailWorkerResponse> | undefined;
 
-export function startThumbnailBackgroundProcess() {
+export async function startThumbnailBackgroundProcess() {
     const worker = new Worker(
         new URL('./background-task.ts', import.meta.url).href,
         { type: 'module' },
     );
 
     thumbnailRpc = WorkerRpc.buildFromMain<ThumbnailWorkerRequest, ThumbnailWorkerResponse>(worker);
-
-    let resolveEchoPromise = () => {};
-    const echoPromise = new Promise<void>((resolve) => {
-        resolveEchoPromise = resolve;
-    });
-
-    thumbnailRpc.on('echo', (_) => {
-        resolveEchoPromise();
-    });
-
-    const int = setInterval(() => {
-        thumbnailRpc?.post({ type: 'echo' });
-    }, 100);
-    echoPromise.then(() => {
-        clearInterval(int);
-    });
-    return echoPromise;
+    await thumbnailRpc.waitUntilEchoIsAvailable();
 }
 
 export function activateThumbnailWorker() {

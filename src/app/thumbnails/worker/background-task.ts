@@ -143,12 +143,6 @@ async function main() {
         logger.info('Background task for generating thumbnails deactivated');
     });
 
-    rpc.on('echo', (_) => {
-        rpc.post({
-            type: 'echo',
-        });
-    });
-
     if (areThumbnailsAvailable()) {
         await findFilesToThumbnail();
         await findDirectoriesToThumbnail();

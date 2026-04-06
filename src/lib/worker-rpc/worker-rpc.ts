@@ -70,14 +70,41 @@ export class WorkerRpc<
         return result;
     }
 
+    waitUntilEchoIsAvailable() {
+        let resolveEchoPromise = () => {};
+        const echoPromise = new Promise<void>((resolve) => {
+            resolveEchoPromise = resolve;
+        });
+
+        this.on('echo', (_) => {
+            resolveEchoPromise();
+        });
+
+        // deno-lint-ignore no-this-alias
+        const self = this;
+        const int = setInterval(() => {
+            self?.post({ type: 'echo' } as TSendMessage);
+        }, 100);
+        echoPromise.then(() => {
+            clearInterval(int);
+        });
+        return echoPromise;
+    }
+
     static buildFromWorker<
         TSendMessage extends IdCarrierOrTypeCarrier,
         TReceiveMessage extends IdCarrierOrTypeCarrier,
     >(worker: Worker) {
-        return new WorkerRpc<TReceiveMessage, TSendMessage>(
+        const rpc = new WorkerRpc<TReceiveMessage, TSendMessage>(
             worker,
             this.#buildEventEmitter(worker),
         );
+        rpc.on('echo', (_msg) => {
+            rpc.post({
+                type: 'echo',
+            } as TReceiveMessage);
+        });
+        return rpc;
     }
 
     static buildFromMain<
