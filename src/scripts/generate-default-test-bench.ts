@@ -250,6 +250,17 @@ async function createAudioAlbums(basePath: string): Promise<void> {
                 '03 - The Soundless Sound.mp3',
             ],
         },
+        {
+            name: 'Sir Reginald Fluffington III - Opus for Cats and Thunderstorms',
+            artFiles: ['front.jpg', 'back.jpg'],
+            tracks: [
+                'Track01.wav',
+                'Track02.wav',
+                'Track03.wav',
+                'Track04.wav',
+                'Track05.wav',
+            ],
+        },
     ];
 
     for (const album of albums) {
