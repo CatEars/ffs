@@ -88,6 +88,28 @@
     <horizontal-ruler></horizontal-ruler>
 
     <section $data-visibility="allowHousekeepingVisibility">
+        <h2>Optional Modules</h2>
+        <p>Enable or disable optional server modules.</p>
+        <ul id="modules-list">
+            <template id="module-item-template">
+                <li>
+                    <strong class="module-name"></strong>
+                    <p class="module-description"></p>
+                    <p class="module-status"></p>
+                    <form method="post">
+                        <input type="hidden" name="name" class="module-name-input" />
+                        <fieldset>
+                            <button type="submit" class="module-action-btn">Activate</button>
+                        </fieldset>
+                    </form>
+                </li>
+            </template>
+        </ul>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section $data-visibility="allowHousekeepingVisibility">
         <h2>Thumbnails</h2>
         <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
         <form action="/api/admin/clear-thumbnails" method="post">
@@ -143,28 +165,6 @@
                 </fieldset>
             </form>
         </section>
-    </section>
-
-    <horizontal-ruler></horizontal-ruler>
-
-    <section $data-visibility="allowHousekeepingVisibility">
-        <h2>Optional Modules</h2>
-        <p>Enable or disable optional server modules.</p>
-        <ul id="modules-list">
-            <template id="module-item-template">
-                <li>
-                    <strong class="module-name"></strong>
-                    <p class="module-description"></p>
-                    <p class="module-status"></p>
-                    <form method="post">
-                        <input type="hidden" name="name" class="module-name-input" />
-                        <fieldset>
-                            <button type="submit" class="module-action-btn">Activate</button>
-                        </fieldset>
-                    </form>
-                </li>
-            </template>
-        </ul>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
