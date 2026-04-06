@@ -2,8 +2,6 @@
 
 [ ] Figure out how we can create a `stable` and `nightly` release branches
 
-[ ] Make thumbnail generation a "Module" and make it easy to disable all modules
-
 [ ] Make plugins a "Module" and make it easy to disable
 
 [ ] Make it easy to run and configure ffs via command-line
@@ -14,11 +12,7 @@
 
 [ ] Fix background upload for mobile applications
 
-[ ] Ensure upload tokens stay between restarts on server
-
 [ ] Use pre-calculated chunking for uploaded files and parallelize upload streaming
-
-[ ] Delete uploaded chunks and auth tokens in background
 
 [ ] Support folder upload
 
