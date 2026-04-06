@@ -16,8 +16,7 @@ import { optionalModules } from './optional-modules.ts';
 import { pluginsModule } from './plugins/module.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import { registerAllWebsiteRoutes } from './website/index.ts';
-import { startHotSwap } from './website/hot-swap.ts';
+import { registerAllWebsiteRoutes, registerPluginPagesOnRouter } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -44,11 +43,11 @@ for (const routeRegistrator of routeRegistrations) {
     await routeRegistrator(router);
 }
 await registerAllWebsiteRoutes(router);
+await registerPluginPagesOnRouter(router, () => pluginsModule.isActivated());
 
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-pluginsModule.setRouter(router);
 for (const optionalModule of optionalModules) {
     await optionalModule.init();
     const isAvailable = await optionalModule.isAvailable();
@@ -63,8 +62,6 @@ for (const optionalModule of optionalModules) {
 if (likelyFirstTimeUser) {
     printWelcomeHelper();
 }
-
-startHotSwap(router);
 
 const port = 8080;
 logger.info(`Starting server on port ${port}`);

@@ -19,15 +19,48 @@ import { loadHtml } from './templating.ts';
 
 let cachedPages: Page[] | null = null;
 
-const registeredWebPaths = new Set<string>();
-const registeredPluginNames = new Set<string>();
-const registeredPluginNavbarLinks = new Map<string, NavbarLink[]>();
-
 async function getPages(): Promise<Page[]> {
     if (cachedPages === null) {
         cachedPages = await collectAllPages();
     }
     return cachedPages;
+}
+
+function createGatedRouter(router: Router, isActive: () => boolean): Router {
+    const gate = async (ctx: Context, next: Next) => {
+        if (!isActive()) {
+            ctx.response.status = HTTP_404_NOT_FOUND;
+            return;
+        }
+        await next();
+    };
+    const routeMethods = new Set([
+        'get',
+        'post',
+        'put',
+        'delete',
+        'patch',
+        'head',
+        'options',
+        'all',
+    ]);
+    return new Proxy(router, {
+        get(target, prop) {
+            if (typeof prop === 'string' && routeMethods.has(prop)) {
+                return (path: string, ...handlers: unknown[]) => {
+                    return (target as Record<string, (...args: unknown[]) => unknown>)[prop](
+                        path,
+                        gate,
+                        ...handlers,
+                    );
+                };
+            }
+            const value = (target as Record<string | symbol, unknown>)[prop];
+            return typeof value === 'function'
+                ? (value as (...args: unknown[]) => unknown).bind(target)
+                : value;
+        },
+    }) as unknown as Router;
 }
 
 export async function registerAllWebsiteRoutes(router: Router) {
@@ -41,46 +74,22 @@ export async function registerAllWebsiteRoutes(router: Router) {
     registerStaticJsRoutes(jsPages, router);
 }
 
-export async function registerPluginPagesOnRouter(router: Router): Promise<void> {
+export async function registerPluginPagesOnRouter(
+    router: Router,
+    isActive: () => boolean,
+): Promise<void> {
     const allPages = await getPages();
     const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
     try {
-        await registerPluginPages(pluginPages, router);
+        await registerPluginPages(pluginPages, router, isActive);
     } catch {
         logger.debug('Unable to register plugin pages');
-    }
-}
-
-export async function syncNewRoutesWithRouter(router: Router): Promise<void> {
-    cachedPages = null;
-    const allPages = await getPages();
-    const plainPages = allPages.filter((x) => x.type === 'Plain') as PlainPage[];
-    const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
-    const jsPages = allPages.filter((x) => x.type === 'Js') as StaticJsPage[];
-
-    const newPlainPages = plainPages.filter((p) => !registeredWebPaths.has(p.webPath));
-    const newJsPages = jsPages.filter((p) => !registeredWebPaths.has(p.webPath));
-    const newPluginPages = pluginPages.filter((p) => !registeredPluginNames.has(p.displayName));
-
-    if (newPlainPages.length > 0) {
-        registerPlainPages(newPlainPages, router);
-    }
-    if (newJsPages.length > 0) {
-        registerStaticJsRoutes(newJsPages, router);
-    }
-    if (newPluginPages.length > 0) {
-        try {
-            await registerPluginPages(newPluginPages, router);
-        } catch {
-            logger.debug('Unable to register new plugin pages during hot-swap');
-        }
     }
 }
 
 function registerStaticJsRoutes(pages: StaticJsPage[], router: Router) {
     for (const page of pages) {
         logger.info('Registering static JS page at', page.webPath);
-        registeredWebPaths.add(page.webPath);
         router.get(page.webPath, async (ctx) => {
             await ctx.send({
                 root: viewPath,
@@ -93,27 +102,19 @@ function registerStaticJsRoutes(pages: StaticJsPage[], router: Router) {
 async function registerPluginPages(
     pluginPages: PluginPage[],
     router: Router,
+    isActive: () => boolean,
 ) {
-    let anyRegistered = false;
+    const gatedRouter = createGatedRouter(router, isActive);
+    const navbarLinks: NavbarLink[] = [];
     for (const page of pluginPages) {
-        if (registeredPluginNames.has(page.displayName)) {
-            continue;
-        }
         if (!page.enabled) {
             logger.info('Plugin', page.displayName, 'was disabled, will not register it');
             continue;
         }
         logger.info('Registering routes from', page.displayName);
-        const navbarLinks: NavbarLink[] = [];
-        await page.register({ router, navbarLinks });
-        registeredPluginNames.add(page.displayName);
-        registeredPluginNavbarLinks.set(page.displayName, navbarLinks);
-        anyRegistered = true;
+        await page.register({ router: gatedRouter, navbarLinks });
     }
-    if (anyRegistered) {
-        const allNavbarLinks = [...registeredPluginNavbarLinks.values()].flat();
-        await writeNavbarExtensions(allNavbarLinks);
-    }
+    await writeNavbarExtensions(navbarLinks);
 }
 
 async function writeNavbarExtensions(navbarLinks: NavbarLink[]) {
@@ -144,7 +145,6 @@ function registerPlainPages(
             'Registering',
             getPageDescription(page, longestWebPath),
         );
-        registeredWebPaths.add(page.webPath);
         const middlewares = page.middlewares;
         if (middlewares.length === 0) {
             middlewares.push(passAlongMiddleware);
