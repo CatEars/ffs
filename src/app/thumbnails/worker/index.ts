@@ -1,12 +1,11 @@
 import { extname } from '@std/path/extname';
 import { relative } from '@std/path/relative';
-import { sleep } from '../../../lib/sleep/sleep.ts';
+import { WorkerRpc } from '../../../lib/worker-rpc/worker-rpc.ts';
 import { getThumbnailsDir } from '../../files/cache-folder.ts';
 import { logger } from '../../logging/loggers.ts';
 import {
     ThumbnailRequest,
     ThumbnailResult,
-    ThumbnailWorkerFoundThumbnail,
     ThumbnailWorkerRequest,
     ThumbnailWorkerResponse,
 } from '../types.ts';
@@ -57,53 +56,27 @@ export function areThumbnailsAvailable() {
     return isFfmpegAvailable() && isImageMagickAvailable();
 }
 
-type ThumbnailWaiter = {
-    resolveOk: (data: ThumbnailWorkerFoundThumbnail) => void;
-    resolveNotFound: () => void;
-    createdAt: number;
-};
-
-let thumbnailWorker: Worker | undefined;
-const waitingPromises = new Map<string, ThumbnailWaiter>();
+let thumbnailRpc: WorkerRpc<ThumbnailWorkerRequest, ThumbnailWorkerResponse> | undefined;
 
 export function startThumbnailBackgroundProcess() {
-    thumbnailWorker = new Worker(
+    const worker = new Worker(
         new URL('./background-task.ts', import.meta.url).href,
         { type: 'module' },
     );
+
+    thumbnailRpc = WorkerRpc.buildFromMain<ThumbnailWorkerRequest, ThumbnailWorkerResponse>(worker);
 
     let resolveEchoPromise = () => {};
     const echoPromise = new Promise<void>((resolve) => {
         resolveEchoPromise = resolve;
     });
-    thumbnailWorker.onmessage = (message: MessageEvent<ThumbnailWorkerResponse>) => {
-        if (message.data.type === 'echo') {
-            resolveEchoPromise();
-            return;
-        }
-        const foundPromise = waitingPromises.get(message.data.id);
-        if (!foundPromise) {
-            return;
-        }
 
-        if (message.data.type === 'thumbnail-found') {
-            foundPromise.resolveOk(message.data);
-        } else if (message.data.type === 'thumbnail-not-found') {
-            foundPromise.resolveNotFound();
-        }
-    };
+    thumbnailRpc.on('echo', (_) => {
+        resolveEchoPromise();
+    });
 
-    // Make sure that waiting promises do not leak memory
-    setInterval(() => {
-        const now = Date.now();
-        waitingPromises.entries()
-            .filter(([_, entry]) => entry.createdAt + 60_000 < now)
-            .forEach(([id]) => {
-                waitingPromises.delete(id);
-            });
-    }, 50_000);
     const int = setInterval(() => {
-        thumbnailWorker?.postMessage({ type: 'echo' });
+        thumbnailRpc?.post({ type: 'echo' });
     }, 100);
     echoPromise.then(() => {
         clearInterval(int);
@@ -112,25 +85,17 @@ export function startThumbnailBackgroundProcess() {
 }
 
 export function activateThumbnailWorker() {
-    if (thumbnailWorker !== undefined) {
-        thumbnailWorker.postMessage({
-            type: 'activate',
-        });
-    }
+    thumbnailRpc?.post({ type: 'activate' });
 }
 
 export function deactivateThumbnailWorker() {
-    if (thumbnailWorker !== undefined) {
-        thumbnailWorker.postMessage({
-            type: 'deactivate',
-        });
-    }
+    thumbnailRpc?.post({ type: 'deactivate' });
 }
 
 export async function getThumbnailLocationQuicklyOrSkip(
     filePath: string,
 ): Promise<ThumbnailResult> {
-    if (thumbnailWorker !== undefined) {
+    if (thumbnailRpc !== undefined) {
         try {
             // This isn't necessarily true, but for prioritizing thumbnails
             // it is okay enough. E.g. ".d" directories are an exception to this.
@@ -147,45 +112,13 @@ export async function getThumbnailLocationQuicklyOrSkip(
                 id,
                 ...data,
             };
-            const sleeper = sleep(5050);
-            let resolver = () => {};
-            let rejecter = () => {};
-            let result: null | ThumbnailWorkerFoundThumbnail = null;
-            const resolverPromise = new Promise<void>((resolve, reject) => {
-                resolver = () => resolve();
-                rejecter = () => reject();
-                try {
-                    // Ensure that this promise at least rejects based on the sleep
-                    sleeper.then(() => rejecter());
-                } catch {
-                    // Intentionally left empty
-                }
-            });
-            const waiter: ThumbnailWaiter = {
-                resolveOk: (data: ThumbnailWorkerFoundThumbnail) => {
-                    result = data;
-                    resolver();
-                },
-                resolveNotFound: () => {
-                    rejecter();
-                },
-                createdAt: Date.now(),
-            };
-            waitingPromises.set(id, waiter);
-            thumbnailWorker.postMessage(request);
-            await Promise.race([sleeper, resolverPromise]).catch(() => {
-                // Intentionally left empty
-            });
-            waitingPromises.delete(id);
-            if (result != null) {
-                // deno does seem to handle cases where a variable is set outside the scope of the current function
-                // deno-lint-ignore no-explicit-any
-                const res: any = result;
+            const result = await thumbnailRpc.request(request);
+            if (result !== null && result.type === 'thumbnail-found') {
                 const thumbnailsDir = getThumbnailsDir();
                 return {
                     type: 'thumbnail-found',
                     root: thumbnailsDir,
-                    path: relative(thumbnailsDir, res.path),
+                    path: relative(thumbnailsDir, result.path),
                 };
             }
         } catch (err) {
