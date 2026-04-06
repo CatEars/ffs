@@ -10,6 +10,8 @@ import {
 class ThumbnailsModule implements OptionalModule {
     private activated: boolean = false;
     public readonly name: string = 'Automatic Thumbnail Generation';
+    public readonly description: string =
+        'Automatically generates thumbnail previews for images and videos using ffmpeg and ImageMagick.';
 
     isAvailable(): Promise<boolean> {
         return areThumbnailsAvailable();

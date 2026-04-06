@@ -24,7 +24,43 @@
             canCreateUsersVisibility: megaphone.view((state) =>
                 state.canCreateUsers ? 'show' : 'hidden'
             ),
+            modules: megaphone.jsonApi('/api/admin/modules', []),
         });
+
+        megaphone.renderEach(
+            state.modules,
+            '#modules-list',
+            megaphone.template('#module-item-template', (clone, mod) => {
+                clone.querySelector('.module-name').textContent = mod.name;
+                clone.querySelector('.module-description').textContent = mod.description;
+                const toggle = clone.querySelector('.module-toggle');
+                const errorMsg = clone.querySelector('.module-error');
+                toggle.checked = mod.isActivated;
+                toggle.disabled = !mod.isAvailable;
+                toggle.title = mod.isAvailable ? '' : 'Module is unavailable';
+                toggle.addEventListener('change', async () => {
+                    const endpoint = toggle.checked
+                        ? '/api/admin/modules/activate'
+                        : '/api/admin/modules/deactivate';
+                    const csrfToken = getCookie('FFS-Csrf-Protection');
+                    errorMsg.textContent = '';
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'FFS-Csrf-Protection': csrfToken,
+                        },
+                        body: JSON.stringify({ name: mod.name }),
+                    });
+                    if (!res.ok) {
+                        toggle.checked = !toggle.checked;
+                        const data = await res.json().catch(() => ({}));
+                        errorMsg.textContent = data.error || 'Operation failed';
+                    }
+                });
+                return clone;
+            })
+        );
 
         megaphone.renderIf(
             state.hasMessage,
@@ -110,6 +146,25 @@
                 </fieldset>
             </form>
         </section>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section $data-visibility="allowHousekeepingVisibility">
+        <h2>Optional Modules</h2>
+        <p>Enable or disable optional server modules.</p>
+        <ul id="modules-list">
+            <template id="module-item-template">
+                <li>
+                    <label>
+                        <input type="checkbox" class="module-toggle" />
+                        <strong class="module-name"></strong>
+                    </label>
+                    <p class="module-description"></p>
+                    <p class="module-error"></p>
+                </li>
+            </template>
+        </ul>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
