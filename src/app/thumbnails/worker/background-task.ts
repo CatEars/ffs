@@ -128,6 +128,7 @@ async function main() {
         logger.debug(
             'Thumbnail worker does not hold reference to self, unable to set up communication',
         );
+        return;
     }
 
     const rpc = WorkerRpc.buildFromWorker<ThumbnailWorkerRequest, ThumbnailWorkerResponse>(me);
