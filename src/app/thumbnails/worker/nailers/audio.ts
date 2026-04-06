@@ -64,6 +64,31 @@ async function convertToThumbnail(artFile: string, outputPath: string): Promise<
     return true;
 }
 
+async function promoteToParentDir(outputPath: string, parentDir: string): Promise<void> {
+    if (thumbnailExists(parentDir)) {
+        return;
+    }
+    const parentThumbnailPath = getThumbnailPath(parentDir);
+    const tempPromotedFile = await Deno.makeTempFile({
+        prefix: 'ffs_audiodir',
+        dir: getThumbnailTempDir(),
+        suffix: '.webp',
+    });
+    try {
+        await Deno.copyFile(outputPath, tempPromotedFile);
+        await ensureDir(dirname(parentThumbnailPath));
+        await move(tempPromotedFile, parentThumbnailPath, { overwrite: true });
+    } catch {
+        await Deno.remove(tempPromotedFile).catch(() => {});
+    }
+}
+
+async function finalizeThumbnail(outputPath: string, parentDir: string): Promise<string> {
+    logger.debug('Generated thumbnail', outputPath);
+    await promoteToParentDir(outputPath, parentDir);
+    return outputPath;
+}
+
 export async function createAudioThumbnail(
     thumbnail: ThumbnailRequest,
 ): Promise<string | null> {
@@ -74,25 +99,7 @@ export async function createAudioThumbnail(
     const folderArt = await findFolderArt(parentDir);
     if (folderArt !== null) {
         if (await convertToThumbnail(folderArt, outputPath)) {
-            logger.debug('Generated thumbnail', outputPath);
-
-            if (!thumbnailExists(parentDir)) {
-                const parentThumbnailPath = getThumbnailPath(parentDir);
-                const tempPromotedFile = await Deno.makeTempFile({
-                    prefix: 'ffs_audiodir',
-                    dir: getThumbnailTempDir(),
-                    suffix: '.webp',
-                });
-                try {
-                    await Deno.copyFile(outputPath, tempPromotedFile);
-                    await ensureDir(dirname(parentThumbnailPath));
-                    await move(tempPromotedFile, parentThumbnailPath, { overwrite: true });
-                } catch {
-                    await Deno.remove(tempPromotedFile).catch(() => {});
-                }
-            }
-
-            return outputPath;
+            return finalizeThumbnail(outputPath, parentDir);
         }
     }
 
@@ -126,23 +133,5 @@ export async function createAudioThumbnail(
         return null;
     }
 
-    logger.debug('Generated thumbnail', outputPath);
-
-    if (!thumbnailExists(parentDir)) {
-        const parentThumbnailPath = getThumbnailPath(parentDir);
-        const tempPromotedFile = await Deno.makeTempFile({
-            prefix: 'ffs_audiodir',
-            dir: getThumbnailTempDir(),
-            suffix: '.webp',
-        });
-        try {
-            await Deno.copyFile(outputPath, tempPromotedFile);
-            await ensureDir(dirname(parentThumbnailPath));
-            await move(tempPromotedFile, parentThumbnailPath, { overwrite: true });
-        } catch {
-            await Deno.remove(tempPromotedFile).catch(() => {});
-        }
-    }
-
-    return outputPath;
+    return finalizeThumbnail(outputPath, parentDir);
 }
