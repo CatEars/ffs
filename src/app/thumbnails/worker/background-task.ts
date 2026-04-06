@@ -2,6 +2,7 @@ import { resolve } from '@std/path/resolve';
 import { MemoryCache } from '../../../lib/cache/memory-cache.ts';
 import { Channel } from '../../../lib/channel/channel.ts';
 import { FileTreeWalker } from '../../../lib/file-system/file-tree-walker.ts';
+import { WorkerRpc } from '../../../lib/worker-rpc/worker-rpc.ts';
 import {
     devModeEnabled,
     getCacheRoot,
@@ -112,24 +113,31 @@ async function main() {
         getCacheRoot(),
     );
 
-    if (me) {
-        me.onmessage = (event: MessageEvent<ThumbnailWorkerRequest>) => {
-            if (event.data.type === 'create-thumbnail') {
-                // Always push prioritized requests to top. Let those found on own be at end
-                filesToPrioritizeChannel.pushFirst(event.data);
-            } else if (event.data.type === 'activate') {
-                activated = true;
-                logger.info('Background task for generating thumbnails activated');
-            } else if (event.data.type === 'deactivate') {
-                activated = false;
-                logger.info('Background task for generating thumbnails deactivated');
-            } else if (event.data.type === 'echo') {
-                doPost({
-                    type: 'echo',
-                });
-            }
-        };
+    if (!me) {
+        logger.debug(
+            'Thumbnail worker does not hold reference to self, unable to set up communication',
+        );
     }
+
+    const rpc = WorkerRpc.buildFromWorker<ThumbnailWorkerRequest, ThumbnailWorkerResponse>(me);
+    rpc.on('create-thumbnail', (msg) => {
+        if (msg.type === 'create-thumbnail') {
+            filesToPrioritizeChannel.pushFirst(msg);
+        }
+    });
+    rpc.on('activate', (_) => {
+        activated = true;
+        logger.info('Background task for generating thumbnails activated');
+    });
+    rpc.on('deactivate', (_) => {
+        activated = false;
+        logger.info('Background task for generating thumbnails deactivated');
+    });
+    rpc.on('echo', (_) => {
+        rpc.post({
+            type: 'echo',
+        });
+    });
 
     const isSelfAvailable = areThumbnailsAvailable();
     if (!isSelfAvailable) {
