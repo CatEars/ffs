@@ -1,0 +1,177 @@
+<!-- layout $templates/base.html -->
+<app-header>Megaphone: MutationObserver Cleanup</app-header>
+<app-main>
+    <style>
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+    </style>
+
+    <p>
+        Tests that per-render-target <code>MutationObserver</code>s correctly remove
+        stale <code>boundValues</code> entries when render containers are re-rendered.
+        Each container starts with pre-bound elements registered at <code>init()</code>
+        time via <code>$</code> attributes. After a render replaces those children the
+        observer should asynchronously clean them up.
+    </p>
+
+    <app-subheader>Live Stats</app-subheader>
+    <table>
+        <thead>
+            <tr><th>Metric</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>boundValues</code> keys</td><td><output id="stat-bv-keys">—</output></td></tr>
+            <tr><td><code>boundValues</code> total entries</td><td><output id="stat-bv-total">—</output></td></tr>
+            <tr><td><code>renderObservers</code> attached</td><td><output id="stat-ro-count">—</output></td></tr>
+        </tbody>
+    </table>
+
+    <!-- ── render() ─────────────────────────────────────────────────────── -->
+    <app-subheader>render() cleanup test</app-subheader>
+    <p>
+        The container below holds 3 elements bound to state key
+        <code>renderLabel</code>. They are registered in <code>boundValues</code>
+        during <code>init()</code>. After each render the observer should remove
+        those stale entries; <code>boundValues['renderLabel']</code> should stay
+        at 0 after the first render.
+    </p>
+    <p>
+        Bound at init: <output id="render-init-count">—</output> &nbsp;
+        Current: <output id="render-bv-count">—</output> &nbsp;
+        <output id="render-pass"></output>
+    </p>
+    <div id="render-test-container">
+        <span $title="renderLabel">alpha</span>
+        <span $title="renderLabel">beta</span>
+        <span $title="renderLabel">gamma</span>
+    </div>
+    <p><button id="btn-render-test">Re-render</button></p>
+
+    <!-- ── renderEach() ──────────────────────────────────────────────────── -->
+    <app-subheader>renderEach() cleanup test</app-subheader>
+    <p>
+        The container holds 2 elements bound to <code>eachLabel</code>. Clicking
+        <strong>Re-render list</strong> swaps in a new list;
+        <code>boundValues['eachLabel']</code> should drop to 0.
+    </p>
+    <p>
+        Bound at init: <output id="each-init-count">—</output> &nbsp;
+        Current: <output id="each-bv-count">—</output> &nbsp;
+        <output id="each-pass"></output>
+    </p>
+    <div id="renderEach-test-container">
+        <span $title="eachLabel">item-a</span>
+        <span $title="eachLabel">item-b</span>
+    </div>
+    <p><button id="btn-each-test">Re-render list</button></p>
+
+    <!-- ── renderIf() ────────────────────────────────────────────────────── -->
+    <app-subheader>renderIf() cleanup test</app-subheader>
+    <p>
+        The container holds 2 elements bound to <code>ifLabel</code>. Toggling
+        <strong>Hide / Show</strong> renders nothing (falsy state) then something
+        again; <code>boundValues['ifLabel']</code> should drop to 0 after hide
+        and remain 0 on subsequent shows because only initially-static elements
+        are registered.
+    </p>
+    <p>
+        Bound at init: <output id="if-init-count">—</output> &nbsp;
+        Current: <output id="if-bv-count">—</output> &nbsp;
+        <output id="if-pass"></output>
+    </p>
+    <div id="renderIf-test-container">
+        <span $title="ifLabel">visible-a</span>
+        <span $title="ifLabel">visible-b</span>
+    </div>
+    <p><button id="btn-if-test">Hide (renderIf = false)</button></p>
+
+    <script>
+        const megaphone = new Megaphone();
+        const state = megaphone.declareState({
+            renderLabel: 'initial',
+            renderCount: 0,
+            eachLabel: 'each-initial',
+            eachList: ['x', 'y', 'z'],
+            ifLabel: 'visible',
+            showIf: true,
+        });
+
+        megaphone.render(state.renderCount, '#render-test-container', (count) => {
+            const p = document.createElement('p');
+            p.textContent = `Render #${count}`;
+            return p;
+        });
+
+        megaphone.renderEach(state.eachList, '#renderEach-test-container', (item, idx) => {
+            const p = document.createElement('p');
+            p.textContent = `${idx}: ${item}`;
+            return p;
+        });
+
+        megaphone.renderIf(state.showIf, '#renderIf-test-container', (val) => {
+            const p = document.createElement('p');
+            p.textContent = String(val);
+            return p;
+        });
+
+        megaphone.init();
+
+        // Capture counts immediately after init, before the async observer fires.
+        // These should be > 0 (stale entries still present), then drop to 0.
+        function boundCount(key) {
+            const entries = megaphone.boundValues.get(key);
+            return entries ? entries.length : 0;
+        }
+
+        document.getElementById('render-init-count').textContent = boundCount('renderLabel');
+        document.getElementById('each-init-count').textContent = boundCount('eachLabel');
+        document.getElementById('if-init-count').textContent = boundCount('ifLabel');
+
+        function updateStats() {
+            let total = 0;
+            for (const entries of megaphone.boundValues.values()) {
+                total += entries.length;
+            }
+            document.getElementById('stat-bv-keys').textContent = megaphone.boundValues.size;
+            document.getElementById('stat-bv-total').textContent = total;
+            document.getElementById('stat-ro-count').textContent = megaphone.renderObservers.size;
+
+            const renderCount = boundCount('renderLabel');
+            document.getElementById('render-bv-count').textContent = renderCount;
+            const renderPass = document.getElementById('render-pass');
+            renderPass.textContent = renderCount === 0 ? 'PASS' : `PENDING (${renderCount})`;
+            renderPass.className = renderCount === 0 ? 'pass' : 'fail';
+
+            const eachCount = boundCount('eachLabel');
+            document.getElementById('each-bv-count').textContent = eachCount;
+            const eachPass = document.getElementById('each-pass');
+            eachPass.textContent = eachCount === 0 ? 'PASS' : `PENDING (${eachCount})`;
+            eachPass.className = eachCount === 0 ? 'pass' : 'fail';
+
+            const ifCount = boundCount('ifLabel');
+            document.getElementById('if-bv-count').textContent = ifCount;
+            const ifPass = document.getElementById('if-pass');
+            ifPass.textContent = ifCount === 0 ? 'PASS' : `PENDING (${ifCount})`;
+            ifPass.className = ifCount === 0 ? 'pass' : 'fail';
+        }
+
+        const statsInterval = setInterval(updateStats, 200);
+        window.addEventListener('beforeunload', () => clearInterval(statsInterval));
+
+        document.getElementById('btn-render-test').addEventListener('click', () => {
+            state.renderCount = state.renderCount.value + 1;
+        });
+
+        document.getElementById('btn-each-test').addEventListener('click', () => {
+            state.eachList = ['p', 'q', 'r'];
+        });
+
+        document.getElementById('btn-if-test').addEventListener('click', () => {
+            const next = !state.showIf.value;
+            state.showIf = next;
+            document.getElementById('btn-if-test').textContent = next
+                ? 'Hide (renderIf = false)'
+                : 'Show (renderIf = true)';
+        });
+    </script>
+</app-main>

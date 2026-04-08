@@ -312,7 +312,7 @@
 
         #assignBoundId(element) {
             if (!element.dataset.megaphoneId) {
-                element.dataset.megaphoneId = Megaphone._nextBoundId++;
+                element.dataset.megaphoneId = String(Megaphone._nextBoundId++);
             }
             return element.dataset.megaphoneId;
         }
