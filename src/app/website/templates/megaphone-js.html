@@ -251,12 +251,14 @@
 
     class Megaphone {
         static _megaphones = [];
+        static _nextBoundId = 0;
 
         constructor() {
             Megaphone._megaphones.push(this);
             this.dependents = {};
             this.watches = new Map();
             this.boundValues = new Map();
+            this.renderObservers = new Map();
             this.state = null;
             this.stateProxy = null;
             this.initialized = false;
@@ -306,6 +308,54 @@
 
                 child = nextSibling;
             }
+        }
+
+        #assignBoundId(element) {
+            if (!element.dataset.megaphoneId) {
+                element.dataset.megaphoneId = Megaphone._nextBoundId++;
+            }
+            return element.dataset.megaphoneId;
+        }
+
+        #removeBoundElementsIn(removedNode) {
+            const idsToRemove = new Set();
+            if (removedNode.dataset && removedNode.dataset.megaphoneId) {
+                idsToRemove.add(removedNode.dataset.megaphoneId);
+            }
+            if (removedNode.querySelectorAll) {
+                for (const el of removedNode.querySelectorAll('[data-megaphone-id]')) {
+                    idsToRemove.add(el.dataset.megaphoneId);
+                }
+            }
+            if (idsToRemove.size === 0) {
+                return;
+            }
+            for (const [property, entries] of this.boundValues) {
+                if (!entries.some((e) => idsToRemove.has(e.megaphoneId))) {
+                    continue;
+                }
+                const filtered = entries.filter((e) => !idsToRemove.has(e.megaphoneId));
+                if (filtered.length === 0) {
+                    this.boundValues.delete(property);
+                } else {
+                    this.boundValues.set(property, filtered);
+                }
+            }
+        }
+
+        #ensureRenderObserver(selector, element) {
+            if (!element || this.renderObservers.has(selector)) {
+                return;
+            }
+            const observer = new MutationObserver((records) => {
+                for (const record of records) {
+                    for (const removedNode of record.removedNodes) {
+                        this.#removeBoundElementsIn(removedNode);
+                    }
+                }
+            });
+            observer.observe(element, { childList: true, subtree: true });
+            this.renderObservers.set(selector, observer);
         }
 
         #registerFormSubmitCsrfAppender() {
@@ -437,10 +487,12 @@
                         }
 
                         const userGivenName = attribute.name.substring(1);
+                        const megaphoneId = this.#assignBoundId(element);
                         boundValues.get(attribute.value).push({
                             element,
                             name: userGivenName,
                             lowercaseName: userGivenName.toLocaleLowerCase(),
+                            megaphoneId,
                         });
                     } else if (this.#isEventListenerMarker(attribute.name)) {
                         if (!knownStateKeys.has(attribute.value)) {
@@ -574,6 +626,7 @@
         renderEach(state, into, renderFunc) {
             this.watch(state, (value) => {
                 const element = document.querySelector(into);
+                this.#ensureRenderObserver(into, element);
                 this.#clearChildNodes(element);
                 for (let idx = 0; idx < value.length; ++idx) {
                     const v = value[idx];
@@ -585,6 +638,7 @@
         render(state, into, renderFunc) {
             this.watch(state, (value) => {
                 const element = document.querySelector(into);
+                this.#ensureRenderObserver(into, element);
                 this.#clearChildNodes(element);
                 this.#renderAndAppend(element, value, renderFunc);
             });
@@ -593,6 +647,7 @@
         renderIf(state, into, renderFunc) {
             this.watch(state, (value) => {
                 const element = document.querySelector(into);
+                this.#ensureRenderObserver(into, element);
                 this.#clearChildNodes(element);
                 if (value) {
                     this.#renderAndAppend(element, value, renderFunc);
