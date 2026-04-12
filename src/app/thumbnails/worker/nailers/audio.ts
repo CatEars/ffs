@@ -53,15 +53,22 @@ async function convertToThumbnail(artFile: string, outputPath: string): Promise<
         args: [artFile, '-thumbnail', '128x128', '-quality', '60', tempThumbFile],
     });
 
-    const convertResult = await convertCommand.output();
-    if (!convertResult.success) {
-        await Deno.remove(tempThumbFile);
-        return false;
-    }
+    let tempThumbFileMoved = false;
+    try {
+        const convertResult = await convertCommand.output();
+        if (!convertResult.success) {
+            return false;
+        }
 
-    await ensureDir(dirname(outputPath));
-    await move(tempThumbFile, outputPath, { overwrite: true });
-    return true;
+        await ensureDir(dirname(outputPath));
+        await move(tempThumbFile, outputPath, { overwrite: true });
+        tempThumbFileMoved = true;
+        return true;
+    } finally {
+        if (!tempThumbFileMoved) {
+            await Deno.remove(tempThumbFile).catch(() => {});
+        }
+    }
 }
 
 async function promoteToParentDir(outputPath: string, parentDir: string): Promise<void> {
@@ -110,28 +117,28 @@ export async function createAudioThumbnail(
         suffix: '.jpg',
     });
 
-    const extractCommand = new Deno.Command('ffmpeg', {
-        args: ['-i', thumbnail.filePath, '-map', '0:v:0', '-c:v', 'copy', '-y', tempArtFile],
-    });
+    try {
+        const extractCommand = new Deno.Command('ffmpeg', {
+            args: ['-i', thumbnail.filePath, '-map', '0:v:0', '-c:v', 'copy', '-y', tempArtFile],
+        });
 
-    const extractResult = await extractCommand.output();
-    if (!extractResult.success) {
-        await Deno.remove(tempArtFile);
-        return null;
+        const extractResult = await extractCommand.output();
+        if (!extractResult.success) {
+            return null;
+        }
+
+        const artStat = await Deno.stat(tempArtFile);
+        if (artStat.size === 0) {
+            return null;
+        }
+
+        const success = await convertToThumbnail(tempArtFile, outputPath);
+        if (!success) {
+            return null;
+        }
+
+        return finalizeThumbnail(outputPath, parentDir);
+    } finally {
+        await Deno.remove(tempArtFile).catch(() => {});
     }
-
-    const artStat = await Deno.stat(tempArtFile);
-    if (artStat.size === 0) {
-        await Deno.remove(tempArtFile);
-        return null;
-    }
-
-    const success = await convertToThumbnail(tempArtFile, outputPath);
-    await Deno.remove(tempArtFile).catch(() => {});
-
-    if (!success) {
-        return null;
-    }
-
-    return finalizeThumbnail(outputPath, parentDir);
 }

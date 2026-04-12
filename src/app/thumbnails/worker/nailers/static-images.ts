@@ -41,16 +41,23 @@ export async function createImageMagickThumbnail(
             tempFile,
         ],
     });
-    const result = await command.output();
-    if (!result.success) {
-        await Deno.remove(tempFile);
-        return null;
+    let tempFileMoved = false;
+    try {
+        const result = await command.output();
+        if (!result.success) {
+            return null;
+        }
+        await ensureDir(dirname(outputPath));
+        await move(tempFile, outputPath, { overwrite: true });
+        tempFileMoved = true;
+        logger.debug(
+            'Generated thumbnail',
+            outputPath,
+        );
+        return outputPath;
+    } finally {
+        if (!tempFileMoved) {
+            await Deno.remove(tempFile).catch(() => {});
+        }
     }
-    await ensureDir(dirname(outputPath));
-    await move(tempFile, outputPath, { overwrite: true });
-    logger.debug(
-        'Generated thumbnail',
-        outputPath,
-    );
-    return outputPath;
 }

@@ -129,6 +129,7 @@ async function getThumbnail(next: ThumbnailRequest) {
             'Skipping. error:',
             err,
         );
+        // Cache the failure so the same broken file is not retried until the TTL expires.
         recentlyParsedThumbnails.set(next.filePath, [null]);
     }
 }
@@ -167,6 +168,7 @@ async function main() {
     setInterval(async () => {
         await ensureNailersUpToDate();
     }, 60_000);
+    setInterval(() => recentlyParsedThumbnails.prune(), fiveMinutes);
 
     if (await areThumbnailsAvailable()) {
         await findFilesToThumbnail();

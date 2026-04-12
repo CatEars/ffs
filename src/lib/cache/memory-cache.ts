@@ -11,6 +11,15 @@ export class MemoryCache<T> {
         this.ttl = ttl;
     }
 
+    prune() {
+        const now = Date.now();
+        for (const [key, entry] of this.cache) {
+            if (entry.lastAccess + this.ttl <= now) {
+                this.cache.delete(key);
+            }
+        }
+    }
+
     public get(key: string): T | undefined {
         const res = this.cache.get(key);
         if (res && res.lastAccess + this.ttl > Date.now()) {
