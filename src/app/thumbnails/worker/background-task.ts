@@ -24,7 +24,7 @@ const fiveMinutes = 1000 * 60 * 5;
 const recentlyParsedThumbnails = new MemoryCache<[string | null]>(
     fiveMinutes,
 );
-const filesToPrioritizeChannel: Channel<ThumbnailRequest> = new Channel();
+const filesToPrioritizeChannel: Channel<ThumbnailRequest> = new Channel(2500);
 
 function buildFileTreeOptions() {
     const fileTreeOptions = {
@@ -32,7 +32,7 @@ function buildFileTreeOptions() {
     };
     const thumbnailSkipPattern = getThumbnailFinderSkipRegex();
     if (thumbnailSkipPattern) {
-        fileTreeOptions.skip.push(new RegExp(thumbnailSkipPattern, 'g'));
+        fileTreeOptions.skip.push(new RegExp(thumbnailSkipPattern));
     }
     return fileTreeOptions;
 }
@@ -152,6 +152,7 @@ async function main() {
     setInterval(async () => {
         await ensureNailersUpToDate();
     }, 60_000);
+    setInterval(() => recentlyParsedThumbnails.prune(), fiveMinutes);
 
     if (await areThumbnailsAvailable()) {
         await findFilesToThumbnail();

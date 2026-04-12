@@ -1,6 +1,11 @@
 export class Channel<TMessage> {
     private readonly queue: TMessage[] = [];
     private readonly waiters: ((value: TMessage | null) => void)[] = [];
+    private readonly maxSize: number;
+
+    constructor(maxSize: number = Infinity) {
+        this.maxSize = maxSize;
+    }
 
     pushFirst(item: TMessage) {
         if (this.waiters.length > 0) {
@@ -14,6 +19,9 @@ export class Channel<TMessage> {
     }
 
     push(item: TMessage) {
+        if (this.queue.length >= this.maxSize) {
+            return;
+        }
         this.queue.push(item);
 
         if (this.waiters.length > 0) {
