@@ -91,3 +91,32 @@ Common development tasks are defined in `deno.jsonc`:
 - `deno task test` — run all tests
 - `deno task bundle-component-library` — bundle the client-side component library
 - `deno task setup` — first-time setup (downloads dependencies and vendor binaries)
+
+## Running in the Agent Sandbox
+
+The cloud agent sandbox intercepts outbound TLS with its own CA certificate. Deno does not trust this CA by default, so **all Deno commands must be prefixed with `DENO_TLS_CA_STORE=system`** to use the system certificate store. Without this, Deno cannot download JSR packages and will fail immediately with `invalid peer certificate: UnknownIssuer`.
+
+```sh
+DENO_TLS_CA_STORE=system deno task test
+DENO_TLS_CA_STORE=system deno run --allow-all src/app/main.ts
+```
+
+### Starting the server for system tests
+
+The system tests under `src/test/system/` connect to a live server at `http://localhost:8080`. The server must be running before executing `deno task test`. Start it in the background using the same environment variables that `src/scripts/dev-main.ts` sets:
+
+```sh
+FFS_ENV=dev \
+FFS_STORE_ROOT=. \
+FFS_USERS_FILE=data/users-file.json \
+FFS_INSTANCE_SECRET=VerySecretIndeed \
+FFS_CUSTOM_COMMANDS_FILE=data/sample-custom-commands.json \
+DENO_TLS_CA_STORE=system \
+nohup deno run --allow-all src/app/main.ts > /tmp/ffs-server.log 2>&1 &
+```
+
+Wait ~15 seconds for startup to complete (watch `/tmp/ffs-server.log` for `Starting server on port 8080`), then run:
+
+```sh
+DENO_TLS_CA_STORE=system deno test --allow-all
+```
