@@ -77,24 +77,17 @@ export async function createMp4Thumbnail(thumbnail: ThumbnailRequest): Promise<s
             tempFile,
         ],
     });
-    let tempFileMoved = false;
-    try {
-        const result = await command.output();
-        if (!result.success) {
-            logger.debug('ffmpeg problems', new TextDecoder().decode(result.stderr));
-            return null;
-        }
-        await ensureDir(dirname(outputPath));
-        await move(tempFile, outputPath, { overwrite: true });
-        tempFileMoved = true;
-        logger.debug(
-            'Generated thumbnail',
-            outputPath,
-        );
-        return outputPath;
-    } finally {
-        if (!tempFileMoved) {
-            await Deno.remove(tempFile).catch(() => {});
-        }
+    const result = await command.output();
+    if (!result.success) {
+        logger.debug('ffmpeg problems', new TextDecoder().decode(result.stderr));
+        await Deno.remove(tempFile);
+        return null;
     }
+    await ensureDir(dirname(outputPath));
+    await move(tempFile, outputPath, { overwrite: true });
+    logger.debug(
+        'Generated thumbnail',
+        outputPath,
+    );
+    return outputPath;
 }

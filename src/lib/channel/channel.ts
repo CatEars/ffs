@@ -28,10 +28,6 @@ export class Channel<TMessage> {
         }
     }
 
-    get size(): number {
-        return this.queue.length;
-    }
-
     consume(): Promise<TMessage | null> {
         if (this.queue.length > 0) {
             const first = this.queue.splice(0, 1)[0];
