@@ -2,9 +2,9 @@ import { assert } from '@std/assert/assert';
 import { assertEquals } from '@std/assert/equals';
 import { assertRejects } from '@std/assert/rejects';
 import { join } from '@std/path';
-import { getShareManifestsDir } from '../app/files/cache-folder.ts';
-import { ManifestShareLinkScheme } from '../app/share-file/manifest-share-link-scheme.ts';
-import './init-test-config.ts';
+import { getShareManifestsDir } from '../../app/files/cache-folder.ts';
+import { ManifestShareLinkScheme } from '../../app/share-file/manifest-share-link-scheme.ts';
+import '../init-test-config.ts';
 
 const scheme = new ManifestShareLinkScheme();
 
