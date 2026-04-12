@@ -91,7 +91,7 @@ export class FileTree {
     }
 
     async listDirectory(relativePath: string): Promise<ListDirectoryResult> {
-        const normalizedPath = join(this.root, relativePath);
+        const normalizedPath = resolve(this.root, relativePath);
         const pathCheck = this.ensureResolveIsUnderRoot(normalizedPath, true);
         if (pathCheck.type === 'invalid') {
             return {
