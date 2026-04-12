@@ -32,7 +32,7 @@ function buildFileTreeOptions() {
     };
     const thumbnailSkipPattern = getThumbnailFinderSkipRegex();
     if (thumbnailSkipPattern) {
-        fileTreeOptions.skip.push(new RegExp(thumbnailSkipPattern, 'g'));
+        fileTreeOptions.skip.push(new RegExp(thumbnailSkipPattern));
     }
     return fileTreeOptions;
 }
@@ -129,6 +129,7 @@ async function getThumbnail(next: ThumbnailRequest) {
             'Skipping. error:',
             err,
         );
+        recentlyParsedThumbnails.set(next.filePath, [null]);
     }
 }
 
