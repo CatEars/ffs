@@ -80,5 +80,9 @@ Deno.test('Can upload files', async () => {
     });
     await result.text();
     assert(result.status >= 300 && result.status < 400, `Expected redirect, got ${result.status}`);
-    Deno.removeSync('README Copy.md');
+    try {
+        Deno.removeSync('README Copy.md');
+    } catch {
+        // ignore cleanup errors
+    }
 });
