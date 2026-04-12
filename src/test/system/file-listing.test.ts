@@ -18,7 +18,7 @@ Deno.test('Can fetch directory contents', async () => {
     const result = await authenticatedFetch(baseUrl + '/api/directory?path=.');
     const directoryListing = await result.json();
     assert(
-        directoryListing.some((x: FileListing) => x.name === 'deno.json' && x.isFile),
+        directoryListing.some((x: FileListing) => x.name === 'deno.jsonc' && x.isFile),
     );
 });
 
@@ -41,7 +41,7 @@ Deno.test('Listing directory gets unauthorized when not using API key', async ()
 });
 
 Deno.test('Fetching file works', async () => {
-    const result = await authenticatedFetch(baseUrl + '/api/file?path=deno.json');
+    const result = await authenticatedFetch(baseUrl + '/api/file?path=deno.jsonc');
     const denoFile = await result.json();
     assert(denoFile['imports'] && denoFile['imports']['@oak/oak']);
 });
@@ -60,7 +60,7 @@ Deno.test('Not allowed to fetch / directory as file', async () => {
 
 Deno.test('Can upload files', async () => {
     const formData = new FormData();
-    const fileName = 'Makefile';
+    const fileName = 'README.md';
     formData.append(
         'file',
         new Blob([Deno.readFileSync(fileName)], { type: 'text/plain' }),
