@@ -23,4 +23,13 @@ export class MemoryCache<T> {
     public set(key: string, obj: T) {
         this.cache.set(key, { element: obj, lastAccess: Date.now() });
     }
+
+    public prune() {
+        const now = Date.now();
+        for (const [key, entry] of this.cache) {
+            if (entry.lastAccess + this.ttl <= now) {
+                this.cache.delete(key);
+            }
+        }
+    }
 }

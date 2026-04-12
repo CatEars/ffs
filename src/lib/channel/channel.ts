@@ -2,6 +2,10 @@ export class Channel<TMessage> {
     private readonly queue: TMessage[] = [];
     private readonly waiters: ((value: TMessage | null) => void)[] = [];
 
+    get size(): number {
+        return this.queue.length;
+    }
+
     pushFirst(item: TMessage) {
         if (this.waiters.length > 0) {
             const resolver = this.waiters.shift();
