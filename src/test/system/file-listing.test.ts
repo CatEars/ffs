@@ -1,7 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { assert } from '@std/assert/assert';
 import {
-    HTTP_200_OK,
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
@@ -59,6 +58,7 @@ Deno.test('Not allowed to fetch / directory as file', async () => {
 });
 
 Deno.test('Can upload files', async () => {
+    const csrfToken = 'test-csrf-token';
     const formData = new FormData();
     const fileName = 'README.md';
     formData.append(
@@ -67,12 +67,18 @@ Deno.test('Can upload files', async () => {
         fileName,
     );
     formData.append('directory', '.');
+    formData.append('ffs_csrf_protection', csrfToken);
 
     const result = await authenticatedFetch(baseUrl + '/api/file/upload', {
         method: 'POST',
         body: formData,
+        redirect: 'manual',
+        headers: {
+            'Cookie': `FFS-Csrf-Protection=${csrfToken}`,
+            'Referer': baseUrl + '/file-manager',
+        },
     });
     await result.text();
-    assertEquals(result.status, HTTP_200_OK);
-    Deno.removeSync(fileName + ' Copy');
+    assert(result.status >= 300 && result.status < 400, `Expected redirect, got ${result.status}`);
+    Deno.removeSync('README Copy.md');
 });
