@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
 import { assertFalse } from '@std/assert/false';
-import { assertThrows } from '@std/assert/throws';
+import { assertRejects } from '@std/assert/rejects';
 import { ShareLinkSchemeRegistry } from '../../app/share-file/share-link-scheme-registry.ts';
 import type {
     DecodedShare,
@@ -59,7 +59,7 @@ Deno.test('createCode selects the first available scheme and prepends its id', a
 
 Deno.test('createCode throws when no scheme is available', async () => {
     const registry = new ShareLinkSchemeRegistry([new FakeScheme('a', false)]);
-    await assertThrows(async () => await registry.createCode({ paths: ['file.txt'] }));
+    await assertRejects(async () => await registry.createCode({ paths: ['file.txt'] }));
 });
 
 Deno.test('decodeCode routes to the correct scheme by id prefix', async () => {
@@ -73,12 +73,12 @@ Deno.test('decodeCode routes to the correct scheme by id prefix', async () => {
 
 Deno.test('decodeCode throws on code missing scheme prefix', async () => {
     const registry = new ShareLinkSchemeRegistry([new FakeScheme('a', true)]);
-    await assertThrows(async () => await registry.decodeCode('nocolon'));
+    await assertRejects(async () => await registry.decodeCode('nocolon'));
 });
 
 Deno.test('decodeCode throws on unknown scheme id', async () => {
     const registry = new ShareLinkSchemeRegistry([new FakeScheme('a', true)]);
-    await assertThrows(async () => await registry.decodeCode('unknown:payload'));
+    await assertRejects(async () => await registry.decodeCode('unknown:payload'));
 });
 
 Deno.test('createCode and decodeCode round-trip through registry', async () => {

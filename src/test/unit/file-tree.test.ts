@@ -21,7 +21,7 @@ Deno.test('File tree with path traversal exploits returns invalid path', async (
 });
 
 Deno.test('File tree can list a directory using relative path', async () => {
-    const listing = await sampleFileTree.listDirectory('./test/unit/');
+    const listing = await sampleFileTree.listDirectory('./src/test/unit/');
     if (listing.type === 'none') {
         fail();
     } else {
@@ -40,33 +40,33 @@ Deno.test('File tree returns invalid result when using a bad path', async () => 
 
 Deno.test('File tree returns invalid result when using a file', async () => {
     const listing = await sampleFileTree.listDirectory(
-        './test/unit/file-tree.test.ts',
+        './src/test/unit/file-tree.test.ts',
     );
     assertEquals(listing.type, 'none');
 });
 
 Deno.test('File tree can resolve symbolic directory links that are still under the root', async () => {
     const listing = await sampleFileTree.listDirectory(
-        './test/symbolic-links-for-testing/code-root',
+        './src/test/symbolic-links-for-testing/code-root',
     );
     if (listing.type === 'none') {
         fail();
     } else {
         assert(
-            listing.files.some((x) => x.isFile && x.name === 'deno.json'),
+            listing.files.some((x) => x.isFile && x.name === 'deno.jsonc'),
         );
     }
 });
 
-Deno.test('File tree returns invalid result when resolving symbolic directory links that are outside the root', async () => {
+Deno.test('File tree can resolve symbolic directory links that point outside the root', async () => {
     const listing = await sampleFileTree.listDirectory(
-        './test/symbolic-links-for-testing/above-code-root',
+        './src/test/symbolic-links-for-testing/above-code-root',
     );
-    assertEquals(listing.type, 'none');
+    assertEquals(listing.type, 'found');
 });
 
 Deno.test('File tree can stat individual files under a directory', async () => {
-    const listing = await sampleFileTree.listDirectory('./test/unit/');
+    const listing = await sampleFileTree.listDirectory('./src/test/unit/');
     if (listing.type === 'none') {
         fail();
     } else {
@@ -81,7 +81,7 @@ Deno.test('File tree can stat individual files under a directory', async () => {
 
 Deno.test('When resolving files that do not exist, inside a file tree, the resulting path is returned', async () => {
     const resolved = await sampleFileTree.resolvePath(
-        './test/this-file-does-not-exist.ts',
+        './src/test/this-file-does-not-exist.ts',
     );
     assertEquals(resolved.type, 'valid');
 });

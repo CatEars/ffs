@@ -3,6 +3,7 @@ src/website/static/*
 !src/website/static/css
 *.mp4
 *.m4v
+*.tgz
 testbench
 dist
 access.log
