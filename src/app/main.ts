@@ -13,9 +13,10 @@ import { resolveUserFileTreeFromState } from './files/resolve-file-tree.ts';
 import './includes-for-compilation.ts';
 import { initializeLoggers, logger } from './logging/loggers.ts';
 import { optionalModules } from './optional-modules.ts';
+import { pluginsModule } from './plugins/module.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import { registerAllWebsiteRoutes } from './website/index.ts';
+import { registerAllWebsiteRoutes, registerPluginPagesOnRouter } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -42,6 +43,7 @@ for (const routeRegistrator of routeRegistrations) {
     await routeRegistrator(router);
 }
 await registerAllWebsiteRoutes(router);
+await registerPluginPagesOnRouter(router, () => pluginsModule.isActivated());
 
 app.use(router.routes());
 app.use(router.allowedMethods());
