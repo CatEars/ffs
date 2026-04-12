@@ -58,11 +58,11 @@ Deno.test('File tree can resolve symbolic directory links that are still under t
     }
 });
 
-Deno.test('File tree returns invalid result when resolving symbolic directory links that are outside the root', async () => {
+Deno.test('File tree can resolve symbolic directory links that point outside the root', async () => {
     const listing = await sampleFileTree.listDirectory(
         './src/test/symbolic-links-for-testing/above-code-root',
     );
-    assertEquals(listing.type, 'none');
+    assertEquals(listing.type, 'found');
 });
 
 Deno.test('File tree can stat individual files under a directory', async () => {
