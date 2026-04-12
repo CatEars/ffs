@@ -140,7 +140,7 @@
         function navigateToHomePath(path, index) {
             const elements = path.split('/');
             const selectedLocation = elements.slice(0, index + 1).join('/');
-            const webPath = `/home/?path=${selectedLocation}`;
+            const webPath = `/home/?path=${encodeURIComponent(selectedLocation)}`;
             window.location.href = webPath;
         }
 
@@ -284,7 +284,7 @@
 
         function gotoUpload() {
             const currentPath = getCurrentPath();
-            const targetUrl = `/upload/?path=${currentPath}`;
+            const targetUrl = `/upload/?path=${encodeURIComponent(currentPath)}`;
             window.open(targetUrl, '_blank');
         }
 
@@ -306,7 +306,7 @@
                 state.fileManagerModeEnabled ? 'show' : 'hidden'
             ),
 
-            files: megaphone.jsonApi(`/api/directory?path=${currentPath}`, [], {
+            files: megaphone.jsonApi(`/api/directory?path=${encodeURIComponent(currentPath)}`, [], {
                 view: (files) =>
                     includeParentUnlessRoot(filesWithUnstringifiedDate(files), currentPath),
             }),
@@ -398,8 +398,10 @@
                 rowText.insertBefore(fl, clone.querySelector('.file-size'));
 
                 const fileSizeEl = clone.querySelector('.file-size');
-                if (file.isFile && file.size != null) {
+                if (file.size != null) {
                     fileSizeEl.textContent = formatBytes(file.size, 1);
+                } else if (file.isDirectory) {
+                    fileSizeEl.textContent = '...';
                 }
 
                 return clone;

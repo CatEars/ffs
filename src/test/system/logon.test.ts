@@ -1,5 +1,5 @@
 import { assert } from '@std/assert/assert';
-import { baseUrl } from './constants.ts';
+import { baseUrl } from '../constants.ts';
 import { assertEquals } from '@std/assert/equals';
 
 Deno.test('Using the right username and password gets us the API key', async () => {

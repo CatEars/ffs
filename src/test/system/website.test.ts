@@ -1,8 +1,8 @@
 import { assertEquals } from '@std/assert/equals';
-import { baseUrl } from './constants.ts';
-import { HTTP_200_OK, HTTP_401_UNAUTHORIZED } from '../lib/http/http-codes.ts';
+import { baseUrl } from '../constants.ts';
+import { HTTP_200_OK, HTTP_401_UNAUTHORIZED } from '../../lib/http/http-codes.ts';
 import { assert } from '@std/assert/assert';
-import { authenticatedFetch } from './authenticated-fetch.ts';
+import { authenticatedFetch } from '../authenticated-fetch.ts';
 
 Deno.test('there is a website that kinda looks like HTML', async () => {
     const result = await fetch(baseUrl + '/');

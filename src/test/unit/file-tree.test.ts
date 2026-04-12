@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert/equals';
 import { resolve } from '@std/path/resolve';
 import { assert } from '@std/assert/assert';
 import { fail } from '@std/assert/fail';
-import { FileTree } from '../app/files/file-tree.ts';
+import { FileTree } from '../../app/files/file-tree.ts';
 
 const sampleFileTree = new FileTree('.');
 
@@ -21,7 +21,7 @@ Deno.test('File tree with path traversal exploits returns invalid path', async (
 });
 
 Deno.test('File tree can list a directory using relative path', async () => {
-    const listing = await sampleFileTree.listDirectory('./test/');
+    const listing = await sampleFileTree.listDirectory('./test/unit/');
     if (listing.type === 'none') {
         fail();
     } else {
@@ -40,7 +40,7 @@ Deno.test('File tree returns invalid result when using a bad path', async () => 
 
 Deno.test('File tree returns invalid result when using a file', async () => {
     const listing = await sampleFileTree.listDirectory(
-        './test/file-tree.test.ts',
+        './test/unit/file-tree.test.ts',
     );
     assertEquals(listing.type, 'none');
 });
@@ -66,7 +66,7 @@ Deno.test('File tree returns invalid result when resolving symbolic directory li
 });
 
 Deno.test('File tree can stat individual files under a directory', async () => {
-    const listing = await sampleFileTree.listDirectory('./test/');
+    const listing = await sampleFileTree.listDirectory('./test/unit/');
     if (listing.type === 'none') {
         fail();
     } else {

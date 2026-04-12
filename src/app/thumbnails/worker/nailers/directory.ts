@@ -9,8 +9,8 @@ import {
     getThumbnailTempDir,
     thumbnailExists,
 } from '../../../files/cache-folder.ts';
-import { logger } from '../../../logging/loggers.ts';
 import { ThumbnailRequest } from '../../types.ts';
+import { acceptedFileExtensions as acceptedAudioExtensions } from './audio.ts';
 import { acceptedFileExtensions as acceptedVideoExtensions } from './mp4.ts';
 import { acceptedFileExtensions as acceptedImageExtensions } from './static-images.ts';
 
@@ -30,17 +30,19 @@ async function promoteThumbnail(request: ThumbnailRequest, fileToCopy: string) {
     }
     await ensureDir(dirname(targetPath));
     await move(tempFile, targetPath, { overwrite: true });
-    logger.debug('Promoting thumbnail for', sourcePath, 'to directory', targetPath);
 }
 
 function findFileType(filePath: string) {
     const fileExt = extname(filePath);
     const imageExts = acceptedImageExtensions;
     const videoExts = acceptedVideoExtensions;
+    const audioExts = acceptedAudioExtensions;
     if (imageExts.includes(fileExt)) {
         return 'image';
     } else if (videoExts.includes(fileExt)) {
         return 'video';
+    } else if (audioExts.includes(fileExt)) {
+        return 'audio';
     } else {
         return 'unknown';
     }
@@ -51,6 +53,7 @@ export async function copyMostFitingThumbnailFromDirectory(
 ): Promise<string | null> {
     // If we created a video thumbnail and there are no other videos -> copy thumbnail to parent
     // Else if we created an image thumbnail and this is the only image -> copy thumbnail to parent
+    // Else if we created an audio thumbnail and this is the only audio -> copy thumbnail to parent
 
     const entries = await collectAsync(Deno.readDir(request.filePath));
     const entriesWithThumbnails = entries.filter((x) =>
@@ -58,11 +61,14 @@ export async function copyMostFitingThumbnailFromDirectory(
     );
     const videos = entriesWithThumbnails.filter((entry) => findFileType(entry.name) === 'video');
     const images = entriesWithThumbnails.filter((entry) => findFileType(entry.name) === 'image');
+    const audios = entriesWithThumbnails.filter((entry) => findFileType(entry.name) === 'audio');
 
     if (videos.length === 1) {
         await promoteThumbnail(request, videos[0].name);
     } else if (images.length === 1) {
         await promoteThumbnail(request, images[0].name);
+    } else if (audios.length === 1) {
+        await promoteThumbnail(request, audios[0].name);
     }
     return null;
 }
