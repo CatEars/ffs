@@ -33,7 +33,8 @@ Deno.test('GET /logout redirects to the landing page', async () => {
     const result = await fetch(baseUrl + '/logout', { redirect: 'manual' });
     await result.body?.cancel();
     assert(result.status >= 300 && result.status < 400);
-    assertEquals('/', new URL(result.headers.get('location')!).pathname);
+    const location = result.headers.get('location')!;
+    assertEquals(new URL(location, baseUrl).pathname, '/');
 });
 
 Deno.test('GET /logout clears the FFS-Authorization cookie', async () => {
@@ -41,5 +42,6 @@ Deno.test('GET /logout clears the FFS-Authorization cookie', async () => {
     await result.body?.cancel();
     const setCookie = result.headers.get('set-cookie') ?? '';
     assert(setCookie.includes('FFS-Authorization='));
-    assert(setCookie.includes('Expires=') || setCookie.includes('Max-Age=0'));
+    const lowerSetCookie = setCookie.toLowerCase();
+    assert(lowerSetCookie.includes('expires=') || lowerSetCookie.includes('max-age=0'));
 });

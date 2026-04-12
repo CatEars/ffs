@@ -41,19 +41,23 @@ export class ClaimCodec {
     }
 
     async verifyAndUrlDecodeClaims(claimStr: string): Promise<Claims | null> {
-        const baseClaims = JSON.parse(decoder.decode(decodeBase64Url(claimStr)));
-        if (!baseClaims.claims || !baseClaims.hmac) {
+        try {
+            const baseClaims = JSON.parse(decoder.decode(decodeBase64Url(claimStr)));
+            if (!baseClaims.claims || !baseClaims.hmac) {
+                return null;
+            }
+
+            const stringifiedClaims = baseClaims.claims as string;
+            const hmac = decodeBase64(baseClaims.hmac);
+            const isValid = await this.#isValidClaim(stringifiedClaims, hmac);
+            if (!isValid) {
+                return null;
+            }
+
+            return JSON.parse(stringifiedClaims) as Claims;
+        } catch {
             return null;
         }
-
-        const stringifiedClaims = baseClaims.claims as string;
-        const hmac = decodeBase64(baseClaims.hmac);
-        const isValid = await this.#isValidClaim(stringifiedClaims, hmac);
-        if (!isValid) {
-            return null;
-        }
-
-        return JSON.parse(stringifiedClaims) as Claims;
     }
 
     async #signClaim(claim: string) {

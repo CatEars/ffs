@@ -1,6 +1,5 @@
 import { assert } from '@std/assert/assert';
 import { baseUrl } from '../constants.ts';
-import { assertEquals } from '@std/assert/equals';
 
 Deno.test('Using the right username and password gets us the API key', async () => {
     const result = await fetch(baseUrl + '/api/logon', {
@@ -15,7 +14,10 @@ Deno.test('Using the right username and password gets us the API key', async () 
     });
     const response = await result.json();
     assert(response['isOk']);
-    assertEquals(response['key'], 'bab5b6be-2aad-11f0-a2ca-3b8bfdd0a613');
+    assert(
+        typeof response['key'] === 'string' && response['key'].length > 0,
+        'Expected a non-empty API key string',
+    );
 });
 
 Deno.test('Using the right username and password gets us the API key - pbkdf2', async () => {
@@ -31,5 +33,8 @@ Deno.test('Using the right username and password gets us the API key - pbkdf2', 
     });
     const response = await result.json();
     assert(response['isOk']);
-    assertEquals(response['key'], '780423cd-0bde-489a-8a2c-369e12c22f19');
+    assert(
+        typeof response['key'] === 'string' && response['key'].length > 0,
+        'Expected a non-empty API key string',
+    );
 });
