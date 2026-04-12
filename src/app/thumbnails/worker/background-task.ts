@@ -37,8 +37,13 @@ function buildFileTreeOptions() {
     return fileTreeOptions;
 }
 
+const CHANNEL_CAPACITY = 2500;
+
 async function findFilesToThumbnail() {
     if (!activated) {
+        return;
+    }
+    if (filesToPrioritizeChannel.size >= CHANNEL_CAPACITY) {
         return;
     }
     const storeRoot = getStoreRoot();
@@ -55,6 +60,9 @@ async function findFilesToThumbnail() {
     );
 
     for await (const file of fileTreeWalker.walk()) {
+        if (filesToPrioritizeChannel.size >= CHANNEL_CAPACITY) {
+            return;
+        }
         filesToPrioritizeChannel.push({
             filePath: resolve(storeRoot, '.' + file.parent, file.name),
         });
@@ -63,6 +71,9 @@ async function findFilesToThumbnail() {
 
 async function findDirectoriesToThumbnail() {
     if (!activated) {
+        return;
+    }
+    if (filesToPrioritizeChannel.size >= CHANNEL_CAPACITY) {
         return;
     }
     const storeRoot = getStoreRoot();
@@ -77,6 +88,9 @@ async function findDirectoriesToThumbnail() {
     fileTreeWalker.filter((file) => !thumbnailExists(file.path));
 
     for await (const directory of fileTreeWalker.walk()) {
+        if (filesToPrioritizeChannel.size >= CHANNEL_CAPACITY) {
+            return;
+        }
         filesToPrioritizeChannel.push({
             filePath: resolve(storeRoot, '.' + directory.parent, directory.name),
         });
