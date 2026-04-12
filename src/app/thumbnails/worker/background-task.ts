@@ -24,7 +24,13 @@ const fiveMinutes = 1000 * 60 * 5;
 const recentlyParsedThumbnails = new MemoryCache<[string | null]>(
     fiveMinutes,
 );
-const filesToPrioritizeChannel: Channel<ThumbnailRequest> = new Channel(2500);
+const filesToPrioritizeChannel: Channel<ThumbnailRequest> = new Channel();
+
+const MAX_CHANNEL_ENTRIES = 2500;
+let fileWalkerGenerator: AsyncGenerator<ThumbnailRequest> | null = null;
+let dirWalkerGenerator: AsyncGenerator<ThumbnailRequest> | null = null;
+let isFillFilesRunning = false;
+let isFillDirsRunning = false;
 
 function buildFileTreeOptions() {
     const fileTreeOptions = {
@@ -37,49 +43,83 @@ function buildFileTreeOptions() {
     return fileTreeOptions;
 }
 
-async function findFilesToThumbnail() {
-    if (!activated) {
-        return;
-    }
+async function* walkFiles(): AsyncGenerator<ThumbnailRequest> {
     const storeRoot = getStoreRoot();
-    const fileTreeOptions = buildFileTreeOptions();
     const fileTreeWalker = new FileTreeWalker(storeRoot, {
-        ...fileTreeOptions,
+        ...buildFileTreeOptions(),
         includeFiles: true,
         includeDirs: false,
         includeSymlinks: false,
     });
-
     fileTreeWalker.filter((file) =>
         canGenerateThumbnailFor(file.path) && !thumbnailExists(file.path)
     );
-
     for await (const file of fileTreeWalker.walk()) {
-        filesToPrioritizeChannel.push({
-            filePath: resolve(storeRoot, '.' + file.parent, file.name),
-        });
+        yield { filePath: resolve(storeRoot, '.' + file.parent, file.name) };
     }
 }
 
-async function findDirectoriesToThumbnail() {
-    if (!activated) {
-        return;
-    }
+async function* walkDirs(): AsyncGenerator<ThumbnailRequest> {
     const storeRoot = getStoreRoot();
-    const fileTreeOptions = buildFileTreeOptions();
     const fileTreeWalker = new FileTreeWalker(storeRoot, {
-        ...fileTreeOptions,
+        ...buildFileTreeOptions(),
         includeFiles: false,
         includeDirs: true,
         includeSymlinks: false,
     });
-
     fileTreeWalker.filter((file) => !thumbnailExists(file.path));
-
     for await (const directory of fileTreeWalker.walk()) {
-        filesToPrioritizeChannel.push({
-            filePath: resolve(storeRoot, '.' + directory.parent, directory.name),
-        });
+        yield { filePath: resolve(storeRoot, '.' + directory.parent, directory.name) };
+    }
+}
+
+async function fillFilesIntoChannel() {
+    if (!activated || isFillFilesRunning) {
+        return;
+    }
+    isFillFilesRunning = true;
+    try {
+        if (!fileWalkerGenerator) {
+            fileWalkerGenerator = walkFiles();
+        }
+        const generator = fileWalkerGenerator;
+        while (activated && filesToPrioritizeChannel.size < MAX_CHANNEL_ENTRIES) {
+            const result = await generator.next();
+            if (result.done) {
+                if (fileWalkerGenerator === generator) {
+                    fileWalkerGenerator = null;
+                }
+                break;
+            }
+            filesToPrioritizeChannel.push(result.value);
+        }
+    } finally {
+        isFillFilesRunning = false;
+    }
+}
+
+async function fillDirsIntoChannel() {
+    if (!activated || isFillDirsRunning) {
+        return;
+    }
+    isFillDirsRunning = true;
+    try {
+        if (!dirWalkerGenerator) {
+            dirWalkerGenerator = walkDirs();
+        }
+        const generator = dirWalkerGenerator;
+        while (activated && filesToPrioritizeChannel.size < MAX_CHANNEL_ENTRIES) {
+            const result = await generator.next();
+            if (result.done) {
+                if (dirWalkerGenerator === generator) {
+                    dirWalkerGenerator = null;
+                }
+                break;
+            }
+            filesToPrioritizeChannel.push(result.value);
+        }
+    } finally {
+        isFillDirsRunning = false;
     }
 }
 
@@ -145,6 +185,8 @@ async function main() {
 
     rpc.on('deactivate', (_) => {
         activated = false;
+        fileWalkerGenerator = null;
+        dirWalkerGenerator = null;
         logger.info('Background task for generating thumbnails deactivated');
     });
 
@@ -155,10 +197,10 @@ async function main() {
     setInterval(() => recentlyParsedThumbnails.prune(), fiveMinutes);
 
     if (await areThumbnailsAvailable()) {
-        await findFilesToThumbnail();
-        await findDirectoriesToThumbnail();
-        setInterval(findFilesToThumbnail, devModeEnabled ? 10_000 : 60_000);
-        setInterval(findDirectoriesToThumbnail, devModeEnabled ? 10_000 : 60_000);
+        await fillFilesIntoChannel();
+        await fillDirsIntoChannel();
+        setInterval(fillFilesIntoChannel, devModeEnabled ? 10_000 : 60_000);
+        setInterval(fillDirsIntoChannel, devModeEnabled ? 10_000 : 60_000);
     }
 
     while (true) {
