@@ -17,7 +17,7 @@ async function getApiKey(): Promise<string> {
         throw new Error('Failed to log in during test setup');
     }
     cachedApiKey = response.key;
-    return cachedApiKey;
+    return cachedApiKey!;
 }
 
 export async function authenticatedFetch(
