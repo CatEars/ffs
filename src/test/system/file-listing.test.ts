@@ -5,9 +5,9 @@ import {
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
-} from '../lib/http/http-codes.ts';
-import { authenticatedFetch } from './authenticated-fetch.ts';
-import { baseUrl } from './constants.ts';
+} from '../../lib/http/http-codes.ts';
+import { authenticatedFetch } from '../authenticated-fetch.ts';
+import { baseUrl } from '../constants.ts';
 
 type FileListing = {
     name: string;
