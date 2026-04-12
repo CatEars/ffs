@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert/equals';
 import { assert } from '@std/assert/assert';
 import { assertFalse } from '@std/assert/false';
-import { assertThrows } from '@std/assert/throws';
+import { assertRejects } from '@std/assert/rejects';
 import { RawPathsShareLinkScheme } from '../../app/share-file/raw-paths-share-link-scheme.ts';
 
 const scheme = new RawPathsShareLinkScheme();
@@ -37,5 +37,5 @@ Deno.test('createCode and decodeCode work for empty paths array', async () => {
 });
 
 Deno.test('decodeCode throws on invalid base64url input', async () => {
-    await assertThrows(async () => await scheme.decodeCode('not-valid-base64url!!!'));
+    await assertRejects(async () => await scheme.decodeCode('not-valid-base64url!!!'));
 });
