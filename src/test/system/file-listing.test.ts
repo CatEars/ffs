@@ -27,8 +27,15 @@ Deno.test('Cannot fetch a super-directory of the store directory', async () => {
     assertEquals(result.status, HTTP_404_NOT_FOUND);
 });
 
-Deno.test('Cannot fetch / directory', async () => {
+Deno.test('Fetching / returns files from store root', async () => {
     const result = await authenticatedFetch(baseUrl + '/api/directory?path=/');
+    const directoryListing = await result.json();
+    assertEquals(result.status, 200);
+    assert(Array.isArray(directoryListing) && directoryListing.length > 0);
+});
+
+Deno.test('Cannot fetch path traversal with ../', async () => {
+    const result = await authenticatedFetch(baseUrl + '/api/directory?path=../');
     await result.text();
     assertEquals(result.status, HTTP_404_NOT_FOUND);
 });
