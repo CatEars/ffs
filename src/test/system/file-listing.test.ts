@@ -1,6 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { assert } from '@std/assert/assert';
 import {
+    HTTP_200_OK,
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
@@ -30,7 +31,7 @@ Deno.test('Cannot fetch a super-directory of the store directory', async () => {
 Deno.test('Fetching / returns files from store root', async () => {
     const result = await authenticatedFetch(baseUrl + '/api/directory?path=/');
     const directoryListing = await result.json();
-    assertEquals(result.status, 200);
+    assertEquals(result.status, HTTP_200_OK);
     assert(Array.isArray(directoryListing) && directoryListing.length > 0);
 });
 
