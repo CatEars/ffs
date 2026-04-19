@@ -1,5 +1,4 @@
 import { Middleware } from '@oak/oak/middleware';
-import { Router } from '@oak/oak/router';
 import { FileTreeWalker } from '../../lib/file-system/file-tree-walker.ts';
 import { viewPath } from '../config.ts';
 
@@ -10,30 +9,13 @@ export type PlainPage = {
     middlewares: Middleware[];
 };
 
-export type NavbarLink = {
-    displayText: string;
-    webPath: string;
-};
-
-export type ApplicationContext = {
-    router: Router;
-    navbarLinks: NavbarLink[];
-};
-
-export type PluginPage = {
-    type: 'Plugin';
-    displayName: string;
-    enabled: boolean;
-    register: (context: ApplicationContext) => Promise<void>;
-};
-
 export type StaticJsPage = {
     type: 'Js';
     webPath: string;
     filePath: string;
 };
 
-export type Page = PlainPage | PluginPage | StaticJsPage;
+export type Page = PlainPage | StaticJsPage;
 
 function isPartialHtmlFile(path: string) {
     return path.endsWith('.partial.html');
@@ -75,20 +57,6 @@ export async function collectAllPages(): Promise<Page[]> {
             webPath,
             middlewares,
         });
-    }
-
-    for (const deno of denos) {
-        const importedDeno = await import(
-            `${viewPath}${deno.parent.substring(1)}${deno.name}`
-        );
-        if (importedDeno.register) {
-            pages.push({
-                type: 'Plugin',
-                displayName: `${deno.parent}${deno.name}`,
-                register: importedDeno.register,
-                enabled: !!importedDeno.enabled,
-            });
-        }
     }
 
     for (const js of javascripts) {
