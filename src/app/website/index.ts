@@ -8,10 +8,8 @@ import { viewPath } from '../config.ts';
 import { logger } from '../logging/loggers.ts';
 import {
     collectAllPages,
-    NavbarLink,
     Page,
     PlainPage,
-    PluginPage,
     StaticJsPage,
 } from './collect-all-pages.ts';
 import { registerStaticRoutes } from './static-files.ts';
@@ -26,65 +24,14 @@ async function getPages(): Promise<Page[]> {
     return cachedPages;
 }
 
-function createGatedRouter(router: Router, isActive: () => boolean): Router {
-    const gate = async (ctx: Context, next: Next) => {
-        if (!isActive()) {
-            ctx.response.status = HTTP_404_NOT_FOUND;
-            return;
-        }
-        await next();
-    };
-    const routeMethods = new Set([
-        'get',
-        'post',
-        'put',
-        'delete',
-        'patch',
-        'head',
-        'options',
-        'all',
-    ]);
-    return new Proxy(router, {
-        get(target, prop) {
-            if (typeof prop === 'string' && routeMethods.has(prop)) {
-                return (path: string, ...handlers: unknown[]) => {
-                    return (target as Record<string, (...args: unknown[]) => unknown>)[prop](
-                        path,
-                        gate,
-                        ...handlers,
-                    );
-                };
-            }
-            const value = (target as Record<string | symbol, unknown>)[prop];
-            return typeof value === 'function'
-                ? (value as (...args: unknown[]) => unknown).bind(target)
-                : value;
-        },
-    }) as unknown as Router;
-}
-
 export async function registerAllWebsiteRoutes(router: Router) {
     const allPages = await getPages();
     const plainPages = allPages.filter((x) => x.type === 'Plain') as PlainPage[];
     const jsPages = allPages.filter((x) => x.type === 'Js') as StaticJsPage[];
     registerPlainPages(plainPages, router);
-    await writeNavbarExtensions([]);
 
     await registerStaticRoutes(router);
     registerStaticJsRoutes(jsPages, router);
-}
-
-export async function registerPluginPagesOnRouter(
-    router: Router,
-    isActive: () => boolean,
-): Promise<void> {
-    const allPages = await getPages();
-    const pluginPages = allPages.filter((x) => x.type === 'Plugin') as PluginPage[];
-    try {
-        await registerPluginPages(pluginPages, router, isActive);
-    } catch {
-        logger.debug('Unable to register plugin pages');
-    }
 }
 
 function registerStaticJsRoutes(pages: StaticJsPage[], router: Router) {
@@ -97,35 +44,6 @@ function registerStaticJsRoutes(pages: StaticJsPage[], router: Router) {
             });
         });
     }
-}
-
-async function registerPluginPages(
-    pluginPages: PluginPage[],
-    router: Router,
-    isActive: () => boolean,
-) {
-    const gatedRouter = createGatedRouter(router, isActive);
-    const navbarLinks: NavbarLink[] = [];
-    for (const page of pluginPages) {
-        if (!page.enabled) {
-            logger.info('Plugin', page.displayName, 'was disabled, will not register it');
-            continue;
-        }
-        logger.info('Registering routes from', page.displayName);
-        await page.register({ router: gatedRouter, navbarLinks });
-    }
-    await writeNavbarExtensions(navbarLinks);
-}
-
-async function writeNavbarExtensions(navbarLinks: NavbarLink[]) {
-    const links = navbarLinks.map((link) =>
-        `<header-tab href="${link.webPath}">${link.displayText}</header-tab>`
-    );
-    await Deno.writeTextFile(
-        resolve(viewPath, '../templates/header/links-added-by-plugins.html'),
-        '<!-- Below is auto-generated, do not touch! -->\n' +
-            links.join('\n'),
-    );
 }
 
 function passAlongMiddleware(_ctx: Context, next: Next) {
