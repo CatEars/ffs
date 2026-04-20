@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+    build:
+        desc: Build main go application
+        cmds:
+            - go build -o ./dist/ffs ./src/goapp/main.go
+
+    clean:
+        desc: Clean temporary files
+        cmds:
+            - rm -rf ./dist
+
+    test:
+        desc: Run tests
+        cmds:
+            - go test ./src/golib/**/*.go
