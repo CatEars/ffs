@@ -1,6 +1,7 @@
 package security
 
 import (
+	"catears/ffs/lib/assert"
 	"testing"
 )
 
@@ -66,11 +67,7 @@ func TestMatchesDenoImplementation(t *testing.T) {
 
 	for _, tc := range testCases {
 		hash, err := Pbkdf2Hash(tc.pwd, tc.salt)
-		if err != nil {
-			t.Error("Error when running pbkdf2", err)
-		}
-		if hash != tc.result {
-			t.Error("test vectors for hashes do not match")
-		}
+		assert.Nil(t, err)
+		assert.Equal(t, hash, tc.result, "Expected", tc.pwd, "and", tc.salt, "to become hashed as", tc.result)
 	}
 }
