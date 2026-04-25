@@ -1,6 +1,7 @@
 package assert
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -41,14 +42,14 @@ func isItNil[T any](a T) bool {
 func Equal[T comparable](t *testing.T, a, b T, messages ...string) {
 	t.Helper()
 	if a != b {
-		t.Error(joinOrDefault("Not equal", messages))
+		t.Error(joinOrDefault(fmt.Sprint("Not equal ", "[", a, "] vs [", b, "]"), messages))
 	}
 }
 
 func NotEqual[T comparable](t *testing.T, a, b T, messages ...string) {
 	t.Helper()
 	if a == b {
-		t.Error(joinOrDefault("Equal", messages))
+		t.Error(joinOrDefault(fmt.Sprint("Are equal ", "[", a, "] vs [", b, "]"), messages))
 	}
 }
 
@@ -56,7 +57,7 @@ func Nil[T any](t *testing.T, a T, messages ...string) {
 	t.Helper()
 	isNil := isItNil(a)
 	if !isNil {
-		t.Error(joinOrDefault("Expected value to be nil", messages))
+		t.Error(joinOrDefault(fmt.Sprint("Expected value to be nil but is: ", a), messages))
 	}
 }
 
