@@ -82,3 +82,10 @@ func False(t *testing.T, result bool, messages ...string) {
 		t.Error(joinOrDefault("Expected false but got true", messages))
 	}
 }
+
+func Contains(t *testing.T, str, substring string, messages ...string) {
+	t.Helper()
+	if !strings.Contains(str, substring) {
+		t.Error(joinOrDefault(fmt.Sprint("Failed to find [", substring, "] in [", str, "]"), messages))
+	}
+}
