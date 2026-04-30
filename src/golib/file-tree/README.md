@@ -12,12 +12,12 @@ It can be configured to follow symlinks, or ignore them. Symlinks are represente
 
 ```go
 /**
- * Resolves a path inside the tree. Paths that would traverse 
+ * Resolves a path inside the tree. Paths that would traverse
  * outside the file tree returns `Invalid`
  *
  * FileTree("/").Traverse("etc/../passwd") resolves to `/etc/passwd`
  * FileTree("/tmp").Traverse("../etc/passwd") resolve to Invalid
- * FileTree("/").Traverse("does-not-exist") resolves to `/doesn-not-exist` (and can then be tested for existance)
+ * FileTree("/").Traverse("does-not-exist") resolves to `/does-not-exist` (and can then be tested for existance)
  * FileTree("/tmp").Traverse("/etc/passwd") resolves to `/tmp/etc/passwd`
  */
 Traverse(path string) *FileTree
