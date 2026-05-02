@@ -28,7 +28,7 @@
             "command": "deno run --allow-all src/scripts/dev-main.ts"
         },
         "test": "deno test --allow-all",
-        "download-dependencies": "deno run --allow-all src/scripts/download-deps.ts",
+        "download-dependencies": "goscript --download-deps",
         "download-vendor-binaries": "./src/scripts/download-vendor-binaries.sh",
         "unpack-favicon": "deno run --allow-all src/scripts/unpack-favicon.ts",
         "setup": {
