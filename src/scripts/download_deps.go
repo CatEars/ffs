@@ -1,11 +1,7 @@
 package main
 
 import (
-	"io"
 	"log"
-	"net/http"
-	"os"
-	"path"
 )
 
 type downloadTarget struct {
@@ -36,31 +32,12 @@ var downloadTargets = []downloadTarget{
 	},
 }
 
-func fatal(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func DownloadDependencies() {
-	client := &http.Client{}
 	for _, dl := range downloadTargets {
 		url := dl.url
 		target := dl.target
 		log.Println("Downloading", url, "into", target)
-
-		resp, err := client.Get(url)
-		fatal(err)
-		defer resp.Body.Close()
-
-		err = os.MkdirAll(path.Dir(target), 0750)
-		fatal(err)
-
-		file, err := os.Create(target)
-		fatal(err)
-		defer file.Close()
-
-		_, err = io.Copy(file, resp.Body)
-		fatal(err)
+		err := DownloadFile(url, target)
+		Fatal(err)
 	}
 }
