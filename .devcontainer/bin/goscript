@@ -1,0 +1,6 @@
+#!/bin/bash
+
+THIS_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$THIS_SCRIPT_DIR/../.."
+
+go run $ROOT_DIR/src/scripts/*.go $@
