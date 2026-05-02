@@ -9,7 +9,8 @@
                 "denoland.vscode-deno",
                 "ecmel.vscode-html-css",
                 "esbenp.prettier-vscode",
-                "bierner.lit-html"
+                "bierner.lit-html",
+                "golang.go"
             ]
         }
     },

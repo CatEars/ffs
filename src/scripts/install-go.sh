@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+THIS_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION="1.26.2"
 GO_DL_URL="https://go.dev/dl/go$VERSION.linux-amd64.tar.gz"
 TAR_NAME="go$VERSION.linux-amd64.tar.gz"
@@ -37,3 +38,6 @@ mkdir -p $BIN_DIR
 echo "Linking go to $BIN_DIR/go from $GO_INSTALL_DIR/bin/go"
 ln -s $GO_INSTALL_DIR/bin/go $BIN_DIR/go
 ln -s $GO_INSTALL_DIR/bin/gofmt $BIN_DIR/gofmt
+
+$THIS_SCRIPT_DIR/add-go-root-include-to-bashrc.sh
+
