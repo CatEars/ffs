@@ -14,6 +14,20 @@ func Fatal(err error) {
 	}
 }
 
+func Touch(path string) error {
+	_, err := os.Stat(path)
+	if err == nil {
+		os.Remove(path)
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	_, err = f.WriteString("\n")
+	return err
+}
+
 func DownloadFile(url, target string) error {
 	client := &http.Client{}
 

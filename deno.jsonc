@@ -20,7 +20,7 @@
         "bundle-component-library": "deno run --allow-all src/scripts/bundle-component-library.ts",
         "ensure-dist": "mkdir -p dist && touch dist/rmme && rm dist/*",
         "enable-eruda": "./src/scripts/set-eruda-as-personal-html-file.sh",
-        "create-personal-files": "deno run --allow-all src/scripts/create-empty-personal-files.ts",
+        "create-personal-files": "goscript --create-personal-files",
         "remove-personal-files": "deno run --allow-all src/scripts/remove-personal-files.ts",
         "generate-default-test-bench": "deno run --allow-all src/scripts/generate-default-test-bench.ts",
         "generate-svg-sprite-sheet": "deno run --allow-all src/scripts/generate-svg-sprite-sheet.ts",
