@@ -7,6 +7,7 @@ func main() {
 	personal := flag.Bool("create-personal-files", false, "Create personal files")
 	bundle := flag.Bool("bundle-component-library", false, "Bundle component library")
 	devMain := flag.Bool("dev-main", false, "Start developing!")
+	propMap := flag.Bool("generate-html-property-mapping", false, "Generates the HTML property mapping file")
 
 	flag.Parse()
 
@@ -18,6 +19,8 @@ func main() {
 		BundleComponentLibrary()
 	} else if *devMain {
 		DevMain()
+	} else if *propMap {
+		GenerateHtmlPropertyMapping()
 	} else {
 		flag.Usage()
 	}
