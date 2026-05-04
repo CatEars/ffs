@@ -29,8 +29,15 @@ func bundleJavascriptWebcomponents() {
 }
 
 func bundleCss() {
-	args := []string{}
-	log.Println("Bundling css...")
+	args := []string{
+		"--bundle",
+		"index.css",
+		"--loader:.svg=dataurl",
+		"--outfile=index.bundle.css",
+	}
+	dir := path.Join(GetCwdOrFail(), "src", "app", "website", "static", "css")
+	runWithEsbuild(dir, args)
+	log.Println("Bundling CSS files into index.bundle.css")
 }
 
 func BundleComponentLibrary() {
