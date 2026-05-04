@@ -24,8 +24,9 @@
         "remove-personal-files": "deno run --allow-all src/scripts/remove-personal-files.ts",
         "generate-default-test-bench": "deno run --allow-all src/scripts/generate-default-test-bench.ts",
         "generate-svg-sprite-sheet": "deno run --allow-all src/scripts/generate-svg-sprite-sheet.ts",
+        "generate-html-property-mapping": "deno run --allow-all src/scripts/generate-html-property-mapping.ts",
         "run": {
-            "command": "deno run --allow-all src/scripts/dev-main.ts"
+            "command": "goscript --dev-main"
         },
         "test": "deno test --allow-all",
         "download-dependencies": "goscript --download-deps",
@@ -89,7 +90,6 @@
             "dependencies": [
                 "build-dist"
             ]
-        },
-        "generate-html-property-mapping": "deno run --allow-all src/scripts/generate-html-property-mapping.ts"
+        }
     }
 }

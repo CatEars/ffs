@@ -12,11 +12,13 @@ func runWithEsbuild(dir string, args []string) {
 	cmd := exec.Command(esbuildPath, args...)
 	cmd.Dir = dir
 
-	err := cmd.Run()
-	Fatal(err)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Panicf("Bundle failed %s\nError: %v", string(out), err)
+	}
 }
 
-func bundleJavascriptWebcomponents() {
+func bundleJavascriptWebcomponents(silent bool) {
 	EnsureDirFromCwd("src", "app", "website", "static", "js")
 	args := []string{
 		"--bundle",
@@ -25,10 +27,12 @@ func bundleJavascriptWebcomponents() {
 	}
 	dir := path.Join(GetCwdOrFail(), "src", "app", "website", "components")
 	runWithEsbuild(dir, args)
-	log.Println("Bundled component library into index.bundle.js")
+	if !silent {
+		log.Println("Bundled component library into index.bundle.js")
+	}
 }
 
-func bundleCss() {
+func bundleCss(silent bool) {
 	args := []string{
 		"--bundle",
 		"index.css",
@@ -37,10 +41,17 @@ func bundleCss() {
 	}
 	dir := path.Join(GetCwdOrFail(), "src", "app", "website", "static", "css")
 	runWithEsbuild(dir, args)
-	log.Println("Bundling CSS files into index.bundle.css")
+	if !silent {
+		log.Println("Bundling CSS files into index.bundle.css")
+	}
+}
+
+func BundleComponentLibrarySilently() {
+	bundleJavascriptWebcomponents(true)
+	bundleCss(true)
 }
 
 func BundleComponentLibrary() {
-	bundleJavascriptWebcomponents()
-	bundleCss()
+	bundleJavascriptWebcomponents(false)
+	bundleCss(false)
 }
