@@ -55,3 +55,19 @@ func DownloadFile(url, target string) error {
 
 	return nil
 }
+
+func EnsureDir(dir string) {
+	os.MkdirAll(dir, 0o777)
+}
+
+func EnsureDirFromCwd(dirs ...string) {
+	cwd := GetCwdOrFail()
+	fullPath := append([]string{cwd}, dirs...)
+	EnsureDir(path.Join(fullPath...))
+}
+
+func GetCwdOrFail() string {
+	cwd, err := os.Getwd()
+	Fatal(err)
+	return cwd
+}

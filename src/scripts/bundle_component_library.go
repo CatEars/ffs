@@ -2,31 +2,34 @@ package main
 
 import (
 	"log"
-	"os"
 	"os/exec"
 	"path"
 )
 
-func bundleJavascriptWebcomponents() {
-	cwd, err := os.Getwd()
+func runWithEsbuild(dir string, args []string) {
+	cwd := GetCwdOrFail()
+	esbuildPath := path.Join(cwd, "src", "scripts", "vendor", "bin", "esbuild")
+	cmd := exec.Command(esbuildPath, args...)
+	cmd.Dir = dir
+
+	err := cmd.Run()
 	Fatal(err)
-	outputDir := path.Join(cwd, "src", "app", "website", "static", "js")
-	os.MkdirAll(outputDir, 0o777)
+}
+
+func bundleJavascriptWebcomponents() {
+	EnsureDirFromCwd("src", "app", "website", "static", "js")
 	args := []string{
 		"--bundle",
 		"index.js",
 		"--outfile=../static/js/index.bundle.js",
 	}
-	esbuildPath := path.Join(cwd, "src", "scripts", "vendor", "bin", "esbuild")
-	cmd := exec.Command(esbuildPath, args...)
-	cmd.Dir = path.Join(cwd, "src", "app", "website", "components")
-
-	err = cmd.Run()
-	Fatal(err)
+	dir := path.Join(GetCwdOrFail(), "src", "app", "website", "components")
+	runWithEsbuild(dir, args)
 	log.Println("Bundled component library into index.bundle.js")
 }
 
 func bundleCss() {
+	args := []string{}
 	log.Println("Bundling css...")
 }
 
