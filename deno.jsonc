@@ -31,7 +31,7 @@
         "test": "deno test --allow-all",
         "download-dependencies": "goscript --download-deps",
         "download-vendor-binaries": "./src/scripts/download-vendor-binaries.sh",
-        "unpack-favicon": "deno run --allow-all src/scripts/unpack-favicon.ts",
+        "unpack-favicon": "goscript --unpack-favicon",
         "setup": {
             "dependencies": [
                 "generate-default-test-bench",
