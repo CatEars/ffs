@@ -11,6 +11,7 @@ func main() {
 	svgSheet := flag.Bool("generate-svg-sprite-sheet", false, "Generates SVG sprite sheet")
 	unpack := flag.Bool("unpack-favicon", false, "Unpacks favicon")
 	removePersonal := flag.Bool("remove-personal-files", false, "Removes personal files")
+	genTest := flag.Bool("generate-default-test-bench", false, "Generates the default test bench")
 
 	flag.Parse()
 
@@ -30,6 +31,8 @@ func main() {
 		UnpackFavicon()
 	} else if *removePersonal {
 		RemovePersonalFiles()
+	} else if *genTest {
+		GenerateDefaultTestBench()
 	} else {
 		flag.Usage()
 	}

@@ -22,7 +22,7 @@
         "enable-eruda": "./src/scripts/set-eruda-as-personal-html-file.sh",
         "create-personal-files": "goscript --create-personal-files",
         "remove-personal-files": "goscript --remove-personal-files",
-        "generate-default-test-bench": "deno run --allow-all src/scripts/generate-default-test-bench.ts",
+        "generate-default-test-bench": "goscript --generate-default-test-bench",
         "generate-svg-sprite-sheet": "goscript --generate-svg-sprite-sheet",
         "generate-html-property-mapping": "goscript --generate-html-property-mapping",
         "run": {
