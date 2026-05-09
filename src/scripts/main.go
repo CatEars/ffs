@@ -10,6 +10,7 @@ func main() {
 	propMap := flag.Bool("generate-html-property-mapping", false, "Generates the HTML property mapping file")
 	svgSheet := flag.Bool("generate-svg-sprite-sheet", false, "Generates SVG sprite sheet")
 	unpack := flag.Bool("unpack-favicon", false, "Unpacks favicon")
+	removePersonal := flag.Bool("remove-personal-files", false, "Removes personal files")
 
 	flag.Parse()
 
@@ -27,6 +28,8 @@ func main() {
 		GenerateSvgSpriteSheet()
 	} else if *unpack {
 		UnpackFavicon()
+	} else if *removePersonal {
+		RemovePersonalFiles()
 	} else {
 		flag.Usage()
 	}
