@@ -23,7 +23,7 @@
         "create-personal-files": "goscript --create-personal-files",
         "remove-personal-files": "deno run --allow-all src/scripts/remove-personal-files.ts",
         "generate-default-test-bench": "deno run --allow-all src/scripts/generate-default-test-bench.ts",
-        "generate-svg-sprite-sheet": "deno run --allow-all src/scripts/generate-svg-sprite-sheet.ts",
+        "generate-svg-sprite-sheet": "goscript --generate-svg-sprite-sheet",
         "generate-html-property-mapping": "goscript --generate-html-property-mapping",
         "run": {
             "command": "goscript --dev-main"
