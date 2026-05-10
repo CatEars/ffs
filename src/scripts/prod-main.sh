@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Helper runner while deno is being migrated to golang
 
