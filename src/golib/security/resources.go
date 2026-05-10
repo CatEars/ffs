@@ -107,34 +107,34 @@ func defaultClaimVerificationFunc(principalClaims, requestedClaims *Claim) bool 
 
 // A claim verifier is used to check if one claim gives access to another
 //
-// If you keep to the standard access levels use the default `Verifier` rather than creating your own
+// You only need to use this if you override verification via `NewResourceManagerWithVerifier`
 type ClaimVerifier struct {
 	HasAccessFunc ClaimVerificationFunction
 }
 
 // Uses the default verification function (write -> read) to ensure
-var Verifier *ClaimVerifier = &ClaimVerifier{
+var verifier *ClaimVerifier = &ClaimVerifier{
 	HasAccessFunc: defaultClaimVerificationFunc,
-}
-
-// Checks if the principal has access to the requested claim
-func (verifier *ClaimVerifier) HasAccess(principalClaims, requestedClaims *Claim) bool {
-	if verifier == nil {
-		return false
-	}
-
-	return verifier.HasAccessFunc(principalClaims, requestedClaims)
 }
 
 // Manager for a particular type of resource, e.g. User, or File
 type ResourceManager struct {
 	ResourceName string
+	Verifier     *ClaimVerifier
 }
 
 // Creates a new resource manager, used to generate Ids and check permissions for that resource
 func NewResourceManager(resourceName string) *ResourceManager {
 	return &ResourceManager{
 		ResourceName: url.PathEscape(resourceName),
+		Verifier:     verifier,
+	}
+}
+
+func NewResourceManagerWithVerifier(resourceName string, verifier *ClaimVerifier) *ResourceManager {
+	return &ResourceManager{
+		ResourceName: url.PathEscape(resourceName),
+		Verifier:     verifier,
 	}
 }
 
@@ -147,6 +147,9 @@ func NewResourceManager(resourceName string) *ResourceManager {
 //	ResourceManager{"File"}.GetId("Thumbnail", "/movies/mymovie.mp4")
 //	>> Resource ID for subgroup thumbnail of "mymovie.mp4"
 func (mgr *ResourceManager) GetId(hierarchy ...string) *ResourceId {
+	if mgr == nil {
+		return nil
+	}
 	paths := make([]string, len(hierarchy)+1)
 	paths[0] = mgr.ResourceName
 	for id, el := range hierarchy {
@@ -165,8 +168,19 @@ func (mgr *ResourceManager) GetId(hierarchy ...string) *ResourceId {
 //	ResourceManager{"User"}.GetClaim(StandardAccess.Write(), "Avatar", "123")
 //	>> Write (and read) access to "Avatar" subgroup of "User" resource
 func (mgr *ResourceManager) GetClaim(accessLevel AccessLevel, hierarchy ...string) *Claim {
+	if mgr == nil {
+		return nil
+	}
 	return &Claim{
 		Resource: mgr.GetId(hierarchy...),
 		Access:   accessLevel,
 	}
+}
+
+func (mgr *ResourceManager) HasAccess(principalClaims, requestedClaims *Claim) bool {
+	if mgr == nil || principalClaims == nil || requestedClaims == nil {
+		return false
+	}
+
+	return mgr.Verifier.HasAccessFunc(principalClaims, requestedClaims)
 }

@@ -38,30 +38,45 @@ func TestReadBaseClaimdIsAddedToString(t *testing.T) {
 func TestExactClaimMatchHasAccess(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User")
 	b := mgr.GetClaim(StandardAccess.Read(), "User")
-	assert.True(t, Verifier.HasAccess(a, b))
-	assert.True(t, Verifier.HasAccess(b, a))
+	assert.True(t, mgr.HasAccess(a, b))
+	assert.True(t, mgr.HasAccess(b, a))
 }
 
 func TestPrefixMatchHasClaim(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User")
 	b := mgr.GetClaim(StandardAccess.Read(), "User", "123")
-	assert.True(t, Verifier.HasAccess(a, b))
+	assert.True(t, mgr.HasAccess(a, b))
 }
 
 func TestMismatchedPrefixHasNoClaim(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User", "123")
 	b := mgr.GetClaim(StandardAccess.Read(), "User")
-	assert.False(t, Verifier.HasAccess(a, b))
+	assert.False(t, mgr.HasAccess(a, b))
 }
 
 func TestWriteAccessWithMatchingPrefixImpliesReadAccess(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Write(), "User")
 	b := mgr.GetClaim(StandardAccess.Read(), "User", "123")
-	assert.True(t, Verifier.HasAccess(a, b))
+	assert.True(t, mgr.HasAccess(a, b))
 }
 
 func TestReadAccessWithMatchingPrefixDoesNotImplyWriteAccess(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User")
 	b := mgr.GetClaim(StandardAccess.Write(), "User", "123")
-	assert.False(t, Verifier.HasAccess(a, b))
+	assert.False(t, mgr.HasAccess(a, b))
+}
+
+func TestResourceManagerCanBeCreatedWithOwnVerifier(t *testing.T) {
+	newMgr := NewResourceManagerWithVerifier("xkcd", &ClaimVerifier{
+		HasAccessFunc: func(principalClaims, requestedClaims *Claim) bool {
+			if principalClaims.Access == "Shibboleet" {
+				return true
+			} else {
+				return defaultClaimVerificationFunc(principalClaims, requestedClaims)
+			}
+		},
+	})
+	a := newMgr.GetClaim("Shibboleet", "comic", "number", "806")
+	b := newMgr.GetClaim(StandardAccess.Read(), "it", "you", "should")
+	assert.True(t, newMgr.HasAccess(a, b))
 }
