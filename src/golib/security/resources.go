@@ -1,16 +1,129 @@
 package security
 
 import (
+	"catears/ffs/lib/functional"
 	"net/url"
 	"strings"
 )
 
+// AccessLevel determines how a principal may access a particular resource
+// AccessLevel is combined with a resource to produce a specific claim
+//
+// The access level is a free text string so that non-library code can define
+// its own security policies based on it. However, there are standard access
+// levels like:
+//
+//   - StandardAccess.Write()
+//   - StandardAccess.Read()
+//
+// Write implies Read
+type AccessLevel string
+
+// Converts an AccessLevel to a string
+func (al *AccessLevel) String() string {
+	return string(*al)
+}
+
+type standardLevelNames struct {
+}
+
+// Standard name for write access
+func (*standardLevelNames) Write() AccessLevel {
+	return "Write"
+}
+
+// Standard name for read access
+func (*standardLevelNames) Read() AccessLevel {
+	return "Read"
+}
+
+// Contains standard access levels like Read() and Write()
+var StandardAccess = &standardLevelNames{}
+
 // Unique identification of a resource
+// Resources are hierarchical. That is, a principal that has access to write
+// `/User` resource also has access to `/User/123`
 type ResourceId url.URL
+
+func (resId *ResourceId) hierarchy() []string {
+	if resId == nil {
+		return []string{}
+	}
+	return strings.Split(resId.Path, "/")
+}
 
 // Converts the ResourceID to its string representation
 func (resId *ResourceId) String() string {
+	if resId == nil {
+		return ""
+	}
 	return (*url.URL)(resId).String()
+}
+
+// Returns true if `lhs` is a prefix of `rhs`. Any AccessLevel
+// applied to `lhs` is then inherited by `rhs`
+func (lhs *ResourceId) IsPrefixFor(rhs *ResourceId) bool {
+	if lhs == nil || rhs == nil {
+		return false
+	}
+	lhsHierarchy := lhs.hierarchy()
+	rhsHierarchy := rhs.hierarchy()
+	return functional.IsArrayPrefix(lhsHierarchy, rhsHierarchy)
+}
+
+// Claim combines a ResourceId and the AccessLevel to define how a resource
+// can be accessed by the particular principal
+type Claim struct {
+	Resource *ResourceId
+	Access   AccessLevel
+}
+
+// Converts a claim to a string representation
+func (claim *Claim) String() string {
+	return claim.Resource.String() + "#" + string(claim.Access)
+}
+
+// Function to verify a principal has the correct access to a requested claim
+type ClaimVerificationFunction = func(principalClaims, requestedClaims *Claim) bool
+
+func defaultClaimVerificationFunc(principalClaims, requestedClaims *Claim) bool {
+	if principalClaims == nil || requestedClaims == nil {
+		return false
+	}
+
+	prefixes := principalClaims.Resource.IsPrefixFor(requestedClaims.Resource)
+	if !prefixes {
+		return false
+	}
+
+	sameAccess := principalClaims.Access == requestedClaims.Access
+	if sameAccess {
+		return true
+	}
+
+	// Write access implies read access
+	return (principalClaims.Access == StandardAccess.Write() && requestedClaims.Access == StandardAccess.Read())
+}
+
+// A claim verifier is used to check if one claim gives access to another
+//
+// If you keep to the standard access levels use the default `Verifier` rather than creating your own
+type ClaimVerifier struct {
+	HasAccessFunc ClaimVerificationFunction
+}
+
+// Uses the default verification function (write -> read) to ensure
+var Verifier *ClaimVerifier = &ClaimVerifier{
+	HasAccessFunc: defaultClaimVerificationFunc,
+}
+
+// Checks if the principal has access to the requested claim
+func (verifier *ClaimVerifier) HasAccess(principalClaims, requestedClaims *Claim) bool {
+	if verifier == nil {
+		return false
+	}
+
+	return verifier.HasAccessFunc(principalClaims, requestedClaims)
 }
 
 // Manager for a particular type of resource, e.g. User, or File
@@ -43,5 +156,17 @@ func (mgr *ResourceManager) GetId(hierarchy ...string) *ResourceId {
 		Scheme: "ffs-resource",
 		Host:   "global",
 		Path:   "/" + strings.Join(paths, "/"),
+	}
+}
+
+// Returns a matching claim defined by the hierarchy of identifiers
+// Example:
+//
+//	ResourceManager{"User"}.GetClaim(StandardAccess.Write(), "Avatar", "123")
+//	>> Write (and read) access to "Avatar" subgroup of "User" resource
+func (mgr *ResourceManager) GetClaim(accessLevel AccessLevel, hierarchy ...string) *Claim {
+	return &Claim{
+		Resource: mgr.GetId(hierarchy...),
+		Access:   accessLevel,
 	}
 }
