@@ -1,3 +1,9 @@
+---- go
+
+[ ] Encode, decode, and sign claims
+
+---- deno
+
 [ ] Try to build an "Embedded configuration" that relies on appended bytes to the executable
 
 [ ] Figure out how we can create a `stable` and `nightly` release branches
