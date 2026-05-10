@@ -8,3 +8,4 @@ testbench
 dist
 access.log
 todo.md
+/bin

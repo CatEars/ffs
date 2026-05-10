@@ -25,6 +25,14 @@
         "generate-default-test-bench": "goscript --generate-default-test-bench",
         "generate-svg-sprite-sheet": "goscript --generate-svg-sprite-sheet",
         "generate-html-property-mapping": "goscript --generate-html-property-mapping",
+        "build-pbkdf2-printer": {
+            "command": "cd src && go build -o ../bin/pbkdf2_printer ./scripts/pbkdf2_printer"
+        },
+        "build-bins": {
+            "dependencies": [
+                "build-pbkdf2-printer"
+            ]
+        },
         "run": {
             "command": "goscript --dev-main"
         },
