@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path"
+	"sync"
 	"time"
 )
 
@@ -24,7 +27,30 @@ func DevMain() {
 	os.Setenv("FFS_CUSTOM_COMMANDS_FILE", "data/sample-custom-commands.json")
 	os.Setenv("FFS_INSTANCE_SECRET", "VerySecretIndeed")
 	os.Setenv("FFS_THUMBNAIL_FINDER_SKIP_REGEX", "(test_no_thumbnails_images|\\.no_thumbnail\\.)")
+	ctx, cancel := context.WithCancel(context.Background())
 
+	wd, err := os.Getwd()
+	Fatal(err)
+
+	oldCmd := exec.CommandContext(ctx, "deno", "--allow-all", path.Join("src", "app", "main.ts"))
+	oldCmd.Stdout = os.Stdout
+	oldCmd.Stderr = os.Stderr
+	newCmd := exec.CommandContext(ctx, "go", "run", "./goapp")
+	newCmd.Dir = path.Join(wd, "src")
+	newCmd.Stdout = os.Stdout
+	newCmd.Stderr = os.Stderr
+
+	var waitGroup sync.WaitGroup
+	waitGroup.Go(func() {
+		err := oldCmd.Run()
+		fmt.Printf("Deno app exited: %v\n", err)
+		cancel()
+	})
+	waitGroup.Go(func() {
+		err := newCmd.Run()
+		fmt.Printf("Go app exited: %v\n", err)
+		cancel()
+	})
 	go func() {
 		bundleTicker := time.NewTicker(time.Second * 2)
 		for {
@@ -32,11 +58,5 @@ func DevMain() {
 			<-bundleTicker.C
 		}
 	}()
-
-	cmd := exec.Command("deno", "--allow-all", path.Join("src", "app", "main.ts"))
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	Fatal(err)
+	waitGroup.Wait()
 }

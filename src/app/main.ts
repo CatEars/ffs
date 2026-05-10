@@ -61,6 +61,6 @@ if (likelyFirstTimeUser) {
     printWelcomeHelper();
 }
 
-const port = 8080;
+const port = 8081;
 logger.info(`Starting server on port ${port}`);
 app.listen({ port });
