@@ -19,5 +19,7 @@ func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	handler := &FfsHandler{}
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	port := ":8080"
+	log.Println("Serving GO app with deno proxy on", port)
+	log.Fatal(http.ListenAndServe(port, handler))
 }
