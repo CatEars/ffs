@@ -36,7 +36,16 @@
         "run": {
             "command": "goscript --dev-main"
         },
-        "test": "deno test --allow-all",
+        "test-deno": "deno test --allow-all",
+        "test-go": {
+            "command": "goscript --run-all-tests"
+        },
+        "test": {
+            "dependencies": [
+                "test-deno",
+                "test-go"
+            ]
+        },
         "download-dependencies": "goscript --download-deps",
         "download-vendor-binaries": "./src/scripts/download-vendor-binaries.sh",
         "unpack-favicon": "goscript --unpack-favicon",

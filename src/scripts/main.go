@@ -12,6 +12,7 @@ func main() {
 	unpack := flag.Bool("unpack-favicon", false, "Unpacks favicon")
 	removePersonal := flag.Bool("remove-personal-files", false, "Removes personal files")
 	genTest := flag.Bool("generate-default-test-bench", false, "Generates the default test bench")
+	testAll := flag.Bool("run-all-tests", false, "Runs all golang tests")
 
 	flag.Parse()
 
@@ -33,6 +34,8 @@ func main() {
 		RemovePersonalFiles()
 	} else if *genTest {
 		GenerateDefaultTestBench()
+	} else if *testAll {
+		RunAllTests()
 	} else {
 		flag.Usage()
 	}
