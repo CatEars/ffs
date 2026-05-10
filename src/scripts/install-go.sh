@@ -1,10 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-THIS_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION="1.26.2"
-GO_DL_URL="https://go.dev/dl/go$VERSION.linux-amd64.tar.gz"
+
+THIS_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export GO_DL_VERSION="$VERSION"
+$THIS_SCRIPT_DIR/download-go.sh
 TAR_NAME="go$VERSION.linux-amd64.tar.gz"
+TAR_LOCATION="./data/vendor/$TAR_NAME"
 BIN_DIR="$HOME/.local/bin"
 GO_INSTALL_DIR="$HOME/go"
 
@@ -28,8 +31,8 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Working in $WORKDIR"
+cp $TAR_LOCATION $WORKDIR
 pushd $WORKDIR
-wget "$GO_DL_URL"
 echo "Extracting $TAR_NAME"
 tar -xf $TAR_NAME
 mv go $(dirname $GO_INSTALL_DIR)
