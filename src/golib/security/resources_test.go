@@ -80,3 +80,9 @@ func TestResourceManagerCanBeCreatedWithOwnVerifier(t *testing.T) {
 	b := newMgr.GetClaim(StandardAccess.Read(), "it", "you", "should")
 	assert.True(t, newMgr.HasAccess(a, b))
 }
+
+func TestRootAccessGivesAccess(t *testing.T) {
+	rootAccess := mgr.GetClaim(StandardAccess.Write())
+	someResource := mgr.GetClaim(StandardAccess.Read(), "Email", "123")
+	assert.True(t, mgr.HasAccess(rootAccess, someResource))
+}
