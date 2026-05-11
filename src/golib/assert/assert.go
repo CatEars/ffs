@@ -39,8 +39,20 @@ func isItNil[T any](a T) bool {
 	return isNil
 }
 
+type equalable[T any] interface {
+	Equal(t T) bool
+}
+
 func Equal[T comparable](t *testing.T, a, b T, messages ...string) {
 	t.Helper()
+	equaler, ok := any(a).(equalable[T])
+	if ok {
+		if !equaler.Equal(b) {
+			t.Error(joinOrDefault(fmt.Sprint("Not equal ", "[", a, "] vs [", b, "]"), messages))
+		}
+		return
+	}
+
 	if a != b {
 		t.Error(joinOrDefault(fmt.Sprint("Not equal ", "[", a, "] vs [", b, "]"), messages))
 	}

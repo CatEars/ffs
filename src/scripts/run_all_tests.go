@@ -27,7 +27,7 @@ func RunAllTests() {
 	})
 
 	for _, testablePackage := range dirsToTest {
-		cmd := exec.Command("go", "test")
+		cmd := exec.Command("go", "test", "-v")
 		cmd.Dir = testablePackage
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr

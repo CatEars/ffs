@@ -2,9 +2,13 @@ package security
 
 import (
 	"catears/ffs/lib/functional"
+	"errors"
 	"net/url"
 	"strings"
 )
+
+var ffsResourceScheme string = "ffs-resource"
+var ffsResourceDomain string = "ffs"
 
 // AccessLevel determines how a principal may access a particular resource
 // AccessLevel is combined with a resource to produce a specific claim
@@ -83,6 +87,42 @@ func (claim *Claim) String() string {
 	return claim.Resource.String() + "#" + string(claim.Access)
 }
 
+func (claim *Claim) MarshalBinary() (data []byte, err error) {
+	if claim == nil {
+		return []byte{}, errors.New("Unable to marshall `nil` Claim")
+	}
+
+	s := claim.String()
+	return []byte(s), nil
+}
+
+func (claim *Claim) UnmarshalBinary(data []byte) error {
+	s := string(data)
+	parsed, err := url.Parse(s)
+	if err != nil {
+		return err
+	}
+
+	claim.Access = AccessLevel(parsed.Fragment)
+	claim.Resource = &ResourceId{}
+	claim.Resource.Scheme = ffsResourceScheme
+	claim.Resource.Host = ffsResourceDomain
+	claim.Resource.Path = parsed.Path
+	return nil
+}
+
+func (claim *Claim) MarshalText() (text []byte, err error) {
+	return claim.MarshalBinary()
+}
+
+func (claim *Claim) UnmarshalText(text []byte) error {
+	return claim.UnmarshalBinary(text)
+}
+
+func (lhs *Claim) Equal(rhs *Claim) bool {
+	return lhs.Access == rhs.Access && lhs.Resource.Path == rhs.Resource.Path
+}
+
 // Function to verify a principal has the correct access to a requested claim
 type ClaimVerificationFunction = func(principalClaims, requestedClaims *Claim) bool
 
@@ -156,8 +196,8 @@ func (mgr *ResourceManager) GetId(hierarchy ...string) *ResourceId {
 		paths[id+1] = url.PathEscape(el)
 	}
 	return &ResourceId{
-		Scheme: "ffs-resource",
-		Host:   "global",
+		Scheme: ffsResourceScheme,
+		Host:   ffsResourceDomain,
 		Path:   "/" + strings.Join(paths, "/"),
 	}
 }
@@ -177,6 +217,7 @@ func (mgr *ResourceManager) GetClaim(accessLevel AccessLevel, hierarchy ...strin
 	}
 }
 
+// Checks if the principal claims has access to the requestd claim
 func (mgr *ResourceManager) HasAccess(principalClaims, requestedClaims *Claim) bool {
 	if mgr == nil || principalClaims == nil || requestedClaims == nil {
 		return false
