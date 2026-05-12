@@ -1,7 +1,5 @@
 ---- go
 
-[ ] Sign claims
-
 ---- deno
 
 [ ] Try to build an "Embedded configuration" that relies on appended bytes to the executable
