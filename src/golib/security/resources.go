@@ -225,3 +225,13 @@ func (mgr *ResourceManager) HasAccess(principalClaims, requestedClaims *Claim) b
 
 	return mgr.Verifier.HasAccessFunc(principalClaims, requestedClaims)
 }
+
+// `RootClaim` is a claim that gives full access to the `ffs` domain
+var RootClaim Claim = Claim{
+	Resource: &ResourceId{
+		Scheme: ffsResourceScheme,
+		Host:   ffsResourceDomain,
+		Path:   "/",
+	},
+	Access: StandardAccess.Write(),
+}
