@@ -39,53 +39,53 @@ func TestReadBaseClaimdIsAddedToString(t *testing.T) {
 func TestExactClaimMatchHasAccess(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User")
 	b := mgr.GetClaim(StandardAccess.Read(), "User")
-	assert.True(t, mgr.HasAccess(a, b))
 	assert.True(t, mgr.HasAccess(b, a))
+	assert.True(t, mgr.HasAccess(a, b))
 }
 
 func TestPrefixMatchHasClaim(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User")
 	b := mgr.GetClaim(StandardAccess.Read(), "User", "123")
-	assert.True(t, mgr.HasAccess(a, b))
+	assert.True(t, mgr.HasAccess(b, a))
 }
 
 func TestMismatchedPrefixHasNoClaim(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User", "123")
 	b := mgr.GetClaim(StandardAccess.Read(), "User")
-	assert.False(t, mgr.HasAccess(a, b))
+	assert.False(t, mgr.HasAccess(b, a))
 }
 
 func TestWriteAccessWithMatchingPrefixImpliesReadAccess(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Write(), "User")
 	b := mgr.GetClaim(StandardAccess.Read(), "User", "123")
-	assert.True(t, mgr.HasAccess(a, b))
+	assert.True(t, mgr.HasAccess(b, a))
 }
 
 func TestReadAccessWithMatchingPrefixDoesNotImplyWriteAccess(t *testing.T) {
 	a := mgr.GetClaim(StandardAccess.Read(), "User")
 	b := mgr.GetClaim(StandardAccess.Write(), "User", "123")
-	assert.False(t, mgr.HasAccess(a, b))
+	assert.False(t, mgr.HasAccess(b, a))
 }
 
 func TestResourceManagerCanBeCreatedWithOwnVerifier(t *testing.T) {
 	newMgr := NewResourceManagerWithVerifier("xkcd", &ClaimVerifier{
-		HasAccessFunc: func(principalClaims, requestedClaims *Claim) bool {
-			if principalClaims.Access == "Shibboleet" {
+		HasAccessFunc: func(requestedClaim, principalClaim *Claim) bool {
+			if principalClaim.Access == "Shibboleet" {
 				return true
 			} else {
-				return defaultClaimVerificationFunc(principalClaims, requestedClaims)
+				return defaultClaimVerificationFunc(principalClaim, requestedClaim)
 			}
 		},
 	})
 	a := newMgr.GetClaim("Shibboleet", "comic", "number", "806")
 	b := newMgr.GetClaim(StandardAccess.Read(), "it", "you", "should")
-	assert.True(t, newMgr.HasAccess(a, b))
+	assert.True(t, newMgr.HasAccess(b, a))
 }
 
 func TestRootAccessGivesAccess(t *testing.T) {
 	rootAccess := mgr.GetClaim(StandardAccess.Write())
 	someResource := mgr.GetClaim(StandardAccess.Read(), "Email", "123")
-	assert.True(t, mgr.HasAccess(rootAccess, someResource))
+	assert.True(t, mgr.HasAccess(someResource, rootAccess))
 }
 
 func TestMarshalClaimAsText(t *testing.T) {

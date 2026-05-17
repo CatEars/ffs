@@ -124,25 +124,25 @@ func (lhs *Claim) Equal(rhs *Claim) bool {
 }
 
 // Function to verify a principal has the correct access to a requested claim
-type ClaimVerificationFunction = func(principalClaims, requestedClaims *Claim) bool
+type ClaimVerificationFunction = func(requestedClaim, principalClaim *Claim) bool
 
-func defaultClaimVerificationFunc(principalClaims, requestedClaims *Claim) bool {
-	if principalClaims == nil || requestedClaims == nil {
+func defaultClaimVerificationFunc(requestedClaim, principalClaim *Claim) bool {
+	if principalClaim == nil || requestedClaim == nil {
 		return false
 	}
 
-	prefixes := principalClaims.Resource.IsPrefixFor(requestedClaims.Resource)
+	prefixes := principalClaim.Resource.IsPrefixFor(requestedClaim.Resource)
 	if !prefixes {
 		return false
 	}
 
-	sameAccess := principalClaims.Access == requestedClaims.Access
+	sameAccess := principalClaim.Access == requestedClaim.Access
 	if sameAccess {
 		return true
 	}
 
 	// Write access implies read access
-	return (principalClaims.Access == StandardAccess.Write() && requestedClaims.Access == StandardAccess.Read())
+	return (principalClaim.Access == StandardAccess.Write() && requestedClaim.Access == StandardAccess.Read())
 }
 
 // A claim verifier is used to check if one claim gives access to another
@@ -218,12 +218,21 @@ func (mgr *ResourceManager) GetClaim(accessLevel AccessLevel, hierarchy ...strin
 }
 
 // Checks if the principal claims has access to the requestd claim
-func (mgr *ResourceManager) HasAccess(principalClaims, requestedClaims *Claim) bool {
-	if mgr == nil || principalClaims == nil || requestedClaims == nil {
+func (mgr *ResourceManager) HasAccess(requestedClaim, principalClaim *Claim) bool {
+	if mgr == nil || principalClaim == nil || requestedClaim == nil {
 		return false
 	}
 
-	return mgr.Verifier.HasAccessFunc(principalClaims, requestedClaims)
+	return mgr.Verifier.HasAccessFunc(requestedClaim, principalClaim)
+}
+
+func (mgr *ResourceManager) AnyHasAccess(requestedClaim *Claim, claims ...*Claim) bool {
+	for _, claim := range claims {
+		if mgr.HasAccess(claim, requestedClaim) {
+			return true
+		}
+	}
+	return false
 }
 
 // `RootClaim` is a claim that gives full access to the `ffs` domain
