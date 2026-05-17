@@ -3,6 +3,7 @@ package security
 import (
 	"crypto/pbkdf2"
 	"crypto/sha512"
+	"crypto/subtle"
 	"encoding/base64"
 )
 
@@ -13,4 +14,12 @@ func Pbkdf2Hash(password, salt string) (string, error) {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(key), nil
+}
+
+func PasswordEqual(givenPassword, salt, b64HashedPassword string) (bool, error) {
+	hashed, err := Pbkdf2Hash(givenPassword, salt)
+	if err != nil {
+		return false, err
+	}
+	return subtle.ConstantTimeCompare([]byte(b64HashedPassword), []byte(hashed)) == 1, nil
 }

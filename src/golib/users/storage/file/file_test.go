@@ -176,3 +176,30 @@ func TestMatchesUsersOfBothTypes(t *testing.T) {
 	assert.NotNil(t, usr1)
 	assert.NotNil(t, usr2)
 }
+
+func TestMatchUserWithWrongPasswordResultsInNil(t *testing.T) {
+	users := fstest.MapFS{
+		"users.json": {Data: []byte(`[
+			{
+				"type": "insecure-basic_auth",
+				"username": "🗝️-catears",
+				"password": "abc123",
+				"key": "same-api-key"
+			},
+			{
+				"type": "pbkdf2",
+				"username": "🔑-catears",
+				"b64Hash": "oBabrExDM+/ULOD16CdSKgQkzNR8MMAcQyVdedor8/6Dbk8RtGuYlJdrfHWKzwNxyA29k5w1D1aWNBM4IdkXiA==",
+				"salt": "MR0QRS26t5dGdqLc",
+				"key": "8LQgWJYuC1wMAFnj"
+			}
+		]`)},
+	}
+	fileSource := New(users, "users.json")
+	err := fileSource.Configure()
+	assert.Nil(t, err)
+	usr1 := fileSource.MatchUser("🗝️-catears", "not-the-password")
+	usr2 := fileSource.MatchUser("🔑-catears", "not-the-password")
+	assert.Nil(t, usr1)
+	assert.Nil(t, usr2)
+}

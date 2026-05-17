@@ -1,6 +1,7 @@
 package file
 
 import (
+	"catears/ffs/lib/security"
 	"catears/ffs/lib/users"
 	"encoding/json"
 	"errors"
@@ -122,9 +123,40 @@ func (fus *FileUserSource) Configure() error {
 	return nil
 }
 
+func convertUser(user *userFromFile) *users.UserRecord {
+	// TODO: For now we give everyone root access,
+	// lets fix this later via claims structure
+	return &users.UserRecord{
+		Username: user.Username,
+		Claims: []*security.Claim{
+			&security.RootClaim,
+		},
+	}
+}
+
 func (fus *FileUserSource) MatchUser(username, password string) *users.UserRecord {
 	if fus.users == nil {
 		return nil
 	}
-	return nil
+	matchingUser, ok := fus.users[username]
+	if !ok {
+		return nil
+	}
+
+	if matchingUser.UserType == "insecure-basic_auth" {
+		if matchingUser.Password == password {
+			return convertUser(&matchingUser)
+		} else {
+			return nil
+		}
+	} else if matchingUser.UserType == "pbkdf2" {
+		equal, err := security.PasswordEqual(password, matchingUser.Salt, matchingUser.B64Hash)
+		if err != nil || !equal {
+			// swallow error when password comparison fails
+			return nil
+		}
+		return convertUser(&matchingUser)
+	} else {
+		return nil
+	}
 }
