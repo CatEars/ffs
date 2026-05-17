@@ -11,11 +11,11 @@ import (
 )
 
 type Pbkdf2HashObject struct {
-	Type     string
-	Username string
-	B64Hash  string
-	Salt     string
-	Key      string
+	Type     string `json:"type"`
+	Username string `json:"username"`
+	B64Hash  string `json:"b64Hash"`
+	Salt     string `json:"salt"`
+	Key      string `json:"key"`
 }
 
 func randomString() string {
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	salt := randomString()
-	res, err := security.Pbkdf2Hash(*username, *password)
+	res, err := security.Pbkdf2Hash(*password, salt)
 	if err != nil {
 		log.Fatalln(err)
 	}
