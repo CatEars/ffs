@@ -6,6 +6,8 @@
 
 [ ] Once rewritten to golang, update permissions system to use URI scheme for permissions everywhere
 
+[ ] Protect sensitive data like user data at rest and clear data on exit. create a manual test with core dump
+
 ---- deno
 
 [ ] Try to build an "Embedded configuration" that relies on appended bytes to the executable
