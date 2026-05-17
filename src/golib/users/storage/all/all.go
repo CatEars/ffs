@@ -35,3 +35,7 @@ func (all *AllUserSource) MatchUser(username, password string) *users.UserRecord
 		},
 	}
 }
+
+func (all *AllUserSource) Name() string {
+	return "Accept Everyone as Root - Source"
+}

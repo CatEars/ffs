@@ -253,3 +253,11 @@ func (fus *FileUserSource) MatchUser(username, password string) *users.UserRecor
 		return nil
 	}
 }
+
+func (fus *FileUserSource) Name() string {
+	if fus.userFilePath != "" {
+		return fmt.Sprintf("Users from file '%s'", fus.userFilePath)
+	} else {
+		return fmt.Sprintf("Users from directory '%s'", fus.userDirectoryPath)
+	}
+}
