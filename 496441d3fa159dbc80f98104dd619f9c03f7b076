@@ -2,6 +2,8 @@
 
 [ ] Implement reading user records
 
+[ ] Bonus: Implement reading user records via env vars
+
 [ ] Once rewritten to golang, update permissions system to use URI scheme for permissions everywhere
 
 ---- deno
