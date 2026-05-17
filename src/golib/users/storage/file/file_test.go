@@ -61,7 +61,7 @@ func TestCanDecodeUsersFromDisk(t *testing.T) {
 			}
 		]`)},
 	}
-	fileSource := New(users, "users.json")
+	fileSource := NewUserFromFile(users, "users.json")
 	err := fileSource.Configure()
 	assert.Nil(t, err)
 	assert.NotNil(t, fileSource.users["insecure"])
@@ -87,7 +87,7 @@ func TestReturnsErrorWhenMultipleUsersHaveSameName(t *testing.T) {
 			}
 		]`)},
 	}
-	fileSource := New(users, "users.json")
+	fileSource := NewUserFromFile(users, "users.json")
 	err := fileSource.Configure()
 	assert.NotNil(t, err)
 	assert.Equal(t, len(fileSource.users), 0)
@@ -110,7 +110,7 @@ func TestReturnsErrorWhenMultipleUsersHaveSameKey(t *testing.T) {
 			}
 		]`)},
 	}
-	fileSource := New(users, "users.json")
+	fileSource := NewUserFromFile(users, "users.json")
 	err := fileSource.Configure()
 	assert.NotNil(t, err)
 	assert.Equal(t, len(fileSource.users), 0)
@@ -144,7 +144,7 @@ func TestSkipsPoorlyConfiguredUsers(t *testing.T) {
 			}
 		]`)},
 	}
-	fileSource := New(users, "users.json")
+	fileSource := NewUserFromFile(users, "users.json")
 	err := fileSource.Configure()
 	assert.Nil(t, err)
 	assert.Equal(t, len(fileSource.users), 2)
@@ -168,7 +168,7 @@ func TestMatchesUsersOfBothTypes(t *testing.T) {
 			}
 		]`)},
 	}
-	fileSource := New(users, "users.json")
+	fileSource := NewUserFromFile(users, "users.json")
 	err := fileSource.Configure()
 	assert.Nil(t, err)
 	usr1 := fileSource.MatchUser("🗝️-catears", "abc123")
@@ -195,11 +195,92 @@ func TestMatchUserWithWrongPasswordResultsInNil(t *testing.T) {
 			}
 		]`)},
 	}
-	fileSource := New(users, "users.json")
+	fileSource := NewUserFromFile(users, "users.json")
 	err := fileSource.Configure()
 	assert.Nil(t, err)
 	usr1 := fileSource.MatchUser("🗝️-catears", "not-the-password")
 	usr2 := fileSource.MatchUser("🔑-catears", "not-the-password")
 	assert.Nil(t, usr1)
 	assert.Nil(t, usr2)
+}
+
+func TestMatchesUsersOfBothTypesFromDirectory(t *testing.T) {
+	users := fstest.MapFS{
+		"user1.json": {Data: []byte(`
+			{
+				"type": "insecure-basic_auth",
+				"username": "🗝️-catears",
+				"password": "abc123",
+				"key": "same-api-key"
+			}
+		`)},
+		"user2.json": {Data: []byte(`
+			{
+				"type": "pbkdf2",
+				"username": "🔑-catears",
+				"b64Hash": "oBabrExDM+/ULOD16CdSKgQkzNR8MMAcQyVdedor8/6Dbk8RtGuYlJdrfHWKzwNxyA29k5w1D1aWNBM4IdkXiA==",
+				"salt": "MR0QRS26t5dGdqLc",
+				"key": "8LQgWJYuC1wMAFnj"
+			}
+		`)},
+	}
+	fileSource := NewUsersFromDirectory(users, ".")
+	err := fileSource.Configure()
+	assert.Nil(t, err)
+	usr1 := fileSource.MatchUser("🗝️-catears", "abc123")
+	usr2 := fileSource.MatchUser("🔑-catears", "hunter2")
+	assert.NotNil(t, usr1)
+	assert.NotNil(t, usr2)
+}
+
+func TestAbleToReadOneUserFileEvenIfOtherIsInvalid(t *testing.T) {
+	users := fstest.MapFS{
+		"user1.json": {Data: []byte(`
+			{
+				"type": "insecure-basic_auth",
+				"username": "🗝️-catears",
+				"password": "abc123",
+				"key": "api-key"
+			}
+		`)},
+		"user2.json": {Data: []byte(`
+			{
+				"type": "pbkdf2",
+				"username": "🔑-catears",
+				"b64Hash": "oBabrExDM+/ULOD16CdSKgQkzNR8MMAcQyVdedor8/6Dbk8RtGuYlJdrfHWKzwNxyA29k5w1D1aWNBM4IdkXiA==",
+				"salt": "MR0QRS26t5dGdqLc"
+			}
+		`)},
+	}
+	fileSource := NewUsersFromDirectory(users, ".")
+	err := fileSource.Configure()
+	assert.Nil(t, err)
+	assert.Equal(t, len(fileSource.users), 1)
+	_, hasUser := fileSource.users["🗝️-catears"]
+	assert.True(t, hasUser)
+}
+
+func TestReturnsErrorWhenMultipleUsersHaveSameKeyInDirectory(t *testing.T) {
+	users := fstest.MapFS{
+		"user1.json": {Data: []byte(`
+			{
+				"type": "insecure-basic_auth",
+				"username": "insecure1",
+				"password": "abc123",
+				"key": "same-api-key"
+			}
+		`)},
+		"user2.json": {Data: []byte(`
+			{
+				"type": "insecure-basic_auth",
+				"username": "insecure2",
+				"password": "abc123",
+				"key": "same-api-key"
+			}
+		`)},
+	}
+	fileSource := NewUsersFromDirectory(users, "users.json")
+	err := fileSource.Configure()
+	assert.NotNil(t, err)
+	assert.Equal(t, len(fileSource.users), 0)
 }

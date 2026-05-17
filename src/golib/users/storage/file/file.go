@@ -8,17 +8,19 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"path"
 	"strings"
 )
 
-// `FileUserSource` reads users from a file on disk
+// `FileUserSource` reads users from a file on disk, or from a directory.
 //
 // Users are either of type "insecure-basic_auth" or "pbkdf2". pbkdf2 users are preferred and they
 // are created via the `pbkdf2_printer` executable script.
 type FileUserSource struct {
-	fsys         fs.FS
-	userFilePath string
-	users        map[string]userFromFile
+	fsys              fs.FS
+	userFilePath      string
+	userDirectoryPath string
+	users             map[string]userFromFile
 }
 
 type userFromFile struct {
@@ -69,10 +71,27 @@ func (lhs *userFromFile) Equal(rhs *userFromFile) bool {
 		lhs.Key == rhs.Key
 }
 
-func New(fsys fs.FS, userFilePath string) *FileUserSource {
+// Create `FileUserSource` that reads users from a json file.
+//
+// The json file must be a list of objects, where each object corresponds
+// to a user. The preferred way to create the objects is via pbkdf2_printer script
+// but you can also check out the `data` folder for examples.
+func NewUserFromFile(fsys fs.FS, userFilePath string) *FileUserSource {
 	return &FileUserSource{
 		fsys:         fsys,
 		userFilePath: userFilePath,
+	}
+}
+
+// Create `FileUserSource` that reads users from a directory.
+//
+// Each json file in the directory should contain exacly one user object.
+// The preferred way to create the objects is via pbkdf2_printer script
+// but you can also check out the `data` folder for examples.
+func NewUsersFromDirectory(fsys fs.FS, directoryPath string) *FileUserSource {
+	return &FileUserSource{
+		fsys:              fsys,
+		userDirectoryPath: directoryPath,
 	}
 }
 
@@ -110,7 +129,73 @@ func (fus *FileUserSource) convertUserfileContent(content []byte) (map[string]us
 	return mapped, err
 }
 
-func (fus *FileUserSource) Configure() error {
+func (fus *FileUserSource) configureDirectoryReader() error {
+	fentries, err := fs.ReadDir(fus.fsys, fus.userDirectoryPath)
+	if err != nil {
+		return err
+	}
+	var mapped map[string]userFromFile = map[string]userFromFile{}
+	var foundKeys map[string]string = map[string]string{}
+	var filenameByUser map[string]string = map[string]string{}
+	for _, entry := range fentries {
+		if entry.Type().IsRegular() && strings.HasSuffix(entry.Name(), ".json") {
+			user, err := fus.readSingleUserFile(entry)
+			if err != nil {
+				return err
+			}
+
+			if user == nil {
+				continue
+			}
+
+			origFile, ok := filenameByUser[user.Username]
+			if ok {
+				msg := fmt.Sprintf("User '%s' appeared multiple times in %s (in file %s and %s), "+
+					"will not read ANY user from the invalid file with duplicate users", user.Username, fus.userDirectoryPath, origFile, entry.Name())
+				return errors.New(msg)
+			}
+
+			otherUser, keyExists := foundKeys[user.Key]
+			if keyExists {
+				msg := fmt.Sprintf("User '%s' in file %s/%s has the same API key as user '%s' in file %s/%s, "+
+					"will not read ANY user from the invalid file with non-unique keys", user.Username, fus.userDirectoryPath, origFile, otherUser, fus.userDirectoryPath, entry.Name())
+				return errors.New(msg)
+			}
+
+			mapped[user.Username] = *user
+			foundKeys[user.Key] = user.Username
+			filenameByUser[user.Username] = entry.Name()
+		}
+	}
+
+	fus.users = mapped
+	return nil
+}
+
+func (fus *FileUserSource) readSingleUserFile(entry fs.DirEntry) (*userFromFile, error) {
+	content, err := fs.ReadFile(fus.fsys, path.Join(fus.userDirectoryPath, entry.Name()))
+	if err != nil {
+		return nil, err
+	}
+
+	user := &userFromFile{}
+	err = json.Unmarshal(content, user)
+	if err != nil {
+		return nil, err
+	}
+
+	invalidFields := user.InvalidFields()
+	if len(invalidFields) > 0 {
+		joined := strings.Join(invalidFields, ", ")
+		log.Printf("User '%s' from '%s' needs to be properly configured to be able to log on: %s", user.Username, fus.userFilePath, joined)
+		// Dont treat invalid fields as an error, but dont create the user
+		return nil, nil
+	}
+
+	return user, nil
+}
+
+func (fus *FileUserSource) configureFileReader() error {
 	fcontent, err := fs.ReadFile(fus.fsys, fus.userFilePath)
 	if err != nil {
 		return err
@@ -121,6 +206,14 @@ func (fus *FileUserSource) Configure() error {
 		return err
 	}
 	return nil
+}
+
+func (fus *FileUserSource) Configure() error {
+	if fus.userDirectoryPath != "" {
+		return fus.configureDirectoryReader()
+	} else {
+		return fus.configureFileReader()
+	}
 }
 
 func convertUser(user *userFromFile) *users.UserRecord {
