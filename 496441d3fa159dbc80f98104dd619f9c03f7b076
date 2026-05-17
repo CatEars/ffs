@@ -2,6 +2,8 @@
 
 [ ] Implement reading user records
 
+[ ] Once rewritten to golang, update permissions system to use URI scheme for permissions everywhere
+
 ---- deno
 
 [ ] Try to build an "Embedded configuration" that relies on appended bytes to the executable
