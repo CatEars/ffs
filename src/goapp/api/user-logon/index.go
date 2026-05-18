@@ -1,7 +1,6 @@
 package userlogon
 
 import (
-	"catears/ffs/lib/response"
 	"net/http"
 )
 
@@ -9,13 +8,6 @@ type userLogonHandler struct{}
 
 func NewUserHandler() *userLogonHandler {
 	return &userLogonHandler{}
-}
-
-func buildLogonCookieWriter() *response.CookieWriter {
-	cw := response.NewCookieWriter()
-	cw.WithHttpOnly()
-	cw.WithPath("/")
-	return cw
 }
 
 /*
@@ -30,8 +22,9 @@ content-length: 22
 X-Firefox-Spdy: h2
 */
 func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	cw := buildLogonCookieWriter()
-	cw.WithKeyValue("Ffs-Authorization", "abc123")
-	cw.WriteCookie(w)
-	w.WriteHeader(http.StatusFound)
+	logonCookie := &http.Cookie{}
+	logonCookie.Path = "/"
+	logonCookie.HttpOnly = true
+	http.SetCookie(w, logonCookie)
+	w.WriteHeader(200)
 }
