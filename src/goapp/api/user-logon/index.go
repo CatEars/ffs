@@ -23,8 +23,10 @@ X-Firefox-Spdy: h2
 */
 func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logonCookie := &http.Cookie{}
+	logonCookie.Name = "Ffs-Authorization"
+	logonCookie.Value = "123"
 	logonCookie.Path = "/"
 	logonCookie.HttpOnly = true
 	http.SetCookie(w, logonCookie)
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusFound)
 }
