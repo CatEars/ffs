@@ -1,6 +1,7 @@
 package main
 
 import (
+	userlogon "catears/ffs/goapp/api/user-logon"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -12,9 +13,14 @@ type FfsHandler struct {
 
 var proxyTarget, _ = url.Parse("http://localhost:8081")
 var proxy *httputil.ReverseProxy = httputil.NewSingleHostReverseProxy(proxyTarget)
+var userApi = userlogon.NewUserHandler()
 
 func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	proxy.ServeHTTP(w, r)
+	if r.Method == "POST" && r.URL.Path == "/api/user-logon" {
+		userApi.ServeHTTP(w, r)
+	} else {
+		proxy.ServeHTTP(w, r)
+	}
 }
 
 func main() {
