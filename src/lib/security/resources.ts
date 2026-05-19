@@ -21,7 +21,7 @@ export class ResourceManager {
     }
 
     nameForResource(...resourceNames: string[]): Resource {
-        return resourceNames;
+        return this.rootResourceName().concat(resourceNames);
     }
 
     rootResourceName() {

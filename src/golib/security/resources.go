@@ -2,6 +2,7 @@ package security
 
 import (
 	"catears/ffs/lib/functional"
+	"encoding/json"
 	"errors"
 	"net/url"
 	"strings"
@@ -85,6 +86,18 @@ type Claim struct {
 // Converts a claim to a string representation
 func (claim *Claim) String() string {
 	return claim.Resource.String() + "#" + string(claim.Access)
+}
+
+func (claim *Claim) LegacyString() string {
+	paths := strings.Split(claim.Resource.Path, "/")
+	for idx, v := range paths {
+		paths[idx], _ = url.PathUnescape(v)
+	}
+	if len(paths) > 0 && paths[0] == "" {
+		paths = paths[1:]
+	}
+	res, _ := json.Marshal(paths)
+	return string(res)
 }
 
 func (claim *Claim) MarshalBinary() (data []byte, err error) {

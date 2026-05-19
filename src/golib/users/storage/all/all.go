@@ -14,8 +14,8 @@ type AllUserSource struct {
 }
 
 // Create `AllUserSource` that lets all users through as root
-func New(skipConfigure bool) AllUserSource {
-	return AllUserSource{
+func New(skipConfigure bool) *AllUserSource {
+	return &AllUserSource{
 		skipConfigure: skipConfigure,
 	}
 }
