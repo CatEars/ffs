@@ -4,9 +4,9 @@ import (
 	"catears/ffs/goapp/config"
 	usermanager "catears/ffs/goapp/user-manager"
 	"catears/ffs/lib/security"
+	"catears/ffs/lib/users"
 	"encoding/base64"
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -16,22 +16,22 @@ func NewUserHandler() *userLogonHandler {
 	return &userLogonHandler{}
 }
 
-type legacyAuth struct {
-	Claims string `json:"claims"`
-	Hmac   string `json:"hmac"`
+type SignedClaims struct {
+	Claims    string `json:"claims"`
+	Signature string `json:"hmac"`
 }
 
 func deriveLegacyApiKey(user string) (string, error) {
 	claim := usermanager.UserResources().GetClaim(security.StandardAccess.Write(), user)
 	c := "[" + claim.LegacyString() + "]"
 	signature, err := security.SignBlob([]byte(config.Config.InstanceSecret()), []byte(c))
-	b64ed := base64.URLEncoding.EncodeToString(signature)
+	b64ed := base64.StdEncoding.EncodeToString(signature)
 	if err != nil {
 		return "", err
 	}
-	auth := legacyAuth{
-		Claims: c,
-		Hmac:   b64ed,
+	auth := SignedClaims{
+		Claims:    c,
+		Signature: b64ed,
 	}
 	formatted, err := json.Marshal(auth)
 	if err != nil {
@@ -40,21 +40,32 @@ func deriveLegacyApiKey(user string) (string, error) {
 	return base64.URLEncoding.EncodeToString(formatted), nil
 }
 
-/*
-HTTP/2 302
-content-type: text/plain; charset=UTF-8
-date: Mon, 18 May 2026 19:14:43 GMT
-location: /home/
-set-cookie: FFS-Authorization=...; path=/; httponly
-set-cookie: FFS-Csrf-Protection=...; path=/
-vary: Accept-Encoding
-content-length: 22
-X-Firefox-Spdy: h2
-*/
+func deriveModernApiKey(record *users.UserRecord) (string, error) {
+	claims := record.Claims
+	marshalled, err := json.Marshal(claims)
+	if err != nil {
+		return "", err
+	}
+	signature, err := security.SignBlob([]byte(config.Config.InstanceSecret()), []byte(marshalled))
+	if err != nil {
+		return "", err
+	}
+	b64ed := base64.StdEncoding.EncodeToString(signature)
+	auth := SignedClaims{
+		Claims:    string(marshalled),
+		Signature: b64ed,
+	}
+	formatted, err := json.Marshal(auth)
+	if err != nil {
+		return "", err
+	}
+
+	return base64.URLEncoding.EncodeToString(formatted), nil
+}
+
 func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	log.Printf("Logging on with %s:%s", username, password)
 	if username == "" || password == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -72,19 +83,22 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	legacyLogonCookie.Name = "Ffs-Authorization"
 	legacyApiKey, err := deriveLegacyApiKey(usr.Username)
 	if err != nil {
-		log.Printf("OH NOES %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Printf("COOKIE %s", legacyApiKey)
 	legacyLogonCookie.Value = legacyApiKey
 	legacyLogonCookie.Path = "/"
 	legacyLogonCookie.HttpOnly = true
 	http.SetCookie(w, legacyLogonCookie)
+
 	modernLogonCookie := &http.Cookie{}
 	modernLogonCookie.Name = "Ffs-Auth"
-
-	modernLogonCookie.Value = "123" + usr.Username
+	modernApiKey, err := deriveModernApiKey(usr)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	modernLogonCookie.Value = modernApiKey
 	modernLogonCookie.Path = "/"
 	modernLogonCookie.HttpOnly = true
 	http.SetCookie(w, modernLogonCookie)
