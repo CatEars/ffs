@@ -3,6 +3,7 @@ package userlogon
 import (
 	"catears/ffs/goapp/config"
 	usermanager "catears/ffs/goapp/user-manager"
+	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/users"
 	"encoding/base64"
@@ -12,7 +13,7 @@ import (
 
 type userLogonHandler struct{}
 
-func NewUserHandler() *userLogonHandler {
+func newUserHandler() *userLogonHandler {
 	return &userLogonHandler{}
 }
 
@@ -104,4 +105,8 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, modernLogonCookie)
 	w.Header().Add("Location", "/home/")
 	w.WriteHeader(http.StatusFound)
+}
+
+func Register(appRouter *router.Router) {
+	appRouter.Post("/api/user-logon", newUserHandler())
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	userlogon "catears/ffs/goapp/api/user-logon"
+	approutes "catears/ffs/goapp/app-routes"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -13,31 +13,13 @@ type FfsHandler struct {
 
 var proxyTarget, _ = url.Parse("http://localhost:8081")
 var proxy *httputil.ReverseProxy = httputil.NewSingleHostReverseProxy(proxyTarget)
-var userApi = userlogon.NewUserHandler()
-
-type matcher struct {
-	Method  string
-	Path    string
-	Handler http.Handler
-}
+var appRouter = approutes.BuildAppRouter()
 
 func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var matchers = []matcher{
-		{
-			Method:  "POST",
-			Path:    "/api/user-logon",
-			Handler: userApi,
-		},
+	matched := appRouter.MatchAndCall(w, r)
+	if !matched {
+		proxy.ServeHTTP(w, r)
 	}
-
-	for _, v := range matchers {
-		if v.Method == r.Method && v.Path == r.URL.Path {
-			v.Handler.ServeHTTP(w, r)
-			return
-		}
-	}
-
-	proxy.ServeHTTP(w, r)
 }
 
 func main() {
