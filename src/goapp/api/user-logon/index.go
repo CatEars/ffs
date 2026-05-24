@@ -64,6 +64,14 @@ func deriveModernApiKey(record *users.UserRecord) (string, error) {
 	return base64.URLEncoding.EncodeToString(formatted), nil
 }
 
+func makeBaseCookie(name string) *http.Cookie {
+	cookie := &http.Cookie{}
+	cookie.Name = name
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	return cookie
+}
+
 func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
@@ -80,29 +88,24 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	legacyLogonCookie := &http.Cookie{}
-	legacyLogonCookie.Name = "FFS-Authorization"
+	legacyLogonCookie := makeBaseCookie("FFS-Authorization")
 	legacyApiKey, err := deriveLegacyApiKey(usr.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	legacyLogonCookie.Value = legacyApiKey
-	legacyLogonCookie.Path = "/"
-	legacyLogonCookie.HttpOnly = true
 	http.SetCookie(w, legacyLogonCookie)
 
-	modernLogonCookie := &http.Cookie{}
-	modernLogonCookie.Name = "FFS-Auth"
+	modernLogonCookie := makeBaseCookie("FFS-Auth")
 	modernApiKey, err := deriveModernApiKey(usr)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	modernLogonCookie.Value = modernApiKey
-	modernLogonCookie.Path = "/"
-	modernLogonCookie.HttpOnly = true
 	http.SetCookie(w, modernLogonCookie)
+
 	w.Header().Add("Location", "/home/")
 	w.WriteHeader(http.StatusFound)
 }
