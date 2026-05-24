@@ -8,19 +8,35 @@ import (
 
 type Middleware = func(next http.Handler) http.Handler
 
-type Router struct {
+type Router interface {
+	Use(middleware Middleware)
+
+	Get(path string, handler http.Handler)
+
+	Post(path string, handler http.Handler)
+
+	Put(path string, handler http.Handler)
+
+	Delete(path string, handler http.Handler)
+
+	With(middlewares ...Middleware) Router
+
+	MatchAndCall(w http.ResponseWriter, r *http.Request) bool
+}
+
+type baseRouter struct {
 	middlewareChain []Middleware
 	routes          map[string]map[string]http.Handler
 }
 
-func NewRouter() *Router {
-	return &Router{
+func NewRouter() Router {
+	return &baseRouter{
 		middlewareChain: []Middleware{},
 		routes:          map[string]map[string]http.Handler{},
 	}
 }
 
-func (router *Router) register(method, path string, handler http.Handler) {
+func (router baseRouter) register(method, path string, handler http.Handler) {
 	method = strings.ToLower(method)
 	path = strings.ToLower(path)
 
@@ -38,7 +54,7 @@ func (router *Router) register(method, path string, handler http.Handler) {
 	inner[path] = router.wrapInCurrentMiddlewares(handler)
 }
 
-func (router *Router) match(method, path string) *http.Handler {
+func (router baseRouter) match(method, path string) *http.Handler {
 	method = strings.ToLower(method)
 	path = strings.ToLower(path)
 	inner, ok := router.routes[method]
@@ -54,7 +70,7 @@ func (router *Router) match(method, path string) *http.Handler {
 	return &route
 }
 
-func (router *Router) wrapInCurrentMiddlewares(handler http.Handler) http.Handler {
+func (router *baseRouter) wrapInCurrentMiddlewares(handler http.Handler) http.Handler {
 	current := handler
 	for i := len(router.middlewareChain) - 1; i >= 0; i -= 1 {
 		current = router.middlewareChain[i](current)
@@ -62,27 +78,34 @@ func (router *Router) wrapInCurrentMiddlewares(handler http.Handler) http.Handle
 	return current
 }
 
-func (router *Router) Use(middleware Middleware) {
+func (router *baseRouter) Use(middleware Middleware) {
 	router.middlewareChain = append(router.middlewareChain, middleware)
 }
 
-func (router *Router) Get(path string, handler http.Handler) {
+func (router *baseRouter) Get(path string, handler http.Handler) {
 	router.register("GET", path, handler)
 }
 
-func (router *Router) Post(path string, handler http.Handler) {
+func (router *baseRouter) Post(path string, handler http.Handler) {
 	router.register("POST", path, handler)
 }
 
-func (router *Router) Put(path string, handler http.Handler) {
+func (router *baseRouter) Put(path string, handler http.Handler) {
 	router.register("PUT", path, handler)
 }
 
-func (router *Router) Delete(path string, handler http.Handler) {
+func (router *baseRouter) Delete(path string, handler http.Handler) {
 	router.register("DELETE", path, handler)
 }
 
-func (router *Router) MatchAndCall(w http.ResponseWriter, r *http.Request) bool {
+func (router *baseRouter) With(middlewares ...Middleware) Router {
+	return &wrappingRouter{
+		middlewareChain: middlewares,
+		wrappedRouter:   router,
+	}
+}
+
+func (router *baseRouter) MatchAndCall(w http.ResponseWriter, r *http.Request) bool {
 	matchingRoute := router.match(r.Method, r.URL.Path)
 	if matchingRoute == nil {
 		return false
@@ -90,4 +113,48 @@ func (router *Router) MatchAndCall(w http.ResponseWriter, r *http.Request) bool 
 
 	(*matchingRoute).ServeHTTP(w, r)
 	return true
+}
+
+type wrappingRouter struct {
+	middlewareChain []Middleware
+	wrappedRouter   Router
+}
+
+func (router *wrappingRouter) wrapHandler(handler http.Handler) http.Handler {
+	current := handler
+	for i := len(router.middlewareChain) - 1; i >= 0; i -= 1 {
+		current = router.middlewareChain[i](current)
+	}
+	return current
+}
+
+func (router *wrappingRouter) Use(middleware Middleware) {
+	router.wrappedRouter.Use(middleware)
+}
+
+func (router *wrappingRouter) Get(path string, handler http.Handler) {
+	router.wrappedRouter.Get(path, router.wrapHandler(handler))
+}
+
+func (router *wrappingRouter) Post(path string, handler http.Handler) {
+	router.wrappedRouter.Post(path, router.wrapHandler(handler))
+}
+
+func (router *wrappingRouter) Put(path string, handler http.Handler) {
+	router.wrappedRouter.Put(path, router.wrapHandler(handler))
+}
+
+func (router *wrappingRouter) Delete(path string, handler http.Handler) {
+	router.wrappedRouter.Delete(path, router.wrapHandler(handler))
+}
+
+func (router *wrappingRouter) With(middlewares ...Middleware) Router {
+	return &wrappingRouter{
+		middlewareChain: middlewares,
+		wrappedRouter:   router,
+	}
+}
+
+func (router *wrappingRouter) MatchAndCall(w http.ResponseWriter, r *http.Request) bool {
+	return router.wrappedRouter.MatchAndCall(w, r)
 }

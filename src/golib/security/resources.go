@@ -139,7 +139,7 @@ func (lhs *Claim) Equal(rhs *Claim) bool {
 // Function to verify a principal has the correct access to a requested claim
 type ClaimVerificationFunction = func(requestedClaim, principalClaim *Claim) bool
 
-func defaultClaimVerificationFunc(requestedClaim, principalClaim *Claim) bool {
+func DefaultClaimVerificationFunc(requestedClaim, principalClaim *Claim) bool {
 	if principalClaim == nil || requestedClaim == nil {
 		return false
 	}
@@ -167,7 +167,7 @@ type ClaimVerifier struct {
 
 // Uses the default verification function (write -> read) to ensure
 var verifier *ClaimVerifier = &ClaimVerifier{
-	HasAccessFunc: defaultClaimVerificationFunc,
+	HasAccessFunc: DefaultClaimVerificationFunc,
 }
 
 // Manager for a particular type of resource, e.g. User, or File

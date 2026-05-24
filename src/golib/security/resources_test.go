@@ -73,7 +73,7 @@ func TestResourceManagerCanBeCreatedWithOwnVerifier(t *testing.T) {
 			if principalClaim.Access == "Shibboleet" {
 				return true
 			} else {
-				return defaultClaimVerificationFunc(principalClaim, requestedClaim)
+				return DefaultClaimVerificationFunc(principalClaim, requestedClaim)
 			}
 		},
 	})

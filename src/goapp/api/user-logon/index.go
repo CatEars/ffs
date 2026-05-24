@@ -14,10 +14,6 @@ import (
 
 type userLogonHandler struct{}
 
-func newUserHandler() *userLogonHandler {
-	return &userLogonHandler{}
-}
-
 func deriveLegacyApiKey(user string) (string, error) {
 	claim := usermanager.UserResources().GetClaim(security.StandardAccess.Write(), user)
 	c := "[" + claim.LegacyString() + "]"
@@ -108,6 +104,6 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.RedirectTo(w, "/home/")
 }
 
-func Register(appRouter *router.Router) {
-	appRouter.Post("/api/user-logon", newUserHandler())
+func Register(appRouter router.Router) {
+	appRouter.Post("/api/user-logon", &userLogonHandler{})
 }

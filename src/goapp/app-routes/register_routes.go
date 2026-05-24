@@ -5,6 +5,6 @@ import (
 	"catears/ffs/lib/router"
 )
 
-func registerRoutes(appRouter *router.Router) {
+func registerRoutes(appRouter router.Router) {
 	apiuserlogon.Register(appRouter)
 }
