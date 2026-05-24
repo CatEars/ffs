@@ -39,12 +39,12 @@ func (cfg *ffsConfig) DevMode() bool {
 	return cfg.getEnvOrEmpty("FFS_ENV") == "dev"
 }
 
-func (cfg *ffsConfig) InstanceSecret() string {
+func (cfg *ffsConfig) InstanceSecret() []byte {
 	sec := cfg.getEnvOrEmpty("FFS_INSTANCE_SECRET")
 	if sec == "" {
 		sec = initializeInstanceSecret()
 	}
-	return sec
+	return []byte(sec)
 }
 
 var Config = &ffsConfig{

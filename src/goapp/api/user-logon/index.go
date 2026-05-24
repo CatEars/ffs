@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 type userLogonHandler struct{}
@@ -17,20 +18,15 @@ func newUserHandler() *userLogonHandler {
 	return &userLogonHandler{}
 }
 
-type SignedClaims struct {
-	Claims    string `json:"claims"`
-	Signature string `json:"hmac"`
-}
-
 func deriveLegacyApiKey(user string) (string, error) {
 	claim := usermanager.UserResources().GetClaim(security.StandardAccess.Write(), user)
 	c := "[" + claim.LegacyString() + "]"
-	signature, err := security.SignBlob([]byte(config.Config.InstanceSecret()), []byte(c))
+	signature, err := security.SignBlob(config.Config.InstanceSecret(), []byte(c))
 	b64ed := base64.StdEncoding.EncodeToString(signature)
 	if err != nil {
 		return "", err
 	}
-	auth := SignedClaims{
+	auth := security.LegacySignedClaims{
 		Claims:    c,
 		Signature: b64ed,
 	}
@@ -43,17 +39,21 @@ func deriveLegacyApiKey(user string) (string, error) {
 
 func deriveModernApiKey(record *users.UserRecord) (string, error) {
 	claims := record.Claims
-	marshalled, err := json.Marshal(claims)
-	if err != nil {
-		return "", err
+	builder := strings.Builder{}
+	for _, v := range claims {
+		_, err := builder.WriteString(v.String())
+		if err != nil {
+			return "", err
+		}
 	}
-	signature, err := security.SignBlob([]byte(config.Config.InstanceSecret()), []byte(marshalled))
+
+	signature, err := security.SignBlob(config.Config.InstanceSecret(), []byte(builder.String()))
 	if err != nil {
 		return "", err
 	}
 	b64ed := base64.StdEncoding.EncodeToString(signature)
-	auth := SignedClaims{
-		Claims:    string(marshalled),
+	auth := security.ModernSignedClaims{
+		Claims:    claims,
 		Signature: b64ed,
 	}
 	formatted, err := json.Marshal(auth)

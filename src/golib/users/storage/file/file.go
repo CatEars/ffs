@@ -216,13 +216,17 @@ func (fus *FileUserSource) Configure() error {
 	}
 }
 
+var userResourceManager = security.NewResourceManager("user")
+
 func convertUser(user *userFromFile) *users.UserRecord {
 	// TODO: For now we give everyone root access,
 	// lets fix this later via claims structure
+	userClaim := userResourceManager.GetClaim(security.StandardAccess.Write(), user.Username)
 	return &users.UserRecord{
 		Username: user.Username,
 		Claims: []*security.Claim{
 			&security.RootClaim,
+			userClaim,
 		},
 	}
 }

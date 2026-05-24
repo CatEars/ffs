@@ -27,11 +27,14 @@ func (all *AllUserSource) Configure() error {
 	return nil
 }
 
+var userResourceManager = security.NewResourceManager("user")
+
 func (all *AllUserSource) MatchUser(username, password string) *users.UserRecord {
 	return &users.UserRecord{
 		Username: username,
 		Claims: []*security.Claim{
 			&security.RootClaim,
+			userResourceManager.GetClaim(security.StandardAccess.Write(), username),
 		},
 	}
 }

@@ -5,6 +5,16 @@ import (
 	"crypto/sha256"
 )
 
+type LegacySignedClaims struct {
+	Claims    string `json:"claims"`
+	Signature string `json:"hmac"`
+}
+
+type ModernSignedClaims struct {
+	Claims    []*Claim `json:"claims"`
+	Signature string   `json:"hmac"`
+}
+
 // Type alias for signature
 type Signature = []byte
 
