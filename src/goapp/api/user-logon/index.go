@@ -81,7 +81,7 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	legacyLogonCookie := &http.Cookie{}
-	legacyLogonCookie.Name = "Ffs-Authorization"
+	legacyLogonCookie.Name = "FFS-Authorization"
 	legacyApiKey, err := deriveLegacyApiKey(usr.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -93,7 +93,7 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, legacyLogonCookie)
 
 	modernLogonCookie := &http.Cookie{}
-	modernLogonCookie.Name = "Ffs-Auth"
+	modernLogonCookie.Name = "FFS-Auth"
 	modernApiKey, err := deriveModernApiKey(usr)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
