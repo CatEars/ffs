@@ -79,7 +79,7 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	usr := usermanager.UserManager().MatchUser(username, password)
 
 	if usr == nil {
-		router.RedirectTo(w, "/logon/fail")
+		http.Redirect(w, r, "/logon/fail", http.StatusFound)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	modernLogonCookie.Value = modernApiKey
 	http.SetCookie(w, modernLogonCookie)
 
-	router.RedirectTo(w, "/home/")
+	http.Redirect(w, r, "/home/", http.StatusFound)
 }
 
 func Register(appRouter router.Router) {
