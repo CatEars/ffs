@@ -103,3 +103,18 @@ func TestUnmarshalClaimAsText(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, claim, mgr.GetClaim(StandardAccess.Write(), "Phone", "123"))
 }
+
+func TestRootClaimResultsInEmptyHierarchy(t *testing.T) {
+	hierarchy := RootClaim.Resource.hierarchy()
+	assert.Equal(t, len(hierarchy), 0)
+}
+
+func TestNonRootClaimResultsInExpectedHierarchy(t *testing.T) {
+	claim := mgr.GetClaim(StandardAccess.Read(), "Avatar", "123")
+	// 1 group + 2 subgroups = 3 hierarchical elements
+	elements := claim.Resource.hierarchy()
+	assert.Equal(t, len(elements), 3)
+	assert.Equal(t, elements[0], "User")
+	assert.Equal(t, elements[1], "Avatar")
+	assert.Equal(t, elements[2], "123")
+}
