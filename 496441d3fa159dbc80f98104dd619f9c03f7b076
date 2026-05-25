@@ -1,5 +1,7 @@
 ---- go
 
+[ ] Fix cache folders to match typescript code
+
 [ ] Create banhammer for user-logon
 
 [ ] Automatic route registration
