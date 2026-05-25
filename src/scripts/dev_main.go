@@ -32,6 +32,10 @@ func DevMain() {
 	wd, err := os.Getwd()
 	Fatal(err)
 
+	generateAutoImportCmd := exec.Command("sh", "-c", "goscript --generate-auto-import")
+	err = generateAutoImportCmd.Run()
+	Fatal(err)
+
 	oldCmd := exec.CommandContext(ctx, "deno", "--allow-all", path.Join("src", "app", "main.ts"))
 	oldCmd.Stdout = os.Stdout
 	oldCmd.Stderr = os.Stderr

@@ -13,6 +13,7 @@ func main() {
 	removePersonal := flag.Bool("remove-personal-files", false, "Removes personal files")
 	genTest := flag.Bool("generate-default-test-bench", false, "Generates the default test bench")
 	testAll := flag.Bool("run-all-tests", false, "Runs all golang tests")
+	genAutoImport := flag.Bool("generate-auto-import", false, "Generates auto-import file")
 
 	flag.Parse()
 
@@ -36,6 +37,8 @@ func main() {
 		GenerateDefaultTestBench()
 	} else if *testAll {
 		RunAllTests()
+	} else if *genAutoImport {
+		GenerateAutoImport()
 	} else {
 		flag.Usage()
 	}
