@@ -1,6 +1,8 @@
 ---- go
 
-[ ] Implement reading user records
+[ ] Create banhammer for user-logon
+
+[ ] Automatic route registration
 
 [ ] Bonus: Implement reading user records via env vars
 
