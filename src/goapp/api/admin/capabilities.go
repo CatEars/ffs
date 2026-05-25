@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"catears/ffs/goapp/appmiddlewares"
+	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/resources"
 	"catears/ffs/lib/middlewares"
 	"catears/ffs/lib/router"
@@ -19,6 +19,10 @@ type capabilities struct {
 var createUserClaim = resources.AdminResource.GetClaim(security.StandardAccess.Write(), "CreateUser")
 var housekeepingClaim = resources.AdminResource.GetClaim(security.StandardAccess.Write(), "Housekeeping")
 
+func (self *capabilitiesRoutes) Register(appRouter router.Router) {
+	appRouter.Get("/api/admin/capabilities", &capabilitiesRoutes{})
+}
+
 func (*capabilitiesRoutes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	claims := middlewares.LookupClaims(r)
 
@@ -30,10 +34,6 @@ func (*capabilitiesRoutes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.JsonResponse(w, cap)
 }
 
-func Register(appRouter router.Router) {
-	appRouter.Get("/api/admin/capabilities", &capabilitiesRoutes{})
-
-	appRouter.With(
-		appmiddlewares.CsrfProtect,
-		appmiddlewares.EnsureClaim(resources.AdminResource, housekeepingClaim)).Post("/api/admin/clear-manifests", &clearManifestRouter{})
+func init() {
+	approutes.Routes = append(approutes.Routes, &capabilitiesRoutes{})
 }

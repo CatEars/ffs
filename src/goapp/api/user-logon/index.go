@@ -1,6 +1,7 @@
 package userlogon
 
 import (
+	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/config"
 	usermanager "catears/ffs/goapp/user-manager"
 	"catears/ffs/lib/router"
@@ -13,6 +14,10 @@ import (
 )
 
 type userLogonHandler struct{}
+
+func (self *userLogonHandler) Register(appRouter router.Router) {
+	appRouter.Post("/api/user-logon", self)
+}
 
 func deriveLegacyApiKey(user string) (string, error) {
 	claim := usermanager.UserResources().GetClaim(security.StandardAccess.Write(), user)
@@ -104,6 +109,6 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/home/", http.StatusFound)
 }
 
-func Register(appRouter router.Router) {
-	appRouter.Post("/api/user-logon", &userLogonHandler{})
+func init() {
+	approutes.Routes = append(approutes.Routes, &userLogonHandler{})
 }
