@@ -3,7 +3,7 @@ import { baseMiddlewares, protectedMiddlewares } from '../../base-middlewares.ts
 
 export function register(router: Router) {
     router.get(
-        '/api/user/capabilities',
+        '/api/admin/capabilities',
         baseMiddlewares(),
         ...protectedMiddlewares(),
         (ctx) => {

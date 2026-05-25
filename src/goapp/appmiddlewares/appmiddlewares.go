@@ -14,9 +14,7 @@ var rootClaimVerifier = &security.ClaimVerifier{
 	HasAccessFunc: security.DefaultClaimVerificationFunc,
 }
 
-func EnsureIsRoot() router.Middleware {
-	return middlewares.BuildClaimEnsurer(rootClaimVerifier, &security.RootClaim)
-}
+var EnsureIsRoot = middlewares.BuildClaimEnsurer(rootClaimVerifier, &security.RootClaim)
 
 func EnsureClaim(mgr *security.ResourceManager, claim *security.Claim) router.Middleware {
 	return middlewares.BuildClaimEnsurer(mgr.Verifier, claim)

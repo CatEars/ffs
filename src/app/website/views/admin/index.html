@@ -7,7 +7,7 @@
         const state = megaphone.declareState({
             message: megaphone.urlParam('message', null),
             hasMessage: megaphone.view((state) => state.message !== null),
-            permissions: megaphone.jsonApi('/api/user/capabilities', {}),
+            permissions: megaphone.jsonApi('/api/admin/capabilities', {}),
             diskUsage: megaphone.jsonApi('/api/admin/disk-usage', {
                 path: '???',
                 available: '???',
