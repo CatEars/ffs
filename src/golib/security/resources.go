@@ -51,10 +51,11 @@ var StandardAccess = &standardLevelNames{}
 type ResourceId url.URL
 
 func (resId *ResourceId) hierarchy() []string {
-	if resId == nil {
+	if resId == nil || resId.Path == "/" {
 		return []string{}
 	}
-	return strings.Split(resId.Path, "/")
+
+	return strings.Split(resId.Path, "/")[1:]
 }
 
 // Converts the ResourceID to its string representation
@@ -241,7 +242,7 @@ func (mgr *ResourceManager) HasAccess(requestedClaim, principalClaim *Claim) boo
 
 func (mgr *ResourceManager) AnyHasAccess(requestedClaim *Claim, claims ...*Claim) bool {
 	for _, claim := range claims {
-		if mgr.HasAccess(claim, requestedClaim) {
+		if mgr.HasAccess(requestedClaim, claim) {
 			return true
 		}
 	}

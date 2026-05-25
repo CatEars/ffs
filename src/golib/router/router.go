@@ -37,6 +37,7 @@ func NewRouter() Router {
 }
 
 func (router baseRouter) register(method, path string, handler http.Handler) {
+	log.Printf("Registering %s %s", method, path)
 	method = strings.ToLower(method)
 	path = strings.ToLower(path)
 

@@ -7,9 +7,11 @@ import (
 )
 
 func BuildAppRouter() router.Router {
+	appmiddlewares.BuildMiddlewares()
+
 	var appRoutes = router.NewRouter()
 	appRoutes.Use(middlewares.RequestLoggingMiddleware)
-	appmiddlewares.BuildMiddlewares()
+	appRoutes.Use(appmiddlewares.UserLookup)
 	registerRoutes(appRoutes)
 	return appRoutes
 }

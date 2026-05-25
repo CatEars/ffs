@@ -6,18 +6,16 @@ import (
 	"net/http"
 )
 
-func BuildClaimEnsurer(claimVerifier *security.ClaimVerifier, requestedClaim *security.Claim) router.Middleware {
+func BuildClaimEnsurer(mgr *security.ResourceManager, requestedClaim *security.Claim) router.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			principalClaims := LookupClaims(r)
-			for _, claim := range principalClaims {
-				if claimVerifier.HasAccessFunc(requestedClaim, claim) {
-					next.ServeHTTP(w, r)
-					return
-				}
+			access := mgr.AnyHasAccess(requestedClaim, principalClaims...)
+			if access {
+				next.ServeHTTP(w, r)
+			} else {
+				w.WriteHeader(http.StatusForbidden)
 			}
-
-			w.WriteHeader(http.StatusForbidden)
 		})
 	}
 }
