@@ -15,7 +15,7 @@ type clearManifestRouter struct{}
 func (self *clearManifestRouter) Register(appRouter router.Router) {
 	r := appRouter.With(
 		appmiddlewares.CsrfProtect,
-		appmiddlewares.EnsureClaim(resources.AdminResource, housekeepingClaim))
+		appmiddlewares.EnsureClaim(resources.AdminResource, resources.HousekeepingClaim))
 
 	r.Post("/api/admin/clear-manifests", self)
 }

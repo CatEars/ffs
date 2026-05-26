@@ -5,7 +5,6 @@ import (
 	"catears/ffs/goapp/resources"
 	"catears/ffs/lib/middlewares"
 	"catears/ffs/lib/router"
-	"catears/ffs/lib/security"
 	"net/http"
 )
 
@@ -16,9 +15,6 @@ type capabilities struct {
 	AllowHousekeeping bool `json:"allowHousekeeping"`
 }
 
-var createUserClaim = resources.AdminResource.GetClaim(security.StandardAccess.Write(), "CreateUser")
-var housekeepingClaim = resources.AdminResource.GetClaim(security.StandardAccess.Write(), "Housekeeping")
-
 func (self *capabilitiesRoutes) Register(appRouter router.Router) {
 	appRouter.Get("/api/admin/capabilities", &capabilitiesRoutes{})
 }
@@ -27,8 +23,8 @@ func (*capabilitiesRoutes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	claims := middlewares.LookupClaims(r)
 
 	var cap = &capabilities{
-		CanCreateUsers:    resources.AdminResource.AnyHasAccess(createUserClaim, claims...),
-		AllowHousekeeping: resources.AdminResource.AnyHasAccess(housekeepingClaim, claims...),
+		CanCreateUsers:    resources.AdminResource.AnyHasAccess(resources.CreateUserClaim, claims...),
+		AllowHousekeeping: resources.AdminResource.AnyHasAccess(resources.HousekeepingClaim, claims...),
 	}
 
 	router.JsonResponse(w, cap)
