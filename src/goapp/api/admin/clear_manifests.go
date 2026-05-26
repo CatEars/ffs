@@ -21,7 +21,7 @@ func (self *clearManifestRouter) Register(appRouter router.Router) {
 }
 
 func (*clearManifestRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := cache.ClearManifestsDirAndEnsureExists()
+	err := cache.ShareManifestsFolder.Recreate()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -3,45 +3,24 @@ package cache
 import (
 	"catears/ffs/goapp/config"
 	"catears/ffs/lib/autofolder"
-	"os"
-	"path"
-	"strings"
 )
 
-var cacheRootFolder *autofolder.AutoFolder = nil
-var shareManifestsFolder *autofolder.AutoFolder = nil
+var CacheRootFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var DiskUsageCacheFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var DownloadManifestsFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var EphemeralUsersFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var ShareManifestsFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var ThumbnailsFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var ThumbnailsTempFolder autofolder.AutoFolder = autofolder.NewSentinel()
+var UploadFolder autofolder.AutoFolder = autofolder.NewSentinel()
 
-func getCacheRootFolder() *autofolder.AutoFolder {
-	if cacheRootFolder == nil {
-		cacheRootFolder = autofolder.New(config.Config.CacheRoot(), autofolder.GroupAccess)
-	}
-	return cacheRootFolder
-}
-
-func ClearManifestsDirAndEnsureExists() error {
-	if shareManifestsFolder == nil {
-		shareManifestsFolder = getCacheRootFolder().Sub("share-manifests")
-	}
-
-	return shareManifestsFolder.Recreate()
-}
-
-func ResolveCacheFolder() (string, error) {
-	cacheRoot := config.Config.CacheRoot()
-	if cacheRoot != "" {
-		return cacheRoot, nil
-	}
-
-	entries, err := os.ReadDir(os.TempDir())
-	if err != nil {
-		return "", err
-	}
-
-	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), "ffs-cachedir-") {
-			return path.Join(os.TempDir(), entry.Name()), nil
-		}
-	}
-
-	return os.MkdirTemp("", "ffs-cachedir-*")
+func InitializeCacheFolders() {
+	CacheRootFolder = autofolder.New(config.Config.CacheRoot(), autofolder.GroupAccess)
+	DiskUsageCacheFolder = CacheRootFolder.Sub("disk-usage")
+	DownloadManifestsFolder = CacheRootFolder.Sub("download-manifests")
+	EphemeralUsersFolder = CacheRootFolder.Sub("ephemeral-users")
+	ShareManifestsFolder = CacheRootFolder.Sub("share-manifests")
+	ThumbnailsFolder = CacheRootFolder.Sub("thumbnails")
+	ThumbnailsTempFolder = CacheRootFolder.Sub("thumbnail-tmp")
+	UploadFolder = CacheRootFolder.Sub("upload")
 }
