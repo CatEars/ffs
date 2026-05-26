@@ -34,6 +34,7 @@ func RunStartup() {
 	log.Printf("Starting go-app from %s", d)
 	config.Config.SetConfig("FFS_USERS_FILE", path.Join("data", "users-file.json"))
 	config.Config.SetConfig("FFS_ENV", "dev")
+	config.Config.SetConfig("FFS_STORE_ROOT", d)
 	config.Config.CacheRoot()
 	dir, err := resolveCacheFolder()
 	if err != nil {
