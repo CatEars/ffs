@@ -7,11 +7,11 @@ import (
 	"strconv"
 )
 
-func FormatBytes(bytes int) string {
+func FormatBytes(bytes uint64) string {
 	return FormatBytesToDecimalPoint(bytes, 2)
 }
 
-func FormatBytesToDecimalPoint(bytes int, decimals int) string {
+func FormatBytesToDecimalPoint(bytes uint64, decimals int) string {
 	if bytes == 0 {
 		return "0 Bytes"
 	}

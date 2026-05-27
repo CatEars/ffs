@@ -39,8 +39,16 @@ func (cfg *ffsConfig) DevMode() bool {
 	return cfg.getEnvOrEmpty("FFS_ENV") == "dev"
 }
 
+func (cfg *ffsConfig) Env() string {
+	return cfg.getEnvOrEmpty("FFS_ENV")
+}
+
 func (cfg *ffsConfig) CacheRoot() string {
 	return cfg.getEnvOrEmpty("FFS_CACHE_ROOT")
+}
+
+func (cfg *ffsConfig) StoreRoot() string {
+	return cfg.getEnvOrEmpty("FFS_STORE_ROOT")
 }
 
 func (cfg *ffsConfig) InstanceSecret() []byte {
