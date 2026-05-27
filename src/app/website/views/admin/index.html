@@ -14,7 +14,6 @@
             }),
             diskMountpoint: megaphone.view((state) => state.diskUsage.path || '???'),
             availableBytesInDisk: megaphone.view((state) => state.diskUsage.available || '???'),
-            canCreateUsers: megaphone.view((state) => state.permissions.canCreateUsers || false),
             allowHousekeeping: megaphone.view(
                 (state) => state.permissions.allowHousekeeping || false
             ),
@@ -132,39 +131,6 @@
                 <button type="submit">Clear Share Links</button>
             </fieldset>
         </form>
-    </section>
-
-    <section $data-visibility="canCreateUsersVisibility">
-        <horizontal-ruler></horizontal-ruler>
-        <section>
-            <h2>Create Ephemeral User</h2>
-            <p>Create a new ephemeral user account with a password.</p>
-            <form action="/api/admin/create-user" method="post">
-                <fieldset>
-                    <legend>Username</legend>
-                    <input
-                        type="text"
-                        id="new-username"
-                        name="username"
-                        placeholder="Username"
-                        autocomplete="off"
-                    />
-                </fieldset>
-                <fieldset>
-                    <legend>Password</legend>
-                    <input
-                        type="password"
-                        id="new-password"
-                        name="password"
-                        placeholder="Password"
-                        autocomplete="new-password"
-                    />
-                </fieldset>
-                <fieldset>
-                    <button type="submit">Create User</button>
-                </fieldset>
-            </form>
-        </section>
     </section>
 
     <horizontal-ruler></horizontal-ruler>
