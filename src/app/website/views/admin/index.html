@@ -20,9 +20,6 @@
             allowHousekeepingVisibility: megaphone.view((state) =>
                 state.allowHousekeeping ? 'show' : 'hidden'
             ),
-            canCreateUsersVisibility: megaphone.view((state) =>
-                state.canCreateUsers ? 'show' : 'hidden'
-            ),
             modules: megaphone.jsonApi('/api/admin/modules', []),
         });
 

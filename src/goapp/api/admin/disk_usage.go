@@ -3,13 +3,11 @@ package admin
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
-	"catears/ffs/goapp/config"
+	"catears/ffs/goapp/disks"
 	"catears/ffs/goapp/resources"
-	diskusage "catears/ffs/lib/disk-usage"
 	"catears/ffs/lib/display"
 	"catears/ffs/lib/router"
 	"net/http"
-	"path/filepath"
 )
 
 type diskUsage struct {
@@ -26,21 +24,16 @@ func (self *diskUsageRouter) Register(approuter router.Router) {
 }
 
 func (*diskUsageRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p := config.Config.StoreRoot()
-	p, err := filepath.Abs(p)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	available, err := diskusage.GetDiskUsage(p)
+	diskIdx := disks.DiskIndexFromRequest(r)
+	disk := disks.GetDisk(diskIdx)
+	available, err := disk.Usage()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	usage := diskUsage{
-		Path:      p,
+		Path:      disk.Descriptor(),
 		Available: display.FormatBytes(available.FreeBytes),
 	}
 	router.JsonResponse(w, usage)

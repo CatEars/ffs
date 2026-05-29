@@ -3,6 +3,7 @@ package main
 import (
 	"catears/ffs/goapp/cache"
 	"catears/ffs/goapp/config"
+	"catears/ffs/goapp/disks"
 	"log"
 	"os"
 	"path"
@@ -55,4 +56,6 @@ func RunStartup() {
 		config.Config.SetConfig("FFS_CACHE_ROOT", dir)
 	}
 	cache.InitializeCacheFolders()
+
+	disks.InitializeDisks(disks.NewPhysicalDisk(config.Config.StoreRoot()))
 }
