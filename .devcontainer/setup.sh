@@ -9,3 +9,4 @@ $THIS_SCRIPT_DIR/setup-git-notes-sync.sh
 $THIS_SCRIPT_DIR/setup-bash-aliases.sh
 $THIS_SCRIPT_DIR/setup-ffs-dependencies.sh
 $THIS_SCRIPT_DIR/setup-eruda.sh
+$THIS_SCRIPT_DIR/setup-mkcert.sh
