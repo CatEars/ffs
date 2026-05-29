@@ -59,6 +59,14 @@ func (cfg *ffsConfig) InstanceSecret() []byte {
 	return []byte(sec)
 }
 
+func (cfg *ffsConfig) CertFile() string {
+	return cfg.getEnvOrEmpty("FFS_CERT_FILE")
+}
+
+func (cfg *ffsConfig) CertKeyFile() string {
+	return cfg.getEnvOrEmpty("FFS_CERT_KEY_FILE")
+}
+
 var Config = &ffsConfig{
 	overrides: make(map[string]string),
 }
