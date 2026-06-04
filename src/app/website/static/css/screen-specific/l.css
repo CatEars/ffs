@@ -1,8 +1,0 @@
-@media (min-width: 1477px) and (max-width: 2015px) {
-    @layer main {
-        :root {
-            --file-card-max-height: 13rem;
-            --thumbnail-hover-max-width: 17.5rem;
-        }
-    }
-}

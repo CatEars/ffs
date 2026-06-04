@@ -19,13 +19,13 @@ func runWithEsbuild(dir string, args []string) {
 }
 
 func bundleJavascriptWebcomponents(silent bool) {
-	EnsureDirFromCwd("src", "app", "website", "static", "js")
+	EnsureDirFromCwd("src", "goapp", "website", "static", "js")
 	args := []string{
 		"--bundle",
 		"index.js",
 		"--outfile=../static/js/index.bundle.js",
 	}
-	dir := path.Join(GetCwdOrFail(), "src", "app", "website", "components")
+	dir := path.Join(GetCwdOrFail(), "src", "goapp", "website", "components")
 	runWithEsbuild(dir, args)
 	if !silent {
 		log.Println("Bundled component library into index.bundle.js")
@@ -39,7 +39,7 @@ func bundleCss(silent bool) {
 		"--loader:.svg=dataurl",
 		"--outfile=index.bundle.css",
 	}
-	dir := path.Join(GetCwdOrFail(), "src", "app", "website", "static", "css")
+	dir := path.Join(GetCwdOrFail(), "src", "goapp", "website", "static", "css")
 	runWithEsbuild(dir, args)
 	if !silent {
 		log.Println("Bundling CSS files into index.bundle.css")

@@ -34,7 +34,10 @@
             ]
         },
         "run": {
-            "command": "goscript --dev-main"
+            "command": "goscript --dev-main",
+            "dependencies": [
+                "bundle-component-library"
+            ]
         },
         "test-deno": "deno test --allow-all",
         "test-go": {

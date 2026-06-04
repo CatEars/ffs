@@ -15,7 +15,6 @@ import { initializeLoggers, logger } from './logging/loggers.ts';
 import { optionalModules } from './optional-modules.ts';
 import { setOnUserAuthenticationHook } from './security/api-protect.ts';
 import { likelyFirstTimeUser, printWelcomeHelper, startup } from './startup.ts';
-import { registerAllWebsiteRoutes } from './website/index.ts';
 
 if (Deno.env.get('FFS_ABANDON_SECURITY') === 'true') {
     unsecure();
@@ -41,7 +40,6 @@ const routeRegistrations = await findRouteRegistrationsInFileTree(
 for (const routeRegistrator of routeRegistrations) {
     await routeRegistrator(router);
 }
-await registerAllWebsiteRoutes(router);
 
 app.use(router.routes());
 app.use(router.allowedMethods());
