@@ -52,7 +52,7 @@
         }
     </style>
     <script type="module">
-        const worker = new Worker('uploader.js');
+        const worker = new Worker('/static/js/uploader.js');
 
         function createUploadProgress(options) {
             const { name, token, size } = options;

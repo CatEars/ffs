@@ -1,5 +1,3 @@
-// TODO: Move uploader.js to static JS folder
-
 console.log('Upload worker initializing');
 
 let nextUpload = null;

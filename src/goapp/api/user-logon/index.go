@@ -7,6 +7,7 @@ import (
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/users"
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
@@ -73,6 +74,10 @@ func makeBaseCookie(name string) *http.Cookie {
 	return cookie
 }
 
+func generateCsrfToken() string {
+	return rand.Text()
+}
+
 func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
@@ -105,6 +110,11 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	modernLogonCookie.Value = modernApiKey
 	http.SetCookie(w, modernLogonCookie)
+
+	legacyCsrfToken := makeBaseCookie("FFS-Csrf-Protection")
+	legacyCsrfToken.HttpOnly = false
+	legacyCsrfToken.Value = generateCsrfToken()
+	http.SetCookie(w, legacyCsrfToken)
 
 	http.Redirect(w, r, "/home/", http.StatusFound)
 }

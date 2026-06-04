@@ -4,6 +4,7 @@ import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/config"
 	"crypto/tls"
+	"embed"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -14,9 +15,12 @@ import (
 type FfsHandler struct {
 }
 
+//go:embed website/*
+var websiteContent embed.FS
+
 var proxyTarget, _ = url.Parse("http://localhost:8081")
 var proxy *httputil.ReverseProxy = httputil.NewSingleHostReverseProxy(proxyTarget)
-var appRouter = approutes.BuildAppRouter(WebsiteContent)
+var appRouter = approutes.BuildAppRouter(websiteContent)
 
 func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	matched := appRouter.MatchAndCall(w, r)
