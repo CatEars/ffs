@@ -1,0 +1,14 @@
+<nav class="header">
+    <div class="main-link-holder">
+        <a class="main-link" href="/logout">FFS</a>
+    </div>
+    {{ with .Tabs }}
+    <header-nav-select>
+        {{ range . }}
+        <option value="{{ .Link }}">{{ .Name }}</option>
+        {{ end }}
+    </header-nav-select>
+    {{ range . }}
+    <header-tab href="{{ .Link }}">{{ .Name }}</header-tab>
+    {{ end }} {{ end }}
+</nav>

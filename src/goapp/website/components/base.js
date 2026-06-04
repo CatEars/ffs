@@ -1,0 +1,56 @@
+import { h, render } from './vendor/preact.mjs';
+import htm from './vendor/htm.mjs';
+
+export const html = htm.bind(h);
+
+export async function loadSharedStylesheets() {
+    const sharedStylesheet = new CSSStyleSheet();
+
+    try {
+        const response = await fetch('/static/css/index.bundle.css');
+        if (!response.ok) {
+            throw new Error(
+                `Failed to load stylesheet: ${response.statusText} / ${response2.statusText}`
+            );
+        }
+        const cssText = await response.text();
+
+        await sharedStylesheet.replace(cssText);
+        console.log('Shared stylesheet loaded and parsed.');
+    } catch (error) {
+        console.error('Error loading shared stylesheet:', error);
+    }
+    return [sharedStylesheet];
+}
+
+export class BaseWebComponent extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.shadowRoot.adoptedStyleSheets = [...document.adoptedStyleSheets];
+    }
+
+    connectedCallback() {
+        this._renderComponent();
+    }
+
+    render(_html) {
+        // Sub-components should override this to return a Node (e.g., a div, p, template content)
+        // Example: return html`<div>Hello, World!</div>`;
+        throw new Error('Sub-components must implement the render(...) method.');
+    }
+
+    postRender(_html) {
+        // Sub-components may override postRender to initiate calls that may affect the shadow DOM
+    }
+
+    _renderComponent() {
+        const content = this.render(html);
+        render(content, this.shadowRoot);
+        this.postRender(html);
+    }
+
+    attributeChangedCallback(_name, _oldValue, _newValue) {
+        this._renderComponent();
+    }
+}

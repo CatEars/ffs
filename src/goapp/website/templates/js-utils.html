@@ -1,0 +1,103 @@
+<script>
+    // Set an item in localStorage
+    function setLocalStorage(key, value) {
+        try {
+            const serializedValue = JSON.stringify(value);
+            localStorage.setItem(key, serializedValue);
+            return value;
+        } catch (e) {
+            console.error('Error setting item to localStorage', e);
+        }
+    }
+
+    // Get an item from localStorage
+    function getLocalStorage(key, defaultValue) {
+        try {
+            const serializedValue = localStorage.getItem(key);
+            return serializedValue ? JSON.parse(serializedValue) : defaultValue;
+        } catch (e) {
+            console.error('Error getting item from localStorage', e);
+            return null;
+        }
+    }
+
+    // Set an item in sessionStorage
+    function setSessionStorage(key, value) {
+        try {
+            const serializedValue = JSON.stringify(value);
+            sessionStorage.setItem(key, serializedValue);
+            return value;
+        } catch (e) {
+            console.error('Error setting item to sessionStorage', e);
+        }
+    }
+
+    // Get an item from sessionStorage
+    function getSessionStorage(key, defaultValue) {
+        try {
+            const serializedValue = sessionStorage.getItem(key);
+            return serializedValue ? JSON.parse(serializedValue) : defaultValue;
+        } catch (e) {
+            console.error('Error getting item from sessionStorage', e);
+            return null;
+        }
+    }
+
+    function getUrlParam(key, defaultValue) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const path = urlParams.get(key);
+        if (path === null) {
+            return defaultValue;
+        }
+        return path;
+    }
+
+    function setUrlParam(key, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        window.history.pushState({}, '', url); // Updates the URL without reloading the page
+    }
+
+    function range(length) {
+        return Array.from({ length }).map((_, idx) => idx);
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) {
+            return '0 Bytes';
+        }
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function reverseIterable(iterable) {
+        const result = [];
+        for (const elem of iterable) {
+            result.push(elem);
+        }
+        result.reverse();
+        return result;
+    }
+
+    function getCookie(name) {
+        if (cookieStore) {
+            return cookieStore.get(name);
+        } else {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+        }
+    }
+
+    function submitForm(selector) {
+        document.querySelector(selector).requestSubmit();
+    }
+</script>

@@ -16,7 +16,7 @@ type FfsHandler struct {
 
 var proxyTarget, _ = url.Parse("http://localhost:8081")
 var proxy *httputil.ReverseProxy = httputil.NewSingleHostReverseProxy(proxyTarget)
-var appRouter = approutes.BuildAppRouter()
+var appRouter = approutes.BuildAppRouter(WebsiteContent)
 
 func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	matched := appRouter.MatchAndCall(w, r)

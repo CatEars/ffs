@@ -1,0 +1,26 @@
+@layer landing, base, main, override;
+
+/* General */
+@import url('./theme.css');
+@import url('./defaults.css');
+@import url('./on-page-load-fixes.css');
+@import url('./icons.css');
+@import url('./fonts.css');
+@import url('./header.css');
+@import url('./forms.css');
+@import url('./data.css');
+@import url('./js-component/index.css');
+@import url('./input.css');
+
+/* View specific */
+@import url('./gallery.css');
+@import url('./file-manager.css');
+@import url('./logon.css');
+@import url('./control-panel.css');
+
+/* Screen specific variables */
+@import url('./screen-specific/xl.css');
+@import url('./screen-specific/l.css');
+@import url('./screen-specific/m.css');
+@import url('./screen-specific/s.css');
+@import url('./screen-specific/xs.css');

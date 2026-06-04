@@ -1,0 +1,637 @@
+{{ template "base-header.html" . }}
+<app-main>
+    <script>
+        function filesWithUnstringifiedDate(files) {
+            return files.map((file) => ({ ...file, date: new Date(file.date) }));
+        }
+
+        function includeParentUnlessRoot(files, currentPath) {
+            if (currentPath === '.') {
+                return files;
+            }
+
+            return [
+                {
+                    name: '..',
+                    isDirectory: true,
+                    fileType: 'directory',
+                    svgIconName: 'folder',
+                },
+            ].concat(files);
+        }
+
+        function paginate(array, page, pageSize) {
+            const startIndex = (page - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            return array.slice(startIndex, endIndex);
+        }
+
+        function getNumPages(array, pageSize) {
+            return Math.ceil(array.length / pageSize);
+        }
+
+        function sortedBy(files, sorting, directoriesFirst, page, pageSize) {
+            const sortingFunction =
+                sorting === 'oldest'
+                    ? (a, b) => a.date - b.date
+                    : sorting === 'newest'
+                      ? (a, b) => b.date - a.date
+                      : sorting === 'a-z'
+                        ? (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
+                        : sorting === 'z-a'
+                          ? (a, b) => -a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' })
+                          : () => {};
+
+            let copy = files.toSorted(sortingFunction);
+            if (directoriesFirst) {
+                const directoryFirstSorter = (a, b) =>
+                    a.isDirectory && !b.isDirectory ? -1 : !a.isDirectory && b.isDirectory ? 1 : 0;
+                copy = copy.toSorted(directoryFirstSorter);
+            }
+
+            return paginate(copy, page, pageSize);
+        }
+
+        function getCurrentPath() {
+            return getUrlParam('path', '.');
+        }
+
+        function calculatePath(root, fileName) {
+            if (fileName === '..') {
+                const lastIndex = root.lastIndexOf('/');
+                if (lastIndex === -1) {
+                    return root;
+                }
+                return root.substring(0, lastIndex);
+            } else {
+                return encodeURIComponent(`${root}/${fileName}`);
+            }
+        }
+
+        function getCurrentPage() {
+            return Number.parseInt(getUrlParam('page', '1'));
+        }
+
+        function setCurrentPage(pageNum) {
+            setUrlParam('page', `${pageNum}`);
+            return pageNum;
+        }
+
+        function isSoundFile(file) {
+            return file.endsWith('.mp3');
+        }
+
+        function isImageFile(file) {
+            // LINK-FILE-EXTENSIONS
+            return [
+                '.png',
+                '.jpg',
+                '.jpeg',
+                '.tiff',
+                '.webp',
+                '.gif',
+                '.avif',
+                '.bmp',
+                '.ico',
+                '.psd',
+            ].some((x) => file.endsWith(x));
+        }
+
+        function isMovieFile(file) {
+            return ['.mp4', '.m4v', '.mov', '.avi', '.webm', '.mkv', '.mpg'].some((x) =>
+                file.endsWith(x)
+            );
+        }
+
+        function isMediaFile(file) {
+            return isSoundFile(file) || isImageFile(file) || isMovieFile(file);
+        }
+
+        function resolveSvgLocationForFile(file) {
+            if (isSoundFile(file.name)) {
+                return 'music_note';
+            } else if (isImageFile(file.name)) {
+                return 'photo_camera';
+            } else if (isMovieFile(file.name)) {
+                return 'videocam';
+            } else if (file.isDirectory) {
+                return 'folder';
+            } else {
+                return 'description';
+            }
+        }
+
+        function getFileImageSource(root, file) {
+            return `/api/thumbnail?path=${encodeURIComponent(root + '/' + file.name)}`;
+        }
+
+        function storeToCuttingBoard(files) {
+            return setSessionStorage('cutting-board', files);
+        }
+
+        function getCuttingBoard() {
+            return getSessionStorage('cutting-board', []);
+        }
+
+        function resetCuttingBoard() {
+            storeToCuttingBoard([]);
+        }
+
+        function navigateToHomePath(path, index) {
+            const elements = path.split('/');
+            const selectedLocation = elements.slice(0, index + 1).join('/');
+            const webPath = `/home/?path=${encodeURIComponent(selectedLocation)}`;
+            window.location.href = webPath;
+        }
+
+        function getBaseLinkTo(file) {
+            const currentPath = decodeURIComponent(getCurrentPath());
+            return calculatePath(currentPath, file.name);
+        }
+
+        function getMediaLinkTo(file) {
+            return `/home/media/view?path=${getBaseLinkTo(file)}`;
+        }
+
+        function getHomeLinkTo(file) {
+            return `/home/?path=${getBaseLinkTo(file)}`;
+        }
+
+        function getCheckedFiles() {
+            const clickedFiles = [];
+            for (const element of document.querySelectorAll('.file-to-cut')) {
+                if (element.checked) {
+                    clickedFiles.push(element.value);
+                }
+                element.checked = false;
+            }
+            return clickedFiles;
+        }
+
+        function cutFiles() {
+            const myPath = getCurrentPath();
+            const clickedFiles = getCheckedFiles();
+            const filesToStore = clickedFiles.map((elem) => ({
+                path: myPath,
+                fileName: elem,
+            }));
+            if (filesToStore.length > 0) {
+                storeToCuttingBoard(filesToStore);
+            }
+        }
+
+        function pasteFiles() {
+            const path = decodeURIComponent(getCurrentPath());
+            const board = getCuttingBoard();
+            resetCuttingBoard();
+            document.getElementById('files-to-move').value = JSON.stringify(board);
+            document.getElementById('destination').value = path;
+            submitForm('#paste-form');
+        }
+
+        function deleteFiles() {
+            const myPath = getCurrentPath();
+            const clickedFiles = getCheckedFiles();
+            const filesToRemove = clickedFiles.map((elem) => ({
+                path: myPath,
+                fileName: elem,
+            }));
+            document.getElementById('files-to-remove').value = JSON.stringify(filesToRemove);
+            submitForm('#delete-form');
+        }
+
+        function createFileShare() {
+            const myPath = getCurrentPath();
+            const paths = getCheckedFiles().map((x) => `${myPath}/${x}`);
+            document.getElementById('link-paths').value = JSON.stringify(paths);
+            submitForm('#link-form');
+        }
+
+        function renameFile() {
+            const myPath = getCurrentPath();
+            const checkedFiles = getCheckedFiles();
+            if (checkedFiles.length === 0) {
+                return;
+            }
+            const elementToRename = checkedFiles[0];
+            document.getElementById('source').value = `${myPath}/${elementToRename}`;
+            submitForm('#rename-form');
+        }
+
+        function makeDirectory() {
+            const myPath = getCurrentPath();
+            document.getElementById('make-directory-path').value = myPath;
+            submitForm('#make-directory-form');
+        }
+
+        function downloadFiles() {
+            const myPath = getCurrentPath();
+            const checkedFiles = getCheckedFiles();
+            if (checkedFiles.length === 0) {
+                return;
+            }
+            const downloadForm = document.getElementById('download-form');
+            document.getElementById('download-input-root').value = myPath;
+            // clear all previously selected files
+            const priorFileInputs = downloadForm.querySelectorAll('[name="file"]');
+            priorFileInputs.forEach((elem) => elem.remove());
+
+            const inputTemplate = document.getElementById('download-input-template');
+            const prependedPath = !!myPath ? '' : `${myPath}/`;
+            for (const file of checkedFiles) {
+                const fullPath = prependedPath + file;
+                const clone = inputTemplate.content.cloneNode(true);
+                clone.querySelector('input').value = fullPath;
+
+                downloadForm.appendChild(clone);
+            }
+
+            submitForm('#download-form');
+        }
+    </script>
+    <script type="module">
+        function onCrumbClick(evt) {
+            navigateToHomePath(evt.detail.trail, evt.detail.index);
+        }
+
+        function onSortDirectoriesFirstChange(evt) {
+            state.directoriesFirst = evt.detail.checked;
+        }
+
+        function createSortingSetter(value) {
+            return () => {
+                state.sorting = value;
+            };
+        }
+
+        function onPageShift(evt) {
+            state.currentPage = evt.detail.page;
+        }
+
+        function generatePageSizeUpdater(value) {
+            return () => {
+                state.pageSize = value;
+            };
+        }
+
+        function onGalleryModeSelected() {
+            state.viewMode = 'gallery';
+        }
+
+        function onFileManagerModeSelected() {
+            state.viewMode = 'files';
+        }
+
+        function gotoUpload() {
+            const currentPath = getCurrentPath();
+            const targetUrl = `/upload/?path=${encodeURIComponent(currentPath)}`;
+            window.open(targetUrl, '_blank');
+        }
+
+        const megaphone = new Megaphone();
+        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
+        const currentPath = getCurrentPath();
+        const state = megaphone.declareState({
+            pageSize: megaphone.localStorage('default-page-size', 100),
+            currentPath,
+
+            viewMode: megaphone.sessionStorage('view-mode', 'gallery'),
+            galleryModeEnabled: megaphone.view((state) => state.viewMode === 'gallery'),
+            galleryVisibility: megaphone.view((state) =>
+                state.galleryModeEnabled ? 'show' : 'hidden'
+            ),
+            fileManagerModeEnabled: megaphone.view((state) => state.viewMode === 'files'),
+            fileManagerVisibility: megaphone.view((state) =>
+                state.fileManagerModeEnabled ? 'show' : 'hidden'
+            ),
+
+            files: megaphone.jsonApi(`/api/directory?path=${encodeURIComponent(currentPath)}`, [], {
+                view: (files) =>
+                    includeParentUnlessRoot(filesWithUnstringifiedDate(files), currentPath),
+            }),
+            maxPages: megaphone.view((state) => getNumPages(state.files, state.pageSize)),
+            sorting: megaphone.localStorage('file-sort-order', 'newest'),
+            directoriesFirst: megaphone.localStorage('show-directories-first', true),
+            currentPage: getCurrentPage(),
+            sortedFiles: megaphone.view((state) =>
+                sortedBy(
+                    state.files,
+                    state.sorting,
+                    state.directoriesFirst,
+                    state.currentPage,
+                    state.pageSize
+                )
+            ),
+
+            sortingByNewest: megaphone.view((state) => state.sorting === 'newest'),
+            sortingByOldest: megaphone.view((state) => state.sorting === 'oldest'),
+            sortingByAtoZ: megaphone.view((state) => state.sorting === 'a-z'),
+            sortingByZtoA: megaphone.view((state) => state.sorting === 'z-a'),
+            sortByNewest: createSortingSetter('newest'),
+            sortByOldest: createSortingSetter('oldest'),
+            sortByAtoZ: createSortingSetter('a-z'),
+            sortByZtoA: createSortingSetter('z-a'),
+
+            setPageSizeTo20: generatePageSizeUpdater(20),
+            setPageSizeTo50: generatePageSizeUpdater(50),
+            setPageSizeTo100: generatePageSizeUpdater(100),
+            setPageSizeTo250: generatePageSizeUpdater(250),
+            setPageSizeTo1000: generatePageSizeUpdater(1000),
+
+            pageSizeIs20: megaphone.view((state) => state.pageSize === 20),
+            pageSizeIs50: megaphone.view((state) => state.pageSize === 50),
+            pageSizeIs100: megaphone.view((state) => state.pageSize === 100),
+            pageSizeIs250: megaphone.view((state) => state.pageSize === 250),
+            pageSizeIs1000: megaphone.view((state) => state.pageSize === 1000),
+
+            onGalleryModeSelected,
+            onFileManagerModeSelected,
+            onSortDirectoriesFirstChange,
+            onCrumbClick,
+            onPageShift,
+            pasteFiles,
+            cutFiles,
+            resetCuttingBoard,
+            createFileShare,
+            renameFile,
+            makeDirectory,
+            deleteFiles,
+            downloadFiles,
+            gotoUpload,
+        });
+
+        megaphone.renderEach(
+            state.sortedFiles,
+            '#gallery',
+            megaphone.webComponent('file-card', (file) => ({
+                filename: file.name,
+                'file-type': file.fileType,
+                'image-src': file.imageSrc,
+                'svg-icon-name': file.svgIconName,
+                root: currentPath,
+            }))
+        );
+
+        megaphone.renderEach(
+            state.sortedFiles,
+            '#file-list',
+            megaphone.template('#file-row-entry', (clone, file) => {
+                clone.querySelector('input').value = file.name;
+                clone
+                    .querySelector('use')
+                    .setAttribute('href', `/static/svg/sprite_sheet.svg#${file.svgIconName}`);
+                const imageSource = file.imageSrc;
+                const iconHover = clone.querySelector('icon-hover');
+                if (file.isFile) {
+                    iconHover.setAttribute('url', imageSource);
+                } else if (file.isDirectory) {
+                    iconHover.setAttribute('disabled', 'true');
+                }
+
+                const fileLink = clone.querySelector('#file-link-row').content.cloneNode(true);
+                const fl = fileLink.querySelector('file-link');
+                fl.setAttribute('filename', file.name);
+                fl.setAttribute('file-type', file.fileType);
+                fl.setAttribute('root', decodeURIComponent(getCurrentPath()));
+                const rowText = clone.querySelector('div.file-row-text');
+                rowText.insertBefore(fl, clone.querySelector('.file-size'));
+
+                const fileSizeEl = clone.querySelector('.file-size');
+                if (file.size != null) {
+                    fileSizeEl.textContent = formatBytes(file.size, 1);
+                } else if (file.isDirectory) {
+                    fileSizeEl.textContent = '...';
+                }
+
+                return clone;
+            })
+        );
+
+        megaphone.init();
+    </script>
+    <breadcrumb-nav $trail="currentPath" @crumb-click="onCrumbClick"></breadcrumb-nav>
+    <horizontal-ruler></horizontal-ruler>
+    <paginate-control
+        $page="currentPage"
+        $max-pages="maxPages"
+        @page-shift="onPageShift"
+    ></paginate-control>
+
+    <div $data-visibility="galleryVisibility">
+        <section id="gallery" class="gallery"></section>
+    </div>
+    <div $data-visibility="fileManagerVisibility">
+        <section id="file-list" class="file-list">
+            <template id="file-row-entry">
+                <div class="file-row">
+                    <label class="file-checkbox">
+                        <input class="file-to-cut" type="checkbox" />
+                    </label>
+
+                    <icon-hover>
+                        <svg class="small-icon">
+                            <use></use>
+                        </svg>
+                    </icon-hover>
+                    <div class="file-row-text">
+                        <template id="link-row">
+                            <a>
+                                <span></span>
+                            </a>
+                        </template>
+                        <template id="file-row">
+                            <span></span>
+                        </template>
+                        <template id="file-link-row">
+                            <file-link></file-link>
+                        </template>
+                        <span class="file-size"></span>
+                    </div>
+                </div>
+            </template>
+        </section>
+    </div>
+    <paginate-control
+        $page="currentPage"
+        $max-pages="maxPages"
+        @page-shift="onPageShift"
+    ></paginate-control>
+    <horizontal-ruler></horizontal-ruler>
+    <drop-down>
+        <p slot="header">Options</p>
+        <form>
+            <gapped-row>
+                <row-layout>
+                    <radio-control
+                        imgSrc="image"
+                        @click="onGalleryModeSelected"
+                        $checked="galleryModeEnabled"
+                    >
+                    </radio-control>
+                    <radio-control
+                        imgSrc="list"
+                        @click="onFileManagerModeSelected"
+                        $checked="fileManagerModeEnabled"
+                    ></radio-control>
+                </row-layout>
+                <row-layout>
+                    <radio-control
+                        text="A-Z"
+                        @click="sortByAtoZ"
+                        $checked="sortingByAtoZ"
+                    ></radio-control>
+                    <radio-control
+                        text="Z-A"
+                        @click="sortByZtoA"
+                        $checked="sortingByZtoA"
+                    ></radio-control>
+                    <radio-control
+                        imgSrc="child"
+                        @click="sortByNewest"
+                        $checked="sortingByNewest"
+                    ></radio-control>
+                    <radio-control
+                        imgSrc="elderly"
+                        @click="sortByOldest"
+                        $checked="sortingByOldest"
+                    ></radio-control>
+                </row-layout>
+                <row-layout>
+                    <radio-control
+                        text="20"
+                        @click="setPageSizeTo20"
+                        $checked="pageSizeIs20"
+                    ></radio-control>
+                    <radio-control
+                        text="50"
+                        @click="setPageSizeTo50"
+                        $checked="pageSizeIs50"
+                    ></radio-control>
+                    <radio-control
+                        text="100"
+                        @click="setPageSizeTo100"
+                        $checked="pageSizeIs100"
+                    ></radio-control>
+                    <radio-control
+                        text="250"
+                        @click="setPageSizeTo250"
+                        $checked="pageSizeIs250"
+                    ></radio-control>
+                    <radio-control
+                        text="1000"
+                        @click="setPageSizeTo1000"
+                        $checked="pageSizeIs1000"
+                    ></radio-control>
+                </row-layout>
+            </gapped-row>
+            <row-layout>
+                <switch-control $checked="directoriesFirst" @change="onSortDirectoriesFirstChange">
+                    Directories always first
+                </switch-control>
+            </row-layout>
+        </form>
+    </drop-down>
+
+    <div $data-visibility="fileManagerVisibility">
+        <column-layout id="action-panel">
+            <drop-down>
+                <p slot="header">Quick Buttons</p>
+                <form id="link-form" action="/api/link" method="POST" style="display: none">
+                    <input id="link-paths" name="paths" type="hidden" />
+                </form>
+                <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
+                    <input id="files-to-move" name="files-to-move" type="hidden" />
+                    <input id="destination" name="destination" type="hidden" />
+                </form>
+                <form
+                    id="delete-form"
+                    action="/api/file/remove"
+                    method="POST"
+                    style="display: none"
+                >
+                    <input id="files-to-remove" name="files-to-remove" type="hidden" />
+                </form>
+                <form id="download-form" action="/api/download" method="POST" style="display: none">
+                    <input id="download-input-root" name="root" type="hidden" />
+                    <template id="download-input-template">
+                        <input type="text" name="file" type="hidden" />
+                    </template>
+                </form>
+                <div class="action-buttons">
+                    <button @click="createFileShare" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#share"></use>
+                        </svg>
+                    </button>
+                    <button @click="downloadFiles" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#download"></use>
+                        </svg>
+                    </button>
+                </div>
+                <horizontal-ruler></horizontal-ruler>
+                <div class="action-buttons">
+                    <button @click="cutFiles" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#content_cut"></use>
+                        </svg>
+                    </button>
+                    <button @click="pasteFiles" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#content_paste"></use>
+                        </svg>
+                    </button>
+                    <button @click="resetCuttingBoard" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#undo"></use>
+                        </svg>
+                    </button>
+                    <button @click="deleteFiles" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#delete"></use>
+                        </svg>
+                    </button>
+                </div>
+                <horizontal-ruler></horizontal-ruler>
+                <div class="action-buttons">
+                    <button @click="gotoUpload" type="button">
+                        <svg class="medium-icon">
+                            <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
+                        </svg>
+                    </button>
+                </div>
+            </drop-down>
+            <drop-down>
+                <p slot="header">Rename</p>
+                <form action="/api/file/rename" method="POST" id="rename-form">
+                    <input id="source" name="source" type="hidden" />
+                    <p>
+                        Select a single file to rename, input the new name of the file, then submit.
+                    </p>
+                    <fieldset>
+                        <legend>New Name of File</legend>
+                        <input id="target" name="target" type="text" />
+                    </fieldset>
+                    <fieldset>
+                        <button @click="renameFile" type="button">Rename</button>
+                    </fieldset>
+                </form>
+            </drop-down>
+            <drop-down>
+                <p slot="header">Make Directory</p>
+                <form id="make-directory-form" action="/api/directory/make" method="POST">
+                    <input type="hidden" name="path" id="make-directory-path" />
+                    <fieldset>
+                        <legend>Directory Name</legend>
+                        <input type="text" name="name" id="name" />
+                    </fieldset>
+                    <fieldset>
+                        <button @click="makeDirectory" type="button">Create Directory</button>
+                    </fieldset>
+                </form>
+            </drop-down>
+        </column-layout>
+    </div>
+</app-main>
+{{ template "base-footer.html" . }}

@@ -1,0 +1,39 @@
+{{ template "base-header.html" . }}
+<script type="module">
+    const megaphone = new Megaphone();
+    megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
+    const code = getUrlParam('code');
+    const state = megaphone.declareState({
+        fileData: megaphone.jsonApi(`/api/share-file/list?code=${code}`, []),
+    });
+
+    megaphone.renderEach(
+        state.fileData,
+        '#file-list',
+        megaphone.template('#file-row', (fileRow, fileLink, index) => {
+            const link = fileRow.querySelector('a');
+
+            link.text = fileLink;
+            link.href = `/api/share-file/download?code=${code}&index=${index}`;
+
+            return fileRow;
+        })
+    );
+    megaphone.init();
+
+    state.fileData = await getFilesFromParams();
+</script>
+<app-main>
+    <app-header>Shared Files</app-header>
+    <p>
+        <b>Instructions:</b> This is the share link, by copying the URL and giving it to a friend,
+        you are able to share this view with them. They can only access what is shown here.
+    </p>
+    <ul id="file-list">
+        <template id="file-row">
+            <li><a></a></li>
+        </template>
+    </ul>
+</app-main>
+{{ template "base-footer.html" . }}

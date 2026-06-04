@@ -1,0 +1,159 @@
+{{ template "base-header.html.html" }}
+<app-main>
+    <script type="module">
+        const megaphone = new Megaphone();
+        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
+        const state = megaphone.declareState({
+            message: megaphone.urlParam('message', null),
+            hasMessage: megaphone.view((state) => state.message !== null),
+            permissions: megaphone.jsonApi('/api/admin/capabilities', {}),
+            diskUsage: megaphone.jsonApi('/api/admin/disk-usage', {
+                path: '???',
+                available: '???',
+            }),
+            diskMountpoint: megaphone.view((state) => state.diskUsage.path || '???'),
+            availableBytesInDisk: megaphone.view((state) => state.diskUsage.available || '???'),
+            allowHousekeeping: megaphone.view(
+                (state) => state.permissions.allowHousekeeping || false
+            ),
+            allowHousekeepingVisibility: megaphone.view((state) =>
+                state.allowHousekeeping ? 'show' : 'hidden'
+            ),
+            modules: megaphone.jsonApi('/api/admin/modules', []),
+        });
+
+        megaphone.renderEach(
+            state.modules,
+            '#modules-list',
+            megaphone.template('#module-item-template', (clone, mod) => {
+                clone.querySelector('.module-name').textContent = mod.name;
+                clone.querySelector('.module-description').textContent = mod.description;
+                const form = clone.querySelector('form');
+                const btn = clone.querySelector('.module-action-btn');
+                clone.querySelector('.module-name-input').value = mod.name;
+                let statusText, statusCircle;
+                if (!mod.isAvailable) {
+                    statusText = 'Unavailable';
+                    statusCircle = '⚫';
+                    btn.textContent = 'Activate';
+                    btn.disabled = true;
+                } else if (mod.isActivated) {
+                    statusText = 'Activated';
+                    statusCircle = '🟢';
+                    btn.textContent = 'Deactivate';
+                    form.action = '/api/admin/modules/deactivate';
+                } else {
+                    statusText = 'Deactivated';
+                    statusCircle = '🔴';
+                    btn.textContent = 'Activate';
+                    form.action = '/api/admin/modules/activate';
+                }
+                clone.querySelector('.module-status').textContent =
+                    `Status: ${statusText} ${statusCircle}`;
+                return clone;
+            })
+        );
+
+        megaphone.renderIf(
+            state.hasMessage,
+            '#message-display',
+            megaphone.template('#message-template', (clone) => {
+                const messageEl = clone.querySelector('.message');
+                messageEl.textContent = state.message.value;
+                const clsName = state.message.value.toLocaleLowerCase().includes('error')
+                    ? 'error'
+                    : 'success';
+                messageEl.className = `message ${clsName}`;
+                return clone;
+            })
+        );
+
+        megaphone.init();
+    </script>
+
+    <app-header>Admin</app-header>
+    <section>
+        <p>Administrative actions for managing the FFS file server.</p>
+        <p>
+            Mounted to <span $textContent="diskMountpoint"></span> and
+            <span $textContent="availableBytesInDisk"></span> are available.
+        </p>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section $data-visibility="allowHousekeepingVisibility">
+        <h2>Optional Modules</h2>
+        <p>Enable or disable optional server modules.</p>
+        <ul id="modules-list">
+            <template id="module-item-template">
+                <li>
+                    <strong class="module-name"></strong>
+                    <p class="module-description"></p>
+                    <p class="module-status"></p>
+                    <form method="post">
+                        <input type="hidden" name="name" class="module-name-input" />
+                        <fieldset>
+                            <button type="submit" class="module-action-btn">Activate</button>
+                        </fieldset>
+                    </form>
+                </li>
+            </template>
+        </ul>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section $data-visibility="allowHousekeepingVisibility">
+        <h2>Thumbnails</h2>
+        <p>Remove all cached thumbnail images. These will be regenerated when files are viewed.</p>
+        <form action="/api/admin/clear-thumbnails" method="post">
+            <fieldset>
+                <button type="submit">Clear Thumbnails</button>
+            </fieldset>
+        </form>
+
+        <horizontal-ruler></horizontal-ruler>
+
+        <h2>Share Links</h2>
+        <p>
+            Remove all share links.
+            <strong
+                >Warning: existing share links will no longer be accessible after clearing.</strong
+            >
+        </p>
+        <form action="/api/admin/clear-manifests" method="post">
+            <fieldset>
+                <button type="submit">Clear Share Links</button>
+            </fieldset>
+        </form>
+    </section>
+
+    <horizontal-ruler></horizontal-ruler>
+
+    <section id="message-display">
+        <template id="message-template">
+            <div class="message"></div>
+            <style>
+                .message {
+                    padding: 1rem;
+                    margin: 1rem 0;
+                    border-radius: 4px;
+                    border: 1px solid;
+                }
+                .message.success {
+                    background-color: #d4edda;
+                    border-color: #c3e6cb;
+                    color: #155724;
+                }
+                .message.error {
+                    background-color: #f8d7da;
+                    border-color: #f5c6cb;
+                    color: #721c24;
+                }
+            </style>
+        </template>
+    </section>
+</app-main>
+{{ template "base-footer.html" . }}
