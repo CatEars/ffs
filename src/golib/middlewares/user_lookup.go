@@ -16,6 +16,9 @@ type userClaimsKey string
 
 func LookupClaims(r *http.Request) []*security.Claim {
 	claims := r.Context().Value(userClaimsKey("claims"))
+	if claims == nil {
+		return []*security.Claim{}
+	}
 	return claims.([]*security.Claim)
 }
 
