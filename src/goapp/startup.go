@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -39,7 +40,15 @@ func RunStartup() {
 	}
 
 	if config.Config.DevMode() {
-		config.Config.SetConfig("FFS_USERS_FILE", path.Join("..", "data", "users-file.json"))
+		cwd, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		err = os.Chdir(filepath.Dir(cwd))
+		if err != nil {
+			panic(err)
+		}
+		config.Config.SetConfig("FFS_USERS_FILE", path.Join("data", "users-file.json"))
 	}
 
 	storeRoot := config.Config.StoreRoot()

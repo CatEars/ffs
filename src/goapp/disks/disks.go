@@ -2,10 +2,30 @@ package disks
 
 import (
 	diskusage "catears/ffs/lib/disk-usage"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 )
+
+type DiskAndFolder struct {
+	DiskIdx int
+	Path    string
+}
+
+func (diskAndFolder *DiskAndFolder) ConvertToFs() (fs.FS, error) {
+	if diskAndFolder.DiskIdx > len(disks) {
+		return nil, fmt.Errorf("No disk matching index %d", diskAndFolder.DiskIdx)
+	}
+
+	disk := disks[diskAndFolder.DiskIdx]
+	filesystem := disk.Fs()
+	if diskAndFolder.Path == "." {
+		return filesystem, nil
+	}
+
+	return fs.Sub(filesystem, diskAndFolder.Path)
+}
 
 type Disk interface {
 	Fs() fs.FS

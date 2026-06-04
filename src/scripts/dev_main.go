@@ -27,8 +27,8 @@ func DevMain() {
 	os.Setenv("FFS_CUSTOM_COMMANDS_FILE", "data/sample-custom-commands.json")
 	os.Setenv("FFS_INSTANCE_SECRET", "VerySecretIndeed")
 	os.Setenv("FFS_THUMBNAIL_FINDER_SKIP_REGEX", "(test_no_thumbnails_images|\\.no_thumbnail\\.)")
-	os.Setenv("FFS_CERT_FILE", "../data/dev-cert.pem")
-	os.Setenv("FFS_CERT_KEY_FILE", "../data/dev-cert.key.pem")
+	os.Setenv("FFS_CERT_FILE", "data/dev-cert.pem")
+	os.Setenv("FFS_CERT_KEY_FILE", "data/dev-cert.key.pem")
 	ctx, cancel := context.WithCancel(context.Background())
 
 	wd, err := os.Getwd()

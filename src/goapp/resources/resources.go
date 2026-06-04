@@ -13,4 +13,6 @@ var CanSeeLogsTabClaim = AppTabsResources.GetClaim(security.StandardAccess.Read(
 var CanSeeShareTabClaim = AppTabsResources.GetClaim(security.StandardAccess.Read(), "Share")
 var CanSeeCustomCommandsTabClaim = AppTabsResources.GetClaim(security.StandardAccess.Read(), "CustomCommands")
 
+var DiskResources = security.NewResourceManager("Disk")
+
 var UserResource = security.NewResourceManager("User")
