@@ -3,7 +3,6 @@ package file
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
-	"catears/ffs/goapp/disks"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"encoding/json"
@@ -29,8 +28,8 @@ type fileToRemove struct {
 }
 
 func (*removeFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	diskFromRequest := r.Context().Value(appmiddlewares.GetDiskAndFolderKey())
-	if diskFromRequest == nil {
+	diskAndFolder, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -42,14 +41,13 @@ func (*removeFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filesToRemove := &[]fileToRemove{}
-	err := json.Unmarshal([]byte(filesToRemoveRaw), filesToRemove)
+	err = json.Unmarshal([]byte(filesToRemoveRaw), filesToRemove)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	diskAndFolder := diskFromRequest.(*disks.DiskAndFolder)
-	remover, err := diskAndFolder.ConvertToRemover()
+	remover, err := diskAndFolder.ConvertToModFS()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

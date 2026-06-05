@@ -7,6 +7,8 @@ import (
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -17,6 +19,19 @@ type diskAndFolderKey string
 
 func GetDiskAndFolderKey() diskAndFolderKey {
 	return diskAndFolderKey("diskandfolderkey")
+}
+
+func GetDiskAndFolderFromRequest(r *http.Request) (*disks.DiskAndFolder, error) {
+	val := r.Context().Value(GetDiskAndFolderKey())
+	if val == nil {
+		return nil, errors.New("No disk and folder set in request")
+	}
+
+	v, ok := val.(*disks.DiskAndFolder)
+	if !ok {
+		return nil, fmt.Errorf("Failed to cast %s to DiskAndFolder", val)
+	}
+	return v, nil
 }
 
 func diskIndexFromRequest(r *http.Request) int {

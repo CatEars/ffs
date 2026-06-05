@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -27,7 +26,6 @@ func ReturnToSender(w http.ResponseWriter, r *http.Request, searchParams ...Sear
 	if err != nil {
 		parsed.Path = "/"
 	}
-	log.Printf("Referer: %s", referer)
 	redirectUrl := url.URL{}
 	redirectUrl.Path = parsed.Path
 

@@ -27,22 +27,29 @@ func (diskAndFolder *DiskAndFolder) ConvertToFs() (fs.FS, error) {
 	return fs.Sub(filesystem, diskAndFolder.Path)
 }
 
-func (diskAndFolder *DiskAndFolder) ConvertToRemover() (Remover, error) {
+func (diskAndFolder *DiskAndFolder) ConvertToModFS() (ModFS, error) {
 	if diskAndFolder.DiskIdx > len(disks) {
 		return nil, fmt.Errorf("No disk matching index %d", diskAndFolder.DiskIdx)
 	}
 
 	disk := disks[diskAndFolder.DiskIdx]
-	return disk.RemoverFrom(diskAndFolder.Path)
+	mod, err := disk.ModFs()
+	if err != nil {
+		return nil, err
+	}
+
+	return mod.Sub(diskAndFolder.Path)
 }
 
-type Remover interface {
+type ModFS interface {
+	Rename(source, destination string) error
 	Remove(path string) error
+	Sub(path string) (ModFS, error)
 }
 
 type Disk interface {
 	Fs() fs.FS
-	RemoverFrom(path string) (Remover, error)
+	ModFs() (ModFS, error)
 	Usage() (diskusage.DiskStat, error)
 	Descriptor() string
 }
@@ -79,13 +86,38 @@ func (d *physicalDisk) Usage() (diskusage.DiskStat, error) {
 	return diskusage.GetDiskUsage(d.root)
 }
 
-func (d *physicalDisk) RemoverFrom(path string) (Remover, error) {
-	root, err := os.OpenRoot(d.root)
+type modFS struct {
+	root *os.Root
+}
+
+func (mod *modFS) Rename(source, destination string) error {
+	return mod.root.Rename(source, destination)
+}
+
+func (mod *modFS) Remove(path string) error {
+	return mod.root.Remove(path)
+}
+
+func (mod *modFS) Sub(path string) (ModFS, error) {
+	newRoot, err := mod.root.OpenRoot(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return root.OpenRoot(path)
+	return &modFS{
+		root: newRoot,
+	}, nil
+}
+
+func (d *physicalDisk) ModFs() (ModFS, error) {
+	r, err := os.OpenRoot(d.root)
+	if err != nil {
+		return nil, err
+	}
+
+	return &modFS{
+		root: r,
+	}, nil
 }
 
 func (d *physicalDisk) Descriptor() string {
