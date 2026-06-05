@@ -8,6 +8,7 @@ import (
 	"catears/ffs/lib/security"
 	"context"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -38,7 +39,7 @@ func RequireDiskAndFolder(accessLevel security.AccessLevel) router.Middleware {
 			}
 			path = strings.TrimPrefix(path, "./")
 
-			elems := strings.Split(path, "/")
+			elems := strings.Split(filepath.Clean(path), string(filepath.Separator))
 			hierarchy := []string{strconv.Itoa(diskIdx)}
 			hierarchy = append(hierarchy, elems...)
 

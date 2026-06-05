@@ -27,8 +27,22 @@ func (diskAndFolder *DiskAndFolder) ConvertToFs() (fs.FS, error) {
 	return fs.Sub(filesystem, diskAndFolder.Path)
 }
 
+func (diskAndFolder *DiskAndFolder) ConvertToRemover() (Remover, error) {
+	if diskAndFolder.DiskIdx > len(disks) {
+		return nil, fmt.Errorf("No disk matching index %d", diskAndFolder.DiskIdx)
+	}
+
+	disk := disks[diskAndFolder.DiskIdx]
+	return disk.RemoverFrom(diskAndFolder.Path)
+}
+
+type Remover interface {
+	Remove(path string) error
+}
+
 type Disk interface {
 	Fs() fs.FS
+	RemoverFrom(path string) (Remover, error)
 	Usage() (diskusage.DiskStat, error)
 	Descriptor() string
 }
@@ -63,6 +77,15 @@ func (d *physicalDisk) Fs() fs.FS {
 
 func (d *physicalDisk) Usage() (diskusage.DiskStat, error) {
 	return diskusage.GetDiskUsage(d.root)
+}
+
+func (d *physicalDisk) RemoverFrom(path string) (Remover, error) {
+	root, err := os.OpenRoot(d.root)
+	if err != nil {
+		return nil, err
+	}
+
+	return root.OpenRoot(path)
 }
 
 func (d *physicalDisk) Descriptor() string {
