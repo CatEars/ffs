@@ -24,13 +24,6 @@ func buildUserTabs(r *http.Request) []AppTab {
 		})
 	}
 
-	if checkTabClaim(claims, resources.CanSeeCustomCommandsTabClaim) {
-		tabs = append(tabs, AppTab{
-			Name: "Commands",
-			Link: "/custom-commands/",
-		})
-	}
-
 	if checkTabClaim(claims, resources.CanSeeShareTabClaim) {
 		tabs = append(tabs, AppTab{
 			Name: "Share",
