@@ -48,13 +48,8 @@ func sendSinglePath(w http.ResponseWriter, r *http.Request, root fs.FS, filePath
 	return nil
 }
 
-func sendAsArchive(w http.ResponseWriter, root fs.FS, filePaths []string) error {
-	stat, err := fs.Stat(root, ".")
-	if err != nil {
-		return err
-	}
-
-	name := stat.Name()
+func sendAsArchive(w http.ResponseWriter, root fs.FS, filePaths []string, options *SendFilesSmartlyOptions) error {
+	name := options.NameHint
 	setDownloadedFilename(w, name+".tar.gz")
 	w.Header().Add("Content-Type", "application/gzip")
 
@@ -93,7 +88,11 @@ func sendAsArchive(w http.ResponseWriter, root fs.FS, filePaths []string) error 
 	return nil
 }
 
-func SendFilesSmartly(w http.ResponseWriter, r *http.Request, root fs.FS, filePaths []string) error {
+type SendFilesSmartlyOptions struct {
+	NameHint string
+}
+
+func SendFilesSmartly(w http.ResponseWriter, r *http.Request, root fs.FS, filePaths []string, options *SendFilesSmartlyOptions) error {
 	if len(filePaths) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		return nil
@@ -102,6 +101,6 @@ func SendFilesSmartly(w http.ResponseWriter, r *http.Request, root fs.FS, filePa
 	if len(filePaths) == 1 {
 		return sendSinglePath(w, r, root, filePaths[0])
 	} else {
-		return sendAsArchive(w, root, filePaths)
+		return sendAsArchive(w, root, filePaths, options)
 	}
 }

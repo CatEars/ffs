@@ -41,6 +41,14 @@ func (diskAndFolder *DiskAndFolder) ConvertToModFS() (ModFS, error) {
 	return mod.Sub(diskAndFolder.Path)
 }
 
+func (diskAndFolder *DiskAndFolder) ConvertToDisk() (Disk, error) {
+	if diskAndFolder.DiskIdx > len(disks) {
+		return nil, fmt.Errorf("No disk matching index %d", diskAndFolder.DiskIdx)
+	}
+
+	return disks[diskAndFolder.DiskIdx], nil
+}
+
 type ModFS interface {
 	Mkdir(path string, perm os.FileMode) error
 	Rename(source, destination string) error
