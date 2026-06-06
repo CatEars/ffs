@@ -42,6 +42,7 @@ func (diskAndFolder *DiskAndFolder) ConvertToModFS() (ModFS, error) {
 }
 
 type ModFS interface {
+	Mkdir(path string, perm os.FileMode) error
 	Rename(source, destination string) error
 	Remove(path string) error
 	Sub(path string) (ModFS, error)
@@ -107,6 +108,10 @@ func (mod *modFS) Sub(path string) (ModFS, error) {
 	return &modFS{
 		root: newRoot,
 	}, nil
+}
+
+func (mod *modFS) Mkdir(path string, perm os.FileMode) error {
+	return mod.root.Mkdir(path, perm)
 }
 
 func (d *physicalDisk) ModFs() (ModFS, error) {

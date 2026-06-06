@@ -3,7 +3,6 @@ package file
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
-	"catears/ffs/goapp/disks"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"net/http"
@@ -26,14 +25,13 @@ func (*fileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	p = strings.TrimPrefix(p, "./")
 
-	diskAndIdx := r.Context().Value(appmiddlewares.GetDiskAndFolderKey())
-	if diskAndIdx == nil {
+	disk, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	d := diskAndIdx.(*disks.DiskAndFolder)
-	f, err := d.ConvertToFs()
+	f, err := disk.ConvertToFs()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

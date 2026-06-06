@@ -17,12 +17,10 @@ import (
 
 type diskAndFolderKey string
 
-func GetDiskAndFolderKey() diskAndFolderKey {
-	return diskAndFolderKey("diskandfolderkey")
-}
+const diskAndFolderKeyConstant diskAndFolderKey = diskAndFolderKey("diskandfolderkey")
 
 func GetDiskAndFolderFromRequest(r *http.Request) (*disks.DiskAndFolder, error) {
-	val := r.Context().Value(GetDiskAndFolderKey())
+	val := r.Context().Value(diskAndFolderKeyConstant)
 	if val == nil {
 		return nil, errors.New("No disk and folder set in request")
 	}
@@ -69,7 +67,7 @@ func RequireDiskAndFolder(accessLevel security.AccessLevel) router.Middleware {
 				DiskIdx: diskIdx,
 				Path:    path,
 			}
-			ctx := context.WithValue(r.Context(), GetDiskAndFolderKey(), diskAndFolder)
+			ctx := context.WithValue(r.Context(), diskAndFolderKeyConstant, diskAndFolder)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
