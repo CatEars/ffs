@@ -8,7 +8,7 @@ if [ ! -f "$TARGET_FILE" ]; then
     touch "$TARGET_FILE"
     echo "#!/bin/bash" > "$TARGET_FILE"
     echo "# Go environment configuration" >> "$TARGET_FILE"
-    echo 'export GOROOT="$HOME/go"' >> "$TARGET_FILE"
+    echo 'export GOROOT="$HOME/go-install"' >> "$TARGET_FILE"
 fi
 
 SOURCE_SNIPPET="if [ -f \"$TARGET_FILE\" ]; then . \"$TARGET_FILE\"; fi"

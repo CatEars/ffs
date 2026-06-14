@@ -9,7 +9,7 @@ $THIS_SCRIPT_DIR/download-go.sh
 TAR_NAME="go$VERSION.linux-amd64.tar.gz"
 TAR_LOCATION="./data/vendor/$TAR_NAME"
 BIN_DIR="$HOME/.local/bin"
-GO_INSTALL_DIR="$HOME/go"
+GO_INSTALL_DIR="$HOME/go-install"
 
 if [[ -d "$GO_INSTALL_DIR" ]];
 then
