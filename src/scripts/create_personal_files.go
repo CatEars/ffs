@@ -6,7 +6,7 @@ import (
 
 func CreatePersonalFiles() {
 	filesToCreate := []string{
-		"./src/app/website/templates/base.personal.html",
+		"./src/goapp/website/templates/base.personal.html",
 	}
 
 	for _, filePath := range filesToCreate {

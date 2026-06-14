@@ -35,7 +35,7 @@ cp $TAR_LOCATION $WORKDIR
 pushd $WORKDIR
 echo "Extracting $TAR_NAME"
 tar -xf $TAR_NAME
-mv go $(dirname $GO_INSTALL_DIR)
+mv go $GO_INSTALL_DIR
 mkdir -p $BIN_DIR
 
 echo "Linking go to $BIN_DIR/go from $GO_INSTALL_DIR/bin/go"

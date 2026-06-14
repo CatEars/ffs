@@ -15,11 +15,7 @@ func Fatal(err error) {
 }
 
 func Touch(path string) error {
-	_, err := os.Stat(path)
-	if err == nil {
-		os.Remove(path)
-	}
-
+	os.Remove(path)
 	f, err := os.Create(path)
 	if err != nil {
 		return err
