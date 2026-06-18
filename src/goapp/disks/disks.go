@@ -3,9 +3,12 @@ package disks
 import (
 	diskusage "catears/ffs/lib/disk-usage"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 )
 
 type DiskAndFolder struct {
@@ -54,6 +57,11 @@ type ModFS interface {
 	Rename(source, destination string) error
 	Remove(path string) error
 	Sub(path string) (ModFS, error)
+	Create(path string) (io.WriteCloser, error)
+}
+
+type ModFSWithLocation interface {
+	AbsPath(path string) (string, error)
 }
 
 type Disk interface {
@@ -96,7 +104,8 @@ func (d *physicalDisk) Usage() (diskusage.DiskStat, error) {
 }
 
 type modFS struct {
-	root *os.Root
+	root     *os.Root
+	rootPath string
 }
 
 func (mod *modFS) Rename(source, destination string) error {
@@ -107,19 +116,43 @@ func (mod *modFS) Remove(path string) error {
 	return mod.root.Remove(path)
 }
 
-func (mod *modFS) Sub(path string) (ModFS, error) {
-	newRoot, err := mod.root.OpenRoot(path)
+func (mod *modFS) Sub(fpath string) (ModFS, error) {
+	newRoot, err := mod.root.OpenRoot(fpath)
+	if err != nil {
+		return nil, err
+	}
+
+	newPath, err := mod.AbsPath(fpath)
 	if err != nil {
 		return nil, err
 	}
 
 	return &modFS{
-		root: newRoot,
+		root:     newRoot,
+		rootPath: newPath,
 	}, nil
 }
 
 func (mod *modFS) Mkdir(path string, perm os.FileMode) error {
 	return mod.root.Mkdir(path, perm)
+}
+
+func (mod *modFS) Create(path string) (io.WriteCloser, error) {
+	return mod.root.Create(path)
+}
+
+func (mod *modFS) AbsPath(fpath string) (string, error) {
+	newPath := path.Join(mod.rootPath, path.Clean(fpath))
+	relPath, err := filepath.Rel(mod.rootPath, newPath)
+	if err != nil {
+		return "", err
+	}
+
+	if strings.HasPrefix(relPath, "..") {
+		return "", fmt.Errorf("Sub may not access outside its root, attempted %s + %s", mod.rootPath, fpath)
+	}
+
+	return newPath, nil
 }
 
 func (d *physicalDisk) ModFs() (ModFS, error) {
@@ -128,8 +161,14 @@ func (d *physicalDisk) ModFs() (ModFS, error) {
 		return nil, err
 	}
 
+	absPath, err := filepath.Abs(d.root)
+	if err != nil {
+		return nil, err
+	}
+
 	return &modFS{
-		root: r,
+		root:     r,
+		rootPath: absPath,
 	}, nil
 }
 

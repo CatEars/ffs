@@ -38,18 +38,6 @@ func writeContent(t *testing.T, booking Booking) string {
 	return expectedContent.String()
 }
 
-func TestBookingCanBeCreatedWrittenToAndFinalizedWithMove(t *testing.T) {
-	booking := createAndGetBooking(t)
-	expectedContent := writeContent(t, booking)
-
-	fpath := path.Join(os.TempDir(), rand.Text())
-	defer os.Remove(fpath)
-	err := booking.Move(fpath)
-	assert.Nil(t, err)
-	finalContent, err := os.ReadFile(fpath)
-	assert.Equal(t, string(finalContent), expectedContent)
-}
-
 func TestBookingCanBeReadViaReaderOnceFinalizedWithReader(t *testing.T) {
 	booking := createAndGetBooking(t)
 	expectedContent := writeContent(t, booking)

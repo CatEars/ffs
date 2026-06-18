@@ -99,7 +99,8 @@
                 const data = JSON.parse(e.data);
                 if (data.type === 'uploaded') {
                     const authToken = data.authToken;
-                    await postJson('/api/upload/commit', { token: authToken });
+                    const { directory, fileName } = idToDirAndFilename[authToken];
+                    await postJson('/api/upload/commit', { token: authToken, directory, fileName });
                     markUploadFinished(authToken);
                 } else if (data.type === 'progress') {
                     updateUploadProgress(data.authToken, data.totalBytesSent);
@@ -115,11 +116,12 @@
             fileInput.value = '';
             state.names = [];
             for (const file of files) {
-                const bookingResponse = await postJson('/api/upload/book', {
+                const bookingResponse = await postJson('/api/upload/book');
+                const booking = await bookingResponse.json();
+                idToDirAndFilename[booking.authToken] = {
                     directory: state.uploadDirectory.value,
                     fileName: file.name,
-                });
-                const booking = await bookingResponse.json();
+                };
                 createUploadProgress({
                     name: file.name,
                     token: booking.authToken,
@@ -152,6 +154,8 @@
 
         const megaphone = new Megaphone();
         megaphone.declareCsrfCookie('FFS-Csrf-Protection');
+
+        const idToDirAndFilename = new Map();
 
         const state = megaphone.declareState({
             uploadDirectory: megaphone.urlParam('path'),

@@ -21,6 +21,8 @@ type Router interface {
 
 	With(middlewares ...Middleware) Router
 
+	Without() Router
+
 	MatchAndCall(w http.ResponseWriter, r *http.Request) bool
 }
 
@@ -106,6 +108,13 @@ func (router *baseRouter) With(middlewares ...Middleware) Router {
 	}
 }
 
+func (router *baseRouter) Without() Router {
+	return &baseRouter{
+		middlewareChain: []Middleware{},
+		routes:          router.routes,
+	}
+}
+
 func (router *baseRouter) MatchAndCall(w http.ResponseWriter, r *http.Request) bool {
 	matchingRoute := router.match(r.Method, r.URL.Path)
 	if matchingRoute == nil {
@@ -154,6 +163,10 @@ func (router *wrappingRouter) With(middlewares ...Middleware) Router {
 		middlewareChain: middlewares,
 		wrappedRouter:   router,
 	}
+}
+
+func (router *wrappingRouter) Without() Router {
+	return router.wrappedRouter.Without()
 }
 
 func (router *wrappingRouter) MatchAndCall(w http.ResponseWriter, r *http.Request) bool {

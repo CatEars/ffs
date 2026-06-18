@@ -25,7 +25,12 @@ type Booking interface {
 	CreatedAt() time.Time
 	Writer() io.WriteCloser
 	Reader() io.ReadSeekCloser
-	Move(targetPath string) error
+	Close() error
+	Clean() error
+}
+
+type BookingWithLocation interface {
+	AbsPath() string
 }
 
 type booking struct {
@@ -54,14 +59,13 @@ func (booking *booking) Close() error {
 	return booking.file.Close()
 }
 
-func (booking *booking) Move(targetPath string) error {
-	err := booking.Close()
-	if err != nil {
-		return err
-	}
+func (booking *booking) AbsPath() string {
+	return booking.file.Name()
+}
 
-	fpath := booking.file.Name()
-	return os.Rename(fpath, targetPath)
+func (booking *booking) Clean() error {
+	booking.file.Close()
+	return os.Remove(booking.AbsPath())
 }
 
 type BookingStore interface {
