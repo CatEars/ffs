@@ -32,11 +32,35 @@ When installing and using software he has neither the skills nor interest to tro
 
 ## Problems
 
-...
+### Browse server files
+
+Roles: Carl, Hildegard, Winston
+
+As a computer user, I want a nice, clean, and quick UI to browse and inspect files when on the same network so that I can browse files from another device.
+
+I want to be able to quickly find, view, and download all types of files, including photos and videos.
+
+As a basic user I don't want to be overwhelmed with technical jargon I do not understand.
+
+As an advanced user I want more detailed information per file (e.g. permission bits)
+
+### Install file server
+
+Roles: Carl, Hildegard, Winston
+
+As a computer user intending to install FFS, I want the installation to be smooth.
 
 ## Devices
 
-...
+These are the devices the different personas will interact with FFS from:
+
+- Linux desktop / Firefox, Terminal Emulator
+- Windows desktop / Edge, Terminal Emulator
+- MacOS desktop / Safari
+- Android smartphone / Chrome for Android
+- Android tablet / Chrome for Android
+- iPhone / Safari
+- iPad / Safari
 
 ## Main flows
 
