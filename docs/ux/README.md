@@ -44,11 +44,31 @@ As a basic user I don't want to be overwhelmed with technical jargon I do not un
 
 As an advanced user I want more detailed information per file (e.g. permission bits)
 
-### Install file server
+#### Finding information
+
+As a user, I want to be able to search for files and find them both via their names, and reasonably indexed metadata.
+
+When searching for visual media, I want to see previews of their contents as thumbnails.
+
+### Install FFS
 
 Roles: Carl, Hildegard, Winston
 
 As a computer user intending to install FFS, I want the installation to be smooth.
+
+As a novice user, I want the initial installation packaging to work without any instructions.
+
+As an intermediate user, I want the installation effort to have a clear guide that works.
+
+As an advanced user, I want to get the final configuration quickly and working easy with my existing tools. I want to know any potential risks of the software I am installing.
+
+### Manage files
+
+"Manage" in this context means moving, deleting, renaming, uploading, ...
+
+Roles: Carl, Hildegard, Winston
+
+As a computer user I want to interact with the file server similar to how I would use File Explorer software to explore a desktops local files. I want to be able to move files, rename them, delete them, upload new files, copy files.
 
 ## Devices
 
