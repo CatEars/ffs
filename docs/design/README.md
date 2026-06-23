@@ -8,9 +8,11 @@ An example would be new videos or photos are uploaded, and the thumbnailer shoul
 
 - **Home tab view mode** - The current home tab view is split into a gallery mode and a table mode. The table mode includes more actions, as there is no way to select cards in the gallery mode. How can we make the views structurally equivalent and allow selecting elements in thr gallery mode?
 
+- **Sharing files** - The current way to share a file uses its own view and endpoints. The "best" way would be to utilize code re-use and re-use existing views to do the same job. Ideally, using the same file listing APIs
+
 ## Solution design - Filesystem changes
 
-Finding filesystem changes without a purpose-built API from the OS kernel is tough. There are such APIs, e.g. fanotify, but they seem to require very high levels of user privilege. A level that is unacceptably high for FFS. 
+Finding filesystem changes without a purpose-built API from the OS kernel is tough. There are such APIs, e.g. fanotify, but they seem to require very high levels of user privilege. A level that is unacceptably high for FFS.
 
 Instead we will have to build our own cache and use directory watch systems combined with being smart in our choice of directories to watch. Combine with a "rescan everything" that runs slowly to catch any failures in the watch group.
 
@@ -47,10 +49,12 @@ Run a directory scan every once in a while and refresh the cache partially, guid
 Linux [fanotify](https://man7.org/linux/man-pages/man7/fanotify.7.html).
 
 Pros:
+
 - Supported since a long time ago
 - Able to receive update notifications for a mount or filesystem, not just a directory
 
 Cons:
+
 - Watching more than a directory requires CAP_SYS_ADMIN, a permission not typically granted to "normal" users
 
 Verdict:
@@ -66,7 +70,10 @@ The main reason for the jittering is the initial data loading. We need to find a
 2. View transitions for folder traversals
 3. Test improved core web vitals
 
-
 ## Solution design - Home Tab View Mode
 
 Proton Drive has solved this in a nice way. Selectable square in the upper corner. Lets investigate that as a possible option.
+
+## Solution design - Sharing files
+
+Create a virtual file system that can be serialized to disk as a manifest of shared files and rebuilt on restarts. Make it possible to mount the virtual file system as a separate disk.
