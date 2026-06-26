@@ -1,6 +1,8 @@
 package symlinkfs
 
 import (
+	diskusage "catears/ffs/lib/disk-usage"
+	"catears/ffs/lib/disks"
 	"fmt"
 	"io/fs"
 	"os"
@@ -8,8 +10,36 @@ import (
 	"strings"
 )
 
+type SymlinkFS interface {
+	disks.Disk
+}
+
 type symlinkFs struct {
+	id string
 	symlinks map[string]string
+}
+
+func (s *symlinkFs) Descriptor() string {
+	return s.id
+}
+
+func (s *symlinkFs) Fs() fs.FS {
+	return s
+}
+
+func (s *symlinkFs) Id() string {
+	return fmt.Sprintf("sym://%s", s.id)
+}
+
+func (s *symlinkFs) ModFs() (disks.ModFS, error) {
+	panic("SymlinkFS does not implement ModFS")
+}
+
+func (s *symlinkFs) Usage() (diskusage.DiskStat, error) {
+	for _, entry := range s.symlinks {
+		return diskusage.GetDiskUsage(entry)
+	}
+	panic("Unreachable - SymlinkFS always contains at least one entry")
 }
 
 func (s *symlinkFs) longestMatchingPrefix(name string) (matchedPrefix string, mappedTo string) {
@@ -71,8 +101,31 @@ func (s *symlinkFs) ReadDir(name string) ([]fs.DirEntry, error) {
 	return os.ReadDir(realPath)
 }
 
-func New(symlinks map[string]string) fs.FS {
-	return &symlinkFs{
-		symlinks: symlinks,
+func absPathAllValues(symlinks map[string]string) (map[string]string, error) {
+	res := make(map[string]string)
+	for key, entry := range symlinks {
+		abs, err := filepath.Abs(entry)
+		if err != nil {
+			return nil, err
+		}
+		res[key] = abs
 	}
+
+	return res, nil
+}
+
+func New(id string, symlinks map[string]string) (SymlinkFS, error) {
+	if len(symlinks) <= 0 {
+		return nil, fmt.Errorf("Cannot create SymlinkFS '%s' with empty symlink mapping", id)
+	}
+
+	absedSymlinks, err := absPathAllValues(symlinks)
+	if err != nil {
+		return nil, err
+	}
+
+	return &symlinkFs{
+		id: id,
+		symlinks: absedSymlinks,
+	}, nil
 }

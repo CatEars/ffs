@@ -17,7 +17,9 @@ func createFakeSymlinkFs() fs.FS {
 	symlinks := make(map[string]string)
 	symlinks["/test"] = path.Join(fakeDir, "test")
 	symlinks["/a/"] = path.Join(fakeDir, "a")
-	return New(symlinks)
+
+	symlink, _ := New("test-symlink-fs", symlinks)
+	return symlink.Fs()
 }
 
 func TestSymlinkFs(t *testing.T) {
