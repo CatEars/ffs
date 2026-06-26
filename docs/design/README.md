@@ -77,3 +77,5 @@ Proton Drive has solved this in a nice way. Selectable square in the upper corne
 ## Solution design - Sharing files
 
 Create a virtual file system that can be serialized to disk as a manifest of shared files and rebuilt on restarts. Make it possible to mount the virtual file system as a separate disk.
+
+The Disk interface needs to be extended so that ModFS is not a requirement, but rather an optional capability. If I share a folder with you, I may not be interested in letting you edit, delete, and write files there. These capabilities are hidden inside ModFS so Disk should be able to tell if modification is allowed or not, and this should be reflected to the web app.
