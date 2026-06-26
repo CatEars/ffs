@@ -3,9 +3,10 @@ package main
 import (
 	"catears/ffs/goapp/cache"
 	"catears/ffs/goapp/config"
-	"catears/ffs/goapp/disks"
+	appdisks "catears/ffs/goapp/disks"
 	"catears/ffs/goapp/uploading"
 	bookingstore "catears/ffs/lib/booking-store"
+	"catears/ffs/lib/disks"
 	"log"
 	"os"
 	"path"
@@ -68,7 +69,7 @@ func RunStartup() {
 	}
 	cache.InitializeCacheFolders()
 
-	disks.InitializeDisks(disks.NewPhysicalDisk(config.Config.StoreRoot()))
+	appdisks.InitializeDisks(disks.NewPhysicalDisk(config.Config.StoreRoot()))
 	uploadDisk, err := cache.UploadFolder.Get()
 	if err != nil {
 		panic(err)

@@ -28,7 +28,7 @@ type fileToRemove struct {
 }
 
 func (*removeFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	diskAndFolder, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	disk, err := appmiddlewares.GetDiskFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -47,7 +47,7 @@ func (*removeFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	remover, err := diskAndFolder.ConvertToModFS()
+	remover, err := disk.ModFs()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

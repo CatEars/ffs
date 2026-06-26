@@ -25,18 +25,13 @@ func (*fileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	p = strings.TrimPrefix(p, "./")
 
-	disk, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	disk, err := appmiddlewares.GetDiskFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	f, err := disk.ConvertToFs()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+	f := disk.Fs()
 	http.ServeFileFS(w, r, f, p)
 }
 

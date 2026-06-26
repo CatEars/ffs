@@ -7,6 +7,7 @@ import (
 	"catears/ffs/goapp/resources"
 	"catears/ffs/goapp/uploading"
 	bookingstore "catears/ffs/lib/booking-store"
+	libdisks "catears/ffs/lib/disks"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"encoding/json"
@@ -45,7 +46,7 @@ func (*uploadCommitRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer booking.Clean()
 
-	disk := disks.GetDisk(disks.DiskIndexFromRequest(r))
+	disk := disks.DiskStore.DiskOrDefault(appmiddlewares.DiskIdFromRequest(r))
 
 	modfs, err := disk.ModFs()
 	if err != nil {
@@ -60,7 +61,7 @@ func (*uploadCommitRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bookingWithLocation, ok1 := booking.(bookingstore.BookingWithLocation)
-	modfsWithLocation, ok2 := modfs.(disks.ModFSWithLocation)
+	modfsWithLocation, ok2 := modfs.(libdisks.ModFSWithLocation)
 	if ok1 && ok2 {
 		sourcePath := bookingWithLocation.AbsPath()
 		targetPath, err := modfsWithLocation.AbsPath(data.Filename)

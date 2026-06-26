@@ -24,8 +24,8 @@ func (self *diskUsageRouter) Register(approuter router.Router) {
 }
 
 func (*diskUsageRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	diskIdx := disks.DiskIndexFromRequest(r)
-	disk := disks.GetDisk(diskIdx)
+	diskId := appmiddlewares.DiskIdFromRequest(r)
+	disk := disks.DiskStore.DiskOrDefault(diskId)
 	available, err := disk.Usage()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -33,13 +33,13 @@ func (move *fileToMove) ToSourceAndDest(destination string) (string, string) {
 }
 
 func (*moveFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	diskAndFolder, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	disk, err := appmiddlewares.GetDiskFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	mod, err := diskAndFolder.ConvertToModFS()
+	mod, err := disk.ModFs()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

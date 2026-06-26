@@ -28,13 +28,13 @@ func (*renameFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	disk, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	disk, err := appmiddlewares.GetDiskFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	mod, err := disk.ConvertToModFS()
+	mod, err := disk.ModFs()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

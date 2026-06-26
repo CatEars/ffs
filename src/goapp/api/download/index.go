@@ -6,7 +6,6 @@ import (
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/send"
-	"log"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -41,35 +40,25 @@ func (*downloadRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	disk, err := appmiddlewares.GetDiskAndFolderFromRequest(r)
+	disk, err := appmiddlewares.GetDiskFromRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	f, err := disk.ConvertToFs()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	d, err := disk.ConvertToDisk()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	f := disk.Fs()
 
 	mappedFiles := make([]string, len(filesToDownload))
 	for idx, fname := range filesToDownload {
 		mappedFiles[idx] = path.Join(root, fname)
 	}
 
-	absPath, err := filepath.Abs(path.Clean(path.Join(d.Descriptor(), root)))
+	absPath, err := filepath.Abs(path.Clean(path.Join(disk.Descriptor(), root)))
 	if err != nil {
-		absPath = d.Descriptor()
+		absPath = disk.Descriptor()
 	}
 	base := path.Base(absPath)
 
-	log.Printf("Name: %s", base)
 	send.SendFilesSmartly(w, r, f, mappedFiles, &send.SendFilesSmartlyOptions{
 		NameHint: base,
 	})
