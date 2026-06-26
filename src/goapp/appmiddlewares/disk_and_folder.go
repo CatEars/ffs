@@ -34,10 +34,12 @@ func DiskIdFromRequest(r *http.Request) string {
 	return r.URL.Query().Get("disk")
 }
 
+// TODO: Change this name, folder is not required, only disk
 func RequireDiskAndFolder(accessLevel security.AccessLevel) router.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			diskId := DiskIdFromRequest(r)
+			// TODO: Lets use a default disk and have the middleware select it here.
 			claims := middlewares.LookupClaims(r)
 			diskClaim := resources.DiskResources.GetClaim(security.StandardAccess.Write(), diskId)
 			if !resources.DiskResources.AnyHasAccess(diskClaim, claims...) {
