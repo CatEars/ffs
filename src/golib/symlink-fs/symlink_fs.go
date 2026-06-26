@@ -1,10 +1,11 @@
 package symlinkfs
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
-	"filepath"
 )
 
 type symlinkFs struct {
@@ -29,21 +30,49 @@ func (s *symlinkFs) longestMatchingPrefix(name string) (matchedPrefix string, ma
 	return maxPref, maxMap
 }
 
-/*func (s *symlinkFs) Open(name string) (fs.File, error) {
+func (s *symlinkFs) translateName(name string) (string, error) {
 	absolute, err := filepath.Abs(name)
+	if err != nil {
+		return "", err
+	}
+
+	longestPrefix, mapping := s.longestMatchingPrefix(absolute)
+	if longestPrefix == "" {
+		return "", fmt.Errorf("%s failed to be mapped to any symlinkFs path", name)
+	}
+
+	return mapping + absolute[len(longestPrefix):], nil
+}
+
+func (s *symlinkFs) Open(name string) (fs.File, error) {
+	realPath, err := s.translateName(name)
 	if err != nil {
 		return nil, err
 	}
-}*/
+
+	return os.Open(realPath)
+}
 
 func (s *symlinkFs) Stat(name string) (fs.FileInfo, error) {
+	realPath, err := s.translateName(name)
+	if err != nil {
+		return nil, err
+	}
 
+	return os.Stat(realPath)
 }
 
 func (s *symlinkFs) ReadDir(name string) ([]fs.DirEntry, error) {
-	
+	realPath, err := s.translateName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return os.ReadDir(realPath)
 }
 
-func New() fs.FS {
-	return &symlinkFs{}
+func New(symlinks map[string]string) fs.FS {
+	return &symlinkFs{
+		symlinks: symlinks,
+	}
 }
