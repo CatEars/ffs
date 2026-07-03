@@ -12,7 +12,7 @@ import (
 type fileRouter struct{}
 
 func (self *fileRouter) Register(approuter router.Router) {
-	r := approuter.With(appmiddlewares.RequireDiskAndFolder(security.StandardAccess.Write()))
+	r := approuter.With(appmiddlewares.RequireDisk(security.StandardAccess.Write()))
 
 	r.Get("/api/file", self)
 }

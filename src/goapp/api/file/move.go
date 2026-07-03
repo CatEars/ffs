@@ -17,7 +17,7 @@ type moveFileRouter struct{}
 func (self *moveFileRouter) Register(approuter router.Router) {
 	r := approuter.With(
 		appmiddlewares.CsrfProtect,
-		appmiddlewares.RequireDiskAndFolder(security.StandardAccess.Write()),
+		appmiddlewares.RequireDisk(security.StandardAccess.Write()),
 	)
 
 	r.Post("/api/file/move", self)

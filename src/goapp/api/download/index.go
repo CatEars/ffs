@@ -16,7 +16,7 @@ type downloadRouter struct{}
 func (self *downloadRouter) Register(approuter router.Router) {
 	r := approuter.With(
 		appmiddlewares.CsrfProtect,
-		appmiddlewares.RequireDiskAndFolder(security.StandardAccess.Read()))
+		appmiddlewares.RequireDisk(security.StandardAccess.Read()))
 
 	r.Post("/api/download", self)
 }

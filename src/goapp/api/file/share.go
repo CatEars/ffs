@@ -13,7 +13,7 @@ type shareFileRouter struct{}
 func (self *shareFileRouter) Register(approuter router.Router) {
 	r := approuter.With(
 		appmiddlewares.CsrfProtect,
-		appmiddlewares.RequireDiskAndFolder(security.StandardAccess.Write()))
+		appmiddlewares.RequireDisk(security.StandardAccess.Write()))
 
 	// POST -> Generate link
 	r.Post("/api/file/share", self)
