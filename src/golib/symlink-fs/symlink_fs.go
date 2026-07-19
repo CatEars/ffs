@@ -3,6 +3,7 @@ package symlinkfs
 import (
 	diskusage "catears/ffs/lib/disk-usage"
 	"catears/ffs/lib/disks"
+	"encoding"
 	"fmt"
 	"io/fs"
 	"os"
@@ -12,6 +13,8 @@ import (
 
 type SymlinkFS interface {
 	disks.Disk
+	encoding.TextMarshaler
+	encoding.TextUnmarshaler
 }
 
 type symlinkFs struct {
@@ -112,6 +115,14 @@ func absPathAllValues(symlinks map[string]string) (map[string]string, error) {
 	}
 
 	return res, nil
+}
+
+func (s *symlinkFs) MarshalText() (text []byte, err error) {
+	panic("Not implemented!")
+}
+
+func (s *symlinkFs) UnmarshalText(text []byte) (err error) {
+	panic("Not implemented!")
 }
 
 func New(id string, symlinks map[string]string) (SymlinkFS, error) {

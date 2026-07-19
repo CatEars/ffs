@@ -25,3 +25,8 @@ func createFakeSymlinkFs() fs.FS {
 func TestSymlinkFs(t *testing.T) {
 	fstest.TestFS(createFakeSymlinkFs(), "/test", "/a/test2", "/a/b/c/test3")
 }
+
+func TestSymlinkFsMarshaling(t *testing.T) {
+	fakeFs := createFakeSymlinkFs()
+	
+}
