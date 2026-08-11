@@ -7,6 +7,7 @@ import (
 	_ "catears/ffs/goapp/api/download"
 	_ "catears/ffs/goapp/api/file"
 	_ "catears/ffs/goapp/api/logout"
+	_ "catears/ffs/goapp/api/thumbnail"
 	_ "catears/ffs/goapp/api/upload"
 	_ "catears/ffs/goapp/api/user-logon"
 )
