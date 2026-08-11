@@ -1,0 +1,5 @@
+- As a user with media files on disk where the filenames do not have a clear relationship to the media content, I want thumbnails to be generated for files so that I can easily find what I am looking for
+    - Typical use case: Images from a smartphone or videos named "2022-05-10.mp4"
+- As a user concerned with conserving disk space, I want to be able to skip generating thumbnails entirely
+- As a user with a fairly large file system where I don't browse 90% of it, I only want thumbnails to be generated for files in folders I actually visit
+    - Typical use case: Running FFS on the home folder
