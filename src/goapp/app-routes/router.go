@@ -32,7 +32,7 @@ func addStaticRoutes(appRoutes router.Router, mcr *microphone.Microphone) error 
 		}
 
 		if d.Type().IsRegular() {
-			appRoutes.Get("/static/"+path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			appRoutes.Get("/static/" + path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				http.ServeFileFS(w, r, mcr.StaticFiles, path)
 			}))
 		}
@@ -43,7 +43,7 @@ func addStaticRoutes(appRoutes router.Router, mcr *microphone.Microphone) error 
 
 func addTemplateRoutes(appRoutes router.Router, mcr *microphone.Microphone) {
 	for viewName, t := range mcr.Views {
-		appRoutes.Get("/"+viewName, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		appRoutes.Get("/" + viewName, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			data := r.Context().Value(appmiddlewares.AppStateContextKey()).(*appmiddlewares.AppState)
 			t.ExecuteTemplate(w, viewName, data)
 		}))
