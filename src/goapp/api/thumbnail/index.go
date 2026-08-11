@@ -7,7 +7,7 @@ import (
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"net/http"
-	"path"
+	"os"
 )
 
 type thumbnailRouter struct{}
@@ -24,21 +24,19 @@ func (*thumbnailRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
-	d := path.Dir(filePath)
-	f := path.Base(filePath)
-	// TODO: `filePath` is user input, ensure access
-	thumbnailFolder := cache.ThumbnailsFolder.Sub(d)
-	d, err := thumbnailFolder.Get()
+
+	thumbnailFolder, err := cache.ThumbnailsFolder.Get()
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	// TODO: The file system is based on "disk" abstraction, but thumbnails are not
 	// TODO: notify thumbnail request and prioritize before serving
 
-	expectedThumbnailPath := path.Join(d, f + ".webp")
-	http.ServeFile(w, r, expectedThumbnailPath)
+	thumbnailBase := os.DirFS(thumbnailFolder)
+	expectedThumbnailPath := filePath + ".webp"
+	http.ServeFileFS(w, r, thumbnailBase, expectedThumbnailPath)
 }
 
 func init() {
