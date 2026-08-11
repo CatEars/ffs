@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"time"
 )
 
@@ -36,7 +37,11 @@ func main() {
 	RunStartup()
 	certFile := config.Config.CertFile()
 	keyFile := config.Config.CertKeyFile()
-	if certFile != "" && keyFile != "" {
+	_, certFileErr := os.ReadFile(certFile)
+	_, keyFileErr := os.ReadFile(keyFile)
+	tlsConfigError := certFileErr != nil || keyFileErr != nil
+
+	if !tlsConfigError && certFile != "" && keyFile != "" {
 		cfg := &tls.Config{
 			MinVersion: tls.VersionTLS13,
 			CurvePreferences: []tls.CurveID{
@@ -54,6 +59,7 @@ func main() {
 		}
 		log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 	} else {
+		// TODO: How best to handle "strict" (fail on TLS not configured) vs. "lax" (downgrade on TLS not configured)?
 		log.Fatal(http.ListenAndServe(address, handler))
 	}
 }
