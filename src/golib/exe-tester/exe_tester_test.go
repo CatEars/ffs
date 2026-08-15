@@ -7,7 +7,7 @@ import (
 )
 
 func checkEcho(t *testing.T, regex string, echoArgs ...string) bool {
-	tester := New("echo", echoArgs, *regexp.MustCompile(regex))
+	tester := New("echo", echoArgs, regexp.MustCompile(regex))
 	exists, err := tester.Exists()
 	assert.Nil(t, err)
 	return exists
@@ -22,7 +22,7 @@ func TestReturnsFalseWhenDoesNotMatchOutput(t *testing.T) {
 }
 
 func TestRaisesErrorWhenExecutableDoesNotExist(t *testing.T) {
-	tester := New("echo-but-not-really", []string{"test"}, *regexp.MustCompile(`fish`))
+	tester := New("echo-but-not-really", []string{"test"}, regexp.MustCompile(`fish`))
 	_, err := tester.Exists()
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "executable file not found in $PATH")

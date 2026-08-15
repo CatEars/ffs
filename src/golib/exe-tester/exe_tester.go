@@ -8,7 +8,7 @@ import (
 type TestableExecutable struct {
 	Executable string
 	Args       []string
-	Tester     regexp.Regexp
+	Tester     *regexp.Regexp
 }
 
 func (testable *TestableExecutable) Exists() (bool, error) {
@@ -21,7 +21,7 @@ func (testable *TestableExecutable) Exists() (bool, error) {
 	return testable.Tester.Match(byteOutput), nil
 }
 
-func New(executable string, args []string, tester regexp.Regexp) *TestableExecutable {
+func New(executable string, args []string, tester *regexp.Regexp) *TestableExecutable {
 	return &TestableExecutable{
 		Executable: executable,
 		Args:       args,
