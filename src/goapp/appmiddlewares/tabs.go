@@ -24,13 +24,6 @@ func buildUserTabs(r *http.Request) []AppTab {
 		})
 	}
 
-	if checkTabClaim(claims, resources.CanSeeLogsTabClaim) {
-		tabs = append(tabs, AppTab{
-			Name: "Logs",
-			Link: "/logs/",
-		})
-	}
-
 	if checkTabClaim(claims, resources.CanSeeAdminTabClaim) {
 		tabs = append(tabs, AppTab{
 			Name: "Admin",

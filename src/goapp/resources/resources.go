@@ -9,7 +9,6 @@ var HousekeepingClaim = AdminResource.GetClaim(security.StandardAccess.Write(), 
 var AppTabsResources = security.NewResourceManager("AppTabs")
 var CanSeeAdminTabClaim = AppTabsResources.GetClaim(security.StandardAccess.Read(), "Admin")
 var CanSeeHomeTabClaim = AppTabsResources.GetClaim(security.StandardAccess.Read(), "Home")
-var CanSeeLogsTabClaim = AppTabsResources.GetClaim(security.StandardAccess.Read(), "Logs")
 
 var DiskResources = security.NewResourceManager("Disk")
 
