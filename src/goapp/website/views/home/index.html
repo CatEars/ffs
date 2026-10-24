@@ -200,13 +200,6 @@
             submitForm('#delete-form');
         }
 
-        function createFileShare() {
-            const myPath = getCurrentPath();
-            const paths = getCheckedFiles().map((x) => `${myPath}/${x}`);
-            document.getElementById('link-paths').value = JSON.stringify(paths);
-            submitForm('#link-form');
-        }
-
         function renameFile() {
             const myPath = getCurrentPath();
             const checkedFiles = getCheckedFiles();
@@ -353,7 +346,6 @@
             pasteFiles,
             cutFiles,
             resetCuttingBoard,
-            createFileShare,
             renameFile,
             makeDirectory,
             deleteFiles,
@@ -537,9 +529,6 @@
         <column-layout id="action-panel">
             <drop-down>
                 <p slot="header">Quick Buttons</p>
-                <form id="link-form" action="/api/link" method="POST" style="display: none">
-                    <input id="link-paths" name="paths" type="hidden" />
-                </form>
                 <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
                     <input id="files-to-move" name="files-to-move" type="hidden" />
                     <input id="destination" name="destination" type="hidden" />
@@ -559,11 +548,6 @@
                     </template>
                 </form>
                 <div class="action-buttons">
-                    <button @click="createFileShare" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#share"></use>
-                        </svg>
-                    </button>
                     <button @click="downloadFiles" type="button">
                         <svg class="medium-icon">
                             <use href="/static/svg/sprite_sheet.svg#download"></use>

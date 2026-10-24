@@ -24,13 +24,6 @@ func buildUserTabs(r *http.Request) []AppTab {
 		})
 	}
 
-	if checkTabClaim(claims, resources.CanSeeShareTabClaim) {
-		tabs = append(tabs, AppTab{
-			Name: "Share",
-			Link: "/share-file/",
-		})
-	}
-
 	if checkTabClaim(claims, resources.CanSeeLogsTabClaim) {
 		tabs = append(tabs, AppTab{
 			Name: "Logs",
