@@ -1,9 +1,5 @@
 import { Application } from '@oak/oak/application';
 import { Router } from '@oak/oak/router';
-import { dirname } from '@std/path/dirname';
-import { fromFileUrl } from '@std/path/from-file-url';
-import { join } from 'node:path';
-import { findRouteRegistrationsInFileTree } from '../lib/file-router/register-routes-by-file-tree.ts';
 import {
     FfsApplicationState,
     setPermissionsFromUserOrDefaultToRootAccess,
@@ -32,14 +28,6 @@ setOnUserAuthenticationHook(async (ctx, user) => {
     setPermissionsFromUserOrDefaultToRootAccess(ctx, user.permissions);
     await resolveUserFileTreeFromState(ctx);
 });
-
-const routeRegistrations = await findRouteRegistrationsInFileTree(
-    join(dirname(fromFileUrl(import.meta.url)), 'api'),
-    logger,
-);
-for (const routeRegistrator of routeRegistrations) {
-    await routeRegistrator(router);
-}
 
 app.use(router.routes());
 app.use(router.allowedMethods());
