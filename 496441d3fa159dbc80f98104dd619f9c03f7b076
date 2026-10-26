@@ -1,3 +1,7 @@
+---- overall
+
+[ ] Naming confusion, "directory" or "folder"
+
 ---- go
 
 [ ] Fix cache folders to match typescript code
