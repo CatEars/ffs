@@ -7,6 +7,7 @@ import (
 	"catears/ffs/lib/security"
 	"io/fs"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -54,6 +55,9 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := r.URL.Query().Get("path")
+	// Note: `fs.ReadDir` does not accept "./" at the start
+	// but e.g. "docs/sub/subsub" works
+	p, _ = strings.CutPrefix(p, "./")
 	fsDisk := disk.Fs()
 	res, err := fs.ReadDir(fsDisk, p)
 
@@ -73,7 +77,7 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fileType := "unidentified"
 		svgIconName := "description"
 		if fileInfo.Mode().IsDir() {
-			fileType = "folder"
+			fileType = "directory"
 			svgIconName = "folder"
 		}
 
