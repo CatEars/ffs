@@ -6,13 +6,13 @@ import (
 
 type DiskStore struct {
 	firstDisk Disk
-	disks map[string]Disk
+	disks     map[string]Disk
 }
 
 func NewDiskStore() *DiskStore {
 	return &DiskStore{
 		firstDisk: theUndisk,
-		disks: make(map[string]Disk),
+		disks:     make(map[string]Disk),
 	}
 }
 
@@ -40,4 +40,12 @@ func (store *DiskStore) DiskOrDefault(id string) Disk {
 
 func (store *DiskStore) DefaultDisk() Disk {
 	return store.firstDisk
+}
+
+func (store *DiskStore) AllDisks() []Disk {
+	disks := []Disk{}
+	for _, disk := range store.disks {
+		disks = append(disks, disk)
+	}
+	return disks
 }

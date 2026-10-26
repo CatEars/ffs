@@ -4,6 +4,7 @@ import (
 	"catears/ffs/goapp/cache"
 	"catears/ffs/goapp/config"
 	appdisks "catears/ffs/goapp/disks"
+	"catears/ffs/goapp/thumbnails"
 	"catears/ffs/goapp/uploading"
 	bookingstore "catears/ffs/lib/booking-store"
 	"catears/ffs/lib/disks"
@@ -12,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func resolveCacheFolder() (string, error) {
@@ -34,6 +36,16 @@ func resolveCacheFolder() (string, error) {
 	return os.MkdirTemp("", "ffs-cachedir-*")
 }
 
+var thumbnailDuration time.Duration = time.Minute * 5
+
+func InfinitelyRunThumbnailBackgroundProcess() {
+	log.Println("Starting thumbnail generator")
+	for {
+		thumbnails.FindAndProduceThumbnails()
+		time.Sleep(thumbnailDuration)
+	}
+}
+
 func RunStartup() {
 	d, _ := os.Getwd()
 	log.Printf("Starting go-app from %s", d)
@@ -52,6 +64,8 @@ func RunStartup() {
 			panic(err)
 		}
 		config.Config.SetConfig("FFS_USERS_FILE", path.Join("data", "users-file.json"))
+
+		thumbnailDuration = time.Second * 45
 	}
 
 	storeRoot := config.Config.StoreRoot()
@@ -75,4 +89,6 @@ func RunStartup() {
 		panic(err)
 	}
 	uploading.InitUploadStore(bookingstore.New(uploadDisk))
+
+	go InfinitelyRunThumbnailBackgroundProcess()
 }
