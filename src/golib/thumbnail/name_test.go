@@ -51,7 +51,7 @@ func TestDifferingButSimilarPathsDoNotCollide(t *testing.T) {
 
 func getSubFolder(filePath string) *testableAutofolder {
 	af := newTestableAutofolder()
-	ResolveThumbnailFolder(af, filePath)
+	ResolveThumbnailFolder(af, "default-disk", filePath)
 	return af
 }
 

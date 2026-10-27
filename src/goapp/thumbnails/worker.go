@@ -99,7 +99,8 @@ func isStale(t time.Time) bool {
 	return t.Before(time.Now().Add(-isOldThumbnailDuration))
 }
 
-func walkSingleDiskAndProductThumbnails(disk d.Disk) {
+func walkSingleDiskAndProduceThumbnails(disk d.Disk) {
+	diskId := disk.Id()
 	err := fs.WalkDir(disk.Fs(), ".", func(fpath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -108,7 +109,6 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 		if fpath == "." {
 			return nil
 		}
-
 		// TODO: Disks are an abstraction to provide the ability for non-physical disks
 		// to be present in the disk store. However, ffmpeg integration is based on commands
 		// running locally and thus a conflict between non-physical disks and ffmpeg is born.
@@ -120,7 +120,7 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 
 		replacedPathName := thumbnail.AsThumbnailName(fpath) + ".webp"
 		tempOutputPath := path.Join(tempPathFolder, replacedPathName)
-		sub := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, fpath)
+		sub := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, diskId, fpath)
 		thumbnailFolder := sub.Peek()
 
 		target := path.Join(thumbnailFolder, replacedPathName)
@@ -139,14 +139,7 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 		}
 
 		nailer := getMatchingNailer(fpath)
-		err = nailer.Generate(ctx)
-		if err != nil {
-			return err
-		}
-
-		// TODO: Move this into NailerContext.Success()
-		log.Printf("Created thumbnail for %s", path.Base(fpath))
-		return nil
+		return nailer.Generate(ctx)
 	})
 
 	if err != nil {
@@ -157,6 +150,6 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 func FindAndProduceThumbnails() {
 	disks := disks.DiskStore.AllDisks()
 	for _, disk := range disks {
-		walkSingleDiskAndProductThumbnails(disk)
+		walkSingleDiskAndProduceThumbnails(disk)
 	}
 }

@@ -1,5 +1,7 @@
 package nailers
 
+// TODO: Implement directory nailer
+
 /*
 [2026-10-27] Original TypeScript source:
 import { ensureDir } from '@std/fs/ensure-dir';

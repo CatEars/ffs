@@ -1,5 +1,7 @@
 package nailers
 
+// TODO: Implement audio nailer
+
 /*
 [2026-10-27] Original TypeScript source code:
 

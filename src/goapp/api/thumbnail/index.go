@@ -26,12 +26,17 @@ func (*thumbnailRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: The file system is based on "disk" abstraction, but thumbnails are not
+	disk, err := appmiddlewares.GetDiskFromRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	// TODO: notify thumbnail request and prioritize before serving
 	thumbnailName := thumbnail.AsThumbnailName(filePath)
-	resolvedFolder := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, filePath)
+	resolvedFolder := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, disk.Id(), filePath)
 
-	_, err := os.Stat(resolvedFolder.Peek())
+	_, err = os.Stat(resolvedFolder.Peek())
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return

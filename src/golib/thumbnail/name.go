@@ -13,14 +13,16 @@ func minInt(a int, b int) int {
 	return a
 }
 
-func ResolveThumbnailFolder(base autofolder.AutoFolder, fPath string) autofolder.AutoFolder {
+func ResolveThumbnailFolder(base autofolder.AutoFolder, diskId string, fPath string) autofolder.AutoFolder {
 	// Index the thumbnail folders based on first six symbols of the file name with two levels of folders
 	// For file names shorter than six symbols, just repeat the last symbol to get six symbols in total
 	// We do not want all thumbnails in the same folder, using two levels of indirection should be sufficient
 	fileBasename := path.Base(fPath)
 	fileBasename, _ = strings.CutPrefix(fileBasename, ".")
 	fileBasename, _ = strings.CutSuffix(fileBasename, path.Ext(fileBasename))
-	res := base
+	diskId = strings.ReplaceAll(strings.ReplaceAll(diskId, "_", "__"), "/", "_")
+
+	res := base.Sub(diskId)
 
 	cnt := 0
 	for range 2 {
