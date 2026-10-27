@@ -38,20 +38,12 @@ func DevMain() {
 	err = generateAutoImportCmd.Run()
 	Fatal(err)
 
-	oldCmd := exec.CommandContext(ctx, "deno", "--allow-all", path.Join("src", "app", "main.ts"))
-	oldCmd.Stdout = os.Stdout
-	oldCmd.Stderr = os.Stderr
 	newCmd := exec.CommandContext(ctx, "go", "run", "./goapp")
 	newCmd.Dir = path.Join(wd, "src")
 	newCmd.Stdout = os.Stdout
 	newCmd.Stderr = os.Stderr
 
 	var waitGroup sync.WaitGroup
-	waitGroup.Go(func() {
-		err := oldCmd.Run()
-		fmt.Printf("Deno app exited: %v\n", err)
-		cancel()
-	})
 	waitGroup.Go(func() {
 		err := newCmd.Run()
 		fmt.Printf("Go app exited: %v\n", err)

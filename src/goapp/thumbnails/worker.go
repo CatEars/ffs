@@ -144,6 +144,7 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 			return err
 		}
 
+		// TODO: Move this into NailerContext.Success()
 		log.Printf("Created thumbnail for %s", path.Base(fpath))
 		return nil
 	})

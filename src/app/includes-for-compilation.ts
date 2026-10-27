@@ -1,7 +1,0 @@
-import './thumbnails/worker/background-task.ts';
-import './disk-usage/worker/background-task.ts';
-
-/**
- * This file exists to include *.ts files that need to be included for compilation.
- * Typically worker files
- */

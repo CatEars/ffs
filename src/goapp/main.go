@@ -7,8 +7,6 @@ import (
 	"embed"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"os"
 	"time"
 )
@@ -19,21 +17,17 @@ type FfsHandler struct {
 //go:embed website/*
 var websiteContent embed.FS
 
-var proxyTarget, _ = url.Parse("http://localhost:8081")
-var proxy *httputil.ReverseProxy = httputil.NewSingleHostReverseProxy(proxyTarget)
 var appRouter = approutes.BuildAppRouter(websiteContent)
 
 func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	matched := appRouter.MatchAndCall(w, r)
-	if !matched {
-		proxy.ServeHTTP(w, r)
-	}
+	// TODO: Handle non-matching web calls
+	appRouter.MatchAndCall(w, r)
 }
 
 func main() {
 	handler := &FfsHandler{}
 	address := ":8080"
-	log.Println("Serving GO app with deno proxy on", address)
+	log.Println("Serving GO app on", address)
 	RunStartup()
 	certFile := config.Config.CertFile()
 	keyFile := config.Config.CertKeyFile()

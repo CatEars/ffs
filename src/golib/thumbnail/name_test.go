@@ -88,5 +88,5 @@ func TestResolveThumbnailFolderWithDotfile(t *testing.T) {
 	af := getSubFolder(".bashrc")
 	assert.Equal(t, len(af.Subs), 2)
 	assert.Equal(t, af.Subs[0], "bas")
-	assert.Equal(t, af.Subs[0], "hrc")
+	assert.Equal(t, af.Subs[1], "hrc")
 }
