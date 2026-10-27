@@ -118,12 +118,12 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 			return err
 		}
 
-		replacedPathName := thumbnail.AsThumbnailName(fpath)
-		tempOutputPath := path.Join(tempPathFolder, replacedPathName+".webp")
+		replacedPathName := thumbnail.AsThumbnailName(fpath) + ".webp"
+		tempOutputPath := path.Join(tempPathFolder, replacedPathName)
 		sub := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, fpath)
 		thumbnailFolder := sub.Peek()
 
-		target := path.Join(thumbnailFolder, replacedPathName+".webp")
+		target := path.Join(thumbnailFolder, replacedPathName)
 
 		existingThumbnail, err := os.Stat(target)
 		if err == nil && !isStale(existingThumbnail.ModTime()) {
@@ -135,7 +135,7 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 			FilePath:        fpath,
 			TempOutputPath:  tempOutputPath,
 			TargetDirectory: sub,
-			OutputName:      replacedPathName + ".webp",
+			OutputName:      replacedPathName,
 		}
 
 		nailer := getMatchingNailer(fpath)

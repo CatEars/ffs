@@ -5,8 +5,11 @@ import (
 	"catears/ffs/goapp/appmiddlewares"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
+	"fmt"
 	"io/fs"
 	"net/http"
+	"net/url"
+	"path"
 	"strings"
 	"time"
 )
@@ -81,13 +84,16 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			svgIconName = "folder"
 		}
 
+		fullPath := path.Join(p, v.Name())
+		imageSrc := fmt.Sprintf("/api/thumbnail?path=%s", url.QueryEscape(fullPath))
+
 		entries[idx] = listDirectoryResultEntry{
 			Name:        v.Name(),
 			IsFile:      fileInfo.Mode().IsRegular(),
 			IsDirectory: fileInfo.Mode().IsDir(),
 			IsSymlink:   false,
 			FileType:    fileType,
-			ImageSrc:    "",
+			ImageSrc:    imageSrc,
 			SvgIconName: svgIconName,
 			Date:        fileInfo.ModTime(),
 			Size:        fileInfo.Size(),

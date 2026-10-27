@@ -6,6 +6,7 @@ import (
 	"catears/ffs/goapp/cache"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
+	"catears/ffs/lib/thumbnail"
 	"net/http"
 	"os"
 )
@@ -25,17 +26,25 @@ func (*thumbnailRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	thumbnailFolder, err := cache.ThumbnailsFolder.Get()
+	// TODO: The file system is based on "disk" abstraction, but thumbnails are not
+	// TODO: notify thumbnail request and prioritize before serving
+	thumbnailName := thumbnail.AsThumbnailName(filePath)
+	resolvedFolder := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, filePath)
+
+	_, err := os.Stat(resolvedFolder.Peek())
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	subFolder, err := resolvedFolder.Get()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// TODO: The file system is based on "disk" abstraction, but thumbnails are not
-	// TODO: notify thumbnail request and prioritize before serving
-
-	thumbnailBase := os.DirFS(thumbnailFolder)
-	expectedThumbnailPath := filePath + ".webp"
+	thumbnailBase := os.DirFS(subFolder)
+	expectedThumbnailPath := thumbnailName + ".webp"
 	http.ServeFileFS(w, r, thumbnailBase, expectedThumbnailPath)
 }
 
