@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -80,7 +81,7 @@ var extensionCapturer *regexp.Regexp = regexp.MustCompile(`\.[a-zA-Z0-9]+$`)
 
 func getMatchingNailer(fpath string) nailers.Nailer {
 	fileName := path.Base(fpath)
-	foundString := extensionCapturer.FindString(fileName)
+	foundString := strings.ToLower(extensionCapturer.FindString(fileName))
 	nailer, found := nailerMap[fileExtension(foundString)]
 	if found {
 		return nailer
