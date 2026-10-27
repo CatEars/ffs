@@ -1,9 +1,7 @@
 package nailers
 
 import (
-	"os"
 	"os/exec"
-	"path"
 	"strings"
 )
 
@@ -21,19 +19,7 @@ func (*ImageNailer) Generate(ctx NailerContext) error {
 		return err
 	}
 
-	// TODO: The code below is the same between nailers, put into `NailerContext.Success()`
-	outputFolder, err := ctx.TargetDirectory.Get()
-	if err != nil {
-		return err
-	}
-
-	outputPath := path.Join(outputFolder, ctx.OutputName)
-	err = os.Rename(ctx.TempOutputPath, outputPath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctx.Success()
 }
 
 var _ Nailer = &ImageNailer{}

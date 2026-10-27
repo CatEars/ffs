@@ -93,7 +93,7 @@ func getMatchingNailer(fpath string) nailers.Nailer {
 // TODO: Only run nailers if dependencies exist
 
 // TODO: Decide on a good level for thumbnail staleness
-var isOldThumbnailDuration time.Duration = time.Minute * 15
+var isOldThumbnailDuration time.Duration = time.Hour * 24 * 3
 
 func isStale(t time.Time) bool {
 	return t.Before(time.Now().Add(-isOldThumbnailDuration))

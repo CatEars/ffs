@@ -3,9 +3,7 @@ package nailers
 import (
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
-	"path"
 	"strconv"
 	"strings"
 )
@@ -66,23 +64,11 @@ func (*MovieNailer) Generate(ctx NailerContext) error {
 
 	err = cmd.Run()
 	// TODO: Delete any incomplete stale temporary file with background process
-
 	if err != nil {
 		return err
 	}
 
-	outputFolder, err := ctx.TargetDirectory.Get()
-	if err != nil {
-		return err
-	}
-
-	outputPath := path.Join(outputFolder, ctx.OutputName)
-	err = os.Rename(ctx.TempOutputPath, outputPath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctx.Success()
 }
 
 var _ Nailer = &MovieNailer{}
