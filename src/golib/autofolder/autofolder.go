@@ -7,6 +7,7 @@ import (
 )
 
 type AutoFolder interface {
+	Peek() string
 	Get() (string, error)
 	Sub(subfolder string) AutoFolder
 	Recreate() error
@@ -34,6 +35,10 @@ func (af *autoFolder) Get() (string, error) {
 		return "", err
 	}
 	return af.path, nil
+}
+
+func (af *autoFolder) Peek() string {
+	return af.path
 }
 
 func (af *autoFolder) Sub(subfolder string) AutoFolder {
@@ -64,4 +69,8 @@ func (self *sentinelFolder) Sub(subfolder string) AutoFolder {
 
 func (*sentinelFolder) Recreate() error {
 	return errors.New("Uninitialized")
+}
+
+func (*sentinelFolder) Peek() string {
+	return ""
 }

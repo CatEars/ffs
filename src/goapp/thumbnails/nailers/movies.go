@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -64,12 +65,19 @@ func (*MovieNailer) Generate(ctx NailerContext) error {
 	cmd := exec.Command("ffmpeg", "-ss", fmt.Sprint(position), "-i", ctx.FilePath, "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", ctx.TempOutputPath)
 
 	err = cmd.Run()
+	// TODO: Delete any incomplete stale temporary file with background process
+
 	if err != nil {
-		// TODO: Delete any incomplete temporary file
 		return err
 	}
 
-	err = os.Rename(ctx.TempOutputPath, ctx.TargetPath)
+	outputFolder, err := ctx.TargetDirectory.Get()
+	if err != nil {
+		return err
+	}
+
+	outputPath := path.Join(outputFolder, ctx.OutputName)
+	err = os.Rename(ctx.TempOutputPath, outputPath)
 	if err != nil {
 		return err
 	}

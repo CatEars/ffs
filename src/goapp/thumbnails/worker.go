@@ -88,7 +88,16 @@ func getMatchingNailer(fpath string) nailers.Nailer {
 	return theUnnailer
 }
 
+// TODO: Test cases with UPPER CASE extension and names
+
+// TODO: Only run nailers if dependencies exist
+
+// TODO: Decide on a good level for thumbnail staleness
 var isOldThumbnailDuration time.Duration = time.Minute * 15
+
+func isStale(t time.Time) bool {
+	return t.Before(time.Now().Add(-isOldThumbnailDuration))
+}
 
 func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 	err := fs.WalkDir(disk.Fs(), ".", func(fpath string, d fs.DirEntry, err error) error {
@@ -99,6 +108,7 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 		if fpath == "." {
 			return nil
 		}
+
 		// TODO: Disks are an abstraction to provide the ability for non-physical disks
 		// to be present in the disk store. However, ffmpeg integration is based on commands
 		// running locally and thus a conflict between non-physical disks and ffmpeg is born.
@@ -109,26 +119,23 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 		}
 
 		replacedPathName := thumbnail.AsThumbnailName(fpath)
-		tempOutputPath := path.Join(tempPathFolder, replacedPathName)
-		log.Printf("%s", fpath)
+		tempOutputPath := path.Join(tempPathFolder, replacedPathName+".webp")
 		sub := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, fpath)
-		thumbnailFolder, err := sub.Get()
-		if err != nil {
-			return err
-		}
+		thumbnailFolder := sub.Peek()
 
 		target := path.Join(thumbnailFolder, replacedPathName+".webp")
 
-		existing, err := os.Stat(target)
-		if err == nil && existing.ModTime().After(time.Now().Add(-isOldThumbnailDuration)) {
-			// thumbnail exists, lets skip making it.
+		existingThumbnail, err := os.Stat(target)
+		if err == nil && !isStale(existingThumbnail.ModTime()) {
+			// thumbnail exists, and was newly generated, lets skip making it.
 			return nil
 		}
 
 		ctx := nailers.NailerContext{
-			FilePath:       fpath,
-			TempOutputPath: tempOutputPath,
-			TargetPath:     target,
+			FilePath:        fpath,
+			TempOutputPath:  tempOutputPath,
+			TargetDirectory: sub,
+			OutputName:      replacedPathName + ".webp",
 		}
 
 		nailer := getMatchingNailer(fpath)
@@ -142,7 +149,7 @@ func walkSingleDiskAndProductThumbnails(disk d.Disk) {
 	})
 
 	if err != nil {
-		log.Printf("Error when generating thumbnails", err)
+		log.Printf("Error when generating thumbnails: %s", err)
 	}
 }
 

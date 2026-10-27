@@ -29,6 +29,10 @@ func (*testableAutofolder) Recreate() error {
 	return nil
 }
 
+func (*testableAutofolder) Peek() string {
+	return ""
+}
+
 func TestReplaceThumbnailName(t *testing.T) {
 	assert.Equal(t, AsThumbnailName("/tmp/my_file.mp3"), "_tmp_my__file.mp3")
 }
