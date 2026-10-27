@@ -2,8 +2,32 @@ package thumbnail
 
 import (
 	"catears/ffs/lib/assert"
+	"catears/ffs/lib/autofolder"
 	"testing"
 )
+
+type testableAutofolder struct {
+	Subs []string
+}
+
+func newTestableAutofolder() *testableAutofolder {
+	return &testableAutofolder{
+		Subs: []string{},
+	}
+}
+
+func (*testableAutofolder) Get() (string, error) {
+	return "", nil
+}
+
+func (t *testableAutofolder) Sub(s string) autofolder.AutoFolder {
+	t.Subs = append(t.Subs, s)
+	return t
+}
+
+func (*testableAutofolder) Recreate() error {
+	return nil
+}
 
 func TestReplaceThumbnailName(t *testing.T) {
 	assert.Equal(t, AsThumbnailName("/tmp/my_file.mp3"), "_tmp_my__file.mp3")
@@ -19,4 +43,46 @@ func TestPathWithoutExtension(t *testing.T) {
 
 func TestDifferingButSimilarPathsDoNotCollide(t *testing.T) {
 	assert.NotEqual(t, AsThumbnailName("/tmp/a_b_c"), AsThumbnailName("/tmp/a/b/c"))
+}
+
+func getSubFolder(filePath string) *testableAutofolder {
+	af := newTestableAutofolder()
+	ResolveThumbnailFolder(af, filePath)
+	return af
+}
+
+func TestResolveThumbnailFolder(t *testing.T) {
+	af := getSubFolder("/tmp/my_file.mp3")
+	assert.Equal(t, len(af.Subs), 2)
+	assert.Equal(t, af.Subs[0], "my_")
+	assert.Equal(t, af.Subs[1], "fil")
+}
+
+func TestResolveThumbnailFolderWithTooShortNameRepeatsLastNonExtensionCharacter(t *testing.T) {
+	af := getSubFolder("/tmp/my.jpg")
+	assert.Equal(t, len(af.Subs), 2)
+	assert.Equal(t, af.Subs[0], "myy")
+	assert.Equal(t, af.Subs[1], "yyy")
+}
+
+func TestResolveThumbnailFolderWithNoExtension(t *testing.T) {
+	af := getSubFolder("/tmp/no_ext")
+	assert.Equal(t, len(af.Subs), 2)
+	assert.Equal(t, af.Subs[0], "no_")
+	assert.Equal(t, af.Subs[1], "ext")
+}
+
+func TestResolveThumbnailFolderWithNoExtensionAndShort(t *testing.T) {
+	af := getSubFolder("/tmp/no")
+	assert.Equal(t, len(af.Subs), 2)
+	assert.Equal(t, af.Subs[0], "noo")
+	assert.Equal(t, af.Subs[1], "ooo")
+}
+
+func TestResolveThumbnailFolderWithDotfile(t *testing.T) {
+	// Dotfiles are special cases where the dot is not indicative of a file extension, but we instead discard the initial dot
+	af := getSubFolder(".bashrc")
+	assert.Equal(t, len(af.Subs), 2)
+	assert.Equal(t, af.Subs[0], "bas")
+	assert.Equal(t, af.Subs[0], "hrc")
 }

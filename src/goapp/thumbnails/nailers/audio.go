@@ -2,7 +2,7 @@ package nailers
 
 type AudioNailer struct{}
 
-func (*AudioNailer) Generate(fpath string) error {
+func (*AudioNailer) Generate(ctx NailerContext) error {
 	return nil
 }
 

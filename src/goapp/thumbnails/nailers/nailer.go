@@ -1,5 +1,11 @@
 package nailers
 
+type NailerContext struct {
+	FilePath       string
+	TempOutputPath string
+	TargetPath     string
+}
+
 type Nailer interface {
-	Generate(fpath string) error
+	Generate(ctx NailerContext) error
 }

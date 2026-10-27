@@ -1,14 +1,10 @@
 package nailers
 
 import (
-	"catears/ffs/goapp/cache"
-	"catears/ffs/lib/thumbnail"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
-	"path"
 	"strconv"
 	"strings"
 )
@@ -48,9 +44,8 @@ func getMp4Duration(fpath string) (mp4Info, error) {
 	}, nil
 }
 
-func (*MovieNailer) Generate(fpath string) error {
-	log.Printf("Yo, making thumbnails for movie file %s", fpath)
-	mp4Info, err := getMp4Duration(fpath)
+func (*MovieNailer) Generate(ctx NailerContext) error {
+	mp4Info, err := getMp4Duration(ctx.FilePath)
 	if err != nil {
 		return err
 	}
@@ -59,13 +54,6 @@ func (*MovieNailer) Generate(fpath string) error {
 		position = 30
 	}
 
-	tempPathFolder, err := cache.ThumbnailsTempFolder.Get()
-	if err != nil {
-		return err
-	}
-
-	replacedPathName := thumbnail.AsThumbnailName(fpath)
-	tempOutputPath := path.Join(tempPathFolder, replacedPathName)
 	thumbnailFilter := "scale=320:240"
 	if float32(mp4Info.Height)*1.3 > float32(mp4Info.Width) {
 		thumbnailFilter = "scale=320:480"
@@ -73,7 +61,7 @@ func (*MovieNailer) Generate(fpath string) error {
 		thumbnailFilter = "scale=320:320"
 	}
 
-	cmd := exec.Command("ffmpeg", "-ss", fmt.Sprint(position), "-i", fpath, "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", tempOutputPath)
+	cmd := exec.Command("ffmpeg", "-ss", fmt.Sprint(position), "-i", ctx.FilePath, "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", ctx.TempOutputPath)
 
 	err = cmd.Run()
 	if err != nil {
@@ -81,22 +69,11 @@ func (*MovieNailer) Generate(fpath string) error {
 		return err
 	}
 
-	// Index the folder based on three first letters of the file name
-	fileBasename := path.Base(fpath)
-	firstThree := fileBasename[:3]
-	sub := cache.ThumbnailsFolder.Sub(firstThree)
-	thumbnailFolder, err := sub.Get()
+	err = os.Rename(ctx.TempOutputPath, ctx.TargetPath)
 	if err != nil {
 		return err
 	}
 
-	target := path.Join(thumbnailFolder, replacedPathName+".webp")
-	err = os.Rename(tempOutputPath, target)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("Created thumbnail for %s", path.Base(fpath))
 	return nil
 }
 

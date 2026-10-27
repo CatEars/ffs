@@ -2,7 +2,7 @@ package nailers
 
 type ImageNailer struct{}
 
-func (*ImageNailer) Generate(fpath string) error {
+func (*ImageNailer) Generate(ctx NailerContext) error {
 	return nil
 }
 
