@@ -2,13 +2,9 @@
 
 [ ] Naming confusion, "directory" or "folder"
 
----- go
-
-[ ] Fix cache folders to match typescript code
-
 [ ] Create banhammer for user-logon
 
-[ ] Automatic route registration
+[ ] Figure out a way to do Automatic route registration
 
 [ ] Bonus: Implement reading user records via env vars
 
@@ -16,13 +12,9 @@
 
 [ ] Protect sensitive data like user data at rest and clear data on exit. create a manual test with core dump
 
----- deno
-
 [ ] Try to build an "Embedded configuration" that relies on appended bytes to the executable
 
 [ ] Figure out how we can create a `stable` and `nightly` release branches
-
-[ ] Make plugins a "Module" and make it easy to disable
 
 [ ] Make it easy to run and configure ffs via command-line
 
@@ -38,13 +30,11 @@
 
 [ ] Rotate logs
 
-[ ] File search
+[ ] Implement "this directory" file search and "recursive search"
 
 [ ] Fix thumbnail generation for files with '%' in name
 
 [ ] Redo thumbnails every once in a while, especially folder-based thumbnails may become stale and misleading
-
-[ ] Figure out good timing of calling thumbnails outdated (and cache times for files)
 
 [ ] Side view of files when in media mode ("playlist")
 
@@ -52,10 +42,6 @@
 
 [ ] Add `Config`/`Admin` tab that can auto-generate config for a new installation
 
-[ ] Make Command use SSE (or similar) for running commands
-
 [ ] Built-in `docs` page
-
-[ ] Look at error: Uncaught "Missing promise in ring @ 2065589943" issue
 
 [ ] Automate changelog of features and fixes
