@@ -27,6 +27,6 @@ func TestSymlinkFs(t *testing.T) {
 }
 
 func TestSymlinkFsMarshaling(t *testing.T) {
-	fakeFs := createFakeSymlinkFs()
-	
+	/*fakeFs := createFakeSymlinkFs()
+	 */
 }

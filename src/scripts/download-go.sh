@@ -12,4 +12,6 @@ then
     exit 0
 fi
 
+# TODO: Use SHA checksum from webpage to ensure integrity of downloaded software
+
 wget -O $OUTPUT_PATH $GO_DL_URL 

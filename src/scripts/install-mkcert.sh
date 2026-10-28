@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Make this follow the same pattern as `download-bombardier` and `download-esbuild`
+
 BIN_DIR="$HOME/.local/bin"
 
 if [ -f "$BIN_DIR/mkcert" ]; then
