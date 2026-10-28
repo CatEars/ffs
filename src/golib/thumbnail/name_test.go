@@ -57,36 +57,41 @@ func getSubFolder(filePath string) *testableAutofolder {
 
 func TestResolveThumbnailFolder(t *testing.T) {
 	af := getSubFolder("/tmp/my_file.mp3")
-	assert.Equal(t, len(af.Subs), 2)
-	assert.Equal(t, af.Subs[0], "my_")
-	assert.Equal(t, af.Subs[1], "fil")
+	assert.Equal(t, len(af.Subs), 3)
+	assert.Equal(t, af.Subs[0], "default-disk")
+	assert.Equal(t, af.Subs[1], "my_")
+	assert.Equal(t, af.Subs[2], "fil")
 }
 
 func TestResolveThumbnailFolderWithTooShortNameRepeatsLastNonExtensionCharacter(t *testing.T) {
 	af := getSubFolder("/tmp/my.jpg")
-	assert.Equal(t, len(af.Subs), 2)
-	assert.Equal(t, af.Subs[0], "myy")
-	assert.Equal(t, af.Subs[1], "yyy")
+	assert.Equal(t, len(af.Subs), 3)
+	assert.Equal(t, af.Subs[0], "default-disk")
+	assert.Equal(t, af.Subs[1], "myy")
+	assert.Equal(t, af.Subs[2], "yyy")
 }
 
 func TestResolveThumbnailFolderWithNoExtension(t *testing.T) {
 	af := getSubFolder("/tmp/no_ext")
-	assert.Equal(t, len(af.Subs), 2)
-	assert.Equal(t, af.Subs[0], "no_")
-	assert.Equal(t, af.Subs[1], "ext")
+	assert.Equal(t, len(af.Subs), 3)
+	assert.Equal(t, af.Subs[0], "default-disk")
+	assert.Equal(t, af.Subs[1], "no_")
+	assert.Equal(t, af.Subs[2], "ext")
 }
 
 func TestResolveThumbnailFolderWithNoExtensionAndShort(t *testing.T) {
 	af := getSubFolder("/tmp/no")
-	assert.Equal(t, len(af.Subs), 2)
-	assert.Equal(t, af.Subs[0], "noo")
-	assert.Equal(t, af.Subs[1], "ooo")
+	assert.Equal(t, len(af.Subs), 3)
+	assert.Equal(t, af.Subs[0], "default-disk")
+	assert.Equal(t, af.Subs[1], "noo")
+	assert.Equal(t, af.Subs[2], "ooo")
 }
 
 func TestResolveThumbnailFolderWithDotfile(t *testing.T) {
 	// Dotfiles are special cases where the dot is not indicative of a file extension, but we instead discard the initial dot
 	af := getSubFolder(".bashrc")
-	assert.Equal(t, len(af.Subs), 2)
-	assert.Equal(t, af.Subs[0], "bas")
-	assert.Equal(t, af.Subs[1], "hrc")
+	assert.Equal(t, len(af.Subs), 3)
+	assert.Equal(t, af.Subs[0], "default-disk")
+	assert.Equal(t, af.Subs[1], "bas")
+	assert.Equal(t, af.Subs[2], "hrc")
 }
