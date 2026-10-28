@@ -8,14 +8,15 @@ import (
 	"catears/ffs/lib/users/storage/file"
 	"log"
 	"os"
+	"path"
 )
 
 var mgr *users.UserManager = nil
 var userResourceManager *security.ResourceManager = nil
 
-// TODO: Don't assume the location of the users file like this!
 func initializeManager() *users.UserManager {
-	fileSource := file.NewUserFromFile(os.DirFS(".."), config.Config.UsersFile())
+	usersFilePath := config.Config.UsersFile()
+	fileSource := file.NewUserFromFile(os.DirFS(path.Dir(usersFilePath)), path.Base(usersFilePath))
 	manager := users.NewUserManager(fileSource)
 	err := manager.Configure()
 	if err != nil {
