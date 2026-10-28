@@ -3,7 +3,10 @@ package nailers
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -78,7 +81,29 @@ func (*MovieNailer) Generate(ctx *NailerContext) error {
 		return err
 	}
 
-	return ctx.Success()
+	err = ctx.Success()
+	if err != nil {
+		return err
+	}
+
+	// If there is only a single video in the folder, promote that to parent directory as thumbnail.
+	entriesInFolder, err := os.ReadDir(path.Dir(ctx.FilePath))
+	cnt := 0
+	for _, entry := range entriesInFolder {
+		ext := strings.ToLower(path.Ext(entry.Name()))
+		if slices.Index(MovieExtNames, ext) != -1 {
+			cnt += 1
+			if cnt > 1 {
+				break
+			}
+		}
+	}
+
+	if cnt == 1 {
+		ctx.PromoteToParent = true
+	}
+
+	return nil
 }
 
 var _ Nailer = &MovieNailer{}
