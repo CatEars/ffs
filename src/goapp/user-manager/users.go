@@ -13,6 +13,7 @@ import (
 var mgr *users.UserManager = nil
 var userResourceManager *security.ResourceManager = nil
 
+// TODO: Don't assume the location of the users file like this!
 func initializeManager() *users.UserManager {
 	fileSource := file.NewUserFromFile(os.DirFS(".."), config.Config.UsersFile())
 	manager := users.NewUserManager(fileSource)

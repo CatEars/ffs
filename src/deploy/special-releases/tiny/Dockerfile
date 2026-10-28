@@ -1,12 +1,21 @@
-FROM denoland/deno:alpine
+FROM ubuntu AS builder
+
+ENV LANG=C.UTF-8
+
+RUN apt update && apt install -y wget
+
+WORKDIR /app
+COPY ./src/ src/
+RUN ./src/scripts/install-go.sh
+RUN cd src && ~/.local/bin/go build -o /app/ffs ./goapp
+
+FROM ubuntu
+
+ENV LANG=C.UTF-8
 
 WORKDIR /app
 COPY data/ /app/data
-COPY src /app/src
-COPY deno.jsonc deno.lock README.md ./
 
-RUN deno cache src/app/main.ts && deno install
-RUN apk add bash && ./src/scripts/install-go.sh && apk del bash
-RUN cd src && ~/.local/bin/go build -o /app/ffs ./goapp
+COPY --from=builder /app/ffs /app/ffs
 
-CMD ["/app/src/scripts/prod-main.sh"]
+CMD ["/app/ffs"]
