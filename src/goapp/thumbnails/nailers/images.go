@@ -5,9 +5,22 @@ import (
 	"strings"
 )
 
+var ImageExtNames []string = []string{
+	".png",
+	".jpg",
+	".jpeg",
+	".tiff",
+	".webp",
+	".gif",
+	".avif",
+	".bmp",
+	".ico",
+	".psd",
+}
+
 type ImageNailer struct{}
 
-func (*ImageNailer) Generate(ctx NailerContext) error {
+func (*ImageNailer) Generate(ctx *NailerContext) error {
 	append := ""
 	if strings.HasSuffix(strings.ToLower(ctx.FilePath), ".gif") {
 		append = "[0]"

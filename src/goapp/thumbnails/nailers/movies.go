@@ -16,6 +16,16 @@ type mp4Info struct {
 	Width    int32
 }
 
+var MovieExtNames []string = []string{
+	".mp4",
+	".m4v",
+	".mov",
+	".avi",
+	".webm",
+	".mkv",
+	".mpg",
+}
+
 func getMp4Duration(fpath string) (mp4Info, error) {
 	cmd := exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "default=noprint_wrappers=1:nokey=1", fpath)
 	result, err := cmd.Output()
@@ -43,7 +53,7 @@ func getMp4Duration(fpath string) (mp4Info, error) {
 	}, nil
 }
 
-func (*MovieNailer) Generate(ctx NailerContext) error {
+func (*MovieNailer) Generate(ctx *NailerContext) error {
 	mp4Info, err := getMp4Duration(ctx.FilePath)
 	if err != nil {
 		return err

@@ -12,9 +12,10 @@ type NailerContext struct {
 	TempOutputPath  string
 	TargetDirectory autofolder.AutoFolder
 	OutputName      string
+	PromoteToParent bool
 }
 
-func (ctx NailerContext) Success() error {
+func (ctx *NailerContext) Success() error {
 	outputFolder, err := ctx.TargetDirectory.Get()
 	if err != nil {
 		return err
@@ -30,6 +31,12 @@ func (ctx NailerContext) Success() error {
 	return nil
 }
 
+func NewNailerContext() *NailerContext {
+	return &NailerContext{
+		PromoteToParent: false,
+	}
+}
+
 type Nailer interface {
-	Generate(ctx NailerContext) error
+	Generate(ctx *NailerContext) error
 }
