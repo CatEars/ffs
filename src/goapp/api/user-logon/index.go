@@ -7,7 +7,6 @@ import (
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/users"
-	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
@@ -18,25 +17,6 @@ type userLogonHandler struct{}
 
 func (self *userLogonHandler) Register(appRouter router.Router) {
 	appRouter.Post("/api/user-logon", self)
-}
-
-func deriveLegacyApiKey(user string) (string, error) {
-	claim := usermanager.UserResources().GetClaim(security.StandardAccess.Write(), user)
-	c := "[" + claim.LegacyString() + "]"
-	signature, err := security.SignBlob(config.Config.InstanceSecret(), []byte(c))
-	b64ed := base64.StdEncoding.EncodeToString(signature)
-	if err != nil {
-		return "", err
-	}
-	auth := security.LegacySignedClaims{
-		Claims:    c,
-		Signature: b64ed,
-	}
-	formatted, err := json.Marshal(auth)
-	if err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(formatted), nil
 }
 
 func deriveModernApiKey(record *users.UserRecord) (string, error) {
@@ -74,10 +54,6 @@ func makeBaseCookie(name string) *http.Cookie {
 	return cookie
 }
 
-func generateCsrfToken() string {
-	return rand.Text()
-}
-
 func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
@@ -93,15 +69,6 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	legacyLogonCookie := makeBaseCookie("FFS-Authorization")
-	legacyApiKey, err := deriveLegacyApiKey(usr.Username)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	legacyLogonCookie.Value = legacyApiKey
-	http.SetCookie(w, legacyLogonCookie)
-
 	modernLogonCookie := makeBaseCookie("FFS-Auth")
 	modernApiKey, err := deriveModernApiKey(usr)
 	if err != nil {
@@ -110,11 +77,6 @@ func (*userLogonHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	modernLogonCookie.Value = modernApiKey
 	http.SetCookie(w, modernLogonCookie)
-
-	legacyCsrfToken := makeBaseCookie("FFS-Csrf-Protection")
-	legacyCsrfToken.HttpOnly = false
-	legacyCsrfToken.Value = generateCsrfToken()
-	http.SetCookie(w, legacyCsrfToken)
 
 	http.Redirect(w, r, "/home/", http.StatusFound)
 }
