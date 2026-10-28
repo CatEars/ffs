@@ -1,6 +1,8 @@
 ---- overall
 
-[ ] Naming confusion, "directory" or "folder"
+[ ] Test cases for folders that update and change
+
+[ ] Naming confusion, "directory" or "folder", spread throughout codebase, fix it!
 
 [ ] Create banhammer for user-logon
 
