@@ -3,6 +3,7 @@ package directory
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
+	"catears/ffs/goapp/thumbnails/nailers"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"slices"
 	"strings"
 	"time"
 )
@@ -77,11 +79,22 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		// TODO: Put file typing into common library
 		fileType := "unidentified"
 		svgIconName := "description"
+		extName := strings.ToLower(path.Ext(fileInfo.Name()))
 		if fileInfo.Mode().IsDir() {
 			fileType = "directory"
 			svgIconName = "folder"
+		} else if slices.Index(nailers.MovieExtNames, extName) != -1 {
+			fileType = "video"
+			svgIconName = "videocam"
+		} else if slices.Index(nailers.AudioExtNames, extName) != -1 {
+			fileType = "sound"
+			svgIconName = "music_note"
+		} else if slices.Index(nailers.ImageExtNames, extName) != -1 {
+			fileType = "image"
+			svgIconName = "photo_camera"
 		}
 
 		fullPath := path.Join(p, v.Name())
