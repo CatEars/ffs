@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-VERSION="1.26.2"
+VERSION="1.27.3"
 
 THIS_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export GO_DL_VERSION="$VERSION"
@@ -39,8 +39,8 @@ mv go $GO_INSTALL_DIR
 mkdir -p $BIN_DIR
 
 echo "Linking go to $BIN_DIR/go from $GO_INSTALL_DIR/bin/go"
-ln -s $GO_INSTALL_DIR/bin/go $BIN_DIR/go
-ln -s $GO_INSTALL_DIR/bin/gofmt $BIN_DIR/gofmt
+ln -s -f $GO_INSTALL_DIR/bin/go $BIN_DIR/go
+ln -s -f $GO_INSTALL_DIR/bin/gofmt $BIN_DIR/gofmt
 
 $THIS_SCRIPT_DIR/add-go-root-include-to-bashrc.sh
 
