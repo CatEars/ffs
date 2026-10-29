@@ -2,11 +2,15 @@
 set -euo pipefail
 
 VERSION="1.27.3"
+SHA256="65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40"
+PLATFORM="linux-amd64"
+TAR_NAME="go$VERSION.$PLATFORM.tar.gz"
 
 THIS_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export GO_DL_VERSION="$VERSION"
+export GO_DL_PLATFORM="$PLATFORM"
+export GO_DL_SHA256="$SHA256"
 $THIS_SCRIPT_DIR/download-go.sh
-TAR_NAME="go$VERSION.linux-amd64.tar.gz"
 TAR_LOCATION="./data/vendor/$TAR_NAME"
 BIN_DIR="$HOME/.local/bin"
 GO_INSTALL_DIR="$HOME/go-install"
