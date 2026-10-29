@@ -14,6 +14,7 @@ func main() {
 	genTest := flag.Bool("generate-default-test-bench", false, "Generates the default test bench")
 	testAll := flag.Bool("run-all-tests", false, "Runs all golang tests")
 	genAutoImport := flag.Bool("generate-auto-import", false, "Generates auto-import file")
+	genTestRunTemplate := flag.Bool("generate-test-run-template", false, "Generates test run template")
 
 	flag.Parse()
 
@@ -39,6 +40,8 @@ func main() {
 		RunAllTests()
 	} else if *genAutoImport {
 		GenerateAutoImport()
+	} else if *genTestRunTemplate {
+		GenerateTestRunTemplate()
 	} else {
 		flag.Usage()
 	}
