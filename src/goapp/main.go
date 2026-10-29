@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -19,9 +20,23 @@ var websiteContent embed.FS
 
 var appRouter = approutes.BuildAppRouter(websiteContent)
 
+func isApiCall(r *http.Request) bool {
+	return strings.HasPrefix(strings.ToLower(r.URL.Path), "/api/")
+}
+
+func isStaticFileRequest(r *http.Request) bool {
+	return strings.HasPrefix(strings.ToLower(r.URL.Path), "/static/")
+}
+
 func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// TODO: Handle non-matching web calls
-	appRouter.MatchAndCall(w, r)
+	called := appRouter.MatchAndCall(w, r)
+	if !called {
+		if isApiCall(r) || isStaticFileRequest(r) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		}
+	}
 }
 
 func main() {
