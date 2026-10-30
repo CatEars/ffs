@@ -15,11 +15,11 @@ func TestIsVideoFileWorks(t *testing.T) {
 }
 
 func TestIsSoundFileWorks(t *testing.T) {
-	assert.True(t, IsSoundFile("/tmp/myfile.mp3"))
-	assert.True(t, IsSoundFile("/tmp/myfile.MP3"))
+	assert.True(t, IsAudioFile("/tmp/myfile.mp3"))
+	assert.True(t, IsAudioFile("/tmp/myfile.MP3"))
 
-	assert.False(t, IsSoundFile("/tmp/myfile.mp4"))
-	assert.False(t, IsSoundFile("/tmp/myfile.png"))
+	assert.False(t, IsAudioFile("/tmp/myfile.mp4"))
+	assert.False(t, IsAudioFile("/tmp/myfile.png"))
 }
 
 func TestIsImageFileWorks(t *testing.T) {

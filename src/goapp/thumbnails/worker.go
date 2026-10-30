@@ -5,18 +5,15 @@ import (
 	"catears/ffs/goapp/disks"
 	"catears/ffs/goapp/thumbnails/nailers"
 	d "catears/ffs/lib/disks"
+	filetype "catears/ffs/lib/file-type"
 	"catears/ffs/lib/thumbnail"
 	"io"
 	"io/fs"
 	"log"
 	"os"
 	"path"
-	"regexp"
-	"strings"
 	"time"
 )
-
-type fileExtension string
 
 type Unnailer struct {
 }
@@ -25,37 +22,10 @@ func (*Unnailer) Generate(ctx *nailers.NailerContext) error {
 	return nil
 }
 
-var nailerMap map[fileExtension]nailers.Nailer = make(map[fileExtension]nailers.Nailer)
+var movieNailer = &nailers.MovieNailer{}
+var imageNailer = &nailers.ImageNailer{}
+var audioNailer = &nailers.AudioNailer{}
 var theUnnailer nailers.Nailer = &Unnailer{}
-
-func init() {
-	movieNailer := &nailers.MovieNailer{}
-	imageNailer := &nailers.ImageNailer{}
-	audioNailer := &nailers.AudioNailer{}
-	for _, movieExt := range nailers.MovieExtNames {
-		nailerMap[fileExtension(movieExt)] = movieNailer
-	}
-	for _, imageExt := range nailers.ImageExtNames {
-		nailerMap[fileExtension(imageExt)] = imageNailer
-	}
-	for _, audioExt := range nailers.AudioExtNames {
-		nailerMap[fileExtension(audioExt)] = audioNailer
-	}
-}
-
-var extensionCapturer *regexp.Regexp = regexp.MustCompile(`\.[a-zA-Z0-9]+$`)
-
-func getMatchingNailer(fpath string) nailers.Nailer {
-	fileName := path.Base(fpath)
-	foundString := strings.ToLower(extensionCapturer.FindString(fileName))
-	nailer, found := nailerMap[fileExtension(foundString)]
-	if found {
-		return nailer
-	}
-	return theUnnailer
-}
-
-// TODO: Test cases with UPPER CASE extension and names
 
 // TODO: Only run nailers if dependencies exist
 
@@ -120,7 +90,20 @@ func walkSingleDiskAndProduceThumbnails(disk d.Disk) {
 		ctx.TempOutputPath = tempOutputPath
 		ctx.TargetDirectory = sub
 		ctx.OutputName = replacedPathName
-		nailer := getMatchingNailer(fpath)
+		desc := filetype.NewFileDescription(fpath)
+		ftype, err := desc.FileType()
+		if err != nil {
+			return err
+		}
+
+		nailer := theUnnailer
+		if ftype == filetype.Audio {
+			nailer = audioNailer
+		} else if ftype == filetype.Image {
+			nailer = imageNailer
+		} else if ftype == filetype.Video {
+			nailer = movieNailer
+		}
 		err = nailer.Generate(ctx)
 
 		if err != nil {

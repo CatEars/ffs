@@ -3,7 +3,7 @@ package directory
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
-	"catears/ffs/goapp/thumbnails/nailers"
+	filetype "catears/ffs/lib/file-type"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"fmt"
@@ -11,24 +11,9 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"slices"
 	"strings"
 	"time"
 )
-
-/**
-  {
-      "name": "bin",
-      "isFile": false,
-      "isDirectory": true,
-      "isSymlink": false,
-      "fileType": "directory",
-      "imageSrc": "/api/thumbnail?path=bin",
-      "svgIconName": "folder",
-      "date": "2026-05-10T03:23:06.832Z",
-      "size": 3195730
-  }
-*/
 
 type listDirectoryRouter struct{}
 
@@ -79,20 +64,20 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// TODO: Put file typing into common library
+		desc := filetype.NewFileDescriptionFromFileInfo(fileInfo)
+
 		fileType := "unidentified"
 		svgIconName := "description"
-		extName := strings.ToLower(path.Ext(fileInfo.Name()))
 		if fileInfo.Mode().IsDir() {
 			fileType = "directory"
 			svgIconName = "folder"
-		} else if slices.Index(nailers.MovieExtNames, extName) != -1 {
+		} else if desc.IsVideoFile {
 			fileType = "video"
 			svgIconName = "videocam"
-		} else if slices.Index(nailers.AudioExtNames, extName) != -1 {
+		} else if desc.IsAudioFile {
 			fileType = "sound"
 			svgIconName = "music_note"
-		} else if slices.Index(nailers.ImageExtNames, extName) != -1 {
+		} else if desc.IsImageFile {
 			fileType = "image"
 			svgIconName = "photo_camera"
 		}
