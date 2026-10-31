@@ -34,7 +34,7 @@ func (*testableAutofolder) Peek() string {
 }
 
 func TestReplaceThumbnailName(t *testing.T) {
-	assert.Equal(t, AsThumbnailName("/tmp/my_file.mp3"), "_tmp_my__file.mp3")
+	assert.Equal(t, AsThumbnailName("/tmp/my_file.mp3"), "_tmp_my__file.mp3.webp")
 }
 
 func TestEmptyString(t *testing.T) {
@@ -42,7 +42,7 @@ func TestEmptyString(t *testing.T) {
 }
 
 func TestPathWithoutExtension(t *testing.T) {
-	assert.Equal(t, AsThumbnailName("/tmp/dir_or_no_dir"), "_tmp_dir__or__no__dir")
+	assert.Equal(t, AsThumbnailName("/tmp/dir_or_no_dir"), "_tmp_dir__or__no__dir.webp")
 }
 
 func TestDifferingButSimilarPathsDoNotCollide(t *testing.T) {

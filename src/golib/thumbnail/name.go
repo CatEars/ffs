@@ -48,5 +48,5 @@ func AsThumbnailName(filePath string) string {
 	// As defense in depth, ensure we take the basename, in case above permits path traversal.
 	replaced = path.Base(replaced)
 
-	return replaced
+	return replaced + ".webp"
 }

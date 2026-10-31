@@ -3,12 +3,15 @@ package main
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/config"
+	"context"
 	"crypto/tls"
 	"embed"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -43,12 +46,28 @@ func main() {
 	handler := &FfsHandler{}
 	address := ":8080"
 	log.Println("Serving GO app on", address)
-	RunStartup()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	RunStartup(ctx)
 	certFile := config.Config.CertFile()
 	keyFile := config.Config.CertKeyFile()
 	_, certFileErr := os.ReadFile(certFile)
 	_, keyFileErr := os.ReadFile(keyFile)
 	tlsConfigError := certFileErr != nil || keyFileErr != nil
+	server := &http.Server{
+		Addr:         address,
+		Handler:      handler,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  15 * time.Second,
+	}
+
+	go func() {
+		<-ctx.Done()
+		ctx, stop := context.WithTimeout(context.Background(), time.Second*5)
+		defer stop()
+		server.Shutdown(ctx)
+	}()
 
 	if !tlsConfigError && certFile != "" && keyFile != "" {
 		cfg := &tls.Config{
@@ -58,17 +77,10 @@ func main() {
 				tls.CurveP256,
 			},
 		}
-		server := &http.Server{
-			Addr:         address,
-			Handler:      handler,
-			TLSConfig:    cfg,
-			ReadTimeout:  15 * time.Second,
-			WriteTimeout: 15 * time.Second,
-			IdleTimeout:  15 * time.Second,
-		}
+		server.TLSConfig = cfg
 		log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 	} else {
 		// TODO: How best to handle "strict" (fail on TLS not configured) vs. "lax" (downgrade on TLS not configured)?
-		log.Fatal(http.ListenAndServe(address, handler))
+		log.Fatal(server.ListenAndServe())
 	}
 }
