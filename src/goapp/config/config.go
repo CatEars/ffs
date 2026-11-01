@@ -1,8 +1,8 @@
 package config
 
 import (
+	"catears/ffs/lib/ffslog"
 	"crypto/rand"
-	"log"
 	"os"
 )
 
@@ -25,7 +25,7 @@ func (cfg *ffsConfig) getEnvOrEmpty(key string) string {
 }
 
 func initializeInstanceSecret() string {
-	log.Printf("WARN: No instance secret set with FFS_INSTANCE_SECRET - generating one randomly - make sure to set the environment variable to a secret value!")
+	ffslog.Warnf("No instance secret set with FFS_INSTANCE_SECRET - generating one randomly - make sure to set the environment variable to a secret value!")
 
 	os.Setenv("FFS_INSTANCE_SECRET", rand.Text())
 	return os.Getenv("FFS_INSTANCE_SECRET")

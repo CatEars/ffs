@@ -2,7 +2,7 @@ package nailers
 
 import (
 	"catears/ffs/lib/autofolder"
-	"log"
+	"catears/ffs/lib/ffslog"
 	"os"
 	"path"
 )
@@ -27,7 +27,7 @@ func (ctx *NailerContext) Success() error {
 		return err
 	}
 
-	log.Printf("Created thumbnail for %s", path.Base(ctx.FilePath))
+	ffslog.Printf("Created thumbnail for %s", path.Base(ctx.FilePath))
 	return nil
 }
 

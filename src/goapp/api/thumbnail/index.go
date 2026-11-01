@@ -4,6 +4,7 @@ import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
 	"catears/ffs/goapp/cache"
+	"catears/ffs/goapp/thumbnails"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/thumbnail"
@@ -32,7 +33,8 @@ func (*thumbnailRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: notify thumbnail request and prioritize before serving
+	// TODO: Create test for prioritized thumbnails
+	thumbnails.PrioritizeThumbnail(disk, filePath)
 	thumbnailName := thumbnail.AsThumbnailName(filePath)
 	resolvedFolder := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, disk.Id(), filePath)
 

@@ -1,13 +1,13 @@
 package middlewares
 
 import (
+	"catears/ffs/lib/ffslog"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/users"
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -23,6 +23,7 @@ func LookupClaims(r *http.Request) []*security.Claim {
 }
 
 func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byte) router.Middleware {
+	logger := ffslog.FindOrCreateLogger("middleware")
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("FFS-Auth")
@@ -33,7 +34,7 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 
 			err = cookie.Valid()
 			if err != nil {
-				log.Printf("WARN - FFS-Auth cookie is not valid, skipping user")
+				logger.Warnf("FFS-Auth cookie is not valid, skipping user")
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -45,7 +46,7 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 			}
 			unb64ed, err := base64.URLEncoding.DecodeString(auth)
 			if err != nil {
-				log.Printf("WARN - User tried to log on but got %s", err)
+				logger.Warnf("User tried to log on but got %s", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -53,7 +54,7 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 			into := &security.ModernSignedClaims{}
 			err = json.Unmarshal(unb64ed, into)
 			if err != nil {
-				log.Printf("WARN - User tried to log on but got %s", err)
+				logger.Warnf("User tried to log on but got %s", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -61,7 +62,7 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 			for _, v := range into.Claims {
 				_, err := builder.WriteString(v.String())
 				if err != nil {
-					log.Printf("WARN - User tried to log on but got %s", err)
+					logger.Warnf("User tried to log on but got %s", err)
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
@@ -69,7 +70,7 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 			signature, err := security.SignBlob(instanceKey, []byte(builder.String()))
 			b64edSig := base64.StdEncoding.EncodeToString(signature)
 			if b64edSig != into.Signature {
-				log.Printf("WARN - User tried to log on but signature did not match claims")
+				logger.Warnf("User tried to log on but signature did not match claims")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

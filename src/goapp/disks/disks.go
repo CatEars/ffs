@@ -2,8 +2,8 @@ package disks
 
 import (
 	"catears/ffs/lib/disks"
+	"catears/ffs/lib/ffslog"
 	"errors"
-	"log"
 )
 
 var DiskStore *disks.DiskStore
@@ -20,6 +20,6 @@ func InitializeDisks(d ...disks.Disk) {
 	DiskStore = diskStore
 	if len(errs) > 0 {
 		e := errors.Join(errs...)
-		log.Printf("[WARN] Got errors when initializing disks: %s", e.Error())
+		ffslog.Warnf("Got errors when initializing disks: %s", e.Error())
 	}
 }

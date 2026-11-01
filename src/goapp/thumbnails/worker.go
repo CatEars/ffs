@@ -5,12 +5,12 @@ import (
 	"catears/ffs/goapp/disks"
 	"catears/ffs/goapp/thumbnails/nailers"
 	d "catears/ffs/lib/disks"
+	"catears/ffs/lib/ffslog"
 	filetype "catears/ffs/lib/file-type"
 	"catears/ffs/lib/thumbnail"
 	"context"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path"
 	"time"
@@ -203,7 +203,7 @@ func walkSingleDiskAndProduceThumbnails(ctx context.Context, disk d.Disk) {
 	})
 
 	if err != nil {
-		log.Printf("Error when generating thumbnails: %s", err)
+		ffslog.Printf("Error when generating thumbnails: %s", err)
 	}
 }
 

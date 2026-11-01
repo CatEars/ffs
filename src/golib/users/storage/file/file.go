@@ -1,13 +1,13 @@
 package file
 
 import (
+	"catears/ffs/lib/ffslog"
 	"catears/ffs/lib/security"
 	"catears/ffs/lib/users"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
-	"log"
 	"path"
 	"strings"
 )
@@ -118,7 +118,7 @@ func (fus *FileUserSource) convertUserfileContent(content []byte) (map[string]us
 		invalidFields := user.InvalidFields()
 		if len(invalidFields) > 0 {
 			joined := strings.Join(invalidFields, ", ")
-			log.Printf("User '%s' from '%s' needs to be properly configured to be able to log on: %s", user.Username, fus.userFilePath, joined)
+			ffslog.Printf("User '%s' from '%s' needs to be properly configured to be able to log on: %s", user.Username, fus.userFilePath, joined)
 			continue
 		}
 
@@ -187,7 +187,7 @@ func (fus *FileUserSource) readSingleUserFile(entry fs.DirEntry) (*userFromFile,
 	invalidFields := user.InvalidFields()
 	if len(invalidFields) > 0 {
 		joined := strings.Join(invalidFields, ", ")
-		log.Printf("User '%s' from '%s' needs to be properly configured to be able to log on: %s", user.Username, fus.userFilePath, joined)
+		ffslog.Printf("User '%s' from '%s' needs to be properly configured to be able to log on: %s", user.Username, fus.userFilePath, joined)
 		// Dont treat invalid fields as an error, but dont create the user
 		return nil, nil
 	}

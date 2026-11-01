@@ -5,8 +5,8 @@ import (
 	"catears/ffs/goapp/appmiddlewares"
 	"catears/ffs/goapp/cache"
 	"catears/ffs/goapp/resources"
+	"catears/ffs/lib/ffslog"
 	"catears/ffs/lib/router"
-	"log"
 	"net/http"
 )
 
@@ -25,7 +25,7 @@ func (*clearThumbnailsRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	log.Printf("Cleared thumbnails directory")
+	ffslog.Printf("Cleared thumbnails directory")
 	router.ReturnToSender(w, r, router.Param("message", "Thumbnails cleared"))
 }
 

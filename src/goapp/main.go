@@ -3,10 +3,10 @@ package main
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/config"
+	"catears/ffs/lib/ffslog"
 	"context"
 	"crypto/tls"
 	"embed"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -45,7 +45,7 @@ func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	handler := &FfsHandler{}
 	address := ":8080"
-	log.Println("Serving GO app on", address)
+	ffslog.Printf("Serving GO app on", address)
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	RunStartup(ctx)
@@ -78,9 +78,9 @@ func main() {
 			},
 		}
 		server.TLSConfig = cfg
-		log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
+		ffslog.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 	} else {
 		// TODO: How best to handle "strict" (fail on TLS not configured) vs. "lax" (downgrade on TLS not configured)?
-		log.Fatal(server.ListenAndServe())
+		ffslog.Fatal(server.ListenAndServe())
 	}
 }

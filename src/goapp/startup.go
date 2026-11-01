@@ -8,8 +8,8 @@ import (
 	"catears/ffs/goapp/uploading"
 	bookingstore "catears/ffs/lib/booking-store"
 	"catears/ffs/lib/disks"
+	"catears/ffs/lib/ffslog"
 	"context"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -41,9 +41,7 @@ func resolveCacheFolder() (string, error) {
 
 var thumbnailWaitDuration time.Duration = time.Second * 5
 
-func InfinitelyRunThumbnailBackgroundProcess(ctx context.Context) {
-	log.Println("Starting thumbnail generator")
-	wg := sync.WaitGroup{}
+func runIndependentWorkerThreads(ctx context.Context, wg *sync.WaitGroup) {
 	var targetThumbnailThreads int32 = 3
 	var currentThreads = atomic.Int32{}
 	var quitChan chan int = make(chan int, targetThumbnailThreads)
@@ -53,23 +51,27 @@ func InfinitelyRunThumbnailBackgroundProcess(ctx context.Context) {
 		currentThreads.Add(-1)
 		quitChan <- 1
 	}
-	go func() {
-		for {
-			currThreadsSnapshot := currentThreads.Load()
-			for currThreadsSnapshot < targetThumbnailThreads {
-				wg.Go(workerThread)
-				currThreadsSnapshot += 1
-			}
-			select {
-			case <-ctx.Done():
-				return
-			case <-quitChan:
-				continue
-			case <-time.After(time.Minute * 5):
-				continue
-			}
+	for {
+		currThreadsSnapshot := currentThreads.Load()
+		for currThreadsSnapshot < targetThumbnailThreads {
+			wg.Go(workerThread)
+			currThreadsSnapshot += 1
 		}
-	}()
+		select {
+		case <-ctx.Done():
+			return
+		case <-quitChan:
+			continue
+		case <-time.After(time.Minute * 5):
+			continue
+		}
+	}
+}
+
+func InfinitelyRunThumbnailBackgroundProcess(ctx context.Context) {
+	ffslog.Print("Starting thumbnail generator")
+	wg := sync.WaitGroup{}
+	go runIndependentWorkerThreads(ctx, &wg)
 	for {
 		select {
 		case <-ctx.Done():
@@ -90,7 +92,7 @@ func InfinitelyRunThumbnailBackgroundProcess(ctx context.Context) {
 
 func RunStartup(ctx context.Context) {
 	d, _ := os.Getwd()
-	log.Printf("Starting go-app from %s", d)
+	ffslog.Printf("Starting go-app from %s", d)
 	env := config.Config.Env()
 	if env == "" {
 		config.Config.SetConfig("FFS_ENV", "dev")

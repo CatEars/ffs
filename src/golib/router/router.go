@@ -1,7 +1,7 @@
 package router
 
 import (
-	"log"
+	"catears/ffs/lib/ffslog"
 	"net/http"
 	"strings"
 )
@@ -39,7 +39,7 @@ func NewRouter() Router {
 }
 
 func (router baseRouter) register(method, path string, handler http.Handler) {
-	log.Printf("Registering %s %s", method, path)
+	ffslog.Printf("Registering %s %s", method, path)
 	method = strings.ToLower(method)
 	path = strings.ToLower(path)
 
@@ -51,7 +51,7 @@ func (router baseRouter) register(method, path string, handler http.Handler) {
 
 	_, ok = inner[path]
 	if ok {
-		log.Panicf("Registering path HTTP %s %s for the second time is not possible", method, path)
+		ffslog.Panicf("Registering path HTTP %s %s for the second time is not possible", method, path)
 	}
 
 	inner[path] = router.wrapInCurrentMiddlewares(handler)

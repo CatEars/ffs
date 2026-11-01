@@ -3,11 +3,11 @@ package file
 import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/appmiddlewares"
+	"catears/ffs/lib/ffslog"
 	"catears/ffs/lib/router"
 	"catears/ffs/lib/security"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"path"
 )
@@ -65,7 +65,7 @@ func (*moveFileRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errs) > 0 {
-		log.Printf("[WARN] Failed to move files: %e", errors.Join(errs...))
+		ffslog.Warnf("Failed to move files: %e", errors.Join(errs...))
 
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
