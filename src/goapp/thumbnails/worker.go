@@ -13,7 +13,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"sync"
 	"time"
 )
 
@@ -72,12 +71,14 @@ type thumbnailRequest struct {
 	filepath string
 }
 
-var prioritizedThumbnailChannel chan thumbnailRequest = make(chan thumbnailRequest)
-var normalThumbnailChannel chan thumbnailRequest = make(chan thumbnailRequest)
+var prioritizedThumbnailChannel chan thumbnailRequest = make(chan thumbnailRequest, 100)
+var normalThumbnailChannel chan thumbnailRequest = make(chan thumbnailRequest, 10)
 
-func thumbnailWorker(ctx context.Context) error {
+func ThumbnailWorkerThread(ctx context.Context) error {
 	doneChan := ctx.Done()
 	// Prioritize doneChan and prioritized channel over normal channel
+	maxLoops := 1000
+	loops := 0
 	for {
 		select {
 		case <-doneChan:
@@ -101,7 +102,13 @@ func thumbnailWorker(ctx context.Context) error {
 				if err != nil {
 					return err
 				}
+			case <-time.After(time.Second * 5):
+				// Intentionally left empty
 			}
+		}
+		loops += 1
+		if loops > maxLoops {
+			return nil
 		}
 	}
 }
@@ -172,7 +179,7 @@ func produceThumbnail(req thumbnailRequest) error {
 	return nil
 }
 
-func walkSingleDiskAndProduceThumbnails(disk d.Disk) {
+func walkSingleDiskAndProduceThumbnails(ctx context.Context, disk d.Disk) {
 	diskId := disk.Id()
 	err := fs.WalkDir(disk.Fs(), ".", func(fpath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -183,11 +190,16 @@ func walkSingleDiskAndProduceThumbnails(disk d.Disk) {
 			return nil
 		}
 
-		normalThumbnailChannel <- thumbnailRequest{
-			filepath: fpath,
-			diskId:   diskId,
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			normalThumbnailChannel <- thumbnailRequest{
+				filepath: fpath,
+				diskId:   diskId,
+			}
+			return nil
 		}
-		return nil
 	})
 
 	if err != nil {
@@ -195,17 +207,29 @@ func walkSingleDiskAndProduceThumbnails(disk d.Disk) {
 	}
 }
 
-func InitThumbnailThreads(ctx context.Context, numThreads int, wg *sync.WaitGroup) {
-	for range numThreads {
-		wg.Go(func() {
-			thumbnailWorker(ctx)
-		})
+func PrioritizeThumbnail(disk d.Disk, filepath string) {
+	req := thumbnailRequest{
+		diskId:   disk.Id(),
+		filepath: filepath,
+	}
+
+	// Shed load rather than wait if too many requests come in at the same time
+	select {
+	case prioritizedThumbnailChannel <- req:
+		break
+	default:
+		break
 	}
 }
 
-func FindAndProduceThumbnails() {
+func FindAndProduceThumbnails(ctx context.Context) {
 	disks := disks.DiskStore.AllDisks()
 	for _, disk := range disks {
-		walkSingleDiskAndProduceThumbnails(disk)
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			walkSingleDiskAndProduceThumbnails(ctx, disk)
+		}
 	}
 }

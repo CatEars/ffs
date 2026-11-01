@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -43,14 +44,39 @@ var thumbnailWaitDuration time.Duration = time.Second * 5
 func InfinitelyRunThumbnailBackgroundProcess(ctx context.Context) {
 	log.Println("Starting thumbnail generator")
 	wg := sync.WaitGroup{}
-	thumbnails.InitThumbnailThreads(ctx, 3, &wg)
+	var targetThumbnailThreads int32 = 3
+	var currentThreads = atomic.Int32{}
+	var quitChan chan int = make(chan int, targetThumbnailThreads)
+	var workerThread = func() {
+		currentThreads.Add(1)
+		thumbnails.ThumbnailWorkerThread(ctx)
+		currentThreads.Add(-1)
+		quitChan <- 1
+	}
+	go func() {
+		for {
+			currThreadsSnapshot := currentThreads.Load()
+			for currThreadsSnapshot < targetThumbnailThreads {
+				wg.Go(workerThread)
+				currThreadsSnapshot += 1
+			}
+			select {
+			case <-ctx.Done():
+				return
+			case <-quitChan:
+				continue
+			case <-time.After(time.Minute * 5):
+				continue
+			}
+		}
+	}()
 	for {
 		select {
 		case <-ctx.Done():
 			wg.Wait()
 			return
 		default:
-			thumbnails.FindAndProduceThumbnails()
+			thumbnails.FindAndProduceThumbnails(ctx)
 			select {
 			case <-ctx.Done():
 				wg.Wait()
