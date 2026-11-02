@@ -92,7 +92,7 @@ func InfinitelyRunThumbnailBackgroundProcess(ctx context.Context) {
 
 func RunStartup(ctx context.Context) {
 	d, _ := os.Getwd()
-	ffslog.Printf("Starting go-app from %s", d)
+	ffslog.Printf("Starting ffs from %s", d)
 	env := config.Config.Env()
 	if env == "" {
 		config.Config.SetConfig("FFS_ENV", "dev")

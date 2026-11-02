@@ -45,7 +45,7 @@ func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	handler := &FfsHandler{}
 	address := ":8080"
-	ffslog.Printf("Serving GO app on", address)
+	ffslog.Printf("Serving API on %s", address)
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	RunStartup(ctx)

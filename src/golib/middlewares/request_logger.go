@@ -16,7 +16,7 @@ func getSource(r *http.Request) string {
 }
 
 func BuildRequestLoggingMiddleware(blacklist *regexp.Regexp) func(http.Handler) http.Handler {
-	logger := ffslog.FindOrCreateLogger("middleware")
+	logger := ffslog.FindOrCreateLogger("Middleware")
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			source := getSource(r)

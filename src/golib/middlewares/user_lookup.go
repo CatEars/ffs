@@ -23,7 +23,7 @@ func LookupClaims(r *http.Request) []*security.Claim {
 }
 
 func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byte) router.Middleware {
-	logger := ffslog.FindOrCreateLogger("middleware")
+	logger := ffslog.FindOrCreateLogger("Middleware")
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("FFS-Auth")

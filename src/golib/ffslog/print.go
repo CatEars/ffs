@@ -42,42 +42,42 @@ func NewLogger(name string) Logger {
 }
 
 func (l *logger) prefix() string {
-	return fmt.Sprintf("<%s>", l.name)
+	return fmt.Sprintf("<%s> ", l.name)
 }
 
 func (l *logger) Debug(v ...any) {
 	if l.level <= DebugLevel {
-		log.Print(append([]any{l.prefix()}, v...))
+		log.Print(append([]any{l.prefix()}, v...)...)
 	}
 }
 
 func (l *logger) Debugf(format string, v ...any) {
 	if l.level <= DebugLevel {
-		log.Printf(l.prefix()+" "+format, v...)
+		log.Printf(l.prefix()+format, v...)
 	}
 }
 
 func (l *logger) Info(v ...any) {
 	if l.level <= InfoLevel {
-		log.Print(append([]any{l.prefix()}, v...))
+		log.Print(append([]any{l.prefix()}, v...)...)
 	}
 }
 
 func (l *logger) Infof(format string, v ...any) {
 	if l.level <= InfoLevel {
-		log.Printf(l.prefix()+" "+format, v...)
+		log.Printf(l.prefix()+format, v...)
 	}
 }
 
 func (l *logger) Warn(v ...any) {
 	if l.level <= WarnLevel {
-		log.Print(append([]any{l.prefix()}, v...))
+		log.Print(append([]any{l.prefix()}, v...)...)
 	}
 }
 
 func (l *logger) Warnf(format string, v ...any) {
 	if l.level <= WarnLevel {
-		log.Printf(l.prefix()+" "+format, v...)
+		log.Printf(l.prefix()+format, v...)
 	}
 }
 
