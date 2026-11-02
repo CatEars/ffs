@@ -30,6 +30,20 @@ var MovieExtNames []string = []string{
 	".mpg",
 }
 
+var videoExtMap map[string]bool = make(map[string]bool)
+
+func init() {
+	for _, ext := range MovieExtNames {
+		videoExtMap[ext] = true
+	}
+}
+
+func isVideoFile(fname string) bool {
+	ext := path.Ext(fname)
+	_, found := videoExtMap[ext]
+	return found
+}
+
 func getMp4Duration(diskFs fs.FS, fpath string) (mp4Info, error) {
 	fhandle, err := diskFs.Open(fpath)
 	if err != nil {

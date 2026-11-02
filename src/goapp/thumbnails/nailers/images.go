@@ -19,6 +19,21 @@ var ImageExtNames []string = []string{
 	".psd",
 }
 
+var imageExtMap map[string]bool = make(map[string]bool)
+
+func init() {
+	for _, ext := range ImageExtNames {
+		imageExtMap[ext] = true
+	}
+}
+
+// TODO: Create a re-usable Set type that essentially does this
+func isImageFile(fname string) bool {
+	ext := path.Ext(fname)
+	_, found := imageExtMap[ext]
+	return found
+}
+
 type ImageNailer struct{}
 
 func (*ImageNailer) Generate(ctx *NailerContext) error {

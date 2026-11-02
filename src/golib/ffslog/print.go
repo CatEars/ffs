@@ -139,6 +139,7 @@ func FindLogger(name string) (logger Logger, found bool) {
 }
 
 func FindOrCreateLogger(name string) Logger {
+	// TODO: Ensure that loggers can be configured to use different levels
 	l, found := logRegister[name]
 	if found {
 		return l

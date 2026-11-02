@@ -19,6 +19,20 @@ var AudioExtNames []string = []string{
 	".ape",
 }
 
+var audioExtMap map[string]bool = make(map[string]bool)
+
+func init() {
+	for _, ext := range AudioExtNames {
+		audioExtMap[ext] = true
+	}
+}
+
+func isAudioFile(fname string) bool {
+	ext := path.Ext(fname)
+	_, found := audioExtMap[ext]
+	return found
+}
+
 var folderArtNames []string = []string{
 	"cover", "folder", "albumart", "album", "front", "artwork",
 }

@@ -28,6 +28,8 @@ var imageNailer = &nailers.ImageNailer{}
 var audioNailer = &nailers.AudioNailer{}
 var theUnnailer nailers.Nailer = &Unnailer{}
 
+// TODO: Remove thumbnails that no longer link to a file ("garbage collection")
+
 // TODO: Only run nailers if dependencies exist
 
 // TODO: Decide on a good level for thumbnail staleness
