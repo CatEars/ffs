@@ -14,7 +14,6 @@ FROM ubuntu
 ENV LANG=C.UTF-8
 
 WORKDIR /app
-COPY data/ /app/data
 
 COPY --from=builder /app/ffs /app/ffs
 
