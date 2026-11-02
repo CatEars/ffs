@@ -51,7 +51,7 @@ func (*thumbnailRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	thumbnailBase := os.DirFS(subFolder)
-	expectedThumbnailPath := thumbnailName + ".webp"
+	expectedThumbnailPath := thumbnailName
 	http.ServeFileFS(w, r, thumbnailBase, expectedThumbnailPath)
 }
 
