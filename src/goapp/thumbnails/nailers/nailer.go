@@ -2,12 +2,14 @@ package nailers
 
 import (
 	"catears/ffs/lib/autofolder"
+	"catears/ffs/lib/disks"
 	"catears/ffs/lib/ffslog"
 	"os"
 	"path"
 )
 
 type NailerContext struct {
+	Disk            disks.Disk
 	FilePath        string
 	TempOutputPath  string
 	TargetDirectory autofolder.AutoFolder

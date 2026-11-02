@@ -65,9 +65,40 @@ func (*AudioNailer) Generate(ctx *NailerContext) error {
 	}
 
 	artFile := path.Join(parentDir, folderArtEntry.Name())
-	cmd := exec.Command("convert", artFile, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
+	physLoc, err := ctx.Disk.PhysicalLocation()
+	if err == nil {
+		return produceAudioThumbnailFromPhysicalLocation(physLoc, artFile, ctx)
+	} else {
+		return produceAudioThumbnailFromFs(artFile, ctx)
+	}
+}
+
+func produceAudioThumbnailFromFs(artFile string, ctx *NailerContext) error {
+	fhandle, err := ctx.Disk.Fs().Open(artFile)
+	if err != nil {
+		return err
+	}
+	defer fhandle.Close()
+
+	cmd := exec.Command("convert", "-", "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
+	cmd.Stdin = fhandle
 
 	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	ctx.PromoteToParent = true
+	return ctx.Success()
+}
+
+func produceAudioThumbnailFromPhysicalLocation(physLoc, artFile string, ctx *NailerContext) error {
+	// TODO: Reduce duplication in this file
+	fpath := path.Join(physLoc, artFile)
+
+	cmd := exec.Command("convert", fpath, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
+
+	err := cmd.Run()
 	if err != nil {
 		return err
 	}

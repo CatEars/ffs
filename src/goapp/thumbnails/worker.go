@@ -27,7 +27,6 @@ var videoNailer = &nailers.MovieNailer{}
 var imageNailer = &nailers.ImageNailer{}
 var audioNailer = &nailers.AudioNailer{}
 var theUnnailer nailers.Nailer = &Unnailer{}
-var numWorkerThreads = 3
 
 // TODO: Only run nailers if dependencies exist
 
@@ -67,7 +66,7 @@ func selectNailer(ftype filetype.FileType) nailers.Nailer {
 }
 
 type thumbnailRequest struct {
-	diskId   string
+	disk     d.Disk
 	filepath string
 }
 
@@ -115,7 +114,7 @@ func ThumbnailWorkerThread(ctx context.Context) error {
 
 func produceThumbnail(req thumbnailRequest) error {
 	fpath := req.filepath
-	diskId := req.diskId
+	diskId := req.disk.Id()
 	tempPathFolder, err := cache.ThumbnailsTempFolder.Get()
 	if err != nil {
 		return err
@@ -140,6 +139,7 @@ func produceThumbnail(req thumbnailRequest) error {
 	// Hmm...
 	// SOLUTION: Use io.Reader/io.Writer and send read file to stdin of ffmpeg, imagemagick
 	ctx := nailers.NewNailerContext()
+	ctx.Disk = req.disk
 	ctx.FilePath = fpath
 	ctx.TempOutputPath = tempOutputPath
 	ctx.TargetDirectory = sub
@@ -180,7 +180,6 @@ func produceThumbnail(req thumbnailRequest) error {
 }
 
 func walkSingleDiskAndProduceThumbnails(ctx context.Context, disk d.Disk) {
-	diskId := disk.Id()
 	err := fs.WalkDir(disk.Fs(), ".", func(fpath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -196,7 +195,7 @@ func walkSingleDiskAndProduceThumbnails(ctx context.Context, disk d.Disk) {
 		default:
 			normalThumbnailChannel <- thumbnailRequest{
 				filepath: fpath,
-				diskId:   diskId,
+				disk:     disk,
 			}
 			return nil
 		}
@@ -209,7 +208,7 @@ func walkSingleDiskAndProduceThumbnails(ctx context.Context, disk d.Disk) {
 
 func PrioritizeThumbnail(disk d.Disk, filepath string) {
 	req := thumbnailRequest{
-		diskId:   disk.Id(),
+		disk:     disk,
 		filepath: filepath,
 	}
 

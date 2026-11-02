@@ -37,6 +37,10 @@ func (u *undiskImpl) Usage() (diskusage.DiskStat, error) {
 	}, nil
 }
 
+func (u *undiskImpl) PhysicalLocation() (string, error) {
+	return "", errors.New("undisk does not support physical location")
+}
+
 func newUndisk() undisk {
 	return &undiskImpl{}
 }

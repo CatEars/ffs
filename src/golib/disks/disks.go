@@ -29,6 +29,7 @@ type Disk interface {
 	ModFs() (ModFS, error)
 	Usage() (diskusage.DiskStat, error)
 	Descriptor() string
+	PhysicalLocation() (string, error)
 }
 
 type physicalDisk struct {
@@ -51,6 +52,10 @@ func (d *physicalDisk) Fs() fs.FS {
 
 func (d *physicalDisk) Usage() (diskusage.DiskStat, error) {
 	return diskusage.GetDiskUsage(d.root)
+}
+
+func (d *physicalDisk) PhysicalLocation() (string, error) {
+	return d.root, nil
 }
 
 type modFS struct {

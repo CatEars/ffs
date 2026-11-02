@@ -4,6 +4,7 @@ import (
 	diskusage "catears/ffs/lib/disk-usage"
 	"catears/ffs/lib/disks"
 	"encoding"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -18,7 +19,7 @@ type SymlinkFS interface {
 }
 
 type symlinkFs struct {
-	id string
+	id       string
 	symlinks map[string]string
 }
 
@@ -104,6 +105,11 @@ func (s *symlinkFs) ReadDir(name string) ([]fs.DirEntry, error) {
 	return os.ReadDir(realPath)
 }
 
+func (s *symlinkFs) PhysicalLocation() (string, error) {
+	// TODO: Investigate symlinkFs support for physical location
+	return "", errors.New("symlinkFs does not support physical location")
+}
+
 func absPathAllValues(symlinks map[string]string) (map[string]string, error) {
 	res := make(map[string]string)
 	for key, entry := range symlinks {
@@ -136,7 +142,7 @@ func New(id string, symlinks map[string]string) (SymlinkFS, error) {
 	}
 
 	return &symlinkFs{
-		id: id,
+		id:       id,
 		symlinks: absedSymlinks,
 	}, nil
 }
