@@ -135,11 +135,6 @@ func produceThumbnail(req thumbnailRequest) error {
 		return nil
 	}
 
-	// TODO: Disks are an abstraction to provide the ability for non-physical disks
-	// to be present in the disk store. However, ffmpeg integration is based on commands
-	// running locally and thus a conflict between non-physical disks and ffmpeg is born.
-	// Hmm...
-	// SOLUTION: Use io.Reader/io.Writer and send read file to stdin of ffmpeg, imagemagick
 	ctx := nailers.NewNailerContext()
 	ctx.Disk = req.disk
 	ctx.FilePath = fpath
