@@ -4,6 +4,7 @@ import (
 	"catears/ffs/lib/autofolder"
 	"catears/ffs/lib/disks"
 	"catears/ffs/lib/ffslog"
+	"catears/ffs/lib/functional"
 	"io/fs"
 	"os"
 	"path"
@@ -22,6 +23,9 @@ type NailerContext struct {
 var logger = ffslog.FindOrCreateLogger("Thumbnail")
 
 func (ctx *NailerContext) Success() error {
+	// TODO: This algorithm is inspired from the old `deno` code, but it fails
+	// to consider when a folder changes files, which can lead to stale thumbnails.
+	// We need a good way to display thumbnails for directories that can handle these types of updates
 	outputFolder, err := ctx.TargetDirectory.Get()
 	if err != nil {
 		return err
@@ -43,12 +47,9 @@ func (ctx *NailerContext) Success() error {
 	for _, entry := range entries {
 		names = append(names, entry.Name())
 	}
-	// TODO: This algorithm is inspired from the old `deno` code, but it fails
-	// to consider when a folder changes files, which can lead to stale thumbnails.
-	// We need a good way to display thumbnails for directories that can handle these types of updates
-	videoFiles := filterVideoFiles(names)
-	imageFiles := filterImageFiles(names)
-	audioFiles := filterAudioFiles(names)
+	videoFiles := functional.Filter(isVideoFile, names)
+	imageFiles := functional.Filter(isImageFile, names)
+	audioFiles := functional.Filter(isAudioFile, names)
 	if len(videoFiles) == 1 && videoFiles[0] == path.Base(ctx.FilePath) {
 		ctx.PromoteToParent = true
 	} else if len(imageFiles) == 1 && imageFiles[0] == path.Base(ctx.FilePath) {
@@ -58,37 +59,6 @@ func (ctx *NailerContext) Success() error {
 	}
 
 	return nil
-}
-
-// TODO: Break these similar functions out to `functional` golib as filter
-func filterVideoFiles(names []string) []string {
-	res := []string{}
-	for _, entry := range names {
-		if isVideoFile(entry) {
-			res = append(res, entry)
-		}
-	}
-	return res
-}
-
-func filterAudioFiles(names []string) []string {
-	res := []string{}
-	for _, entry := range names {
-		if isAudioFile(entry) {
-			res = append(res, entry)
-		}
-	}
-	return res
-}
-
-func filterImageFiles(names []string) []string {
-	res := []string{}
-	for _, entry := range names {
-		if isImageFile(entry) {
-			res = append(res, entry)
-		}
-	}
-	return res
 }
 
 func NewNailerContext() *NailerContext {
