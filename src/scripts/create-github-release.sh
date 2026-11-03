@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=$(git describe --tags --abbrev=0)
+VERSION="$(git describe --tags --abbrev=0)"
 
 echo "Creating a Github release for catears/ffs version $VERSION"
 curl -L \
@@ -45,6 +45,7 @@ curl -L \
   "https://uploads.github.com/repos/catears/ffs/releases/$release_id/assets?name=$TINY_ARCHIVE_NAME" \
   --data-binary "@dist/$TINY_ARCHIVE_NAME"
 
+# TODO: Build other platform binaries on release and streamline release process
 echo "Uploading remaining platform binaries..."
 
 for FILEPATH in dist/*; do
