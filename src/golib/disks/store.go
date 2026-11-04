@@ -35,7 +35,7 @@ func (store *DiskStore) DiskOrDefault(id string) Disk {
 		return disk
 	}
 
-	return theUndisk
+	return store.DefaultDisk()
 }
 
 func (store *DiskStore) DefaultDisk() Disk {
