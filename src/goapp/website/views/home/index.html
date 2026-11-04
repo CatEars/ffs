@@ -1,5 +1,6 @@
 {{ template "base-header.html" . }}
 <app-main>
+    <!-- TODO: Implement filter bar for files -->
     <script>
         function filesWithUnstringifiedDate(files) {
             return files.map((file) => ({ ...file, date: new Date(file.date) }));
@@ -77,8 +78,10 @@
             return pageNum;
         }
 
-        function isSoundFile(file) {
-            return file.endsWith('.mp3');
+        function isAudioFile(file) {
+            return ['.mp3', '.wav', '.ogg', '.flac', '.aac', '.m4a', '.opus', '.wma', '.ape'].some(
+                (x) => file.endsWith(x)
+            );
         }
 
         function isImageFile(file) {
@@ -104,11 +107,11 @@
         }
 
         function isMediaFile(file) {
-            return isSoundFile(file) || isImageFile(file) || isMovieFile(file);
+            return isAudioFile(file) || isImageFile(file) || isMovieFile(file);
         }
 
         function resolveSvgLocationForFile(file) {
-            if (isSoundFile(file.name)) {
+            if (isAudioFile(file.name)) {
                 return 'music_note';
             } else if (isImageFile(file.name)) {
                 return 'photo_camera';

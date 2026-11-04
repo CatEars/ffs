@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// LINK-FILE-EXTENSIONS
 var ImageExtNames []string = []string{
 	".png",
 	".jpg",
