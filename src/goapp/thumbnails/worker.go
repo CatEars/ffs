@@ -4,6 +4,7 @@ import (
 	"catears/ffs/goapp/cache"
 	"catears/ffs/goapp/disks"
 	"catears/ffs/goapp/thumbnails/nailers"
+	"catears/ffs/lib/autofolder"
 	d "catears/ffs/lib/disks"
 	"catears/ffs/lib/ffslog"
 	filetype "catears/ffs/lib/file-type"
@@ -23,6 +24,7 @@ func (*Unnailer) Generate(ctx *nailers.NailerContext) error {
 	return nil
 }
 
+var logger = ffslog.FindOrCreateLogger("Thumbnail")
 var videoNailer = &nailers.MovieNailer{}
 var imageNailer = &nailers.ImageNailer{}
 var audioNailer = &nailers.AudioNailer{}
@@ -72,8 +74,15 @@ type thumbnailRequest struct {
 	filepath string
 }
 
+type promotionRequest struct {
+	filepath        string
+	diskId          string
+	targetDirectory autofolder.AutoFolder
+}
+
 var prioritizedThumbnailChannel chan thumbnailRequest = make(chan thumbnailRequest, 100)
 var normalThumbnailChannel chan thumbnailRequest = make(chan thumbnailRequest, 10)
+var promotionThumbnailChannel chan promotionRequest = make(chan promotionRequest, 100)
 
 func ThumbnailWorkerThread(ctx context.Context) error {
 	doneChan := ctx.Done()
@@ -86,6 +95,13 @@ func ThumbnailWorkerThread(ctx context.Context) error {
 			return nil
 		case req := <-prioritizedThumbnailChannel:
 			err := produceThumbnail(req)
+			if err != nil {
+				return err
+			}
+		// Ensure that promotion takes precedence over "normal" so that a full promotion
+		// queue does not deadlock thumbnail creation
+		case req := <-promotionThumbnailChannel:
+			err := promoteThumbnail(req)
 			if err != nil {
 				return err
 			}
@@ -103,6 +119,11 @@ func ThumbnailWorkerThread(ctx context.Context) error {
 				if err != nil {
 					return err
 				}
+			case req := <-promotionThumbnailChannel:
+				err := promoteThumbnail(req)
+				if err != nil {
+					return err
+				}
 			case <-time.After(time.Second * 5):
 				// Intentionally left empty
 			}
@@ -112,6 +133,36 @@ func ThumbnailWorkerThread(ctx context.Context) error {
 			return nil
 		}
 	}
+}
+
+func promoteThumbnail(req promotionRequest) error {
+	replacedPathName := thumbnail.AsThumbnailName(req.filepath)
+	parentPath := path.Dir(req.filepath)
+	parentThumbnailName := thumbnail.AsThumbnailName(parentPath)
+	parentThumbnailDir := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, req.diskId, parentPath)
+	resolvedParentThumbnailDir, err := parentThumbnailDir.Get()
+	if err != nil {
+		return err
+	}
+	originalDir, err := req.targetDirectory.Get()
+	if err != nil {
+		return err
+	}
+
+	parentThumbnailPath := path.Join(resolvedParentThumbnailDir, parentThumbnailName)
+	existing, err := os.Stat(parentThumbnailPath)
+	if err == nil && !isStale(existing.ModTime()) {
+		// TODO: parent already exists, write test case to ensure promotion only happens once
+		return nil
+	}
+	sourcePath := path.Join(originalDir, replacedPathName)
+	err = copyFile(parentThumbnailPath, sourcePath)
+	if err != nil {
+		return err
+	}
+
+	logger.Debugf("Promoted thumbnail %s to directory %s", path.Base(req.filepath), path.Base(path.Dir(req.filepath)))
+	return nil
 }
 
 func produceThumbnail(req thumbnailRequest) error {
@@ -155,22 +206,11 @@ func produceThumbnail(req thumbnailRequest) error {
 	}
 
 	if ctx.PromoteToParent {
-		// TODO: Find a nicer way to do this, possibly delay and handle completely separately
-		parentPath := path.Dir(fpath)
-		parentThumbnailName := thumbnail.AsThumbnailName(parentPath)
-		parentThumbnailDir := thumbnail.ResolveThumbnailFolder(cache.ThumbnailsFolder, diskId, parentPath)
-		resolvedParentThumbnailDir, err := parentThumbnailDir.Get()
-		if err != nil {
-			return err
+		promotionThumbnailChannel <- promotionRequest{
+			filepath:        fpath,
+			diskId:          diskId,
+			targetDirectory: ctx.TargetDirectory,
 		}
-		originalDir, err := ctx.TargetDirectory.Get()
-		if err != nil {
-			return err
-		}
-
-		parentThumbnailPath := path.Join(resolvedParentThumbnailDir, parentThumbnailName)
-		sourcePath := path.Join(originalDir, replacedPathName)
-		return copyFile(parentThumbnailPath, sourcePath)
 	}
 
 	return nil
@@ -199,7 +239,7 @@ func walkSingleDiskAndProduceThumbnails(ctx context.Context, disk d.Disk) {
 	})
 
 	if err != nil {
-		ffslog.Printf("Error when generating thumbnails: %s", err)
+		logger.Warnf("Error when generating thumbnails: %s", err)
 	}
 }
 

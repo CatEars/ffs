@@ -37,16 +37,13 @@ func (ctx *NailerContext) Success() error {
 		return err
 	}
 
-	logger.Infof("Created thumbnail for %s", path.Base(ctx.FilePath))
+	logger.Debugf("Created thumbnail for %s", path.Base(ctx.FilePath))
 	entries, err := fs.ReadDir(ctx.Disk.Fs(), path.Dir(ctx.FilePath))
 	if err != nil {
 		return err
 	}
 
-	names := []string{}
-	for _, entry := range entries {
-		names = append(names, entry.Name())
-	}
+	names := functional.Map(func(entry fs.DirEntry) string { return entry.Name() }, entries)
 	videoFiles := functional.Filter(isVideoFile, names)
 	imageFiles := functional.Filter(isImageFile, names)
 	audioFiles := functional.Filter(isAudioFile, names)
