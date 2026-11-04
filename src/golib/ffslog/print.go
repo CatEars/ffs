@@ -37,7 +37,7 @@ const (
 func NewLogger(name string) Logger {
 	return &logger{
 		name:  name,
-		level: InfoLevel,
+		level: DebugLevel,
 	}
 }
 
@@ -138,6 +138,7 @@ func FindLogger(name string) (logger Logger, found bool) {
 	return l, f
 }
 
+// TODO: Guard creation with mutex to ensure there are not multiple instances of the same logger
 func FindOrCreateLogger(name string) Logger {
 	// TODO: Ensure that loggers can be configured to use different levels
 	l, found := logRegister[name]
