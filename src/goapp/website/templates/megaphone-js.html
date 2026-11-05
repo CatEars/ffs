@@ -20,7 +20,9 @@
                     .replaceAll('{', '')
                     .trim();
             } else {
-                [declaration, body] = selectorBody.split('=>');
+                // Only split on first arrow function and concat rest
+                [declaration, ...body] = selectorBody.split('=>');
+                body = body.join('=>');
                 declaration = declaration.replaceAll('(', '').replaceAll(')', '').trim();
             }
 
