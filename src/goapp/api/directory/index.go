@@ -68,6 +68,8 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		fileType := "unidentified"
 		svgIconName := "description"
+		fullPath := path.Join(p, v.Name())
+		imageSrc := fmt.Sprintf("/api/thumbnail?path=%s", url.QueryEscape(fullPath))
 		if fileInfo.Mode().IsDir() {
 			fileType = "directory"
 			svgIconName = "folder"
@@ -80,10 +82,9 @@ func (*listDirectoryRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if desc.IsImageFile {
 			fileType = "image"
 			svgIconName = "photo_camera"
+		} else {
+			imageSrc = ""
 		}
-
-		fullPath := path.Join(p, v.Name())
-		imageSrc := fmt.Sprintf("/api/thumbnail?path=%s", url.QueryEscape(fullPath))
 
 		entries[idx] = listDirectoryResultEntry{
 			Name:        v.Name(),
