@@ -197,6 +197,53 @@
         onDeclareState() {}
     }
 
+    class DebouncedFunction {
+        static #callers = {};
+
+        constructor(func, delayMs) {
+            const key = DebouncedFunction.#generateRandomValue();
+            this.key = key;
+            this.func = DebouncedFunction.#wrapFunc(func, key, delayMs);
+            this.delayMs = delayMs;
+        }
+
+        set(func) {
+            this.func = DebouncedFunction.#wrapFunc(func, this.key, this.delayMs);
+        }
+
+        get() {
+            return this.func;
+        }
+
+        onDeclareState() {}
+
+        static #wrapFunc(func, key, delayMs) {
+            return (...outerArgs) => {
+                const num = setTimeout(
+                    (...args) => {
+                        delete DebouncedFunction.#callers[key];
+                        func(...args);
+                    },
+                    delayMs,
+                    ...outerArgs
+                );
+                const existingValue = DebouncedFunction.#callers[key];
+                if (existingValue) {
+                    clearTimeout(existingValue);
+                }
+                DebouncedFunction.#callers[key] = num;
+            };
+        }
+
+        static #generateRandomValue() {
+            if (crypto) {
+                return crypto.randomUUID();
+            } else {
+                return `${Math.random()}`;
+            }
+        }
+    }
+
     class MegaphoneDebugger {
         static _claimedStateNames = new Map();
 
@@ -280,7 +327,8 @@
             if (
                 value instanceof JsonApiValue ||
                 value instanceof BrowserStorage ||
-                value instanceof ComputedView
+                value instanceof ComputedView ||
+                value instanceof DebouncedFunction
             ) {
                 return value;
             }
@@ -315,7 +363,6 @@
             this.rootNode.addEventListener(
                 'submit',
                 (event) => {
-                    console.log('CSRF', self.csrfToken);
                     if (!self.csrfToken) {
                         return;
                     }
@@ -571,6 +618,10 @@
                 options.view = Megaphone.identity;
             }
             return new JsonApiValue(key, defaultValue, options);
+        }
+
+        debounce(f, delayMs = 100) {
+            return new DebouncedFunction(f, delayMs);
         }
 
         renderEach(state, into, renderFunc) {
