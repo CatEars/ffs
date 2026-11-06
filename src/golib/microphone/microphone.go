@@ -3,12 +3,17 @@ package microphone
 import (
 	"html/template"
 	"io/fs"
+	"net/http"
 	"strings"
 )
 
+type viewMapping map[string]*template.Template
+
 type Microphone struct {
-	Views       map[string]*template.Template
-	StaticFiles fs.FS
+	contentRoot  fs.FS
+	Views        viewMapping
+	StaticFiles  fs.FS
+	AlwaysReload bool
 }
 
 func findAllHtmlFiles(contentRoot fs.FS) ([]string, error) {
@@ -32,8 +37,8 @@ func findAllHtmlFiles(contentRoot fs.FS) ([]string, error) {
 	return files, nil
 }
 
-func convertFilesToTemplates(contentRoot fs.FS, templateBase *template.Template, paths []string) (map[string]*template.Template, error) {
-	result := make(map[string]*template.Template)
+func convertFilesToTemplates(contentRoot fs.FS, templateBase *template.Template, paths []string) (viewMapping, error) {
+	result := make(viewMapping)
 
 	for _, viewPath := range paths {
 		canonicalPath := strings.Replace(viewPath, "index.html", "", 1)
@@ -50,11 +55,7 @@ func convertFilesToTemplates(contentRoot fs.FS, templateBase *template.Template,
 	return result, nil
 }
 
-func New(contentRoot fs.FS) (*Microphone, error) {
-	staticFolder, err := fs.Sub(contentRoot, "static")
-	if err != nil {
-		return nil, err
-	}
+func readAll(contentRoot fs.FS) (viewMapping, error) {
 	viewsFolder, err := fs.Sub(contentRoot, "views")
 	if err != nil {
 		return nil, err
@@ -71,9 +72,44 @@ func New(contentRoot fs.FS) (*Microphone, error) {
 	if err != nil {
 		return nil, err
 	}
+	return views, nil
+}
+
+func New(contentRoot fs.FS) (*Microphone, error) {
+	staticFolder, err := fs.Sub(contentRoot, "static")
+	if err != nil {
+		return nil, err
+	}
+
+	views, err := readAll(contentRoot)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Microphone{
-		Views:       views,
-		StaticFiles: staticFolder,
+		contentRoot:  contentRoot,
+		Views:        views,
+		StaticFiles:  staticFolder,
+		AlwaysReload: false,
 	}, nil
+}
+
+func (mcr *Microphone) ExecuteTemplate(w http.ResponseWriter, viewName string, data any) error {
+	var views viewMapping
+	if mcr.AlwaysReload {
+		var err error
+		views, err = readAll(mcr.contentRoot)
+		if err != nil {
+			return err
+		}
+	} else {
+		views = mcr.Views
+	}
+	t, found := views[viewName]
+	if !found {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		return t.ExecuteTemplate(w, viewName, data)
+	}
+	return nil
 }
