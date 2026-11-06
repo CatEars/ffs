@@ -4,12 +4,14 @@ import (
 	approutes "catears/ffs/goapp/app-routes"
 	"catears/ffs/goapp/config"
 	"catears/ffs/lib/ffslog"
+	"catears/ffs/lib/router"
 	"context"
 	"crypto/tls"
 	"embed"
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"strings"
 	"syscall"
 	"time"
@@ -21,7 +23,7 @@ type FfsHandler struct {
 //go:embed website/*
 var websiteContent embed.FS
 
-var appRouter = approutes.BuildAppRouter(websiteContent)
+var appRouter router.Router
 
 func isApiCall(r *http.Request) bool {
 	return strings.HasPrefix(strings.ToLower(r.URL.Path), "/api/")
@@ -49,6 +51,15 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	RunStartup(ctx)
+	if config.Config.DevMode() {
+		pwd, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		appRouter = approutes.BuildAppRouter(os.DirFS(path.Join(pwd, "src", "goapp")))
+	} else {
+		appRouter = approutes.BuildAppRouter(websiteContent)
+	}
 	certFile := config.Config.CertFile()
 	keyFile := config.Config.CertKeyFile()
 	_, certFileErr := os.ReadFile(certFile)

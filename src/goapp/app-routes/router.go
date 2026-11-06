@@ -2,6 +2,8 @@ package approutes
 
 import (
 	"catears/ffs/goapp/appmiddlewares"
+	"catears/ffs/goapp/config"
+	"catears/ffs/lib/ffslog"
 	"catears/ffs/lib/microphone"
 	"catears/ffs/lib/middlewares"
 	"catears/ffs/lib/router"
@@ -43,10 +45,14 @@ func addStaticRoutes(appRoutes router.Router, mcr *microphone.Microphone) error 
 }
 
 func addTemplateRoutes(appRoutes router.Router, mcr *microphone.Microphone) {
-	for viewName, t := range mcr.Views {
+	for viewName := range mcr.Views {
 		appRoutes.Get("/"+viewName, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			data := r.Context().Value(appmiddlewares.AppStateContextKey()).(*appmiddlewares.AppState)
-			t.ExecuteTemplate(w, viewName, data)
+			err := mcr.ExecuteTemplate(w, viewName, data)
+			if err != nil {
+				ffslog.Warn("Error when executing template ", viewName, err)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}))
 	}
 }
@@ -56,6 +62,9 @@ func BuildAppRouter(websiteContent fs.FS) router.Router {
 	mcr, err := buildMicrophone(websiteContent)
 	if err != nil {
 		panic(err)
+	}
+	if config.Config.DevMode() {
+		mcr.AlwaysReload = true
 	}
 
 	var appRoutes = router.NewRouter()
