@@ -306,13 +306,22 @@
                 view: (files) =>
                     includeParentUnlessRoot(filesWithUnstringifiedDate(files), currentPath),
             }),
-            maxPages: megaphone.view((state) => getNumPages(state.files, state.pageSize)),
+            filter: megaphone.urlParam('filter', ''),
+            filteredFiles: megaphone.view((state) => {
+                return state.files.filter(
+                    (f) => f.name === '..' || f.name.toLocaleLowerCase().includes(state.filter)
+                );
+            }),
+            showFilterSearchBar: 'hidden',
+            //showFilterSearchBar: 'show',
+
+            maxPages: megaphone.view((state) => getNumPages(state.filteredFiles, state.pageSize)),
             sorting: megaphone.localStorage('file-sort-order', 'newest'),
             directoriesFirst: megaphone.localStorage('show-directories-first', true),
             currentPage: getCurrentPage(),
             sortedFiles: megaphone.view((state) =>
                 sortedBy(
-                    state.files,
+                    state.filteredFiles,
                     state.sorting,
                     state.directoriesFirst,
                     state.currentPage,
@@ -346,6 +355,10 @@
             onSortDirectoriesFirstChange,
             onCrumbClick,
             onPageShift,
+            onFilterInput: megaphone.debounce(function (evt) {
+                state.filter = evt.target.value.toLocaleLowerCase();
+                // TODO: re-render of the file manager will reload thumbnails, causing annoying blinking...
+            }),
             pasteFiles,
             cutFiles,
             resetCuttingBoard,
@@ -407,6 +420,11 @@
     </script>
     <breadcrumb-nav $trail="currentPath" @crumb-click="onCrumbClick"></breadcrumb-nav>
     <horizontal-ruler></horizontal-ruler>
+    <section $data-visibility="showFilterSearchBar">
+        <input type="text" @input="onFilterInput" />
+        <horizontal-ruler></horizontal-ruler>
+    </section>
+
     <paginate-control
         $page="currentPage"
         $max-pages="maxPages"
@@ -528,97 +546,88 @@
         </form>
     </drop-down>
 
-    <div $data-visibility="fileManagerVisibility">
-        <column-layout id="action-panel">
-            <drop-down>
-                <p slot="header">Quick Buttons</p>
-                <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
-                    <input id="files-to-move" name="files-to-move" type="hidden" />
-                    <input id="destination" name="destination" type="hidden" />
-                </form>
-                <form
-                    id="delete-form"
-                    action="/api/file/remove"
-                    method="POST"
-                    style="display: none"
-                >
-                    <input id="files-to-remove" name="files-to-remove" type="hidden" />
-                </form>
-                <form id="download-form" action="/api/download" method="POST" style="display: none">
-                    <input id="download-input-root" name="root" type="hidden" />
-                    <template id="download-input-template">
-                        <input type="text" name="file" type="hidden" />
-                    </template>
-                </form>
-                <div class="action-buttons">
-                    <button @click="downloadFiles" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#download"></use>
-                        </svg>
-                    </button>
-                </div>
-                <horizontal-ruler></horizontal-ruler>
-                <div class="action-buttons">
-                    <button @click="cutFiles" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#content_cut"></use>
-                        </svg>
-                    </button>
-                    <button @click="pasteFiles" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#content_paste"></use>
-                        </svg>
-                    </button>
-                    <button @click="resetCuttingBoard" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#undo"></use>
-                        </svg>
-                    </button>
-                    <button @click="deleteFiles" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#delete"></use>
-                        </svg>
-                    </button>
-                </div>
-                <horizontal-ruler></horizontal-ruler>
-                <div class="action-buttons">
-                    <button @click="gotoUpload" type="button">
-                        <svg class="medium-icon">
-                            <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
-                        </svg>
-                    </button>
-                </div>
-            </drop-down>
-            <drop-down>
-                <p slot="header">Rename</p>
-                <form action="/api/file/rename" method="POST" id="rename-form">
-                    <input id="source" name="source" type="hidden" />
-                    <p>
-                        Select a single file to rename, input the new name of the file, then submit.
-                    </p>
-                    <fieldset>
-                        <legend>New Name of File</legend>
-                        <input id="target" name="target" type="text" />
-                    </fieldset>
-                    <fieldset>
-                        <button @click="renameFile" type="button">Rename</button>
-                    </fieldset>
-                </form>
-            </drop-down>
-            <drop-down>
-                <p slot="header">Make Directory</p>
-                <form id="make-directory-form" action="/api/directory/make" method="POST">
-                    <input type="hidden" name="path" id="make-directory-path" />
-                    <fieldset>
-                        <legend>Directory Name</legend>
-                        <input type="text" name="name" id="name" />
-                    </fieldset>
-                    <fieldset>
-                        <button @click="makeDirectory" type="button">Create Directory</button>
-                    </fieldset>
-                </form>
-            </drop-down>
-        </column-layout>
-    </div>
+    <column-layout id="action-panel">
+        <drop-down>
+            <p slot="header">Quick Buttons</p>
+            <form id="paste-form" action="/api/file/move" method="POST" style="display: none">
+                <input id="files-to-move" name="files-to-move" type="hidden" />
+                <input id="destination" name="destination" type="hidden" />
+            </form>
+            <form id="delete-form" action="/api/file/remove" method="POST" style="display: none">
+                <input id="files-to-remove" name="files-to-remove" type="hidden" />
+            </form>
+            <form id="download-form" action="/api/download" method="POST" style="display: none">
+                <input id="download-input-root" name="root" type="hidden" />
+                <template id="download-input-template">
+                    <input type="text" name="file" type="hidden" />
+                </template>
+            </form>
+            <div class="action-buttons">
+                <button @click="downloadFiles" type="button">
+                    <svg class="medium-icon">
+                        <use href="/static/svg/sprite_sheet.svg#download"></use>
+                    </svg>
+                </button>
+            </div>
+            <horizontal-ruler></horizontal-ruler>
+            <div class="action-buttons">
+                <button @click="cutFiles" type="button">
+                    <svg class="medium-icon">
+                        <use href="/static/svg/sprite_sheet.svg#content_cut"></use>
+                    </svg>
+                </button>
+                <button @click="pasteFiles" type="button">
+                    <svg class="medium-icon">
+                        <use href="/static/svg/sprite_sheet.svg#content_paste"></use>
+                    </svg>
+                </button>
+                <button @click="resetCuttingBoard" type="button">
+                    <svg class="medium-icon">
+                        <use href="/static/svg/sprite_sheet.svg#undo"></use>
+                    </svg>
+                </button>
+                <button @click="deleteFiles" type="button">
+                    <svg class="medium-icon">
+                        <use href="/static/svg/sprite_sheet.svg#delete"></use>
+                    </svg>
+                </button>
+            </div>
+            <horizontal-ruler></horizontal-ruler>
+            <div class="action-buttons">
+                <button @click="gotoUpload" type="button">
+                    <svg class="medium-icon">
+                        <use href="/static/svg/sprite_sheet.svg#upload_file"></use>
+                    </svg>
+                </button>
+            </div>
+        </drop-down>
+        <drop-down>
+            <p slot="header">Rename</p>
+            <form action="/api/file/rename" method="POST" id="rename-form">
+                <input id="source" name="source" type="hidden" />
+                <p>Select a single file to rename, input the new name of the file, then submit.</p>
+                <fieldset>
+                    <legend>New Name of File</legend>
+                    <input id="target" name="target" type="text" />
+                </fieldset>
+                <fieldset>
+                    <button @click="renameFile" type="button">Rename</button>
+                </fieldset>
+            </form>
+        </drop-down>
+        <drop-down>
+            <p slot="header">Make Directory</p>
+            <form id="make-directory-form" action="/api/directory/make" method="POST">
+                <input type="hidden" name="path" id="make-directory-path" />
+                <fieldset>
+                    <legend>Directory Name</legend>
+                    <input type="text" name="name" id="name" />
+                </fieldset>
+                <fieldset>
+                    <button @click="makeDirectory" type="button">Create Directory</button>
+                </fieldset>
+            </form>
+        </drop-down>
+    </column-layout>
 </app-main>
 {{ template "base-footer.html" . }}
