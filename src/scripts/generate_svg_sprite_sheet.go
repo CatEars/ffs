@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-var inputFolder = path.Join("src", "app", "website", "static", "svg")
-var outputFile = path.Join("src", "app", "website", "static", "svg", "sprite_sheet.svg")
+var inputFolder = path.Join("src", "goapp", "website", "static", "svg")
+var outputFile = path.Join("src", "goapp", "website", "static", "svg", "sprite_sheet.svg")
 
 var svgSpriteHeader = `<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">` + "\n"
 var svgSpriteFooter = "\n" + `</svg>`
@@ -29,13 +29,13 @@ func GenerateSvgSpriteSheet() {
 		Fatal(err)
 		//svgContent := string(svgContentBytes)
 		iconId := strings.TrimSuffix(entry.Name(), ".svg")
-		matcher := regexp.MustCompile(`<path\s+d="([^"]+)"`)
+		matcher := regexp.MustCompile(`(<path(.|\s)+/>)`)
 		match := matcher.FindSubmatch(svgContentBytes)
 		if len(match) > 1 {
 			pathData := match[1]
 			symbol := fmt.Sprintf(
 				`  <symbol id="%s" fill="currentColor" viewBox="0 -960 960 960">
-    <path d="%s" />
+    %s
   </symbol>`, iconId, pathData)
 			sprites = append(sprites, symbol)
 		} else {
