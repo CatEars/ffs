@@ -1,6 +1,5 @@
 {{ template "base-header.html" . }}
 <app-main>
-    <!-- TODO: Implement filter bar for files -->
     <script>
         function filesWithUnstringifiedDate(files) {
             return files.map((file) => ({ ...file, date: new Date(file.date) }));
@@ -312,8 +311,8 @@
                     (f) => f.name === '..' || f.name.toLocaleLowerCase().includes(state.filter)
                 );
             }),
-            showFilterSearchBar: 'hidden',
-            //showFilterSearchBar: 'show',
+            //showFilterSearchBar: 'hidden',
+            showFilterSearchBar: 'show',
 
             maxPages: megaphone.view((state) => getNumPages(state.filteredFiles, state.pageSize)),
             sorting: megaphone.localStorage('file-sort-order', 'newest'),
@@ -420,17 +419,20 @@
     </script>
     <breadcrumb-nav $trail="currentPath" @crumb-click="onCrumbClick"></breadcrumb-nav>
     <horizontal-ruler></horizontal-ruler>
-    <section $data-visibility="showFilterSearchBar">
-        <input type="text" @input="onFilterInput" />
-        <horizontal-ruler></horizontal-ruler>
+
+    <section class="top-search-bar" $data-visibility="showFilterSearchBar">
+        <label>
+            <svg class="icon">
+                <use href="/static/svg/sprite_sheet.svg#filter"></use>
+            </svg>
+            <input type="text" @input="onFilterInput" />
+        </label>
+        <paginate-control
+            $page="currentPage"
+            $max-pages="maxPages"
+            @page-shift="onPageShift"
+        ></paginate-control>
     </section>
-
-    <paginate-control
-        $page="currentPage"
-        $max-pages="maxPages"
-        @page-shift="onPageShift"
-    ></paginate-control>
-
     <div $data-visibility="galleryVisibility">
         <section id="gallery" class="gallery"></section>
     </div>

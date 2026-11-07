@@ -1,5 +1,5 @@
 @media (max-width: 623px) {
-    @layer main {
+    @layer screen-specific {
         :root {
             --file-card-max-height: 13rem;
             --thumbnail-hover-max-width: 7.5rem;
@@ -22,6 +22,17 @@
             align-items: center;
             flex: 1;
             margin: 0.25rem;
+        }
+
+        .top-search-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .top-search-bar > label {
+            width: 100%;
+            margin-bottom: 0;
         }
     }
 }
