@@ -312,7 +312,6 @@
                     (f) => f.name === '..' || f.name.toLocaleLowerCase().includes(state.filter)
                 );
             }),
-            //showFilterSearchBar: 'hidden',
             showFilterSearchBar: 'show',
 
             maxPages: megaphone.view((state) => getNumPages(state.filteredFiles, state.pageSize)),
