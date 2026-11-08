@@ -1,5 +1,6 @@
 {{ template "base-header.html" . }}
 <app-main>
+    <!-- TODO: Current active page is not part of url params, same with page size which kinda should be -->
     <script>
         function filesWithUnstringifiedDate(files) {
             return files.map((file) => ({ ...file, date: new Date(file.date) }));

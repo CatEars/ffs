@@ -2,6 +2,8 @@
 
 ## Prerequisites
 
+TODO: Update for golang
+
 - Run `deno task generate-default-test-bench` from the project root
 - Start the server with `deno task run` and log in
 
