@@ -1,6 +1,6 @@
 # Test Run - $VERSION$
 
-Date: 2026-11-07
+Date: 2026-11-09
 
 ## Tests
 
@@ -18,6 +18,7 @@ Date: 2026-11-07
 ### deploy
 
 [ ] - 000-auto-install.md
+[ ] - 001-test-environments.md
 
 ### navigation
 
