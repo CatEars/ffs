@@ -34,7 +34,11 @@ for PLATFORM in "${PLATFORMS[@]}"; do
         -trimpath \
         -ldflags="-s -w -buildid=" \
         -o "$ROOT_DIR/dist/$BIN_NAME"
-        
+    
+    # Try to compress with UPX, but don't fail the build if it's unsupported or errors out
+    if ! "$THIS_SCRIPT_DIR/vendor/bin/upx" --best --lzma "$ROOT_DIR/dist/$BIN_NAME"; then
+        echo "Warning: UPX compression failed or is unsupported for $BIN_NAME. Skipping compression." >&2
+    fi
 done
 
 echo "Successfully built Docker images for all tags on HEAD and compiled all Go binaries."
