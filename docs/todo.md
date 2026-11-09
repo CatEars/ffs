@@ -4,8 +4,6 @@
 
 [ ] TODO: Create banhammer for user-logon
 
-[ ] TODO: Figure out a way to do Automatic route registration
-
 [ ] TODO: Bonus: Implement reading user records via env vars
 
 [ ] TODO: Once rewritten to golang, update permissions system to use URI scheme for permissions everywhere

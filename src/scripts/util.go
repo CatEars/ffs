@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 )
 
@@ -66,4 +67,13 @@ func GetCwdOrFail() string {
 	cwd, err := os.Getwd()
 	Fatal(err)
 	return cwd
+}
+
+func RunBash(file string) error {
+	cwd := GetCwdOrFail()
+	cmd := exec.Command("bash", path.Join(cwd, file))
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }

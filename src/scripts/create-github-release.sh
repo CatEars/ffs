@@ -1,6 +1,9 @@
 #!/bin/bash
 
 VERSION="$(git describe --tags --abbrev=0)"
+echo "Enter GitHub API token: "
+read -r FFS_RELEASE_TOKEN
+
 
 echo "Creating a Github release for catears/ffs version $VERSION"
 curl -L \
