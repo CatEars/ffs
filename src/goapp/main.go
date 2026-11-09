@@ -5,9 +5,11 @@ import (
 	"catears/ffs/goapp/config"
 	"catears/ffs/lib/ffslog"
 	"catears/ffs/lib/router"
+	"catears/ffs/lib/safefs"
 	"context"
 	"crypto/tls"
 	"embed"
+	"io/fs"
 	"net/http"
 	"os"
 	"os/signal"
@@ -44,6 +46,22 @@ func (h *FfsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getSiteContent() fs.FS {
+	pwd, err := os.Getwd()
+	if err != nil {
+		pwd = "."
+	}
+	goappDir := path.Join(pwd, "src", "goapp")
+
+	// If in dev mode, and running from source control root
+	if config.Config.DevMode() && safefs.DirExists(goappDir) {
+		return os.DirFS(goappDir)
+	}
+
+	// Else we provide from executable built-in HTML/CSS/JS content
+	return websiteContent
+}
+
 func main() {
 	handler := &FfsHandler{}
 	address := ":8080"
@@ -51,15 +69,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	RunStartup(ctx)
-	if config.Config.DevMode() {
-		pwd, err := os.Getwd()
-		if err != nil {
-			panic(err)
-		}
-		appRouter = approutes.BuildAppRouter(os.DirFS(path.Join(pwd, "src", "goapp")))
-	} else {
-		appRouter = approutes.BuildAppRouter(websiteContent)
-	}
+	appRouter = approutes.BuildAppRouter(getSiteContent())
 	certFile := config.Config.CertFile()
 	keyFile := config.Config.CertKeyFile()
 	_, certFileErr := os.ReadFile(certFile)

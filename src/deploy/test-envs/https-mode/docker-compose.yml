@@ -1,0 +1,14 @@
+services:
+  ffs:
+    image: catears/ffs
+    ports:
+      - 8080:8080
+    volumes:
+      - ../../../../:/files
+    environment:
+      - FFS_STORE_ROOT=/files
+      - FFS_INSTANCE_SECRET=ThisIsATestValue
+      - FFS_CERT_FILE=/files/data/dev-cert.pem
+      - FFS_CERT_KEY_FILE=/files/data/dev-cert.key.pem
+      - FFS_USERS_FILE=/files/data/users-file.json
+      - FFS_ENV=prod

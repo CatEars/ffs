@@ -3,10 +3,18 @@
 Friendly File Server (FFS) is a file server borne from the ~~frustration~~ friendliness of
 attempting to get other file servers to _Just Work™_.
 
+## Install
+
+### Docker Image
+
+```bash
+curl -sL https://raw.githubusercontent.com/catears/ffs/master/src/deploy/auto-install/gh-deploy.sh \
+  | bash ;
+```
+
 ## Run
 
 ```bash
-curl -sL https://raw.githubusercontent.com/catears/ffs/master/src/deploy/auto-install/gh-deploy.sh | bash ;
 docker run --rm --volume ./:/files --env 'FFS_STORE_ROOT=/files' --publish 8080:8080 catears/ffs
 ```
 
