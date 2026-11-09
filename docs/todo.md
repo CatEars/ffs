@@ -1,5 +1,3 @@
-[ ] TODO: Fix better "first-timer" experience. Currently they download ~1 GiB because of ffmpeg and image magick
-
 [ ] TODO: Test cases for folders that update and change
 
 [ ] TODO: Naming confusion, "directory" or "folder", spread throughout codebase, fix it!
@@ -45,5 +43,3 @@
 [ ] TODO: Built-in `docs` page
 
 [ ] TODO: Automate changelog of features and fixes
-
-[ ] TODO: Standardize different testing environments: - (Devmode/HTTPS mode/HTTP mode)

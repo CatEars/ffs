@@ -28,7 +28,7 @@ try:
         data = json.load(f)
 
     for asset in data.get('assets', []):
-        if asset.get('name') == 'ffs.latest.tar.gz':
+        if 'tiny' in asset.get('name'):
             print(asset.get('browser_download_url'))
 
 except FileNotFoundError:

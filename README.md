@@ -9,13 +9,13 @@ attempting to get other file servers to _Just Work™_.
 
 ```bash
 curl -sL https://raw.githubusercontent.com/catears/ffs/master/src/deploy/auto-install/gh-deploy.sh \
-  | bash ;
+  | bash
 ```
 
 ## Run
 
 ```bash
-docker run --rm --volume ./:/files --env 'FFS_STORE_ROOT=/files' --publish 8080:8080 catears/ffs
+docker run --rm --volume ./:/files --env 'FFS_STORE_ROOT=/files' --publish 8080:8080 catears/ffs:tiny
 ```
 
 This will download the latest release and run a docker image on port 8080 for you to try it out.
