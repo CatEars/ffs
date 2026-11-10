@@ -4,15 +4,13 @@
 
 [ ] TODO: Create banhammer for user-logon
 
-[ ] TODO: Bonus: Implement reading user records via env vars
+[ ] TODO: Implement reading user records via env vars
 
 [ ] TODO: Once rewritten to golang, update permissions system to use URI scheme for permissions everywhere
 
 [ ] TODO: Protect sensitive data like user data at rest and clear data on exit. create a manual test with core dump.
 
 [ ] TODO: Experiment with building an "Embedded configuration" that relies on appended bytes to the executable
-
-[ ] TODO: Figure out how we can create a `stable` and `nightly` release branches
 
 [ ] TODO: Make it easy to run and configure ffs via command-line
 
@@ -24,13 +22,9 @@
 
 [ ] TODO: Create manual test with full disk
 
-[ ] TODO: Rotate logs
+[ ] TODO: Customizable log configuration. Log levels, file outputs, log rotation, etc.
 
 [ ] TODO: Implement "recursive search" file search
-
-[ ] TODO: Fix thumbnail generation for files with '%' in name
-
-[ ] TODO: Redo thumbnails every once in a while, especially folder-based thumbnails may become stale and misleading
 
 [ ] TODO: Side view of files when in media mode ("playlist mode")
 
@@ -43,3 +37,5 @@
 [ ] TODO: Automate changelog of features and fixes
 
 [ ] TODO: Debug nav tab enabled in dev mode
+
+[ ] TODO: Automate set-up of test bench
