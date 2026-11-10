@@ -41,3 +41,5 @@
 [ ] TODO: Built-in `docs` page
 
 [ ] TODO: Automate changelog of features and fixes
+
+[ ] TODO: Debug nav tab enabled in dev mode
