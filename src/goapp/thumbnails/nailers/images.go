@@ -28,7 +28,7 @@ func init() {
 }
 
 func isImageFile(fname string) bool {
-	ext := path.Ext(fname)
+	ext := strings.ToLower(path.Ext(fname))
 	return imageExts.Has(ext)
 }
 

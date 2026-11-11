@@ -1,6 +1,7 @@
 package nailers
 
 import (
+	"catears/ffs/lib/datastructure"
 	"os"
 	"os/exec"
 	"path"
@@ -19,18 +20,16 @@ var AudioExtNames []string = []string{
 	".ape",
 }
 
+var audioExts = datastructure.NewSet()
 var audioExtMap map[string]bool = make(map[string]bool)
 
 func init() {
-	for _, ext := range AudioExtNames {
-		audioExtMap[ext] = true
-	}
+	audioExts.AddSlice(AudioExtNames)
 }
 
 func isAudioFile(fname string) bool {
-	ext := path.Ext(fname)
-	_, found := audioExtMap[ext]
-	return found
+	ext := strings.ToLower(path.Ext(fname))
+	return audioExts.Has(ext)
 }
 
 var folderArtNames []string = []string{
