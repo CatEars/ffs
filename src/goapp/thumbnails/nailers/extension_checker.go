@@ -11,9 +11,9 @@ type extensionChecker struct {
 }
 
 func newExtensionChecker(extensions []string) *extensionChecker {
-	ec := &extensionChecker{}
-	ec.extensions.AddSlice(extensions)
-	return ec
+	return &extensionChecker{
+		extensions: datastructure.NewSetFromSlice(extensions),
+	}
 }
 
 func (ec *extensionChecker) MatchesAny(filepath string) bool {

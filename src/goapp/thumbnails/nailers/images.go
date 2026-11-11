@@ -26,7 +26,7 @@ func isGifFormat(filepath string) bool {
 	return strings.HasSuffix(strings.ToLower(filepath), ".gif")
 }
 
-func runCommand(cmd *exec.Cmd, ctx *NailerContext) error {
+func runImageCommand(cmd *exec.Cmd, ctx *NailerContext) error {
 	err := cmd.Run()
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func produceImageThumbnailFromFs(ctx *NailerContext) error {
 	cmd := exec.Command("convert", inputArg, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
 	cmd.Stdin = fhandle
 
-	return runCommand(cmd, ctx)
+	return runImageCommand(cmd, ctx)
 }
 
 func produceImageThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContext) error {
@@ -62,7 +62,7 @@ func produceImageThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContex
 
 	cmd := exec.Command("convert", fpath+append, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
 
-	return runCommand(cmd, ctx)
+	return runImageCommand(cmd, ctx)
 }
 
 func (*ImageNailer) Generate(ctx *NailerContext) error {

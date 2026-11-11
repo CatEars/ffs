@@ -45,6 +45,34 @@ func findFolderArt(entries []os.DirEntry) (os.DirEntry, bool) {
 	return nil, false
 }
 
+func runAudioCommand(cmd *exec.Cmd, ctx *NailerContext) error {
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	ctx.PromoteToParent = true
+	return ctx.Success()
+}
+
+func produceAudioThumbnailFromFs(artFile string, ctx *NailerContext) error {
+	fhandle, err := ctx.Disk.Fs().Open(artFile)
+	if err != nil {
+		return err
+	}
+	defer fhandle.Close()
+
+	cmd := exec.Command("convert", "-", "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
+	cmd.Stdin = fhandle
+	return runAudioCommand(cmd, ctx)
+}
+
+func produceAudioThumbnailFromPhysicalLocation(physLoc, artFile string, ctx *NailerContext) error {
+	fpath := path.Join(physLoc, artFile)
+	cmd := exec.Command("convert", fpath, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
+	return runAudioCommand(cmd, ctx)
+}
+
 func (*AudioNailer) Generate(ctx *NailerContext) error {
 	parentDir := path.Dir(ctx.FilePath)
 	entries, err := os.ReadDir(parentDir)
@@ -64,40 +92,6 @@ func (*AudioNailer) Generate(ctx *NailerContext) error {
 	} else {
 		return produceAudioThumbnailFromFs(artFile, ctx)
 	}
-}
-
-func produceAudioThumbnailFromFs(artFile string, ctx *NailerContext) error {
-	fhandle, err := ctx.Disk.Fs().Open(artFile)
-	if err != nil {
-		return err
-	}
-	defer fhandle.Close()
-
-	cmd := exec.Command("convert", "-", "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
-	cmd.Stdin = fhandle
-
-	err = cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	ctx.PromoteToParent = true
-	return ctx.Success()
-}
-
-func produceAudioThumbnailFromPhysicalLocation(physLoc, artFile string, ctx *NailerContext) error {
-	// TODO: Reduce duplication in this file
-	fpath := path.Join(physLoc, artFile)
-
-	cmd := exec.Command("convert", fpath, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
-
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	ctx.PromoteToParent = true
-	return ctx.Success()
 }
 
 var _ Nailer = &AudioNailer{}

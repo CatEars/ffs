@@ -90,6 +90,16 @@ func getVideoDurationPhys(root, fpath string) (videoInfo, error) {
 	return parseVideoDuration(cmd)
 }
 
+func runVideoCommand(cmd *exec.Cmd, ctx *NailerContext) error {
+	err := cmd.Run()
+	// TODO: Delete any incomplete stale temporary file with background process
+	if err != nil {
+		return err
+	}
+
+	return ctx.Success()
+}
+
 func produceVideoThumbnailFromFs(ctx *NailerContext) error {
 	vidInfo, err := getVideoDurationFs(ctx.Disk.Fs(), ctx.FilePath)
 	if err != nil {
@@ -107,19 +117,7 @@ func produceVideoThumbnailFromFs(ctx *NailerContext) error {
 
 	cmd := exec.Command("ffmpeg", "-i", "-", "-ss", fmt.Sprint(position), "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", ctx.TempOutputPath)
 	cmd.Stdin = fhandle
-
-	err = cmd.Run()
-	// TODO: Delete any incomplete stale temporary file with background process
-	if err != nil {
-		return err
-	}
-
-	err = ctx.Success()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return runVideoCommand(cmd, ctx)
 }
 
 func produceVideoThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContext) error {
@@ -134,18 +132,7 @@ func produceVideoThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContex
 	joined := path.Join(physLoc, ctx.FilePath)
 	cmd := exec.Command("ffmpeg", "-ss", fmt.Sprint(position), "-i", joined, "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", ctx.TempOutputPath)
 
-	err = cmd.Run()
-	// TODO: Delete any incomplete stale temporary file with background process
-	if err != nil {
-		return err
-	}
-
-	err = ctx.Success()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return runVideoCommand(cmd, ctx)
 }
 
 func (*MovieNailer) Generate(ctx *NailerContext) error {
