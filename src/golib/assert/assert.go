@@ -58,6 +58,30 @@ func Equal[T comparable](t *testing.T, a, b T, messages ...string) {
 	}
 }
 
+func SequenceEqual[T comparable](t *testing.T, a, b []T, messages ...string) {
+	t.Helper()
+	if len(a) != len(b) {
+		t.Error(joinOrDefault(fmt.Sprint("Not same length ", len(a), " vs ", len(b)), messages))
+	}
+
+	for idx, lhs := range a {
+		rhs := b[idx]
+		equaler, ok := any(lhs).(equalable[T])
+		if ok {
+			if !equaler.Equal(rhs) {
+				t.Error(joinOrDefault(fmt.Sprint("Not equal at index ", idx, " [", lhs, "] vs [", rhs, "]"), messages))
+			}
+			return
+		}
+
+		if lhs != rhs {
+			t.Error(joinOrDefault(fmt.Sprint("Not equal at index ", idx, " [", lhs, "] vs [", rhs, "]"), messages))
+			return
+		}
+
+	}
+}
+
 func NotEqual[T comparable](t *testing.T, a, b T, messages ...string) {
 	t.Helper()
 	if a == b {

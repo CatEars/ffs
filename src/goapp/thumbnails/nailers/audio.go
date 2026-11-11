@@ -1,6 +1,8 @@
 package nailers
 
 import (
+	"catears/ffs/lib/datastructure"
+	"catears/ffs/lib/functional"
 	"os"
 	"os/exec"
 	"path"
@@ -27,24 +29,15 @@ var folderArtExtensions []string = []string{
 	".jpg", ".jpeg", ".png", ".webp",
 }
 
-var allFolderArtCombinations map[string]bool
-
-func init() {
-	allFolderArtCombinations = make(map[string]bool)
-	for _, name := range folderArtNames {
-		for _, ext := range folderArtExtensions {
-			allFolderArtCombinations[name+ext] = true
-		}
-	}
-}
+var folderArtNamesAndExtensions = functional.Product(folderArtNames, folderArtExtensions, functional.Sum.String)
+var allFolderArtCombinations = datastructure.NewSetFromSlice(folderArtNamesAndExtensions)
 
 type AudioNailer struct{}
 
 func findFolderArt(entries []os.DirEntry) (os.DirEntry, bool) {
 	for _, entry := range entries {
 		name := strings.ToLower(entry.Name())
-		_, found := allFolderArtCombinations[name]
-		if found {
+		if allFolderArtCombinations.Has(name) {
 			return entry, true
 		}
 	}
