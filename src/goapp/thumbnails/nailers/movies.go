@@ -1,7 +1,6 @@
 package nailers
 
 import (
-	"catears/ffs/lib/datastructure"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -47,11 +46,10 @@ var MovieExtNames []string = []string{
 	".mpg",
 }
 
-var videoExts = datastructure.NewSetFromSlice(MovieExtNames)
+var videoExtensionChecker = newExtensionChecker(MovieExtNames)
 
 func isVideoFile(fname string) bool {
-	ext := strings.ToLower(path.Ext(fname))
-	return videoExts.Has(ext)
+	return videoExtensionChecker.MatchesAny(fname)
 }
 
 func parseVideoDuration(cmd *exec.Cmd) (videoInfo, error) {

@@ -1,7 +1,6 @@
 package nailers
 
 import (
-	"catears/ffs/lib/datastructure"
 	"os/exec"
 	"path"
 	"strings"
@@ -21,18 +20,30 @@ var ImageExtNames []string = []string{
 	".psd",
 }
 
-var imageExts = datastructure.NewSetFromSlice(ImageExtNames)
+var imageExtensionChecker = newExtensionChecker(ImageExtNames)
 
 func isImageFile(fname string) bool {
-	ext := strings.ToLower(path.Ext(fname))
-	return imageExts.Has(ext)
+	return imageExtensionChecker.MatchesAny(fname)
 }
 
 type ImageNailer struct{}
 
+func isGifFormat(filepath string) bool {
+	return strings.HasSuffix(strings.ToLower(filepath), ".gif")
+}
+
+func runCommand(cmd *exec.Cmd, ctx *NailerContext) error {
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	return ctx.Success()
+}
+
 func produceImageThumbnailFromFs(ctx *NailerContext) error {
 	inputArg := ""
-	if strings.HasSuffix(strings.ToLower(ctx.FilePath), ".gif") {
+	if isGifFormat(ctx.FilePath) {
 		inputArg = "gif:-[0]"
 	}
 	fhandle, err := ctx.Disk.Fs().Open(ctx.FilePath)
@@ -44,18 +55,12 @@ func produceImageThumbnailFromFs(ctx *NailerContext) error {
 	cmd := exec.Command("convert", inputArg, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
 	cmd.Stdin = fhandle
 
-	err = cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	return ctx.Success()
+	return runCommand(cmd, ctx)
 }
 
 func produceImageThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContext) error {
-	// TODO: Reduce duplication in this file
 	append := ""
-	if strings.HasSuffix(strings.ToLower(ctx.FilePath), ".gif") {
+	if isGifFormat(ctx.FilePath) {
 		append = "[0]"
 	}
 
@@ -63,12 +68,7 @@ func produceImageThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContex
 
 	cmd := exec.Command("convert", fpath+append, "-thumbnail", "128x128", "-quality", "60", ctx.TempOutputPath)
 
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	return ctx.Success()
+	return runCommand(cmd, ctx)
 }
 
 func (*ImageNailer) Generate(ctx *NailerContext) error {
