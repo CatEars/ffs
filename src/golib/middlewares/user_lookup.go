@@ -22,11 +22,13 @@ func LookupClaims(r *http.Request) []*security.Claim {
 	return claims.([]*security.Claim)
 }
 
+var authCookieName = "FFS-Auth"
+
 func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byte) router.Middleware {
 	logger := ffslog.FindOrCreateLogger("Middleware")
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie("FFS-Auth")
+			cookie, err := r.Cookie(authCookieName)
 			if err != nil {
 				next.ServeHTTP(w, r)
 				return
@@ -34,7 +36,7 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 
 			err = cookie.Valid()
 			if err != nil {
-				logger.Warnf("FFS-Auth cookie is not valid, skipping user")
+				logger.Warnf("%s cookie is not valid, skipping user", authCookieName)
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -68,10 +70,22 @@ func BuildUserLookupMiddleware(userManager *users.UserManager, instanceKey []byt
 				}
 			}
 			signature, err := security.SignBlob(instanceKey, []byte(builder.String()))
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 			b64edSig := base64.StdEncoding.EncodeToString(signature)
 			if b64edSig != into.Signature {
-				logger.Warnf("User tried to log on but signature did not match claims")
-				w.WriteHeader(http.StatusInternalServerError)
+				// Assume user has logged on previously, but instance secret has updated
+				// Force them to log on again
+				http.SetCookie(w, &http.Cookie{
+					Name:     authCookieName,
+					Value:    "",
+					Path:     "/",
+					MaxAge:   -1,
+					HttpOnly: true,
+				})
+				http.Redirect(w, r, "/", http.StatusFound)
 				return
 			}
 

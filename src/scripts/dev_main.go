@@ -42,19 +42,31 @@ func tempPath(filename string) string {
 	return path.Join(ffsTempDir, filename)
 }
 
+func envOrDefault(key, defaultValue string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return defaultValue
+	}
+	return val
+}
+
+func setEnvOrDefault(key, defaultValue string) {
+	os.Setenv(key, envOrDefault(key, defaultValue))
+}
+
 func DevMain() {
 	os.MkdirAll(ffsTempDir, 0o755)
 
 	syncFile(tempPath("users-file.json"), "data/users-file.json")
 	syncFile(tempPath("dev-cert.key.pem"), "data/dev-cert.key.pem")
 	syncFile(tempPath("dev-cert.pem"), "data/dev-cert.pem")
-	os.Setenv("FFS_ENV", "dev")
-	os.Setenv("FFS_STORE_ROOT", ".")
-	os.Setenv("FFS_USERS_FILE", tempPath("users-file.json"))
-	os.Setenv("FFS_INSTANCE_SECRET", "VerySecretIndeed")
-	os.Setenv("FFS_THUMBNAIL_FINDER_SKIP_REGEX", "(test_no_thumbnails_images|\\.no_thumbnail\\.)")
-	os.Setenv("FFS_CERT_FILE", tempPath("dev-cert.pem"))
-	os.Setenv("FFS_CERT_KEY_FILE", tempPath("dev-cert.key.pem"))
+	setEnvOrDefault("FFS_ENV", "dev")
+	setEnvOrDefault("FFS_STORE_ROOT", ".")
+	setEnvOrDefault("FFS_USERS_FILE", tempPath("users-file.json"))
+	setEnvOrDefault("FFS_INSTANCE_SECRET", "VerySecretIndeed")
+	setEnvOrDefault("FFS_THUMBNAIL_FINDER_SKIP_REGEX", "(test_no_thumbnails_images|\\.no_thumbnail\\.)")
+	setEnvOrDefault("FFS_CERT_FILE", tempPath("dev-cert.pem"))
+	setEnvOrDefault("FFS_CERT_KEY_FILE", tempPath("dev-cert.key.pem"))
 	ctx, cancel := context.WithCancel(context.Background())
 
 	wd, err := os.Getwd()
