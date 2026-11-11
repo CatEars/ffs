@@ -1,6 +1,7 @@
 package nailers
 
 import (
+	"catears/ffs/lib/datastructure"
 	"os/exec"
 	"path"
 	"strings"
@@ -20,19 +21,15 @@ var ImageExtNames []string = []string{
 	".psd",
 }
 
-var imageExtMap map[string]bool = make(map[string]bool)
+var imageExts = datastructure.NewSet()
 
 func init() {
-	for _, ext := range ImageExtNames {
-		imageExtMap[ext] = true
-	}
+	imageExts.AddSlice(ImageExtNames)
 }
 
-// TODO: Create a re-usable Set type that essentially does this
 func isImageFile(fname string) bool {
 	ext := path.Ext(fname)
-	_, found := imageExtMap[ext]
-	return found
+	return imageExts.Has(ext)
 }
 
 type ImageNailer struct{}
