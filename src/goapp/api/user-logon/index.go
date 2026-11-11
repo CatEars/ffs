@@ -19,8 +19,6 @@ func (self *userLogonHandler) Register(appRouter router.Router) {
 	appRouter.Post("/api/user-logon", self)
 }
 
-// TODO: Create test case for re-logon when instance secret is updated
-
 func deriveModernApiKey(record *users.UserRecord) (string, error) {
 	claims := record.Claims
 	builder := strings.Builder{}
