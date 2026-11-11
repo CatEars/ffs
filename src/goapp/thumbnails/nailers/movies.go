@@ -46,12 +46,6 @@ var MovieExtNames []string = []string{
 	".mpg",
 }
 
-var videoExtensionChecker = newExtensionChecker(MovieExtNames)
-
-func isVideoFile(fname string) bool {
-	return videoExtensionChecker.MatchesAny(fname)
-}
-
 func parseVideoDuration(cmd *exec.Cmd) (videoInfo, error) {
 	result, err := cmd.Output()
 	if err != nil {

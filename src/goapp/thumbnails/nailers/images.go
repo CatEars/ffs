@@ -20,12 +20,6 @@ var ImageExtNames []string = []string{
 	".psd",
 }
 
-var imageExtensionChecker = newExtensionChecker(ImageExtNames)
-
-func isImageFile(fname string) bool {
-	return imageExtensionChecker.MatchesAny(fname)
-}
-
 type ImageNailer struct{}
 
 func isGifFormat(filepath string) bool {

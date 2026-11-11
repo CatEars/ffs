@@ -22,6 +22,10 @@ type NailerContext struct {
 
 var logger = ffslog.FindOrCreateLogger("Thumbnail")
 
+var imageExtensionChecker = newExtensionChecker(ImageExtNames)
+var videoExtensionChecker = newExtensionChecker(MovieExtNames)
+var audioExtensionChecker = newExtensionChecker(AudioExtNames)
+
 func (ctx *NailerContext) Success() error {
 	// TODO: This algorithm is inspired from the old `deno` code, but it fails
 	// to consider when a folder changes files, which can lead to stale thumbnails.
@@ -44,9 +48,9 @@ func (ctx *NailerContext) Success() error {
 	}
 
 	names := functional.Map(func(entry fs.DirEntry) string { return entry.Name() }, entries)
-	videoFiles := functional.Filter(isVideoFile, names)
-	imageFiles := functional.Filter(isImageFile, names)
-	audioFiles := functional.Filter(isAudioFile, names)
+	videoFiles := functional.Filter(videoExtensionChecker.MatchesAny, names)
+	imageFiles := functional.Filter(imageExtensionChecker.MatchesAny, names)
+	audioFiles := functional.Filter(audioExtensionChecker.MatchesAny, names)
 	if len(videoFiles) == 1 && videoFiles[0] == path.Base(ctx.FilePath) {
 		ctx.PromoteToParent = true
 	} else if len(imageFiles) == 1 && imageFiles[0] == path.Base(ctx.FilePath) {

@@ -19,12 +19,6 @@ var AudioExtNames []string = []string{
 	".ape",
 }
 
-var audioExtensionChecker = newExtensionChecker(AudioExtNames)
-
-func isAudioFile(fname string) bool {
-	return audioExtensionChecker.MatchesAny(fname)
-}
-
 var folderArtNames []string = []string{
 	"cover", "folder", "albumart", "album", "front", "artwork",
 }
