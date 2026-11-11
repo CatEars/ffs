@@ -21,11 +21,7 @@ var ImageExtNames []string = []string{
 	".psd",
 }
 
-var imageExts = datastructure.NewSet()
-
-func init() {
-	imageExts.AddSlice(ImageExtNames)
-}
+var imageExts = datastructure.NewSetFromSlice(ImageExtNames)
 
 func isImageFile(fname string) bool {
 	ext := strings.ToLower(path.Ext(fname))
@@ -33,15 +29,6 @@ func isImageFile(fname string) bool {
 }
 
 type ImageNailer struct{}
-
-func (*ImageNailer) Generate(ctx *NailerContext) error {
-	physLoc, err := ctx.Disk.PhysicalLocation()
-	if err == nil {
-		return produceImageThumbnailFromPhysicalLocation(physLoc, ctx)
-	} else {
-		return produceImageThumbnailFromFs(ctx)
-	}
-}
 
 func produceImageThumbnailFromFs(ctx *NailerContext) error {
 	inputArg := ""
@@ -82,6 +69,15 @@ func produceImageThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContex
 	}
 
 	return ctx.Success()
+}
+
+func (*ImageNailer) Generate(ctx *NailerContext) error {
+	physLoc, err := ctx.Disk.PhysicalLocation()
+	if err == nil {
+		return produceImageThumbnailFromPhysicalLocation(physLoc, ctx)
+	} else {
+		return produceImageThumbnailFromFs(ctx)
+	}
 }
 
 var _ Nailer = &ImageNailer{}

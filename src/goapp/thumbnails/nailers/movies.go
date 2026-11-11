@@ -47,11 +47,7 @@ var MovieExtNames []string = []string{
 	".mpg",
 }
 
-var videoExts = datastructure.NewSet()
-
-func init() {
-	videoExts.AddSlice(MovieExtNames)
-}
+var videoExts = datastructure.NewSetFromSlice(MovieExtNames)
 
 func isVideoFile(fname string) bool {
 	ext := strings.ToLower(path.Ext(fname))

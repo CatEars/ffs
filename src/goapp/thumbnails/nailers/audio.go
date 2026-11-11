@@ -20,12 +20,7 @@ var AudioExtNames []string = []string{
 	".ape",
 }
 
-var audioExts = datastructure.NewSet()
-var audioExtMap map[string]bool = make(map[string]bool)
-
-func init() {
-	audioExts.AddSlice(AudioExtNames)
-}
+var audioExts = datastructure.NewSetFromSlice(AudioExtNames)
 
 func isAudioFile(fname string) bool {
 	ext := strings.ToLower(path.Ext(fname))

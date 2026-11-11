@@ -30,3 +30,9 @@ func NewSet() Set {
 		values: make(map[string]bool),
 	}
 }
+
+func NewSetFromSlice(vals []string) Set {
+	s := NewSet()
+	s.AddSlice(vals)
+	return s
+}
