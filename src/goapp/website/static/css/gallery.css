@@ -29,7 +29,7 @@
     .top-search-bar > label > svg {
         /* TODO: anchor-name is quite new property, is that okay to use? Baseline 2026 */
         position-anchor: --filter-bar-anchor;
-        position: fixed;
+        position: absolute;
         color: var(--background-color);
         margin-left: 0.3rem;
         cursor: text;
