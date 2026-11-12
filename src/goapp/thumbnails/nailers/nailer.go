@@ -23,7 +23,7 @@ type NailerContext struct {
 var logger = ffslog.FindOrCreateLogger("Thumbnail")
 
 var imageExtensionChecker = newExtensionChecker(ImageExtNames)
-var videoExtensionChecker = newExtensionChecker(MovieExtNames)
+var videoExtensionChecker = newExtensionChecker(VideoExtNames)
 var audioExtensionChecker = newExtensionChecker(AudioExtNames)
 
 func (ctx *NailerContext) Success() error {

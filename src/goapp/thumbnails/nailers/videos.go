@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type MovieNailer struct{}
+type VideoNailer struct{}
 
 type videoInfo struct {
 	Duration float64
@@ -36,7 +36,7 @@ func DetermineThumbnailPosition(vidInfo videoInfo) float64 {
 	return position
 }
 
-var MovieExtNames []string = []string{
+var VideoExtNames []string = []string{
 	".mp4",
 	".m4v",
 	".mov",
@@ -135,7 +135,7 @@ func produceVideoThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContex
 	return runVideoCommand(cmd, ctx)
 }
 
-func (*MovieNailer) Generate(ctx *NailerContext) error {
+func (*VideoNailer) Generate(ctx *NailerContext) error {
 	physLoc, err := ctx.Disk.PhysicalLocation()
 	if err == nil {
 		return produceVideoThumbnailFromPhysicalLocation(physLoc, ctx)
@@ -144,4 +144,4 @@ func (*MovieNailer) Generate(ctx *NailerContext) error {
 	}
 }
 
-var _ Nailer = &MovieNailer{}
+var _ Nailer = &VideoNailer{}

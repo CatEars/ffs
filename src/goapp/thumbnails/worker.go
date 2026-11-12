@@ -25,7 +25,7 @@ func (*Unnailer) Generate(ctx *nailers.NailerContext) error {
 }
 
 var logger = ffslog.FindOrCreateLogger("Thumbnail")
-var videoNailer = &nailers.MovieNailer{}
+var videoNailer = &nailers.VideoNailer{}
 var imageNailer = &nailers.ImageNailer{}
 var audioNailer = &nailers.AudioNailer{}
 var theUnnailer nailers.Nailer = &Unnailer{}
