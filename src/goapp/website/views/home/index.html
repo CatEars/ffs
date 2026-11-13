@@ -100,14 +100,14 @@
             ].some((x) => file.endsWith(x));
         }
 
-        function isMovieFile(file) {
+        function isVideoFile(file) {
             return ['.mp4', '.m4v', '.mov', '.avi', '.webm', '.mkv', '.mpg'].some((x) =>
                 file.endsWith(x)
             );
         }
 
         function isMediaFile(file) {
-            return isAudioFile(file) || isImageFile(file) || isMovieFile(file);
+            return isAudioFile(file) || isImageFile(file) || isVideoFile(file);
         }
 
         function resolveSvgLocationForFile(file) {
@@ -115,7 +115,7 @@
                 return 'music_note';
             } else if (isImageFile(file.name)) {
                 return 'photo_camera';
-            } else if (isMovieFile(file.name)) {
+            } else if (isVideoFile(file.name)) {
                 return 'videocam';
             } else if (file.isDirectory) {
                 return 'folder';
