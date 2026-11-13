@@ -1,18 +1,43 @@
 {{ template "base-header.html" . }}
 <app-main>
+    <style>
+        form {
+            label {
+                display: flex;
+                flex-direction: column;
+                input {
+                    padding-top: 0.7rem;
+                    padding-bottom: 0.7rem;
+                }
+            }
+
+            button {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                font-weight: bold;
+                font-size: large;
+            }
+
+            @media (width >= 841px) {
+                button {
+                    width: 10rem;
+                }
+            }
+        }
+    </style>
     <app-header>Friendly File Server (FFS)</app-header>
     <form method="POST" action="/api/user-logon">
-        <fieldset>
-            <legend>Username</legend>
+        <label>
+            Username
             <input id="username" name="username" type="text" />
-        </fieldset>
-        <fieldset>
-            <legend>Password</legend>
+        </label>
+
+        <label>
+            Password
             <input id="password" name="password" type="password" />
-        </fieldset>
-        <fieldset>
-            <button class="hero-button" type="submit">Log on</button>
-        </fieldset>
+        </label>
+
+        <button type="submit">Log on</button>
     </form>
 </app-main>
 {{ template "base-footer.html" . }}

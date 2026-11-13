@@ -1,7 +1,9 @@
-{{ template "base-header.html" . }} {{ template "header.html" . }}
+{{ template "base-header.html" . }}
+{{ template "header.html" . }}
 <app-main>
     <script type="module">
         const megaphone = new Megaphone();
+        // TODO: FFS-Csrf-Protection necessary?
         megaphone.declareCsrfCookie('FFS-Csrf-Protection');
 
         const state = megaphone.declareState({
