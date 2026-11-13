@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 )
 
 type Logger interface {
@@ -138,9 +139,12 @@ func FindLogger(name string) (logger Logger, found bool) {
 	return l, f
 }
 
-// TODO: Guard creation with mutex to ensure there are not multiple instances of the same logger
+var logCreatorLock *sync.Mutex = &sync.Mutex{}
+
 func FindOrCreateLogger(name string) Logger {
 	// TODO: Ensure that loggers can be configured to use different levels
+	logCreatorLock.Lock()
+	defer logCreatorLock.Unlock()
 	l, found := logRegister[name]
 	if found {
 		return l
