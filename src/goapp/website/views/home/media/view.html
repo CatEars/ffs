@@ -1,8 +1,8 @@
-{{ template "base-header.html" . }} {{ template "header.html" . }}
+{{ template "base-header.html" . }}
+{{ template "header.html" . }}
 <app-main>
     <script type="module">
         const megaphone = new Megaphone();
-        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
 
         function onCrumbClick(evt) {
             const { detail } = evt;

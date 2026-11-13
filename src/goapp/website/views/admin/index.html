@@ -3,8 +3,6 @@
 <app-main>
     <script type="module">
         const megaphone = new Megaphone();
-        // TODO: FFS-Csrf-Protection necessary?
-        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
 
         const state = megaphone.declareState({
             message: megaphone.urlParam('message', null),

@@ -1,4 +1,5 @@
-{{ template "base-header.html" . }} {{ template "header.html" . }}
+{{ template "base-header.html" . }}
+{{ template "header.html" . }}
 <app-header>Upload</app-header>
 <app-main>
     <style>
@@ -153,7 +154,6 @@
         }
 
         const megaphone = new Megaphone();
-        megaphone.declareCsrfCookie('FFS-Csrf-Protection');
 
         const idToDirAndFilename = new Map();
 
