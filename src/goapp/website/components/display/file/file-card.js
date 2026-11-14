@@ -45,7 +45,7 @@ class FileCard extends BaseWebComponent {
                 }
                 img {
                     object-fit: cover;
-                    width: 100%;
+                    min-width: 100%;
                     min-height: 0;
                 }
                 a > span {
