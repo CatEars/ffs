@@ -24,13 +24,9 @@ class FileCard extends BaseWebComponent {
         return html`
             <style>
                 a {
-                    display: flex;
-                    flex-grow: 1;
-                    flex-direction: column;
                     text-decoration: none;
                     color: var(--font-color);
                     height: var(--file-card-max-height);
-                    max-height: var(--file-card-max-height);
                 }
                 a > div {
                     display: flex;
@@ -45,6 +41,7 @@ class FileCard extends BaseWebComponent {
                     border: 1px solid grey;
                     border-top-left-radius: 5px;
                     border-top-right-radius: 5px;
+                    height: var(--file-image-max-height);
                 }
                 img {
                     object-fit: cover;
@@ -52,18 +49,24 @@ class FileCard extends BaseWebComponent {
                     min-height: 0;
                 }
                 a > span {
-                    border: 1px solid grey;
+                    border: 1px solid gray;
                     border-top: none;
                     border-bottom-left-radius: 5px;
                     border-bottom-right-radius: 5px;
+
                     overflow: hidden;
-                    white-space: nowrap;
                     word-break: break-all;
                     text-overflow: ellipsis;
-                    min-height: 1.5rem;
                     padding-left: 0.2rem;
                     padding-right: 0.2rem;
-                    flex-grow: 0;
+                    /* 100% of width - padding left and right - border left and right */
+                    width: calc(100% - 0.4rem - 2px);
+                    line-clamp: 2;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    text-align: center;
+                    height: calc(var(--file-card-max-height) - var(--file-image-max-height));
                 }
                 div.loaded > svg {
                     display: none;

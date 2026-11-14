@@ -3,7 +3,6 @@ import AppHeader from './text/app-header.js';
 import AppMain from './layout/app-main.js';
 import AppSubheader from './text/app-subheader.js';
 import BreadcrumbNav from './navigation/breadcrumb-nav.js';
-import CliCommand from './display/cli-command.js';
 import ColumnLayout from './layout/column-layout.js';
 import DropDown from './display/drop-down.js';
 import FileCard from './display/file/file-card.js';
@@ -25,7 +24,6 @@ const components = [
     ['app-main', AppMain],
     ['app-subheader', AppSubheader],
     ['breadcrumb-nav', BreadcrumbNav],
-    ['cli-command', CliCommand],
     ['column-layout', ColumnLayout],
     ['drop-down', DropDown],
     ['file-card', FileCard],

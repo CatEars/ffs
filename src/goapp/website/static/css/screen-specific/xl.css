@@ -1,7 +1,6 @@
 @media (min-width: 2016px) {
     @layer screen-specific {
         :root {
-            --file-card-max-height: 13rem;
             --thumbnail-hover-max-width: 22.5rem;
         }
     }
