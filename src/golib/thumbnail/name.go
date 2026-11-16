@@ -13,6 +13,8 @@ func minInt(a int, b int) int {
 	return a
 }
 
+// TODO: Ensure this function NEVER panics
+
 func ResolveThumbnailFolder(base autofolder.AutoFolder, diskId string, fPath string) autofolder.AutoFolder {
 	// Index the thumbnail folders based on first six symbols of the file name with two levels of folders
 	// For file names shorter than six symbols, just repeat the last symbol to get six symbols in total

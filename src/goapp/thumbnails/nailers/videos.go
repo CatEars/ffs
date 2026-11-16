@@ -1,9 +1,9 @@
 package nailers
 
 import (
+	"catears/ffs/lib/ffslog"
 	"errors"
 	"fmt"
-	"io/fs"
 	"os/exec"
 	"path"
 	"strconv"
@@ -18,14 +18,84 @@ type videoInfo struct {
 	Width    int32
 }
 
-func DetermineThumbnailFilter(vidInfo videoInfo) string {
+type videoLocation struct {
+	Location string
+}
+
+func (loc *videoLocation) GenerateFFProbeCommand() *exec.Cmd {
+	return exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "default=noprint_wrappers=1:nokey=1", loc.Location)
+}
+
+func (loc *videoLocation) GenerateFFMpegThumbnailCommand(vidInfo videoInfo, outputPath string) *exec.Cmd {
+	// TODO: Optimize the speed of both ffmpeg commands
+
+	position := DetermineThumbnailPosition(vidInfo)
+	if false || float32(vidInfo.Height)*1.3 > float32(vidInfo.Width) {
+		ffslog.Print("PORTRAIT")
+		// Portrait -> generate three "portraits" and concat them together: A|B|C
+		// Compute the three timestamps based on the float64 position
+		p1 := 0.95 * position
+		p2 := position
+		p3 := 1.05 * position
+
+		// Dynamically build the filter_complex string using fmt.Sprintf
+		// Filter complex with 2px vertical borders only between images
+		filterComplex := fmt.Sprintf(
+			"[0:v]split=3[v1][v2][v3]; "+
+				"[v1]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw+2:ih:0:0:black[s1]; "+
+				"[v2]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw+2:ih:0:0:black[s2]; "+
+				"[v3]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw:ih:0:0:black[s3]; "+
+				"[s1][s2][s3]hstack=inputs=3[out]",
+			p1, p2, p3,
+		)
+
+		// Assemble the argument list including your flags
+		args := []string{
+			"-i", loc.Location,
+			"-frames:v", "1",
+			//			"-vsync", "vfr",
+			"-err_detect", "ignore_err",
+			"-y",
+			"-filter_complex", filterComplex,
+			"-map", "[out]",
+			outputPath,
+		}
+
+		return exec.Command("ffmpeg", args...)
+	}
+
+	ffslog.Print("NON-PORTRAIT")
+	// Assume landscape video
 	thumbnailFilter := "scale=320:240"
-	if float32(vidInfo.Height)*1.3 > float32(vidInfo.Width) {
-		thumbnailFilter = "scale=320:480"
-	} else if vidInfo.Height > vidInfo.Width {
+	if vidInfo.Height > vidInfo.Width {
+		// Roughly rectangular uses 320x320 scale
 		thumbnailFilter = "scale=320:320"
 	}
-	return thumbnailFilter
+
+	args := []string{
+		"-i", loc.Location,
+		"-ss", fmt.Sprint(position),
+		"-vf", thumbnailFilter,
+		"-frames:v", "1",
+		//		"-vsync", "vfr",
+		"-err_detect", "ignore_err",
+		"-y",
+		outputPath,
+	}
+
+	return exec.Command("ffmpeg", args...)
+}
+
+func newFsVideoLocation() *videoLocation {
+	return &videoLocation{
+		Location: "-",
+	}
+}
+
+func newPhysVideoLocation(root, filePath string) *videoLocation {
+	return &videoLocation{
+		Location: path.Join(root, filePath),
+	}
 }
 
 func DetermineThumbnailPosition(vidInfo videoInfo) float64 {
@@ -72,28 +142,14 @@ func parseVideoDuration(cmd *exec.Cmd) (videoInfo, error) {
 	}, nil
 }
 
-func getVideoDurationFs(diskFs fs.FS, fpath string) (videoInfo, error) {
-	fhandle, err := diskFs.Open(fpath)
-	if err != nil {
-		return videoInfo{}, err
-	}
-	defer fhandle.Close()
-
-	cmd := exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "default=noprint_wrappers=1:nokey=1", "-")
-	cmd.Stdin = fhandle
-	return parseVideoDuration(cmd)
-}
-
-func getVideoDurationPhys(root, fpath string) (videoInfo, error) {
-	joined := path.Join(root, fpath)
-	cmd := exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "default=noprint_wrappers=1:nokey=1", joined)
-	return parseVideoDuration(cmd)
-}
+// TODO: Check if priority thumbnailing is actually working
 
 func runVideoCommand(cmd *exec.Cmd, ctx *NailerContext) error {
+	//cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	// TODO: Delete any incomplete stale temporary file with background process
 	if err != nil {
+		ffslog.Print("WARN its just that bad", err)
 		return err
 	}
 
@@ -101,37 +157,42 @@ func runVideoCommand(cmd *exec.Cmd, ctx *NailerContext) error {
 }
 
 func produceVideoThumbnailFromFs(ctx *NailerContext) error {
-	vidInfo, err := getVideoDurationFs(ctx.Disk.Fs(), ctx.FilePath)
-	if err != nil {
-		return err
-	}
-
-	position := DetermineThumbnailPosition(vidInfo)
-	thumbnailFilter := DetermineThumbnailFilter(vidInfo)
-
 	fhandle, err := ctx.Disk.Fs().Open(ctx.FilePath)
 	if err != nil {
 		return err
 	}
 	defer fhandle.Close()
 
-	cmd := exec.Command("ffmpeg", "-i", "-", "-ss", fmt.Sprint(position), "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", ctx.TempOutputPath)
-	cmd.Stdin = fhandle
-	return runVideoCommand(cmd, ctx)
-}
+	loc := newFsVideoLocation()
+	probeCmd := loc.GenerateFFProbeCommand()
+	probeCmd.Stdin = fhandle
 
-func produceVideoThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContext) error {
-	vidInfo, err := getVideoDurationPhys(physLoc, ctx.FilePath)
+	vidInfo, err := parseVideoDuration(probeCmd)
 	if err != nil {
 		return err
 	}
 
-	position := DetermineThumbnailPosition(vidInfo)
-	thumbnailFilter := DetermineThumbnailFilter(vidInfo)
+	fhandle2, err := ctx.Disk.Fs().Open(ctx.FilePath)
+	if err != nil {
+		return err
+	}
+	defer fhandle2.Close()
 
-	joined := path.Join(physLoc, ctx.FilePath)
-	cmd := exec.Command("ffmpeg", "-ss", fmt.Sprint(position), "-i", joined, "-vf", thumbnailFilter, "-frames:v", "1", "-vsync", "vfr", "-err_detect", "ignore_err", "-y", ctx.TempOutputPath)
+	cmd := loc.GenerateFFMpegThumbnailCommand(vidInfo, ctx.TempOutputPath)
+	cmd.Stdin = fhandle2
+	return runVideoCommand(cmd, ctx)
+}
 
+func produceVideoThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContext) error {
+	loc := newPhysVideoLocation(physLoc, ctx.FilePath)
+	probeCmd := loc.GenerateFFProbeCommand()
+	vidInfo, err := parseVideoDuration(probeCmd)
+	if err != nil {
+		return err
+	}
+
+	cmd := loc.GenerateFFMpegThumbnailCommand(vidInfo, ctx.TempOutputPath)
+	ffslog.Print("were getting physical", cmd.Args)
 	return runVideoCommand(cmd, ctx)
 }
 
