@@ -1,7 +1,6 @@
 package nailers
 
 import (
-	"catears/ffs/lib/ffslog"
 	"errors"
 	"fmt"
 	"os/exec"
@@ -18,73 +17,119 @@ type videoInfo struct {
 	Width    int32
 }
 
+func (vidInfo videoInfo) IsPortrait() bool {
+	return float32(vidInfo.Height) > float32(vidInfo.Width)*1.3
+}
+
+type videoPackage struct {
+	VideoInfo  videoInfo
+	Location   string
+	OutputPath string
+}
+
 type videoLocation struct {
 	Location string
 }
 
-func (loc *videoLocation) GenerateFFProbeCommand() *exec.Cmd {
-	return exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "default=noprint_wrappers=1:nokey=1", loc.Location)
+type thumbnailGenerator interface {
+	CreateFFMpegThumbnailCommand(vid *videoPackage) *exec.Cmd
 }
 
-func (loc *videoLocation) GenerateFFMpegThumbnailCommand(vidInfo videoInfo, outputPath string) *exec.Cmd {
-	// TODO: Optimize the speed of both ffmpeg commands
+type speedOptimizedThumbnailGenerator struct{}
 
-	position := DetermineThumbnailPosition(vidInfo)
-	if false || float32(vidInfo.Height)*1.3 > float32(vidInfo.Width) {
-		ffslog.Print("PORTRAIT")
-		// Portrait -> generate three "portraits" and concat them together: A|B|C
-		// Compute the three timestamps based on the float64 position
-		p1 := 0.95 * position
-		p2 := position
-		p3 := 1.05 * position
+func (*speedOptimizedThumbnailGenerator) CreateFFMpegThumbnailCommand(vid *videoPackage) *exec.Cmd {
+	position := determineThumbnailPosition(vid.VideoInfo)
 
-		// Dynamically build the filter_complex string using fmt.Sprintf
-		// Filter complex with 2px vertical borders only between images
-		filterComplex := fmt.Sprintf(
-			"[0:v]split=3[v1][v2][v3]; "+
-				"[v1]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw+2:ih:0:0:black[s1]; "+
-				"[v2]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw+2:ih:0:0:black[s2]; "+
-				"[v3]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw:ih:0:0:black[s3]; "+
-				"[s1][s2][s3]hstack=inputs=3[out]",
-			p1, p2, p3,
-		)
-
-		// Assemble the argument list including your flags
-		args := []string{
-			"-i", loc.Location,
-			"-frames:v", "1",
-			//			"-vsync", "vfr",
-			"-err_detect", "ignore_err",
-			"-y",
-			"-filter_complex", filterComplex,
-			"-map", "[out]",
-			outputPath,
-		}
-
-		return exec.Command("ffmpeg", args...)
-	}
-
-	ffslog.Print("NON-PORTRAIT")
 	// Assume landscape video
 	thumbnailFilter := "scale=320:240"
-	if vidInfo.Height > vidInfo.Width {
+	if vid.VideoInfo.IsPortrait() {
+		thumbnailFilter = "scale=240:320"
+	} else if vid.VideoInfo.Height > vid.VideoInfo.Width {
 		// Roughly rectangular uses 320x320 scale
 		thumbnailFilter = "scale=320:320"
 	}
 
 	args := []string{
-		"-i", loc.Location,
 		"-ss", fmt.Sprint(position),
+		"-i", vid.Location,
 		"-vf", thumbnailFilter,
 		"-frames:v", "1",
-		//		"-vsync", "vfr",
+		"-vsync", "vfr",
 		"-err_detect", "ignore_err",
 		"-y",
-		outputPath,
+		vid.OutputPath,
 	}
 
 	return exec.Command("ffmpeg", args...)
 }
+
+var speedThumbnailer = speedOptimizedThumbnailGenerator{}
+
+type visuallyOptimizedThumbnailGenerator struct{}
+
+func (*visuallyOptimizedThumbnailGenerator) CreateFFMpegThumbnailCommand(vid *videoPackage) *exec.Cmd {
+	if vid.VideoInfo.IsPortrait() {
+		position := determineThumbnailPosition(vid.VideoInfo)
+
+		// Seek to the beginning of the thumbnail sequence.
+		p1 := 0.95 * position
+
+		// Relative offsets from p1.
+		p2 := 0.05 * position
+		p3 := 0.10 * position
+
+		filterComplex := fmt.Sprintf(
+			"[0:v]split=3[v1][v2][v3];"+
+				"[v1]select='eq(n,0)',setpts=PTS-STARTPTS,scale=-2:240,pad=iw+2:ih:0:0:black[s1];"+
+				"[v2]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw+2:ih:0:0:black[s2];"+
+				"[v3]trim=start=%.3f,setpts=PTS-STARTPTS,select='eq(n,0)',scale=-2:240,pad=iw:ih:0:0:black[s3];"+
+				"[s1][s2][s3]hstack=inputs=3[out]",
+			p2,
+			p3,
+		)
+
+		args := []string{
+			// Seek before opening the input.
+			"-ss", fmt.Sprintf("%.3f", p1),
+
+			// Limit decoder threads.
+			"-threads", "1",
+
+			"-i", vid.Location,
+
+			// Ignore streams we don't need.
+			"-an",
+			"-sn",
+			"-dn",
+
+			// Limit filter graph threads.
+			"-filter_complex_threads", "1",
+
+			"-filter_complex", filterComplex,
+			"-map", "[out]",
+
+			// Only generate one frame.
+			"-frames:v", "1",
+
+			"-err_detect", "ignore_err",
+			"-y",
+
+			vid.OutputPath,
+		}
+
+		return exec.Command("ffmpeg", args...)
+	} else {
+		return speedThumbnailer.CreateFFMpegThumbnailCommand(vid)
+	}
+}
+
+var visualThumbnailer = visuallyOptimizedThumbnailGenerator{}
+
+func generateFFProbeCommand(location string) *exec.Cmd {
+	return exec.Command("ffprobe", "-v", "error", "-show_entries", "format=duration", "-show_entries", "stream=width,height", "-of", "default=noprint_wrappers=1:nokey=1", location)
+}
+
+var videoThumbnailer thumbnailGenerator = &visualThumbnailer
 
 func newFsVideoLocation() *videoLocation {
 	return &videoLocation{
@@ -98,7 +143,7 @@ func newPhysVideoLocation(root, filePath string) *videoLocation {
 	}
 }
 
-func DetermineThumbnailPosition(vidInfo videoInfo) float64 {
+func determineThumbnailPosition(vidInfo videoInfo) float64 {
 	position := (vidInfo.Duration * 0.45)
 	if position < 0 {
 		position = 30
@@ -145,11 +190,9 @@ func parseVideoDuration(cmd *exec.Cmd) (videoInfo, error) {
 // TODO: Check if priority thumbnailing is actually working
 
 func runVideoCommand(cmd *exec.Cmd, ctx *NailerContext) error {
-	//cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	// TODO: Delete any incomplete stale temporary file with background process
 	if err != nil {
-		ffslog.Print("WARN its just that bad", err)
 		return err
 	}
 
@@ -163,8 +206,8 @@ func produceVideoThumbnailFromFs(ctx *NailerContext) error {
 	}
 	defer fhandle.Close()
 
-	loc := newFsVideoLocation()
-	probeCmd := loc.GenerateFFProbeCommand()
+	loc := "-"
+	probeCmd := generateFFProbeCommand(loc)
 	probeCmd.Stdin = fhandle
 
 	vidInfo, err := parseVideoDuration(probeCmd)
@@ -178,21 +221,33 @@ func produceVideoThumbnailFromFs(ctx *NailerContext) error {
 	}
 	defer fhandle2.Close()
 
-	cmd := loc.GenerateFFMpegThumbnailCommand(vidInfo, ctx.TempOutputPath)
+	vid := &videoPackage{
+		VideoInfo:  vidInfo,
+		Location:   loc,
+		OutputPath: ctx.TempOutputPath,
+	}
+
+	cmd := videoThumbnailer.CreateFFMpegThumbnailCommand(vid)
 	cmd.Stdin = fhandle2
 	return runVideoCommand(cmd, ctx)
 }
 
 func produceVideoThumbnailFromPhysicalLocation(physLoc string, ctx *NailerContext) error {
-	loc := newPhysVideoLocation(physLoc, ctx.FilePath)
-	probeCmd := loc.GenerateFFProbeCommand()
+	loc := path.Join(physLoc, ctx.FilePath)
+	probeCmd := generateFFProbeCommand(loc)
 	vidInfo, err := parseVideoDuration(probeCmd)
 	if err != nil {
 		return err
 	}
 
-	cmd := loc.GenerateFFMpegThumbnailCommand(vidInfo, ctx.TempOutputPath)
-	ffslog.Print("were getting physical", cmd.Args)
+	vid := &videoPackage{
+		VideoInfo:  vidInfo,
+		Location:   loc,
+		OutputPath: ctx.TempOutputPath,
+	}
+
+	cmd := videoThumbnailer.CreateFFMpegThumbnailCommand(vid)
+	//	cmd.Stderr = os.Stderr
 	return runVideoCommand(cmd, ctx)
 }
 
@@ -205,4 +260,5 @@ func (*VideoNailer) Generate(ctx *NailerContext) error {
 	}
 }
 
+// Ensure `VideoNailer` always implements `Nailer` interface
 var _ Nailer = &VideoNailer{}
