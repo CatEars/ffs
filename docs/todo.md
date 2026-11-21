@@ -39,3 +39,9 @@
 [ ] TODO: Debug nav tab enabled in dev mode
 
 [ ] TODO: Automate set-up of test bench
+
+[ ] TODO: Test thumbnail with moov atom at end of stream while input streaming via stdin
+
+[ ] TODO: Test thumbnail with too long name (256+, `getconf MAX_NAME /`)
+
+[ ] TODO: Test thumbnail with path too long (4096+, `getconf MAX_PATH /`)
