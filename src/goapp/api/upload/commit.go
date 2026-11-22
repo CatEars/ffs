@@ -44,7 +44,6 @@ func (*uploadCommitRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	defer booking.Clean()
 
 	disk := disks.DiskStore.DiskOrDefault(appmiddlewares.DiskIdFromRequest(r))
 
@@ -68,22 +67,29 @@ func (*uploadCommitRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			err = os.Rename(sourcePath, targetPath)
 			if err == nil {
+				booking.Clean()
 				w.WriteHeader(http.StatusOK)
 				return
 			}
 		}
 	}
 
-	reader := booking.Reader()
-	reader.Seek(0, io.SeekStart)
 	f, err := modfs.Create(data.Filename)
 	if err != nil {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	go io.Copy(f, reader)
+	go finalize(f, booking)
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func finalize(dst io.WriteCloser, booking bookingstore.Booking) {
+	defer booking.Clean()
+	src := booking.Reader()
+	src.Seek(0, io.SeekStart)
+	defer dst.Close()
+	io.Copy(dst, src)
 }
 
 func init() {
