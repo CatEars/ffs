@@ -64,6 +64,7 @@ func (booking *booking) AbsPath() string {
 }
 
 func (booking *booking) Clean() error {
+	// TODO: Close error ignored, maybe not OK?
 	booking.file.Close()
 	return os.Remove(booking.AbsPath())
 }
